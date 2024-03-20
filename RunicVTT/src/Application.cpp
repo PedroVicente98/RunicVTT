@@ -1,34 +1,17 @@
-#include <GL/glew.h> 
-#include <GLFW/glfw3.h>
+#include "Application.h"
 
-#include "Renderer.h"
-#include "Shader.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBufferLayout.h"
-#include "Texture.h"
-
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
-
-
-#ifdef _WIN32   
-// windows code goes here.  
-#elif __linux__    
-// linux code goes here.  
-#else     
-#error Platform not supported
-#endif
-
-int main(void)
+Application::Application()
+    : window_handle(nullptr)
 {
-    GLFWwindow* window;
+    
+}
 
+Application::~Application()
+{
+}
+
+int Application::create()
+{
     /* Initialize the library */
     if (!glfwInit())
         return -1;
@@ -36,101 +19,107 @@ int main(void)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-    //glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
+    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+    const GLFWvidmode* videoMode = glfwGetVideoMode(primary);
+
+    int monitorX, monitorY;
+    glfwGetMonitorPos(primary, &monitorX, &monitorY);
+
+    window_handle = glfwCreateWindow(640, 480, "RunicVTT", NULL, NULL);
+    if (!window_handle)
     {
         glfwTerminate();
         return -1;
     }
 
     /* Make the window's context current */
-    glfwMakeContextCurrent(window);
+    glfwMakeContextCurrent(window_handle);
     glfwSwapInterval(1);
 
-    if (glewInit() != GLEW_OK) {
-        std::cout << "GLEW FAILED";
+
+    // REST OF INITIAL SETUP like IMGUI first layout and other configurations
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
+    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    //io.ConfigViewportsNoAutoMerge = true;
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+    ImGuiStyle& style = ImGui::GetStyle();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        //ImGui::UpdatePlatformWindows();
+        //ImGui::RenderPlatformWindowsDefault();
+
+        style.WindowRounding = 0.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
     }
 
-    std::cout << glGetString(GL_VERSION) << std::endl;
-    {//Escopo para finalizar OPenGL antes GlFW
+    // Setup Platform/Renderer backends
+    const char* glsl_version = "#version 130";
+    ImGui_ImplGlfw_InitForOpenGL(window_handle, true);
+    ImGui_ImplOpenGL3_Init(glsl_version);
 
-        float positions[] = {
-            -1.0f, -1.0f, 0.0f, 0.0f,//0
-             1.0f, -1.0f, 1.0f, 0.0f,//1
-             1.0f, 1.0f,  1.0f, 1.0f,//2
-             -1.0f, 1.0f, 0.0f, 1.0f //3
-        };
+    return 0;
+}
 
-        unsigned int indices[] = {
-            0 , 1 , 2,
-            2 , 3 , 0
-        };
 
-        GLCall(glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA));
-        GLCall(glEnable(GL_BLEND));
+int Application::run() {
+    {//Scope to end OpenGL before GlFW
+        MainWindow main_window(window_handle);
 
-        VertexArray va;
-        VertexBuffer vb(positions, 4/*number of vertexes*/ * 4/*floats per vertex*/ * sizeof(float));
-        VertexBufferLayout layout;
-
-        layout.Push<float>(2);
-        layout.Push<float>(2);
-        va.AddBuffer(vb, layout);
-
-        IndexBuffer ib(indices, 6);
-
-        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
-
-        Shader shader("res/shaders/Basic.shader");
-        shader.Bind();
-        //shader.SetUniform4f("u_Color", 0.8f, 0.3f, 0.8f, 1.0f);
-        shader.SetUniform1i("u_Texture", 0);
-        shader.SetUniformMat4f("u_MVP", proj);
-
-        //Texture texture("res/texture/PhandalinBattlemap2.png");
-        Texture texture("C:\\Dev\\TCC\\RunicVTT\\RunicVTT\\res\\textures\\PhandalinBattlemap2.png");
-        //Texture texture("\\res\\texture\\PhandalinBattlemap2.png");
-        texture.Bind();
-
-        va.Unbind();
-        vb.Unbind();
-        ib.Unbind();
-        shader.Unbind();
-
-        Renderer renderer;
-        
-        float r = 0.0f;
-        float increment = 0.05f;
-        /* Loop until the user closes the window */
-        while (!glfwWindowShouldClose(window))
+        while (!glfwWindowShouldClose(window_handle))
         {
-            /* Render here */
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
 
-            shader.Bind();
-            //shader.SetUniform4f("u_Color", 0.1f, r, 0.6f, 1.0f);
-
-            renderer.Draw(va, ib, shader);
-
-            if (r > 1.0f) {
-                increment = -0.05f;
-            }
-            else if (r < 0.0f) {
-                increment = 0.05f;
-            }
-
-            r += increment;
-
-            /* Swap front and back buffers */
-            glfwSwapBuffers(window);
             /* Poll for and process events */
             glfwPollEvents();
+            main_window.clear();
+
+            // Start the Dear ImGui frame
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            ImGui::DockSpaceOverViewport(NULL, ImGuiDockNodeFlags_None);
+            
+           
+            /* Render here */
+
+            
+
+            main_window.draw();
+
+
+
+
+
+
+
+            // Rendering
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+            /* Swap front and back buffers */
+            glfwSwapBuffers(window_handle);
         }
     }
 
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window_handle);
     glfwTerminate();
     return 0;
 }
