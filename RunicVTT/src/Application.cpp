@@ -22,11 +22,11 @@ int Application::create()
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
     /* Create a windowed mode window and its OpenGL context */
-    GLFWmonitor* primary = glfwGetPrimaryMonitor();
+   /* GLFWmonitor* primary = glfwGetPrimaryMonitor();
     const GLFWvidmode* videoMode = glfwGetVideoMode(primary);
 
     int monitorX, monitorY;
-    glfwGetMonitorPos(primary, &monitorX, &monitorY);
+    glfwGetMonitorPos(primary, &monitorX, &monitorY);*/
 
     window_handle = glfwCreateWindow(640, 480, "RunicVTT", NULL, NULL);
     if (!window_handle)
@@ -39,7 +39,15 @@ int Application::create()
     glfwMakeContextCurrent(window_handle);
     glfwSwapInterval(1);
 
+    if (glewInit()) {
+        std::cout << "GLEW FAILED";
+    }
 
+    return 0;
+}
+
+int Application::run() 
+{
     // REST OF INITIAL SETUP like IMGUI first layout and other configurations
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -48,7 +56,7 @@ int Application::create()
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
     //io.ConfigViewportsNoAutoMerge = true;
     io.ConfigWindowsMoveFromTitleBarOnly = true;
 
@@ -60,56 +68,52 @@ int Application::create()
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-        //ImGui::UpdatePlatformWindows();
-        //ImGui::RenderPlatformWindowsDefault();
-
         style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        style.Colors[ImGuiCol_WindowBg].w = 0.0f;
     }
 
     // Setup Platform/Renderer backends
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 330 core";
     ImGui_ImplGlfw_InitForOpenGL(window_handle, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplOpenGL3_Init();
 
-    return 0;
-}
-
-
-int Application::run() {
     {//Scope to end OpenGL before GlFW
-        MainWindow main_window(window_handle);
+        ApplicationHandler application_window(window_handle);
 
         while (!glfwWindowShouldClose(window_handle))
         {
-
             /* Poll for and process events */
             glfwPollEvents();
-            main_window.clear();
-
+            application_window.clear();
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            ImGui::DockSpaceOverViewport(NULL, ImGuiDockNodeFlags_None);
-            
-           
-            /* Render here */
+            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImGuiID dockspace_id = ImGui::GetID("Root");
+            ImGui::DockSpace(dockspace_id);
+            ImGui::DockSpaceOverViewport(viewport, ImGuiDockNodeFlags_PassthruCentralNode);
+            ///* Render here */
 
-            
+       
 
-            main_window.draw();
-
-
-
-
-
+            application_window.renderMainMenuBar();
+            application_window.handleInput();
+            application_window.render();
 
 
-            // Rendering
+            //// Rendering
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
+            if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+            {
+                GLFWwindow* backup_current_context = glfwGetCurrentContext();
+                ImGui::UpdatePlatformWindows();
+                ImGui::RenderPlatformWindowsDefault();
+                glfwMakeContextCurrent(backup_current_context);
+            }
+            
             /* Swap front and back buffers */
             glfwSwapBuffers(window_handle);
         }
@@ -123,3 +127,4 @@ int Application::run() {
     glfwTerminate();
     return 0;
 }
+

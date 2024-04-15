@@ -1,13 +1,13 @@
 #pragma once
-#include "MainWindow.h"
+#include "ApplicationHandler.h"
 
 class Application {
 public:
 	Application();
 	~Application();
 
-	int create();
 	int run();
+	int create();
 
 private:
 	GLFWwindow* window_handle; 

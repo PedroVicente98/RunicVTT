@@ -15,6 +15,8 @@ public:
 	Texture(const std::string& path);
 	~Texture();
 
+	void SetFilePath(const std::string& path);
+
 	void Bind(unsigned int slot = 0) const;
 	void Unbind() const;
 

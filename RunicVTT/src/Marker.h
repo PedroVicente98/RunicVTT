@@ -17,6 +17,7 @@
 
 class Marker {
 public:
+	Marker();
 	Marker(const std::string& path);
 	~Marker();
 private:
@@ -27,6 +28,7 @@ private:
 	float height; // height of the marker
 	std::string image_path;
 	unsigned char* image_buffer;
+	ImVec2 position = { x , y };
 
 	Texture texture;
 	Shader shader;

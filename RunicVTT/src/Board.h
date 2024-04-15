@@ -12,22 +12,33 @@ public:
 		bool clicked; // Clicked state (can be used for button activation)
 	};
 
-
 	Board();
 	~Board();
 
-	void draw_ui();
+	void draw();
 
-	void draw_map();
 
-	void draw_toolbar();
+	Marker create_marker(std::string file_path);
+
+	void setMap(std::string file_path);
+	void handleInput();
 
 private:
+	void draw_map();
+	void draw_toolbar();
+	void render();
+	void handleMarkers();
+	unsigned int width;
+	unsigned int height;
+
+	Texture texture;
+
+	std::string map_path;
 	std::vector<Marker> board_markers;
 
-	std::vector<ToolbarItem> toolbarItems = {
+	/*std::vector<ToolbarItem> toolbarItems = {
 	   {"Draw", "ICON_FA_PENCIL", "Draw Tool", false},
-	   {"Erase", "ICON_FA_ERASER", "Erase Tool", false},
-	   // Add more toolbar items as needed
-	};
+	   {"Erase Marker", "ICON_FA_ERASER", "Erase Tool", false},
+	   {"Add Marker", "ICON_FA_ERASER", "Marker Tool", false}
+	};*/
 };

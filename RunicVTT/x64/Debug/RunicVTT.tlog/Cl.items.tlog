@@ -1,9 +1,11 @@
+C:\Dev\RunicVTT\RunicVTT\src\GameTable.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\GameTable.obj
+C:\Dev\RunicVTT\RunicVTT\src\ApplicationHandler.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\ApplicationHandler.obj
 C:\Dev\RunicVTT\RunicVTT\src\Board.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Board.obj
 C:\Dev\RunicVTT\RunicVTT\src\Marker.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Marker.obj
 C:\Dev\RunicVTT\RunicVTT\src\main.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\main.obj
 C:\Dev\RunicVTT\RunicVTT\src\Camera.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Camera.obj
 C:\Dev\RunicVTT\RunicVTT\src\Application.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Application.obj
-C:\Dev\RunicVTT\RunicVTT\src\Window.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Window.obj
+C:\Dev\RunicVTT\RunicVTT\src\utils\Window.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Window.obj
 C:\Dev\RunicVTT\RunicVTT\src\vendor\imgui\imgui.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\imgui.obj
 C:\Dev\RunicVTT\RunicVTT\src\vendor\imgui\imgui_demo.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\imgui_demo.obj
 C:\Dev\RunicVTT\RunicVTT\src\vendor\imgui\imgui_draw.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\imgui_draw.obj
