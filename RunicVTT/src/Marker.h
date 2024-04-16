@@ -20,19 +20,17 @@ public:
 	Marker();
 	Marker(const std::string& path);
 	~Marker();
-private:
 
-	float x; // x-coordinate
-	float y; // y-coordinate
-	float width; // width of the marker
-	float height; // height of the marker
+	void renderEditWindow();
+	void setMarkerImage();
+	void changeSize();
+	void changePosition();
+	void addColorCircle();
+
+private:
 	std::string image_path;
 	unsigned char* image_buffer;
-	ImVec2 position = { x , y };
-
+	ImVec2 position;
+	ImVec2 size;
 	Texture texture;
-	Shader shader;
-	VertexArray vertex_array;
-	VertexBuffer vertex_buffer;
-	IndexBuffer index_buffer;
 };

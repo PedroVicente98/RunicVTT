@@ -95,12 +95,8 @@ int Application::run()
             ImGui::DockSpaceOverViewport(viewport, ImGuiDockNodeFlags_PassthruCentralNode);
             ///* Render here */
 
-       
-
             application_window.renderMainMenuBar();
-            application_window.handleInput();
-            application_window.render();
-
+            application_window.renderActiveGameTable();
 
             //// Rendering
             ImGui::Render();
