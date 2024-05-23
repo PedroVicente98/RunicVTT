@@ -4,18 +4,19 @@
 
 class GameTable {
 public:
-	GameTable();
+	GameTable(unsigned char serialized_data, Renderer& renderer);
+	GameTable(std::string& game_table_name, Renderer& renderer);
 	~GameTable();
 
 
 	void renderMenu();
-	unsigned char serializeData();
+	//unsigned char serializeData();
 
 	void renderActiveBoard();
-	void createBoard();
-	void saveBoard();
-	void loadBoard();
-	void setActiveBoard();
+	//void createBoard();
+	//void saveBoard();
+	//void loadBoard();
+	//void setActiveBoard();
 
 	/*void openConnection();
 	void closeConnection();
@@ -27,7 +28,8 @@ public:
 	void openNotesDirectory();*/
 
 	std::string game_table_name;
+	Renderer& renderer;
 private:
 
-	Board active_board;
+	Board* active_board;
 };

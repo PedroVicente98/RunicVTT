@@ -17,20 +17,20 @@
 
 class Marker {
 public:
-	Marker();
-	Marker(const std::string& path);
+	Marker(const std::string& texturePath, const glm::vec2& pos, const glm::vec2& sz, Renderer& rend);
 	~Marker();
-
-	void renderEditWindow();
+	void draw(Shader& shader, const glm::mat4& viewProjMatrix);
+	/*void renderEditWindow();
 	void setMarkerImage();
 	void changeSize();
 	void changePosition();
-	void addColorCircle();
-
-private:
-	std::string image_path;
-	unsigned char* image_buffer;
-	ImVec2 position;
-	ImVec2 size;
+	void addColorCircle();*/
+	Renderer renderer;
+	glm::vec2 position;
+	glm::vec2 size;
 	Texture texture;
+	VertexArray va;
+	VertexBuffer vb;
+	IndexBuffer ib;
+private:
 };
