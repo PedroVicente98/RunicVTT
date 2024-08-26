@@ -14,8 +14,9 @@
 
 class DirectoryWindow {
 public:
-    DirectoryWindow(std::string directoryPath) {
+    DirectoryWindow(std::string directoryPath, std::string directoryName) {
         this->directoryPath = directoryPath;
+        this->directoryName = directoryName;
     }
 
     struct ImageData {
@@ -32,9 +33,9 @@ public:
 
     }
 
-    void renderDirectory(const char* directory) {
+    void renderDirectory() {
         ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x*0.1, ImGui::GetIO().DisplaySize.y*0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
-        ImGui::Begin(directory, NULL, ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(directoryName.c_str(), NULL, ImGuiWindowFlags_NoCollapse);
         ImGui::Text("Path: %s", directoryPath.c_str());
         ImGui::Separator();
 
@@ -92,6 +93,7 @@ public:
 private:
     
     std::string directoryPath;
+    std::string directoryName;
     std::vector<ImageData> images;
     std::thread monitorThread;
     bool running = true;

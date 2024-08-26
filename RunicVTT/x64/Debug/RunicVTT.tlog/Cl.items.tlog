@@ -1,7 +1,8 @@
-C:\Dev\RunicVTT\src\Board.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Board.obj
-C:\Dev\RunicVTT\src\GameTable.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\GameTable.obj
+C:\Dev\RunicVTT\src\ApplicationHandler.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\ApplicationHandler.obj
+C:\Dev\RunicVTT\src\BoardManager.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\BoardManager.obj
+C:\Dev\RunicVTT\src\GameTableManager.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\GameTableManager.obj
 C:\Dev\RunicVTT\src\main.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\main.obj
-C:\Dev\RunicVTT\src\Marker.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Marker.obj
+C:\Dev\RunicVTT\src\NetworkManager.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\NetworkManager.obj
 C:\Dev\RunicVTT\src\renderer\IndexBuffer.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\IndexBuffer.obj
 C:\Dev\RunicVTT\src\renderer\Renderer.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Renderer.obj
 C:\Dev\RunicVTT\src\renderer\Shader.cpp;C:\Dev\RunicVTT\RunicVTT\x64\Debug\Shader.obj

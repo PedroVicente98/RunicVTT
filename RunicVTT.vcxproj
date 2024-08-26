@@ -131,10 +131,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Board.cpp" />
-    <ClCompile Include="src\GameTable.cpp" />
+    <ClCompile Include="src\ApplicationHandler.cpp" />
+    <ClCompile Include="src\BoardManager.cpp" />
+    <ClCompile Include="src\GameTableManager.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Marker.cpp" />
+    <ClCompile Include="src\NetworkManager.cpp" />
     <ClCompile Include="src\renderer\IndexBuffer.cpp" />
     <ClCompile Include="src\renderer\Renderer.cpp" />
     <ClCompile Include="src\renderer\Shader.cpp" />
@@ -163,11 +164,13 @@
     <ClInclude Include="dependencies\GLEW\include\GL\wglew.h" />
     <ClInclude Include="dependencies\GLFW\include\GLFW\glfw3.h" />
     <ClInclude Include="dependencies\GLFW\include\GLFW\glfw3native.h" />
-    <ClInclude Include="include\Board.h" />
+    <ClInclude Include="include\ApplicationHandler.h" />
+    <ClInclude Include="include\BoardManager.h" />
     <ClInclude Include="include\Chat.h" />
+    <ClInclude Include="include\Components.h" />
     <ClInclude Include="include\DirectoryWindow.h" />
-    <ClInclude Include="include\GameTable.h" />
-    <ClInclude Include="include\Marker.h" />
+    <ClInclude Include="include\GameTableManager.h" />
+    <ClInclude Include="include\NetworkManager.h" />
     <ClInclude Include="src\renderer\IndexBuffer.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\renderer\Shader.h" />
