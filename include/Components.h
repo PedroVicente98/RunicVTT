@@ -7,7 +7,7 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include "flecs.h"
-
+#include "NetworkManager.h"
 #include <shared_mutex>
 
 // Position Component
@@ -57,7 +57,7 @@ struct Grid {
 };
 
 // Board Component
-struct BoardComponent {
+struct Board {
     std::vector<flecs::entity> markers;
     std::vector<flecs::entity> fogOfWar;
 };
@@ -81,23 +81,24 @@ struct ActiveBoard
 {
 };
 
-//// Network Component
-//struct Network {
-//    std::string external_ip;
-//    std::string internal_ip;
-//    unsigned short port;
-//    std::string password;
-//    std::shared_ptr<NetworkManager> network_manager;
-//    std::vector<std::shared_ptr<PeerConnection>> active_peers;
-//    bool is_gamemaster;
-//};
-//
-//// Notes Component
-//struct Notes {
-//    std::vector<flecs::entity> notes;
-//};
-//
-//// Tool Component (for managing active tools)
-//struct Tool {
-//    std::string currentTool;
-//};
+
+// Network Component
+struct Network {
+    std::string external_ip;
+    std::string internal_ip;
+    unsigned short port;
+    std::string password;
+    std::shared_ptr<NetworkManager> network_manager;
+    std::vector<std::shared_ptr<std::string>> active_peers;
+    bool is_gamemaster;
+};
+
+// Notes Component
+struct Notes {
+    std::vector<flecs::entity> notes;
+};
+
+// Tool Component (for managing active tools)
+struct Tool {
+    std::string currentTool;
+};

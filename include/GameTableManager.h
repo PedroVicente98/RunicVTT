@@ -11,7 +11,6 @@ public:
 	GameTableManager(flecs::world ecs);
 	~GameTableManager();
 
-	flecs::entity createBoard();
 	void saveGameTable();
 	void loadGameTable();
 
@@ -20,6 +19,7 @@ public:
 
 	void createGameTablePopUp();
 	void closeGameTablePopUp();
+	void createBoardPopUp();
 
 	std::string game_table_name; 
 	Chat chat;

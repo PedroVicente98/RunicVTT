@@ -12,8 +12,10 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "Components.h"
 
-BoardManager::BoardManager()
+BoardManager::BoardManager(flecs::world ecs)
+ : ecs(ecs)
 {   
   
 }
@@ -25,6 +27,20 @@ BoardManager::~BoardManager()
 bool BoardManager::isBoardActive()
 {
     return active_board.is_valid();
+}
+
+flecs::entity BoardManager::createBoard()
+{
+    auto board = ecs.entity()
+        .set(Board{})
+        .set(Panning{false})
+        .set(Zoom{1.0f})
+        .set(Position{0,0})
+        .set(Grid{ {0.0f,0.0f},{1.0f,1.0f} })
+        .set(TextureComponent{})
+        .set(Size{1.0f, 1.0f});
+    active_board = board;
+    return board;
 }
 
 void BoardManager::renderToolbar()

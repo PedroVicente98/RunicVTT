@@ -19,7 +19,7 @@
 
 class BoardManager {
 public:
-	BoardManager();
+	BoardManager(flecs::world ecs);
 	~BoardManager();
 	void renderToolbar();
 	void renderMap();
@@ -27,9 +27,11 @@ public:
 	void renderFogOfWar();
 	void addMarkerOnClick();
 	bool isBoardActive();
+	flecs::entity createBoard();
 
 	std::string board_name;
 private:
+	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
 
 };

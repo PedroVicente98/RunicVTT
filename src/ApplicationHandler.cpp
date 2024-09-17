@@ -14,10 +14,13 @@ ApplicationHandler::ApplicationHandler()
     ecs.component<Zoom>();// .member<float>("zoomLevel");
     ecs.component<Panning>();// .member<bool>("isPanning");
     ecs.component<Grid>();// .member<glm::vec2>("offset").member<glm::vec2>("scale");
-    ecs.component<BoardComponent>();
+    ecs.component<Board>();
     ecs.component<MarkerComponent>();
     ecs.component<FogOfWar>();
     ecs.component<GameTable>();
+    ecs.component<Network>();
+    ecs.component<Notes>();
+    ecs.component<Tool>();
 
 }
 
@@ -186,6 +189,12 @@ void ApplicationHandler::renderDockSpace()
 void ApplicationHandler::renderMainMenuBar() {
     bool open_create_gametable = false;
     bool close_current_gametable = false;
+    
+    bool open_create_board = false;
+    bool close_current_board = false;
+
+
+
     ImGui::BeginMainMenuBar();
     if (ImGui::BeginMenu("File")) {
         if (ImGui::MenuItem("Open", "Ctrl+O")) {
@@ -210,6 +219,7 @@ void ApplicationHandler::renderMainMenuBar() {
     if(game_table_manager.isGameTableActive()){
         if (ImGui::BeginMenu("Board")) {
             if (ImGui::MenuItem("Create")) {
+                open_create_board = true;
             }
             if (ImGui::MenuItem("Open", "Ctrl+Y")) {
             }
@@ -237,6 +247,12 @@ void ApplicationHandler::renderMainMenuBar() {
 
     if (ImGui::IsPopupOpen("CloseGameTable"))
         game_table_manager.closeGameTablePopUp();
+    
+    if (open_create_board)
+        ImGui::OpenPopup("CreateBoard");
+
+    if (ImGui::IsPopupOpen("CreateBoard"))
+        game_table_manager.createBoardPopUp();
 
 
 }
