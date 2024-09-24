@@ -193,7 +193,8 @@ void ApplicationHandler::renderMainMenuBar() {
     bool open_create_board = false;
     bool close_current_board = false;
 
-
+    bool open_network_connection = false;
+    bool close_network_connection = false;
 
     ImGui::BeginMainMenuBar();
     if (ImGui::BeginMenu("File")) {
@@ -217,6 +218,17 @@ void ApplicationHandler::renderMainMenuBar() {
     }
 
     if(game_table_manager.isGameTableActive()){
+        if (ImGui::BeginMenu("Network")) {
+            if (ImGui::MenuItem("Open Connection")) {
+                open_network_connection = true;
+            }
+            bool is_connection_active = game_table_manager.isConnectionActive();
+            if (ImGui::MenuItem("Close Connection", 0, false, is_connection_active)) {
+                close_network_connection = true;
+            }
+            ImGui::EndMenu();
+        }
+        
         if (ImGui::BeginMenu("Board")) {
             if (ImGui::MenuItem("Create")) {
                 open_create_board = true;
@@ -235,6 +247,22 @@ void ApplicationHandler::renderMainMenuBar() {
         ImGui::EndMenu();
     }
     ImGui::EndMainMenuBar();
+
+
+
+
+
+    if (close_network_connection)
+        ImGui::OpenPopup("CloseNetwork");
+
+    if(ImGui::IsPopupOpen("CloseNetwork"))
+        game_table_manager.closeNetworkPopUp();
+
+    if (open_network_connection)
+        ImGui::OpenPopup("CreateNetwork");
+
+    if(ImGui::IsPopupOpen("CreateNetwork"))
+        game_table_manager.createNetworkPopUp();
 
     if (open_create_gametable)
         ImGui::OpenPopup("CreateGameTable");

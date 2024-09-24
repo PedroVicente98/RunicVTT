@@ -7,7 +7,6 @@
 #include <glm/glm.hpp>
 #include <GL/glew.h>
 #include "flecs.h"
-#include "NetworkManager.h"
 #include <shared_mutex>
 
 // Position Component
@@ -88,7 +87,6 @@ struct Network {
     std::string internal_ip;
     unsigned short port;
     std::string password;
-    std::shared_ptr<NetworkManager> network_manager;
     std::vector<std::shared_ptr<std::string>> active_peers;
     bool is_gamemaster;
 };
