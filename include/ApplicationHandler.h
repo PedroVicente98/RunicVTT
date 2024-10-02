@@ -32,13 +32,14 @@
 class ApplicationHandler {
 
 public:
-	ApplicationHandler();
+	ApplicationHandler(GLFWwindow* window, std::string shader_directory_path);
 	~ApplicationHandler();
 	int run();
 
 private:
 	void renderMainMenuBar();
 	void renderDockSpace();
+	void renderActiveGametable();
 
 	GLFWwindow* window;
 	flecs::world ecs;

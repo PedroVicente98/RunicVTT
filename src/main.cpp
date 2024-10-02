@@ -2,11 +2,57 @@
 #include "ApplicationHandler.h"
 
 
-int main(void) {
-	ApplicationHandler app;
-	app.run();
+GLFWwindow* initializeOpenGLContext() {
+    if (!glfwInit()) {
+        std::cerr << "Falha ao inicializar o GLFW!" << std::endl;
+        return nullptr;
+    }
 
+    // Cria a janela e inicializa o contexto OpenGL
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Runic VTT", nullptr, nullptr);
+    if (!window) {
+        std::cerr << "Falha ao criar a janela GLFW!" << std::endl;
+        glfwTerminate();
+        return nullptr;
+    }
+
+    // Faz o contexto OpenGL atual para a janela
+    glfwMakeContextCurrent(window);
+
+    // Inicializa o GLEW (opcional, se estiver usando)
+    if (glewInit() != GLEW_OK) {
+        std::cerr << "Falha ao inicializar o GLEW!" << std::endl;
+        return nullptr;
+    }
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
+    // Retorna o ponteiro da janela
+    return window;
 }
+
+
+
+int main() {
+    // Inicializa o contexto OpenGL
+    GLFWwindow* window = initializeOpenGLContext();
+    if (!window) {
+        return -1;  // Falha na inicialização
+    }
+    std::filesystem::path base_path = std::filesystem::current_path();
+    std::filesystem::path shader_directory_path = base_path / "res" / "shaders" / "Basic.shader";
+
+    ApplicationHandler app(window, shader_directory_path.string());
+    app.run();  // Executa o loop principal da aplicação
+
+    glfwTerminate();  // Limpa os recursos do GLFW quando terminar
+    return 0;
+}
+
 
 //
 //int main(void)

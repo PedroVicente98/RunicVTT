@@ -33,6 +33,29 @@ public:
 
     }
 
+    // Function to generate the texture IDs
+    void generateTextureIDs() {
+        // Wait for the monitoring thread to finish one full loop
+        {
+            std::shared_lock<std::shared_mutex> lock(imagesMutex);  // Shared lock: waits if the thread is still writing
+            if (!first_scan_done) {
+                lock.unlock();
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Wait and retry
+                generateTextureIDs();  // Retry generating textures
+                return;
+            }
+        }
+
+        // Now generate textures
+        std::unique_lock<std::shared_mutex> lock(imagesMutex);  // Unique lock to write (generate textures)
+        for (auto& image : images) {
+            if (image.textureID == 0) {
+                std::string path_file = directoryPath + "\\" + image.filename;
+                image.textureID = LoadTextureFromFile(path_file.c_str());
+            }
+        }
+    }
+
     void renderDirectory() {
         ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x*0.1, ImGui::GetIO().DisplaySize.y*0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
         ImGui::Begin(directoryName.c_str(), NULL, ImGuiWindowFlags_NoCollapse);
@@ -60,8 +83,11 @@ public:
                 ImGui::BeginGroup();
                 ImGui::PushID(count);
                 if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
+                    selected_image = image;
+                    std::cout << "Selected Image: " << image.filename << std::endl;
                     ImGui::OpenPopup("Image Popup");
                 }
+
                 if (ImGui::BeginPopup("Image Popup")) {
                     ImGui::Text("File: %s", image.filename.c_str());
                     ImGui::EndPopup();
@@ -75,7 +101,19 @@ public:
         ImGui::End();
     }
 
+    // Método genérico para retornar a imagem selecionada
+    ImageData getSelectedImage() const {
+        return selected_image;
+    }
+
+    // Método para limpar a imagem selecionada
+    void clearSelectedImage() {
+        selected_image = { 0, "" };  // Limpa a seleção
+    }
+
+
     void startMonitoring() {
+        std::cout << "STARED MONITORING";
         monitorThread = std::thread(&DirectoryWindow::monitorDirectory, this, directoryPath);
     }
 
@@ -90,14 +128,15 @@ public:
         stopMonitoring();
     }
 
-private:
-    
     std::string directoryPath;
     std::string directoryName;
+private:
+    ImageData selected_image = { 0, "" };  // Armazena a imagem selecionada
     std::vector<ImageData> images;
     std::thread monitorThread;
     bool running = true;
     std::shared_mutex imagesMutex;
+    bool first_scan_done = false;  // Flag to track when the first scan is complete
 
     // Function to find an ImageData by filename
     std::vector<ImageData>::iterator findImageByFilename(std::vector<ImageData>& images, const std::string& filename) {
@@ -110,21 +149,24 @@ private:
         std::vector<ImageData> newImages;
 
         while (running) {
-            std::this_thread::sleep_for(std::chrono::seconds(2)); // Check every 2 seconds
-
             std::vector<std::string> currentFiles;
+            std::cout << "current Files len" << currentFiles.size() << "Path: " << path << std::endl;
             try {
                 for (const auto& entry : std::filesystem::directory_iterator(path)) {
-                    if (entry.is_regular_file()) {
+                    std::cout << "entry: " << entry.path().filename().string() << "IS REGULAR : " << entry.is_regular_file() << std::endl;
+                   if (entry.is_regular_file()) {
                         currentFiles.push_back(entry.path().filename().string());
                     }
                 }
+                std::cout << "current Files len AFTER THE FACT" << currentFiles.size() << "Path: " << path << std::endl;
             }
+
             catch (const std::filesystem::filesystem_error& e) {
                 std::cerr << "Filesystem error: " << e.what() << std::endl;
             }
 
             if (currentFiles != knownFiles) {
+
                 std::unique_lock<std::shared_mutex> lock(imagesMutex); // Ensure thread-safe access to images
                 
                 for (auto it = knownFiles.begin(); it != knownFiles.end();) {
@@ -152,7 +194,10 @@ private:
 
                 images.insert(images.end(), newImages.begin(), newImages.end());
                 
+                first_scan_done = true;
+               
             }
+            std::this_thread::sleep_for(std::chrono::seconds(2)); // Check every 2 seconds
         }
     }
 

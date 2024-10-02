@@ -57,8 +57,9 @@ struct Grid {
 
 // Board Component
 struct Board {
-    std::vector<flecs::entity> markers;
-    std::vector<flecs::entity> fogOfWar;
+    std::string board_name;
+    /*std::vector<flecs::entity> markers;
+    std::vector<flecs::entity> fogOfWar;*/
 };
 
 // Marker Component
@@ -97,6 +98,6 @@ struct Notes {
 };
 
 // Tool Component (for managing active tools)
-struct Tool {
+struct ToolComponent {
     std::string currentTool;
 };

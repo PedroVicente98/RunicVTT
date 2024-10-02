@@ -3,8 +3,8 @@
 #include "glm/glm.hpp"
 
 
-ApplicationHandler::ApplicationHandler()
-    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), window(nullptr), game_table_manager(ecs)
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string shader_directory_path)
+    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs, shader_directory_path), window(window)
 {
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -20,7 +20,7 @@ ApplicationHandler::ApplicationHandler()
     ecs.component<GameTable>();
     ecs.component<Network>();
     ecs.component<Notes>();
-    ecs.component<Tool>();
+    ecs.component<ToolComponent>();
 
 }
 
@@ -32,37 +32,18 @@ ApplicationHandler::~ApplicationHandler()
 
 int ApplicationHandler::run() 
 {
-    GLFWwindow* window;
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    if (glewInit() != GLEW_OK) {
-        std::cout << "GLEW FAILED";
-    }
+    game_table_manager.setInputCallbacks(window);
+    glfwSetWindowUserPointer(window, &game_table_manager);
+
 
     std::cout << glGetString(GL_VERSION) << std::endl;
     {//Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glEnable(GL_BLEND));
-
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -88,15 +69,6 @@ int ApplicationHandler::run()
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init();
 
-        /*std::filesystem::path base_path = std::filesystem::current_path();
-        std::filesystem::path map_directory_path = base_path / "res" / "textures";
-        std::filesystem::path marker_directory_path = base_path / "res" / "markers";
-        std::string map_directory_name = "MapDiretory";
-        std::string marker_directory_name = "MarkerDiretory";
-        DirectoryWindow map_directory(map_directory_path.string(), map_directory_name);
-        DirectoryWindow marker_directory(marker_directory_path.string(), marker_directory_name);
-        map_directory.startMonitoring();
-        marker_directory.startMonitoring();*/
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
@@ -112,25 +84,7 @@ int ApplicationHandler::run()
 
             renderMainMenuBar();
             renderDockSpace();
-         
-            if (game_table_manager.isGameTableActive()) {
-                game_table_manager.chat.renderChat();
-                //ImGui::ShowMetricsWindow();
-                ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
-                ImGui::Begin("MapWindow", nullptr, window_flags);
-                ImVec2 window_pos = ImGui::GetWindowPos();
-                ImVec2 window_size = ImGui::GetWindowSize();
-                int viewport_x = (int)window_pos.x; // Cast to int, ImGui uses float which might not necessarily align with pixel units
-                int viewport_y = (int)(ImGui::GetIO().DisplaySize.y - window_pos.y - window_size.y); // Adjust for OpenGL's bottom-left origin
-                int viewport_width = (int)window_size.x;
-                int viewport_height = (int)window_size.y;
-                glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
-                //gametable.renderActiveBoard();
-                ImGui::End();
-
-            }
-
-
+            renderActiveGametable();
 
             // Rendering
             ImGui::Render();
@@ -170,9 +124,9 @@ void ApplicationHandler::renderDockSpace()
         ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.3f, nullptr, &dockspace_id);
 
         ImGui::DockBuilderDockWindow("MapWindow", dockspace_id);
-        ImGui::DockBuilderDockWindow("MapDiretory", dock_right_id);
-        ImGui::DockBuilderDockWindow("MarkerDiretory", dock_right_id);
         ImGui::DockBuilderDockWindow("ChatWindow", dock_right_id);
+        //ImGui::DockBuilderDockWindow("MapDiretory", dock_right_id);
+        ImGui::DockBuilderDockWindow("MarkerDiretory", dock_right_id);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
@@ -184,6 +138,32 @@ void ApplicationHandler::renderDockSpace()
     ImGui::End();
 
    
+}
+
+void ApplicationHandler::renderActiveGametable() {
+
+    if (game_table_manager.isGameTableActive()) {
+
+        game_table_manager.chat.renderChat();
+        //game_table_manager.map_directory.renderDirectory();
+        game_table_manager.render();
+
+        //ImGui::ShowMetricsWindow();
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
+        ImGui::Begin("MapWindow", nullptr, window_flags);
+        ImVec2 window_pos = ImGui::GetWindowPos();
+        ImVec2 window_size = ImGui::GetWindowSize();
+        int viewport_x = (int)window_pos.x; // Cast to int, ImGui uses float which might not necessarily align with pixel units
+        int viewport_y = (int)(ImGui::GetIO().DisplaySize.y - window_pos.y - window_size.y); // Adjust for OpenGL's bottom-left origin
+        int viewport_width = (int)window_size.x;
+        int viewport_height = (int)window_size.y;
+        glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+
+        //gametable.renderActiveBoard();
+        ImGui::End();
+    }
+
+
 }
 
 void ApplicationHandler::renderMainMenuBar() {
@@ -233,6 +213,9 @@ void ApplicationHandler::renderMainMenuBar() {
             if (ImGui::MenuItem("Create")) {
                 open_create_board = true;
             }
+            if (ImGui::MenuItem("Close")) {
+                close_current_board = true;
+            }
             if (ImGui::MenuItem("Open", "Ctrl+Y")) {
             }
             ImGui::EndMenu();
@@ -281,6 +264,12 @@ void ApplicationHandler::renderMainMenuBar() {
 
     if (ImGui::IsPopupOpen("CreateBoard"))
         game_table_manager.createBoardPopUp();
+    
+    if (close_current_board)
+        ImGui::OpenPopup("CloseBoard");
+
+    if (ImGui::IsPopupOpen("CloseBoard"))
+        game_table_manager.closeBoardPopUp();
 
 
 }

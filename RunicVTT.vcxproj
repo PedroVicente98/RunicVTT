@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;flecs_STATIC;GLEW_STATIC;ASIO_STANDALONE;ASIO_SEPARATE_COMPILATION</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS;flecs_STATIC;GLEW_STATIC;ASIO_STANDALONE;ASIO_SEPARATE_COMPILATION;_SILENCE_CXX20_U8PATH_DEPRECATION_WARNING</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)dependencies\GLEW\include;$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)include;$(SolutionDir)include\renderer;$(SolutionDir)vendor;$(SolutionDir)vendor\asio\include;$(SolutionDir)vendor\flecs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

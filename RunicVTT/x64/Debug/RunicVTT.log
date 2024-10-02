@@ -1,39 +1,36 @@
 ﻿  Verificando fontes para dependências de módulo...
-  glm.cppm
-  Compilando...
-  glm.cppm
   ApplicationHandler.cpp
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
-  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-  BoardManager.cpp
 C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefinição de macro
   (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
   C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1):
   'flecs_STATIC' declarado anteriormente na linha de comando
   
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
+  
+  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
+  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
+  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
+  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
 C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(130,1): warning C4005: 'APIENTRY': redefinição de macro
   (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
   C:\Dev\RunicVTT\dependencies\GLFW\include\GLFW\glfw3.h(123,1):
   consulte a definição anterior de 'APIENTRY'
   
-C:\Dev\RunicVTT\include\DirectoryWindow.h(37,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
-  
-C:\Dev\RunicVTT\include\DirectoryWindow.h(37,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'src/ApplicationHandler.cpp')
-  
-C:\Dev\RunicVTT\src\ApplicationHandler.cpp(226,58): error C2039: ' null': não é um membro de 'std'
-  C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.39.33519\include\deque(23,1):
-  consulte a declaração de 'std'
-  
-C:\Dev\RunicVTT\src\ApplicationHandler.cpp(226,58): error C2065: 'null': identificador não declarado
-C:\Dev\RunicVTT\src\ApplicationHandler.cpp(226,64): error C2275: 'std::nullptr_t': esperava uma expressão em vez de um tipo
+  BoardManager.cpp
 C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefinição de macro
   (compilando o arquivo fonte 'src/BoardManager.cpp')
   C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1):
   'flecs_STATIC' declarado anteriormente na linha de comando
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/BoardManager.cpp')
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/BoardManager.cpp')
   
   GameTableManager.cpp
 C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefinição de macro
@@ -41,6 +38,12 @@ C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefi
   C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1):
   'flecs_STATIC' declarado anteriormente na linha de comando
   
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/GameTableManager.cpp')
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/GameTableManager.cpp')
+  
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
   - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
@@ -50,22 +53,17 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
   C:\Dev\RunicVTT\dependencies\GLFW\include\GLFW\glfw3.h(123,1):
   consulte a definição anterior de 'APIENTRY'
   
-C:\Dev\RunicVTT\src\GameTableManager.cpp(30,24): error C2039: ' isConnectionOpen': não é um membro de 'GameTableManager'
-  C:\Dev\RunicVTT\include\GameTableManager.h(11,7):
-  consulte a declaração de 'GameTableManager'
-  
-C:\Dev\RunicVTT\src\GameTableManager.cpp(138,12): error C2065: 'networkManager': identificador não declarado
-  NetworkManager.cpp
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
-  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-C:\Dev\RunicVTT\src\NetworkManager.cpp(40,28): warning C4101: 'e': variável local não referenciada
   main.cpp
 C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefinição de macro
   (compilando o arquivo fonte 'src/main.cpp')
   C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1):
   'flecs_STATIC' declarado anteriormente na linha de comando
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/main.cpp')
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(60,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/main.cpp')
   
   Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
   - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
@@ -76,31 +74,5 @@ C:\Program Files (x86)\Windows Kits\10\Include\10.0.22621.0\shared\minwindef.h(1
   C:\Dev\RunicVTT\dependencies\GLFW\include\GLFW\glfw3.h(123,1):
   consulte a definição anterior de 'APIENTRY'
   
-C:\Dev\RunicVTT\include\DirectoryWindow.h(37,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'src/main.cpp')
-  
-C:\Dev\RunicVTT\include\DirectoryWindow.h(37,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
-  (compilando o arquivo fonte 'src/main.cpp')
-  
-  IndexBuffer.cpp
-  Renderer.cpp
-  Shader.cpp
-  Texture.cpp
-  VertexArray.cpp
-C:\Dev\RunicVTT\src\renderer\VertexArray.cpp(27,3): warning C4312: 'conversão de tipo': conversão de 'unsigned int' para 'const void *' de tamanho maior
-  VertexBuffer.cpp
-  asio.cpp
-  Please define _WIN32_WINNT or _WIN32_WINDOWS appropriately. For example:
-  - add -D_WIN32_WINNT=0x0601 to the compiler command line; or
-  - add _WIN32_WINNT=0x0601 to your project's Preprocessor Definitions.
-  Assuming _WIN32_WINNT=0x0601 (i.e. Windows 7 target).
-  glm.cpp
-  imgui.cpp
-  imgui_demo.cpp
-  imgui_draw.cpp
-  imgui_impl_glfw.cpp
-  imgui_impl_opengl3.cpp
-  imgui_tables.cpp
-  imgui_widgets.cpp
   Gerando Código...
-C:\Dev\RunicVTT\src\NetworkManager.cpp(1,1): error C1090: Falha na chamada à API PDB, código de erro '3': C:\Dev\RunicVTT\RunicVTT\x64\Debug\vc143.pdb
+  RunicVTT.vcxproj -> C:\Dev\RunicVTT\x64\Debug\RunicVTT.exe

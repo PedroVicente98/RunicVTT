@@ -1,9 +1,16 @@
 #include "GameTableManager.h"
 
 
-GameTableManager::GameTableManager(flecs::world ecs)
-    : ecs(ecs), board_manager(ecs)
+GameTableManager::GameTableManager(flecs::world ecs, std::string shader_directory_path)
+    : ecs(ecs), board_manager(ecs, shader_directory_path), map_directory(std::string(), std::string())
 {
+    std::filesystem::path base_path = std::filesystem::current_path();
+    std::string map_directory_name = "MapDiretory";
+    std::filesystem::path map_directory_path = base_path / "res" / "textures";
+    map_directory.directoryName = map_directory_name;
+    map_directory.directoryPath = map_directory_path.string();
+    map_directory.startMonitoring();
+    map_directory.generateTextureIDs();
 }
 
 
@@ -21,6 +28,10 @@ void GameTableManager::loadGameTable()
 }
 
 
+bool GameTableManager::isBoardActive()
+{
+    return board_manager.isBoardActive();
+}
 
 bool GameTableManager::isGameTableActive()
 {
@@ -40,6 +51,64 @@ void GameTableManager::closeConnection() {
     network_manager.stopServer();
     std::cout << "Connection closed." << std::endl;
 }
+
+
+#include "GameTableManager.h"
+
+#include "GameTableManager.h"
+#include "GameTableManager.h"
+
+// Função para configurar os callbacks do GLFW
+void GameTableManager::setInputCallbacks(GLFWwindow* window) {
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+    glfwSetCursorPosCallback(window, cursorPositionCallback);
+    glfwSetScrollCallback(window, scrollCallback);
+}
+
+// Callback estático de botão do mouse
+void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    // Recupera o ponteiro para a instância do GameTableManager
+    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+    // Certifique-se de que o ponteiro foi corretamente recuperado
+    if (!game_table_manager) return;
+    glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        if (game_table_manager->isBoardActive()) {
+            game_table_manager->board_manager.startMouseDrag(mouse_pos);
+            if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
+                game_table_manager->board_manager.handleFogCreation(mouse_pos);
+            }
+            else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
+                game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
+            }
+        }
+    }
+}
+
+// Callback estático de movimentação do cursor
+void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+    // Recupera o ponteiro para a instância do GameTableManager
+    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+    if (!game_table_manager) return;
+    game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
+    if (game_table_manager->isBoardActive()) {
+        if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
+            game_table_manager->board_manager.handleMarkerDragging(game_table_manager->current_mouse_pos);
+        }
+    }
+}
+
+// Callback estático de scroll (zoom)
+void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    // Recupera o ponteiro para a instância do GameTableManager
+    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+    if (!game_table_manager) return;
+    float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
+    if (game_table_manager->isBoardActive()) {
+        game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager
+    }
+}
+
 
 
 
@@ -79,34 +148,89 @@ void GameTableManager::createGameTablePopUp()
     }
 }
 
-void GameTableManager::createBoardPopUp()
-{   
+
+void GameTableManager::createBoardPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CreateBoard"))
-    {
+    if (ImGui::BeginPopupModal("CreateBoard")) {
         ImGui::SetItemDefaultFocus();
+        
+        // Dividindo a janela em duas colunas
+        ImGui::Columns(2, nullptr, false);
+
+        // Coluna esquerda: formulário de criação do board
+        ImGui::Text("Create a new board");
+
+        // Campo para o nome do board
         ImGui::InputText("Board Name", buffer, sizeof(buffer));
-        game_table_name = buffer;
+        std::string board_name(buffer);
 
         ImGui::Separator();
-        
-        if (ImGui::Button("Save"))
-        {
-            auto board = board_manager.createBoard();
-            board.add(flecs::ChildOf, active_game_table);
-            ImGui::CloseCurrentPopup();
 
+        // Pega a imagem selecionada do diretório de mapas
+        DirectoryWindow::ImageData selectedImage = map_directory.getSelectedImage();
+
+        if (!selectedImage.filename.empty()) {
+            ImGui::Text("Selected Map: %s", selectedImage.filename.c_str());
+            ImGui::Image((void*)(intptr_t)selectedImage.textureID, ImVec2(128, 128));  // Preview da imagem selecionada
+        }
+        else {
+            ImGui::Text("No map selected. Please select a map.");
+        }
+
+        ImGui::Separator();
+
+        // Botão para salvar o board, habilitado apenas se houver nome e mapa selecionado
+        if (ImGui::Button("Save") && !selectedImage.filename.empty() && strlen(buffer) > 0) {
+            // Cria o board com o mapa e o nome inseridos
+            auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID);
+            board.add(flecs::ChildOf, active_game_table);
+
+            // Limpa a seleção após salvar
+            map_directory.clearSelectedImage();
             memset(buffer, '\0', sizeof(buffer));
 
+            // Fecha o popup após salvar
+            ImGui::CloseCurrentPopup();
         }
 
         ImGui::SameLine();
 
+        // Botão para fechar o popup
+        if (ImGui::Button("Close")) {
+            map_directory.clearSelectedImage();  // Limpa o caminho ao fechar
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::NextColumn();
+
+        // Coluna direita: diretório de mapas para seleção de imagem
+        map_directory.renderDirectory();  // Renderiza o diretório de mapas dentro da coluna direita
+
+        ImGui::Columns(1);  // Volta para uma única coluna
+
+        ImGui::EndPopup();
+    }
+}
+
+void GameTableManager::closeBoardPopUp()
+{
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("CloseBoard"))
+    {
+        ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
         {
+            board_manager.closeBoard();
             ImGui::CloseCurrentPopup();
-            memset(buffer, '\0', sizeof(buffer));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
     }
@@ -121,6 +245,7 @@ void GameTableManager::closeGameTablePopUp()
         ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
         {
+            board_manager.closeBoard();
             active_game_table = flecs::entity();
             ImGui::CloseCurrentPopup();
         }
@@ -200,5 +325,12 @@ void GameTableManager::closeNetworkPopUp() {
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndPopup();
+    }
+}
+
+void GameTableManager::render()
+{
+    if (board_manager.isBoardActive()) {
+        board_manager.marker_directory.renderDirectory();
     }
 }
