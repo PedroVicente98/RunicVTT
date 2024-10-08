@@ -21,6 +21,7 @@ public:
 
     struct ImageData {
         GLuint textureID;
+        glm::vec2 size;
         std::string filename;
     };
 
@@ -51,14 +52,19 @@ public:
         for (auto& image : images) {
             if (image.textureID == 0) {
                 std::string path_file = directoryPath + "\\" + image.filename;
-                image.textureID = LoadTextureFromFile(path_file.c_str());
+                image = LoadTextureFromFile(path_file.c_str());
             }
         }
     }
 
-    void renderDirectory() {
+    void renderDirectory(bool is_map_directory = false) {
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+        if (is_map_directory == true) {
+            window_flags |= ImGuiWindowFlags_NoMove;
+        }
+        
         ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x*0.1, ImGui::GetIO().DisplaySize.y*0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
-        ImGui::Begin(directoryName.c_str(), NULL, ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(directoryName.c_str(), NULL, window_flags);
         ImGui::Text("Path: %s", directoryPath.c_str());
         ImGui::Separator();
 
@@ -76,7 +82,7 @@ public:
                 if (count % columns != 0) ImGui::SameLine();
                 std::string path_file = directoryPath +"\\" + image.filename.c_str();
                 if (image.textureID == 0) {
-                    image.textureID = LoadTextureFromFile(path_file.c_str());
+                    image = LoadTextureFromFile(path_file.c_str());
                     std::cout << "textureID" << image.textureID << std::endl;
                 }
 
@@ -108,12 +114,11 @@ public:
 
     // Método para limpar a imagem selecionada
     void clearSelectedImage() {
-        selected_image = { 0, "" };  // Limpa a seleção
+        selected_image = { 0,  glm::vec2() ,"" };  // Limpa a seleção
     }
 
 
     void startMonitoring() {
-        std::cout << "STARED MONITORING";
         monitorThread = std::thread(&DirectoryWindow::monitorDirectory, this, directoryPath);
     }
 
@@ -131,7 +136,7 @@ public:
     std::string directoryPath;
     std::string directoryName;
 private:
-    ImageData selected_image = { 0, "" };  // Armazena a imagem selecionada
+    ImageData selected_image = { 0, glm::vec2() , "" };  // Armazena a imagem selecionada
     std::vector<ImageData> images;
     std::thread monitorThread;
     bool running = true;
@@ -150,15 +155,12 @@ private:
 
         while (running) {
             std::vector<std::string> currentFiles;
-            std::cout << "current Files len" << currentFiles.size() << "Path: " << path << std::endl;
             try {
                 for (const auto& entry : std::filesystem::directory_iterator(path)) {
-                    std::cout << "entry: " << entry.path().filename().string() << "IS REGULAR : " << entry.is_regular_file() << std::endl;
                    if (entry.is_regular_file()) {
                         currentFiles.push_back(entry.path().filename().string());
                     }
                 }
-                std::cout << "current Files len AFTER THE FACT" << currentFiles.size() << "Path: " << path << std::endl;
             }
 
             catch (const std::filesystem::filesystem_error& e) {
@@ -187,7 +189,7 @@ private:
                     if (it == images.end()) {
                         // Simulate loading a new texture (replace with actual loading code)
                         std::string path_file = path +"\\" + filename.c_str();
-                        newImages.push_back({ 0, filename });
+                        newImages.push_back({ 0, glm::vec2() ,filename });
                     }
                 }
                 knownFiles = std::move(currentFiles);
@@ -201,7 +203,7 @@ private:
         }
     }
 
-    GLuint LoadTextureFromFile(const char* path) {
+    ImageData LoadTextureFromFile(const char* path) {
 
         // Record the start time using std::chrono::high_resolution_clock
         std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -211,7 +213,7 @@ private:
         stbi_set_flip_vertically_on_load(0); // Flip images vertically if needed
         if (!data) {
             std::cerr << "Failed to load texture: " << path << std::endl;
-            return 0;
+            return ImageData(0, glm::vec2(), "");
         }
 
         GLuint textureID[1];
@@ -237,7 +239,7 @@ private:
         // Output the duration in milliseconds
         std::cout << "Operation for file "<< path <<"took " << duration.count() << " seconds" << std::endl;
 
-        return textureID[0];
+        return ImageData(textureID[0], glm::vec2(width, height), path);
     }
 
 };

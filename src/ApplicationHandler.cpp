@@ -44,6 +44,7 @@ int ApplicationHandler::run()
     {//Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glEnable(GL_BLEND));
+        GLCall(glDisable(GL_DEPTH_TEST));
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -145,8 +146,6 @@ void ApplicationHandler::renderActiveGametable() {
     if (game_table_manager.isGameTableActive()) {
 
         game_table_manager.chat.renderChat();
-        //game_table_manager.map_directory.renderDirectory();
-        game_table_manager.render();
 
         //ImGui::ShowMetricsWindow();
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
@@ -159,7 +158,8 @@ void ApplicationHandler::renderActiveGametable() {
         int viewport_height = (int)window_size.y;
         glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
 
-        //gametable.renderActiveBoard();
+        game_table_manager.render();
+
         ImGui::End();
     }
 

@@ -1,5 +1,5 @@
 #include "GameTableManager.h"
-
+#include "imgui/imgui_internal.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::string shader_directory_path)
     : ecs(ecs), board_manager(ecs, shader_directory_path), map_directory(std::string(), std::string())
@@ -53,11 +53,6 @@ void GameTableManager::closeConnection() {
 }
 
 
-#include "GameTableManager.h"
-
-#include "GameTableManager.h"
-#include "GameTableManager.h"
-
 // Função para configurar os callbacks do GLFW
 void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -71,6 +66,7 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     // Certifique-se de que o ponteiro foi corretamente recuperado
     if (!game_table_manager) return;
+    std::cout << "MOUSE BUTTON CALLBACK: " << button << " | " << action << " | " << mods << std::endl;
     glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
@@ -90,6 +86,7 @@ void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, d
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
+    std::cout << "CURSOR POSITION CALLBACK: " << xpos << " | " << ypos << std::endl;
     game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
     if (game_table_manager->isBoardActive()) {
         if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
@@ -103,6 +100,8 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
+
+    std::cout << "SCROLL CALLBACK: " << yoffset << std::endl;
     float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
     if (game_table_manager->isBoardActive()) {
         game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager
@@ -126,7 +125,7 @@ void GameTableManager::createGameTablePopUp()
         ImGui::Separator();
         ImGui::InputText("Password", pass_buffer, sizeof(buffer), ImGuiInputTextFlags_Password);
         
-        if (ImGui::Button("Save"))
+        if (ImGui::Button("Save") && strlen(buffer) > 0)
         {
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
@@ -154,7 +153,18 @@ void GameTableManager::createBoardPopUp() {
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("CreateBoard")) {
         ImGui::SetItemDefaultFocus();
-        
+        // Create a dockspace within the popup for the MapDirectory
+        ImGuiID dockspace_id = ImGui::GetID("CreateBoardDockspace");
+
+        // Create the dockspace
+        if (ImGui::DockBuilderGetNode(dockspace_id) == 0) {
+            ImGui::DockBuilderRemoveNode(dockspace_id);
+            ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoUndocking);
+
+            ImGui::DockBuilderDockWindow("MapDiretory", dockspace_id);
+            ImGui::DockBuilderFinish(dockspace_id);
+        }
+
         // Dividindo a janela em duas colunas
         ImGui::Columns(2, nullptr, false);
 
@@ -165,25 +175,25 @@ void GameTableManager::createBoardPopUp() {
         ImGui::InputText("Board Name", buffer, sizeof(buffer));
         std::string board_name(buffer);
 
-        ImGui::Separator();
+        ImGui::NewLine();
 
         // Pega a imagem selecionada do diretório de mapas
         DirectoryWindow::ImageData selectedImage = map_directory.getSelectedImage();
 
         if (!selectedImage.filename.empty()) {
             ImGui::Text("Selected Map: %s", selectedImage.filename.c_str());
-            ImGui::Image((void*)(intptr_t)selectedImage.textureID, ImVec2(128, 128));  // Preview da imagem selecionada
+            ImGui::Image((void*)(intptr_t)selectedImage.textureID, ImVec2(256, 256));  // Preview da imagem selecionada
         }
         else {
             ImGui::Text("No map selected. Please select a map.");
         }
 
-        ImGui::Separator();
+        ImGui::NewLine();
 
         // Botão para salvar o board, habilitado apenas se houver nome e mapa selecionado
         if (ImGui::Button("Save") && !selectedImage.filename.empty() && strlen(buffer) > 0) {
             // Cria o board com o mapa e o nome inseridos
-            auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID);
+            auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
             board.add(flecs::ChildOf, active_game_table);
 
             // Limpa a seleção após salvar
@@ -204,8 +214,10 @@ void GameTableManager::createBoardPopUp() {
 
         ImGui::NextColumn();
 
+        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+
         // Coluna direita: diretório de mapas para seleção de imagem
-        map_directory.renderDirectory();  // Renderiza o diretório de mapas dentro da coluna direita
+        map_directory.renderDirectory(true);  // Renderiza o diretório de mapas dentro da coluna direita
 
         ImGui::Columns(1);  // Volta para uma única coluna
 
@@ -332,5 +344,6 @@ void GameTableManager::render()
 {
     if (board_manager.isBoardActive()) {
         board_manager.marker_directory.renderDirectory();
+        board_manager.renderBoard();
     }
 }

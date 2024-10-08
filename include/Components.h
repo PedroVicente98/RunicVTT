@@ -35,6 +35,7 @@ struct Moving {
 struct TextureComponent {
     GLuint textureID;
     std::string image_path;
+    glm::vec2 size;
 };
 
 // Zoom Component
@@ -50,9 +51,9 @@ struct Panning {
 // Grid Component
 struct Grid {
     glm::vec2 offset;
-    //float offsetX, offsetY;
-    //float scaleX, offsetY;
     glm::vec2 scale;
+    bool is_hex;
+    bool snap_to_grid;
 };
 
 // Board Component

@@ -32,7 +32,7 @@ public:
     void zoom(float zoomFactor) {
         zoomLevel *= zoomFactor;
     }
-    glm::mat4 getViewMatrix() const {
+    glm::mat4 getViewMatrix() {
         return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f)), glm::vec3(zoomLevel));
     }
 
@@ -61,6 +61,13 @@ public:
     void handleMarkerSelection(glm::vec2 mousePos);
     bool isMouseOverMarker(const Position& markerPos, const Size& markerSize, glm::vec2 mousePos);
 
+    // Grid-related methods
+   
+    void handleGridTool(const glm::vec2& mouseDelta, float scrollDelta);
+    void toggleGridType();  // Switch between square and hex grid
+    void toggleSnapToGrid();  // Enable/disable snap to grid
+    glm::vec2 snapToGrid(const glm::vec2& position);
+
     // Fog of War interactions
     flecs::entity createFogOfWar(glm::vec2 startPos, glm::vec2 size);
     void deleteFogOfWar(flecs::entity fogEntity);
@@ -77,7 +84,7 @@ public:
 
 	bool isBoardActive();
     flecs::entity createBoard();
-    flecs::entity createBoard(std::string board_name, std::string map_image_path, GLuint texture_id);
+    flecs::entity createBoard(std::string board_name, std::string map_image_path, GLuint texture_id, glm::vec2 size);
 	//flecs::entity createBoard(std::string map_image_path);
 
     void closeBoard();
@@ -91,8 +98,26 @@ public:
 	std::string board_name;
     DirectoryWindow marker_directory;
 private:
+
+    Shader grid_shader;  // Shader used for grid rendering
+
+    void renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
+    void renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
+    void addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices);
+    void renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp);
+
+    // Snap to grid helper functions
+    glm::vec2 snapToSquareGrid(const glm::vec2& position, const Grid& grid);
+    glm::vec2 snapToHexGrid(const glm::vec2& position, const Grid& grid);
+
+    // Helper functions for hex grid math
+    glm::vec2 worldToAxial(const glm::vec2& pos, const Grid& grid);
+    glm::vec2 axialToWorld(const glm::vec2& axialPos, const Grid& grid);
+    glm::vec2 roundAxial(const glm::vec2& axial);
+
     // Render functions (private)
     void renderImage(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
+    void renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight);
     void renderMarker(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
     void renderFog(const Position &pos, const Size &size, const glm::mat4 &viewMatrix, const float alpha);
 
@@ -102,7 +127,6 @@ private:
 	flecs::entity active_board = flecs::entity();
     Camera camera;
     Tool currentTool;  // Active tool for interaction
-
     // Rendering resources
     VertexArray vertexArray;
     IndexBuffer indexBuffer;
