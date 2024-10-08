@@ -54,8 +54,8 @@ BoardManager::BoardManager(flecs::world ecs, std::string shader_file_path)
     shader.SetUniformMat4f("u_MVP", view_matrix);
     shader.SetUniform1i("u_Texture", 0);  // Use texture slot 0 by default
     shader.SetUniform1f("u_Alpha", 1.0f);;
-    shader.SetUniform1i("useTexture", 0); 
-    shader.SetUniform4f("u_Color",0.0f, 0.0f, 0.0f, 1.0f);
+    //shader.SetUniform1i("useTexture", 0); 
+    //shader.SetUniform4f("u_Color",0.0f, 0.0f, 0.0f, 1.0f);
     shader.Unbind();   // Shader initialization (assuming a vertex and fragment shader)
 
 }
@@ -131,7 +131,7 @@ void BoardManager::renderToolbar() {
 }
 
 void BoardManager::renderBoard() {
-    glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
+    glm::mat4 viewMatrix = camera.getViewMatrix();  // ObtÃ©m a matriz de visualizaÃ§Ã£o da cÃ¢mera (pan/zoom)
 
     ImVec2 map_window_size = ImGui::GetWindowSize();
     // Use `each()` to query and apply the function to the entity with the necessary components
@@ -150,10 +150,10 @@ void BoardManager::renderBoard() {
             renderMarker(texture.textureID, pos, size, viewMatrix);  // Renderizar o marcador
         }
         });
-    // Renderizar a névoa de guerra (Fog of War)
+    // Renderizar a nÃ©voa de guerra (Fog of War)
     ecs.each([&](flecs::entity e, const FogOfWar& fog, const Position& pos, const Size& size, const Visibility& visibility) {
         if (visibility.isVisible) {
-            renderFog(pos, size, viewMatrix, 1.0f);  // Renderizar a névoa com transparência
+            renderFog(pos, size, viewMatrix, 1.0f);  // Renderizar a nÃ©voa com transparÃªncia
         }
         });
 }
@@ -256,7 +256,7 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
 }
 
 bool BoardManager::isMouseOverMarker(const Position& markerPos, const Size& markerSize, glm::vec2 mousePos) {
-    // Verifica se o mouse está dentro dos limites do marcador
+    // Verifica se o mouse estÃ¡ dentro dos limites do marcador
     bool withinXBounds = mousePos.x >= markerPos.x && mousePos.x <= (markerPos.x + markerSize.width);
     bool withinYBounds = mousePos.y >= markerPos.y && mousePos.y <= (markerPos.y + markerSize.height);
 
@@ -267,14 +267,14 @@ bool BoardManager::isMouseOverMarker(const Position& markerPos, const Size& mark
 void BoardManager::handleMarkerSelection(glm::vec2 mousePos) {
     ecs.each([&](flecs::entity e, const Position& pos, const Size& size, MarkerComponent& marker) {
         if (isMouseOverMarker(pos, size, mousePos)) {
-            marker.isWindowActive = true;  // Abre a janela de configuração do marcador
+            marker.isWindowActive = true;  // Abre a janela de configuraÃ§Ã£o do marcador
         }
         });
 }
 
 
 void BoardManager::startMouseDrag(glm::vec2 mousePos) {
-    mouseStartPos = mousePos;  // Captura a posição inicial do mouse
+    mouseStartPos = mousePos;  // Captura a posiÃ§Ã£o inicial do mouse
 }
 
 glm::vec2 BoardManager::getMouseStartPosition() const {
