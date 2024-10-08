@@ -16,7 +16,7 @@
 #include <filesystem>
 
 BoardManager::BoardManager(flecs::world ecs, std::string shader_file_path)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), vertexArray(), indexBuffer(nullptr, 0), shader(shader_file_path), grid_shader(shader_file_path), mouseStartPos({0,0}), marker_directory(std::string(), std::string()){
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), vertexArray(), indexBuffer(nullptr, 0), shader(shader_file_path), mouseStartPos({0,0}), marker_directory(std::string(), std::string()){
     
     std::filesystem::path base_path = std::filesystem::current_path();
     std::filesystem::path marker_directory_path = base_path / "res" / "markers";
@@ -48,14 +48,14 @@ BoardManager::BoardManager(flecs::world ecs, std::string shader_file_path)
     // Initialize the index buffer
     indexBuffer = IndexBuffer(indices, 6);  // 6 indices for 2 triangles in the quad
 
-    glm::mat4 view_matrix = camera.getViewMatrix();
+    //glm::mat4 view_matrix = camera.getViewMatrix();
+    glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+
     // Shader initialization (assuming a vertex and fragment shader)
     shader.Bind();
-    shader.SetUniformMat4f("u_MVP", view_matrix);
+    shader.SetUniformMat4f("u_MVP", proj);
     shader.SetUniform1i("u_Texture", 0);  // Use texture slot 0 by default
     shader.SetUniform1f("u_Alpha", 1.0f);;
-    //shader.SetUniform1i("useTexture", 0); 
-    //shader.SetUniform4f("u_Color",0.0f, 0.0f, 0.0f, 1.0f);
     shader.Unbind();   // Shader initialization (assuming a vertex and fragment shader)
 
 }
@@ -142,20 +142,20 @@ void BoardManager::renderBoard() {
     });
 
 
-    //RENDER GRID
+    ////RENDER GRID
 
-    // Renderizar os marcadores
-    ecs.each([&](flecs::entity e, const MarkerComponent& marker, const Position& pos, const Size& size, const TextureComponent& texture, const Visibility& visibility) {
-        if (visibility.isVisible) {
-            renderMarker(texture.textureID, pos, size, viewMatrix);  // Renderizar o marcador
-        }
-        });
-    // Renderizar a névoa de guerra (Fog of War)
-    ecs.each([&](flecs::entity e, const FogOfWar& fog, const Position& pos, const Size& size, const Visibility& visibility) {
-        if (visibility.isVisible) {
-            renderFog(pos, size, viewMatrix, 1.0f);  // Renderizar a névoa com transparência
-        }
-        });
+    //// Renderizar os marcadores
+    //ecs.each([&](flecs::entity e, const MarkerComponent& marker, const Position& pos, const Size& size, const TextureComponent& texture, const Visibility& visibility) {
+    //    if (visibility.isVisible) {
+    //        renderMarker(texture.textureID, pos, size, viewMatrix);  // Renderizar o marcador
+    //    }
+    //    });
+    //// Renderizar a névoa de guerra (Fog of War)
+    //ecs.each([&](flecs::entity e, const FogOfWar& fog, const Position& pos, const Size& size, const Visibility& visibility) {
+    //    if (visibility.isVisible) {
+    //        renderFog(pos, size, viewMatrix, 1.0f);  // Renderizar a névoa com transparência
+    //    }
+    //    });
 }
 
 // Render Image (Board background)

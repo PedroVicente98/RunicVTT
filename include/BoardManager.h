@@ -99,7 +99,7 @@ public:
     DirectoryWindow marker_directory;
 private:
 
-    Shader grid_shader;  // Shader used for grid rendering
+    //Shader grid_shader;  // Shader used for grid rendering
 
     void renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
     void renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);

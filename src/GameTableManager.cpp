@@ -66,7 +66,7 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     // Certifique-se de que o ponteiro foi corretamente recuperado
     if (!game_table_manager) return;
-    std::cout << "MOUSE BUTTON CALLBACK: " << button << " | " << action << " | " << mods << std::endl;
+    //std::cout << "MOUSE BUTTON CALLBACK: " << button << " | " << action << " | " << mods << std::endl;
     glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
@@ -86,7 +86,7 @@ void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, d
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
-    std::cout << "CURSOR POSITION CALLBACK: " << xpos << " | " << ypos << std::endl;
+    //std::cout << "CURSOR POSITION CALLBACK: " << xpos << " | " << ypos << std::endl;
     game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
     if (game_table_manager->isBoardActive()) {
         if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
@@ -101,7 +101,7 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
 
-    std::cout << "SCROLL CALLBACK: " << yoffset << std::endl;
+    //std::cout << "SCROLL CALLBACK: " << yoffset << std::endl;
     float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
     if (game_table_manager->isBoardActive()) {
         game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager

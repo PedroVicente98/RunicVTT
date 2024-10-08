@@ -1,3 +1,21 @@
 ﻿  Verificando fontes para dependências de módulo...
-  Renderer.cpp
+  BoardManager.cpp
+C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1): warning C4005: 'flecs_STATIC': redefinição de macro
+  (compilando o arquivo fonte 'src/BoardManager.cpp')
+  C:\Dev\RunicVTT\vendor\flecs\flecs.h(2,1):
+  'flecs_STATIC' declarado anteriormente na linha de comando
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(66,114): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/BoardManager.cpp')
+  
+C:\Dev\RunicVTT\include\DirectoryWindow.h(66,80): warning C4244: 'argumento': conversão de 'double' para 'float', possível perda de dados
+  (compilando o arquivo fonte 'src/BoardManager.cpp')
+  
+C:\Dev\RunicVTT\src\BoardManager.cpp(351,54): warning C4267: 'argumento': conversão de 'size_t' para 'unsigned int', possível perda de dados
+C:\Dev\RunicVTT\src\BoardManager.cpp(356,44): warning C4267: 'argumento': conversão de 'size_t' para 'GLsizei', possível perda de dados
+C:\Dev\RunicVTT\src\BoardManager.cpp(424,13): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+C:\Dev\RunicVTT\src\BoardManager.cpp(430,13): warning C4244: 'inicializando': conversão de 'double' para 'float', possível perda de dados
+  VertexArray.cpp
+C:\Dev\RunicVTT\src\renderer\VertexArray.cpp(27,3): warning C4312: 'conversão de tipo': conversão de 'unsigned int' para 'const void *' de tamanho maior
+  Gerando Código...
   RunicVTT.vcxproj -> C:\Dev\RunicVTT\x64\Debug\RunicVTT.exe
