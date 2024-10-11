@@ -39,7 +39,9 @@ int ApplicationHandler::run()
 
     game_table_manager.setInputCallbacks(window);
     glfwSetWindowUserPointer(window, &game_table_manager);
-
+    int minWidth = 800;// AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÂO QUEBRA O LAYOUT
+    int minHeight = 600;
+    glfwSetWindowSizeLimits(window, minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     std::cout << glGetString(GL_VERSION) << std::endl;
     {//Escopo para finalizar OPenGL antes GlFW
