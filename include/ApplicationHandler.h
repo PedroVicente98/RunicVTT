@@ -39,7 +39,7 @@ public:
 private:
 	void renderMainMenuBar();
 	void renderDockSpace();
-	void renderActiveGametable();
+	void renderActiveGametable(VertexArray &va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 	GLFWwindow* window;
 	flecs::world ecs;

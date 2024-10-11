@@ -20,16 +20,16 @@ void main()
 
 out vec4 color;
 
-in vec2 v_TextCoord;     
+in vec2 v_TextCoord;
 
 //uniform vec4 u_Color;
 uniform sampler2D u_Texture;
-uniform float u_Alpha;  // Alpha value for transparency
+uniform float u_Alpha;
 
 void main()
 {
     vec4 textColor = texture(u_Texture, v_TextCoord);
-    textColor.a = textColor.a * u_Alpha;  // Modify the alpha value
+    textColor.a = textColor.a * u_Alpha;
     color = textColor;
 
 };

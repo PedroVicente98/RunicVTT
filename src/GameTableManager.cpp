@@ -340,10 +340,10 @@ void GameTableManager::closeNetworkPopUp() {
     }
 }
 
-void GameTableManager::render()
+void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer)
 {
     if (board_manager.isBoardActive()) {
         board_manager.marker_directory.renderDirectory();
-        board_manager.renderBoard();
+        board_manager.renderBoard(va, ib, shader, renderer);
     }
 }

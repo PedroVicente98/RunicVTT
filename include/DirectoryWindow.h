@@ -83,14 +83,13 @@ public:
                 std::string path_file = directoryPath +"\\" + image.filename.c_str();
                 if (image.textureID == 0) {
                     image = LoadTextureFromFile(path_file.c_str());
-                    std::cout << "textureID" << image.textureID << std::endl;
                 }
 
                 ImGui::BeginGroup();
                 ImGui::PushID(count);
                 if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
                     selected_image = image;
-                    std::cout << "Selected Image: " << image.filename << std::endl;
+                    std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
                     ImGui::OpenPopup("Image Popup");
                 }
 
@@ -175,7 +174,6 @@ private:
                     if (std::find(currentFiles.begin(),currentFiles.end(),*it) == currentFiles.end()) {
                         std::string removed_filename = *it;
                         auto image_it = findImageByFilename(images, removed_filename);
-                        std::cout << "delete texture_id" << image_it->textureID << " | " << image_it->filename << std::endl;
                         glDeleteTextures(1, &image_it->textureID);
                         image_it = images.erase(image_it);
                     }
@@ -237,7 +235,7 @@ private:
         std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
 
         // Output the duration in milliseconds
-        std::cout << "Operation for file "<< path <<"took " << duration.count() << " seconds" << std::endl;
+        //std::cout << "Operation for file "<< path <<"took " << duration.count() << " seconds" << std::endl;
 
         return ImageData(textureID[0], glm::vec2(width, height), path);
     }

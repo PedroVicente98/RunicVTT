@@ -22,6 +22,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string shader_di
     ecs.component<Notes>();
     ecs.component<ToolComponent>();
 
+   
 }
 
 ApplicationHandler::~ApplicationHandler()
@@ -45,6 +46,49 @@ int ApplicationHandler::run()
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glEnable(GL_BLEND));
         GLCall(glDisable(GL_DEPTH_TEST));
+
+        float positions[] = {
+         -1.0f, -1.0f, 0.0f, 0.0f,//0
+          1.0f, -1.0f, 1.0f, 0.0f,//1
+          1.0f, 1.0f,  1.0f, 1.0f,//2
+          -1.0f, 1.0f, 0.0f, 1.0f //3
+        };
+
+        unsigned int indices[] = {
+            0 , 1 , 2,
+            2 , 3 , 0
+        };
+
+
+        VertexArray va;
+        VertexBuffer vb(positions, 4/*number of vertexes*/ * 4/*floats per vertex*/ * sizeof(float));
+        VertexBufferLayout layout;
+
+        layout.Push<float>(2);
+        layout.Push<float>(2);
+        va.AddBuffer(vb, layout);
+
+        IndexBuffer ib(indices, 6);
+
+        glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+
+        std::filesystem::path base_path = std::filesystem::current_path();
+        std::filesystem::path shader_path = base_path / "res" / "shaders" / "Basic.shader";
+        Shader shader(shader_path.string());
+        shader.Bind();
+        shader.SetUniform1i("u_Texture", 0);
+        shader.SetUniformMat4f("u_MVP", proj);
+        shader.SetUniform1f("u_Alpha", 0.5f);
+
+        va.Unbind();
+        vb.Unbind();
+        ib.Unbind();
+        shader.Unbind();
+
+        Renderer renderer;
+        std::filesystem::path texture_path = base_path / "res" / "textures" / "PhandalinBattlemap2.png";
+        Texture texture(texture_path.string());
+        texture.Bind();
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -85,7 +129,7 @@ int ApplicationHandler::run()
 
             renderMainMenuBar();
             renderDockSpace();
-            renderActiveGametable();
+            renderActiveGametable(va, ib, shader, renderer);
 
             // Rendering
             ImGui::Render();
@@ -141,7 +185,7 @@ void ApplicationHandler::renderDockSpace()
    
 }
 
-void ApplicationHandler::renderActiveGametable() {
+void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
 
     if (game_table_manager.isGameTableActive()) {
 
@@ -156,13 +200,12 @@ void ApplicationHandler::renderActiveGametable() {
         int viewport_y = (int)(ImGui::GetIO().DisplaySize.y - window_pos.y - window_size.y); // Adjust for OpenGL's bottom-left origin
         int viewport_width = (int)window_size.x;
         int viewport_height = (int)window_size.y;
-        glViewport(viewport_x, viewport_y, viewport_width, viewport_height);
+        GLCall(glViewport(viewport_x, viewport_y, viewport_width, viewport_height));
 
-        game_table_manager.render();
+        game_table_manager.render(va, ib, shader, renderer);
 
         ImGui::End();
     }
-
 
 }
 

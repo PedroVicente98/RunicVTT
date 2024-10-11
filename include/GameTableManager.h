@@ -30,7 +30,7 @@ public:
 	void createNetworkPopUp();
 	void closeNetworkPopUp();
 
-	void render();
+	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 
 	void setInputCallbacks(GLFWwindow* window);

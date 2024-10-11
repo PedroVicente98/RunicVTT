@@ -49,7 +49,7 @@ public:
 	BoardManager(flecs::world ecs, std::string shader_file_path);
 	~BoardManager();
 
-	void renderBoard();  // Render board elements (map, markers, fog)
+	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
 	void renderToolbar();  // Render toolbar
 
     // Marker interactions

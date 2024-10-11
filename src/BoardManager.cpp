@@ -25,40 +25,7 @@ BoardManager::BoardManager(flecs::world ecs, std::string shader_file_path)
     marker_directory.directoryPath = marker_directory_path.string();
     marker_directory.startMonitoring();
 
-    // Initialize vertexArray and indexBuffer once (assuming basic quad for rendering)
-    float vertices[] = {
-            -1.0f, -1.0f, 0.0f, 0.0f,//0
-             1.0f, -1.0f, 1.0f, 0.0f,//1
-             1.0f, 1.0f,  1.0f, 1.0f,//2
-             -1.0f, 1.0f, 0.0f, 1.0f //3
-    };
-
-    unsigned int indices[] = {
-        0, 1, 2,
-        2, 3, 0
-    };
-
-    // Create and bind vertex buffer
-    VertexBuffer vb(vertices, sizeof(vertices));
-    VertexBufferLayout layout;
-    layout.Push<float>(2);  // Position
-    layout.Push<float>(2);  // TexCoord
-    vertexArray.AddBuffer(vb, layout);
-
-    // Initialize the index buffer
-    indexBuffer = IndexBuffer(indices, 6);  // 6 indices for 2 triangles in the quad
-
-    //glm::mat4 view_matrix = camera.getViewMatrix();
-    glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
-
-    // Shader initialization (assuming a vertex and fragment shader)
-    shader.Bind();
-    shader.SetUniformMat4f("u_MVP", proj);
-    shader.SetUniform1i("u_Texture", 0);  // Use texture slot 0 by default
-    shader.SetUniform1f("u_Alpha", 1.0f);;
-    shader.Unbind();   // Shader initialization (assuming a vertex and fragment shader)
-
-}
+ }
 
 BoardManager::~BoardManager()
 {
@@ -130,16 +97,44 @@ void BoardManager::renderToolbar() {
     ImGui::End();
 }
 
-void BoardManager::renderBoard() {
+void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
+
+    const Board* board = active_board.get<Board>();
+    const Panning* panning = active_board.get<Panning>();
+    const Zoom* zoom = active_board.get<Zoom>();
+    const Position* position = active_board.get<Position>();
+    const Grid* grid = active_board.get<Grid>();
+    const TextureComponent* texture = active_board.get<TextureComponent>();
+    const Size* size = active_board.get<Size>();
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
 
-    ImVec2 map_window_size = ImGui::GetWindowSize();
-    // Use `each()` to query and apply the function to the entity with the necessary components
-    ecs.each([&](flecs::entity entity, const TextureComponent& texture, const Position& pos, const Size& size, const Zoom& zoom, const Panning& panning, const Board& board, const Grid& grid) {
-        // Rendering the board image with texture
-        //renderGrid(viewMatrix, map_window_size.x, map_window_size.y);
-        renderImage(texture.textureID, pos, size, viewMatrix);
-    });
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
+    model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+        
+    ImVec2 window_size = ImGui::GetWindowSize();
+    glm::mat4 projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
+    glm::mat4 mvp = projection * viewMatrix * model;
+    
+    shader.Bind();
+    shader.SetUniformMat4f("u_MVP", mvp);
+    shader.SetUniform1f("u_Alpha", 1.0f);
+    shader.SetUniform1i("u_Texture", 0);
+    shader.Unbind();
+
+
+    GLCall(glActiveTexture(GL_TEXTURE0));
+    GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
+
+    renderer.Draw(va, ib, shader);
+
+    //ImVec2 map_window_size = ImGui::GetWindowSize();
+    //// Use `each()` to query and apply the function to the entity with the necessary components
+    //ecs.each([&](flecs::entity entity, const TextureComponent& texture, const Position& pos, const Size& size, const Zoom& zoom, const Panning& panning, const Board& board, const Grid& grid) {
+    //    // Rendering the board image with texture
+    //    //renderGrid(viewMatrix, map_window_size.x, map_window_size.y);
+    //    renderImage(texture.textureID, pos, size, viewMatrix);
+    //});
 
 
     ////RENDER GRID
@@ -157,65 +152,65 @@ void BoardManager::renderBoard() {
     //    }
     //    });
 }
+//
+//// Render Image (Board background)
+//void BoardManager::renderImage(GLuint textureID, const Position& pos, const Size& size, glm::mat4& viewMatrix) {
+//    
+//  
+//    // Model matrix: based on the position and size of the object
+//    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
+//    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
+//    
+//    ImVec2 window_size = ImGui::GetWindowSize();
+//    glm::mat4 projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
+//    // MVP: Multiply Projection * View * Model in this order
+//    glm::mat4 mvp = projection * viewMatrix * model;
+//
+//
+//    shader.Bind();
+//    shader.SetUniformMat4f("u_MVP", mvp);
+//    shader.SetUniform1f("u_Alpha", 1.0f);
+//    shader.SetUniform1i("u_Texture", 0);
+//    shader.Unbind();
+//
+//    GLCall(glBindTexture(GL_TEXTURE_2D, textureID));
+//    Renderer renderer;
+//    renderer.Draw(vertexArray, indexBuffer, shader);  // Render using the VAO/IBO
+//    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
+//    shader.Unbind();
+//}
 
-// Render Image (Board background)
-void BoardManager::renderImage(GLuint textureID, const Position& pos, const Size& size, glm::mat4& viewMatrix) {
-    
-  
-    // Model matrix: based on the position and size of the object
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
-    
-    ImVec2 window_size = ImGui::GetWindowSize();
-    glm::mat4 projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
-    // MVP: Multiply Projection * View * Model in this order
-    glm::mat4 mvp = projection * viewMatrix * model;
+//// Render Marker
+//void BoardManager::renderMarker(GLuint textureID, const Position& pos, const Size& size, glm::mat4& viewMatrix) {
+//    shader.Bind();
+//    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
+//    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
+//    glm::mat4 mvp = viewMatrix * model;
+//    shader.SetUniformMat4f("u_MVP", mvp);
+//    shader.SetUniform1i("u_Texture", 0);
+//    shader.SetUniform1i("useTexture", 1);
+//    Texture markerTexture("");  // Assuming you have the path to the marker's texture
+//    markerTexture.Bind();
+//    Renderer renderer;
+//    renderer.Draw(vertexArray, indexBuffer, shader);
+//    markerTexture.Unbind();
+//    shader.Unbind();
+//}
 
-
-    shader.Bind();
-    shader.SetUniformMat4f("u_MVP", mvp);
-    shader.SetUniform1f("u_Alpha", 1.0f);
-    shader.SetUniform1i("u_Texture", 0);
-    shader.Unbind();
-
-    GLCall(glBindTexture(GL_TEXTURE_2D, textureID));
-    Renderer renderer;
-    renderer.Draw(vertexArray, indexBuffer, shader);  // Render using the VAO/IBO
-    GLCall(glBindTexture(GL_TEXTURE_2D, 0));
-    shader.Unbind();
-}
-
-// Render Marker
-void BoardManager::renderMarker(GLuint textureID, const Position& pos, const Size& size, glm::mat4& viewMatrix) {
-    shader.Bind();
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
-    glm::mat4 mvp = viewMatrix * model;
-    shader.SetUniformMat4f("u_MVP", mvp);
-    shader.SetUniform1i("u_Texture", 0);
-    shader.SetUniform1i("useTexture", 1);
-    Texture markerTexture("");  // Assuming you have the path to the marker's texture
-    markerTexture.Bind();
-    Renderer renderer;
-    renderer.Draw(vertexArray, indexBuffer, shader);
-    markerTexture.Unbind();
-    shader.Unbind();
-}
-
-// Render Fog with transparency
-void BoardManager::renderFog(const Position& pos, const Size& size, const glm::mat4& viewMatrix, const float alpha) {
-    shader.Bind();
-    shader.SetUniform1i("useTexture", 0);
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
-    glm::mat4 mvp = viewMatrix * model;
-    shader.SetUniformMat4f("u_MVP", mvp);
-    shader.SetUniform1f("u_Alpha", alpha);  // Set transparency for fog
-
-    Renderer renderer;
-    renderer.Draw(vertexArray, indexBuffer, shader);
-    shader.Unbind();
-}
+//// Render Fog with transparency
+//void BoardManager::renderFog(const Position& pos, const Size& size, const glm::mat4& viewMatrix, const float alpha) {
+//    shader.Bind();
+//    shader.SetUniform1i("useTexture", 0);
+//    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
+//    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
+//    glm::mat4 mvp = viewMatrix * model;
+//    shader.SetUniformMat4f("u_MVP", mvp);
+//    shader.SetUniform1f("u_Alpha", alpha);  // Set transparency for fog
+//
+//    Renderer renderer;
+//    renderer.Draw(vertexArray, indexBuffer, shader);
+//    shader.Unbind();
+//}
 
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, glm::vec2 position) {
     Texture texture(imageFilePath);
@@ -281,84 +276,84 @@ glm::vec2 BoardManager::getMouseStartPosition() const {
     return mouseStartPos;
 }
 
-void BoardManager::renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight) {
-    ecs.each([&](flecs::entity entity, const Grid& grid) {
-        glm::mat4 mvp = viewMatrix;  // Use viewMatrix as part of the MVP
+//void BoardManager::renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight) {
+//    ecs.each([&](flecs::entity entity, const Grid& grid) {
+//        glm::mat4 mvp = viewMatrix;  // Use viewMatrix as part of the MVP
+//
+//        if (grid.is_hex) {
+//            renderHexGrid(mvp, windowWidth, windowHeight, grid);
+//        }
+//        else {
+//            renderSquareGrid(mvp, windowWidth, windowHeight, grid);
+//        }
+//        });
+//}
+//
+//void BoardManager::renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid) {
+//    std::vector<glm::vec2> vertices;
+//
+//    // Generate vertical and horizontal lines for square grid
+//    for (float x = -grid.offset.x; x < windowWidth; x += grid.scale.x) {
+//        vertices.push_back(glm::vec2(x, 0.0f));
+//        vertices.push_back(glm::vec2(x, windowHeight));
+//    }
+//    for (float y = -grid.offset.y; y < windowHeight; y += grid.scale.y) {
+//        vertices.push_back(glm::vec2(0.0f, y));
+//        vertices.push_back(glm::vec2(windowWidth, y));
+//    }
+//
+//    renderLineVertices(vertices, mvp);
+//}
+//
+//void BoardManager::renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid) {
+//    std::vector<glm::vec2> vertices;
+//    float hexWidth = grid.scale.x;
+//    float hexHeight = grid.scale.y;
+//    float threeQuarterHexHeight = hexHeight * 0.75f;
+//
+//    for (float y = -grid.offset.y; y < windowHeight; y += threeQuarterHexHeight) {
+//        for (float x = -grid.offset.x; x < windowWidth; x += hexWidth * 0.75f) {
+//            float adjustedX = (int(y / hexHeight) % 2 == 0) ? x : x + (hexWidth * 0.5f);
+//            addHexagonVertices(adjustedX, y, hexWidth * 0.5f, vertices);
+//        }
+//    }
+//
+//    renderLineVertices(vertices, mvp);
+//}
+//
+//void BoardManager::addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices) {
+//    constexpr float angleIncrement  = glm::radians(60.0f);  // 60 degrees for hexagon angles
+//
+//    for (int i = 0; i < 6; ++i) {
+//        float angle1 = i * angleIncrement;
+//        float angle2 = (i + 1) * angleIncrement;
+//
+//        glm::vec2 p1 = glm::vec2(x + radius * cos(angle1), y + radius * sin(angle1));
+//        glm::vec2 p2 = glm::vec2(x + radius * cos(angle2), y + radius * sin(angle2));
+//
+//        vertices.push_back(p1);
+//        vertices.push_back(p2);  // Line from p1 to p2
+//    }
+//}
 
-        if (grid.is_hex) {
-            renderHexGrid(mvp, windowWidth, windowHeight, grid);
-        }
-        else {
-            renderSquareGrid(mvp, windowWidth, windowHeight, grid);
-        }
-        });
-}
-
-void BoardManager::renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid) {
-    std::vector<glm::vec2> vertices;
-
-    // Generate vertical and horizontal lines for square grid
-    for (float x = -grid.offset.x; x < windowWidth; x += grid.scale.x) {
-        vertices.push_back(glm::vec2(x, 0.0f));
-        vertices.push_back(glm::vec2(x, windowHeight));
-    }
-    for (float y = -grid.offset.y; y < windowHeight; y += grid.scale.y) {
-        vertices.push_back(glm::vec2(0.0f, y));
-        vertices.push_back(glm::vec2(windowWidth, y));
-    }
-
-    renderLineVertices(vertices, mvp);
-}
-
-void BoardManager::renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid) {
-    std::vector<glm::vec2> vertices;
-    float hexWidth = grid.scale.x;
-    float hexHeight = grid.scale.y;
-    float threeQuarterHexHeight = hexHeight * 0.75f;
-
-    for (float y = -grid.offset.y; y < windowHeight; y += threeQuarterHexHeight) {
-        for (float x = -grid.offset.x; x < windowWidth; x += hexWidth * 0.75f) {
-            float adjustedX = (int(y / hexHeight) % 2 == 0) ? x : x + (hexWidth * 0.5f);
-            addHexagonVertices(adjustedX, y, hexWidth * 0.5f, vertices);
-        }
-    }
-
-    renderLineVertices(vertices, mvp);
-}
-
-void BoardManager::addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices) {
-    constexpr float angleIncrement  = glm::radians(60.0f);  // 60 degrees for hexagon angles
-
-    for (int i = 0; i < 6; ++i) {
-        float angle1 = i * angleIncrement;
-        float angle2 = (i + 1) * angleIncrement;
-
-        glm::vec2 p1 = glm::vec2(x + radius * cos(angle1), y + radius * sin(angle1));
-        glm::vec2 p2 = glm::vec2(x + radius * cos(angle2), y + radius * sin(angle2));
-
-        vertices.push_back(p1);
-        vertices.push_back(p2);  // Line from p1 to p2
-    }
-}
-
-void BoardManager::renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp) {
-    shader.Bind();
-    shader.SetUniformMat4f("u_MVP", mvp);
-    shader.SetUniform4f("u_Color", 0.0f, 0.0f, 0.0f, 1.0f);
-    shader.SetUniform1i("useTexture", 1);
-
-    VertexArray va;
-    VertexBuffer vb(vertices.data(), vertices.size() * sizeof(glm::vec2));
-    VertexBufferLayout layout;
-    layout.Push<float>(2);  // Each vertex has 2 components (x, y)
-    va.AddBuffer(vb, layout);
-
-    glDrawArrays(GL_LINES, 0, vertices.size());
-
-    va.Unbind();
-    vb.Unbind();
-    shader.Unbind();
-}
+//void BoardManager::renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp) {
+//    shader.Bind();
+//    shader.SetUniformMat4f("u_MVP", mvp);
+//    shader.SetUniform4f("u_Color", 0.0f, 0.0f, 0.0f, 1.0f);
+//    shader.SetUniform1i("useTexture", 1);
+//
+//    VertexArray va;
+//    VertexBuffer vb(vertices.data(), vertices.size() * sizeof(glm::vec2));
+//    VertexBufferLayout layout;
+//    layout.Push<float>(2);  // Each vertex has 2 components (x, y)
+//    va.AddBuffer(vb, layout);
+//
+//    glDrawArrays(GL_LINES, 0, vertices.size());
+//
+//    va.Unbind();
+//    vb.Unbind();
+//    shader.Unbind();
+//}
 
 // Handles mouse input for moving and resizing the grid
 void BoardManager::handleGridTool(const glm::vec2& mouseDelta, float scrollDelta) {
