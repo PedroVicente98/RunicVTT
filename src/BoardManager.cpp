@@ -215,13 +215,17 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, glm::vec2 position) {
     Texture texture(imageFilePath);
 
-    return ecs.entity()
+     flecs::entity marker = ecs.entity()
         .set(MarkerComponent{ false })
         .set(Position{ (int)position.x, (int)position.y })
         .set(Size{ 1.0f, 1.0f })
         .set(TextureComponent{ texture.GetRendererID(), imageFilePath })
         .set(Visibility{ true })
         .set(Moving{ false });
+
+    marker.add(flecs::ChildOf, active_board);
+
+    return marker;
 }
 
 void BoardManager::deleteMarker(flecs::entity markerEntity) {
