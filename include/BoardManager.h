@@ -81,7 +81,7 @@ public:
 	void renderToolbar();  // Render toolbar
 
     void resetCamera();
-
+	
     // Marker interactions
     flecs::entity createMarker(const std::string& imageFilePath, glm::vec2 position);
     void deleteMarker(flecs::entity markerEntity);
@@ -120,7 +120,7 @@ public:
     void closeBoard();
     void setActiveBoard(flecs::entity board_entity);
 
-
+    void renderEditWindow(flecs::entity entity);
     void startMouseDrag(glm::vec2 mousePos);
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
