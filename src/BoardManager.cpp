@@ -79,22 +79,39 @@ void BoardManager::setActiveBoard(flecs::entity board_entity)
 }
 
 void BoardManager::renderToolbar() {
-    ImGui::Begin("Toolbar");
+    ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
+    ImVec4 activeColor = ImVec4(0.2f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
 
-    if (ImGui::Button("Move Tool")) {
-        setCurrentTool(Tool::MOVE);
+    // Tool: Move
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? activeColor : defaultColor);
+    if (ImGui::Button("Move Tool", ImVec2(80, 40))) {
+        currentTool = Tool::MOVE;
     }
-    if (ImGui::Button("Marker Tool")) {
-        setCurrentTool(Tool::MARKER);
-    }
-    if (ImGui::Button("Fog Tool")) {
-        setCurrentTool(Tool::FOG);
-    }
-    if (ImGui::Button("Select Tool")) {
-        setCurrentTool(Tool::SELECT);
-    }
+    ImGui::PopStyleColor();
+    ImGui::SameLine(); // Ensure buttons are on the same row
 
-    ImGui::End();
+    // Tool: Fog
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
+    if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
+        currentTool = Tool::FOG;
+    }
+    ImGui::PopStyleColor();
+    ImGui::SameLine(); // Ensure buttons are on the same row
+
+    // Tool: Marker
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MARKER ? activeColor : defaultColor);
+    if (ImGui::Button("Marker Tool", ImVec2(80, 40))) {
+        currentTool = Tool::MARKER;
+    }
+    ImGui::PopStyleColor();
+    ImGui::SameLine(); // Ensure buttons are on the same row
+
+    // Tool: Select
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
+    if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
+        currentTool = Tool::SELECT;
+    }
+    ImGui::PopStyleColor();
 }
 
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
@@ -215,13 +232,17 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, glm::vec2 position) {
     Texture texture(imageFilePath);
 
-    return ecs.entity()
+     flecs::entity marker = ecs.entity()
         .set(MarkerComponent{ false })
         .set(Position{ (int)position.x, (int)position.y })
         .set(Size{ 1.0f, 1.0f })
         .set(TextureComponent{ texture.GetRendererID(), imageFilePath })
         .set(Visibility{ true })
         .set(Moving{ false });
+
+    marker.add(flecs::ChildOf, active_board);
+
+    return marker;
 }
 
 void BoardManager::deleteMarker(flecs::entity markerEntity) {
