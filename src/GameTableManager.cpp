@@ -95,15 +95,19 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
             if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE && game_table_manager->isMouseInsideMapWindow()) {
-                game_table_manager->board_manager.startMouseDrag(mouse_pos);
+		if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
+			//game_table_manager->board_manager.startMarkerDrag();
+		}else{
+                	game_table_manager->board_manager.startMouseDrag(mouse_pos);
+		}
             }
 
             if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
                 game_table_manager->board_manager.handleFogCreation(mouse_pos);
             }
-            else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
-                game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
-            }
+            //else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
+            //    game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
+            //}
         }
     }
 
