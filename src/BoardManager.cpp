@@ -489,11 +489,13 @@ glm::vec2 BoardManager::roundAxial(const glm::vec2& axial) {
 }
 
 flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
-    return ecs.entity()
+    auto fog = ecs.entity()
         .set(FogOfWar{ false })
         .set(Position{ (int)startPos.x, (int)startPos.y })
         .set(Size{ size.x, size.y })
         .set(Visibility{ true });
+    fog.add(flecs::ChildOf, active_board);
+    return fog;
 }
 
 void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
