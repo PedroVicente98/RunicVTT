@@ -525,6 +525,59 @@ void BoardManager::setCurrentTool(Tool newTool) {
     currentTool = newTool;
 }
 
+void BoardManager::renderEditWindow(flecs::entity entity) {
+    // Get the current mouse position to set the window position
+    ImVec2 mousePos = ImGui::GetMousePos();
+    
+    // Set the cursor position to the current mouse position
+    ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
+    
+    // Define the window title (you can customize this as needed)
+    ImGui::Begin("Edit Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
+
+    // Retrieve the Size and Visibility components of the entity
+    if (entity.has<Size>() && entity.has<Visibility>()) {
+        auto& size = entity.get_mut<Size>();  // Mutable access to the size
+        auto& visibility = entity.get_mut<Visibility>()->isVisible;  // Mutable access to the visibility
+
+        // Slider for size change (adjust range as needed)
+        if (ImGui::SliderFloat("Size", &scale, 0.1f, 10.0f, "%.1fx")) {
+            // Apply the scale change, adjusting the height to maintain aspect ratio
+            size.width = size.width * scale;
+            size.height = size.heigh * scale;  // Adjust height proportionally to the width
+        }
+
+        // Checkbox for visibility change
+        ImGui::Checkbox("Visible", &visibility);
+
+        ImGui::Separator();
+
+        // Button to delete the entity (with a confirmation popup)
+        if (ImGui::Button("Delete")) {
+            ImGui::OpenPopup("Confirm Delete");
+        }
+
+        // Confirm delete popup
+        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+            ImGui::Text("Are you sure you want to delete this entity?");
+            ImGui::Separator();
+
+            if (ImGui::Button("Yes", ImVec2(120, 0))) {
+                entity.destruct();  // Delete the entity
+                ImGui::CloseCurrentPopup();  // Close the popup after deletion
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("No", ImVec2(120, 0))) {
+                ImGui::CloseCurrentPopup();  // Close the popup without deletion
+            }
+            ImGui::EndPopup();
+        }
+    } else {
+        ImGui::Text("Invalid entity or missing components!");
+    }
+
+    ImGui::End();
+}
 
 
 //================OLD ===================================
