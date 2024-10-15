@@ -194,8 +194,38 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
         game_table_manager.chat.renderChat();
 
         //ImGui::ShowMetricsWindow();
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
         ImGui::Begin("MapWindow", nullptr, window_flags);
+        if (game_table_manager.isBoardActive()) {
+
+            ImVec2 window_size = ImGui::GetWindowSize();
+            ImVec2 window_pos = ImGui::GetWindowPos();
+
+            ImGui::SetCursorScreenPos(window_pos);
+            ImGui::InvisibleButton("##MapDropArea", window_size);
+            // Handle the drop payload
+            if (ImGui::BeginDragDropTarget()) {
+                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
+                    // Extract the marker image payload
+                    //IM_ASSERT(payload->DataSize == sizeof(MarkerImageData));  // Ensure correct payload size
+                    const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
+
+                    // Calculate drop position (use the mouse position relative to the window)
+                    ImVec2 dropPos = ImGui::GetMousePos();
+                    ImVec2 windowPos = ImGui::GetWindowPos();
+                    ImVec2 relativeDropPos = { dropPos.x - windowPos.x, dropPos.y - windowPos.y };
+                    std::cout << "dropPos: " << dropPos.x << "," << dropPos.y << " | relativeDropPos: " << relativeDropPos.x << ',' << relativeDropPos.y << " | windowPos: " << windowPos.x << "," << windowPos.y << std::endl;
+                    //// Convert the drop position to the board's coordinate system (you may need to adjust this based on your MVP matrix)
+                    //glm::vec2 markerPosition = screenToWorldPosition(relativeDropPos);
+
+                    //// Create the marker at the dropped position
+                    //createMarker(markerImage->name, markerPosition, markerImage->size, true, markerImage->textureID);
+                }
+                ImGui::EndDragDropTarget();
+            }
+        }
+
+
         ImVec2 window_pos = ImGui::GetWindowPos();
         ImVec2 window_size = ImGui::GetWindowSize();
         int viewport_x = (int)window_pos.x; // Cast to int, ImGui uses float which might not necessarily align with pixel units

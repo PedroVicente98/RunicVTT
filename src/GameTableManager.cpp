@@ -62,6 +62,29 @@ void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetScrollCallback(window, scrollCallback);
 }
 
+
+
+bool GameTableManager::isMouseInsideMapWindow() {
+    // Get the pointer to the MapWindow by name
+    ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
+    if (!window) return false;  // If window doesn't exist, return false
+
+    // Get the mouse position
+    ImVec2 mousePos = ImGui::GetMousePos();
+
+    // Get the window position and size
+    ImVec2 windowPos = window->Pos;  // Top-left corner
+    ImVec2 windowSize = window->Size;  // Size of the window
+
+    // Check if the mouse is inside the window boundaries
+    bool isInsideX = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x);
+    bool isInsideY = (mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+
+    // Return true if both X and Y coordinates are inside the window
+    return isInsideX && isInsideY;
+}
+
+
 // Callback estático de botão do mouse
 void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     // Recupera o ponteiro para a instância do GameTableManager
@@ -71,7 +94,7 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
-            if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
+            if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE && game_table_manager->isMouseInsideMapWindow()) {
                 game_table_manager->board_manager.startMouseDrag(mouse_pos);
             }
 

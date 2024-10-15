@@ -12,6 +12,8 @@
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image/stb_image.h"
 
+
+
 class DirectoryWindow {
 public:
     DirectoryWindow(std::string directoryPath, std::string directoryName) {
@@ -87,15 +89,33 @@ public:
 
                 ImGui::BeginGroup();
                 ImGui::PushID(count);
-                if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
-                    selected_image = image;
-                    std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
-                    ImGui::OpenPopup("Image Popup");
-                }
 
-                if (ImGui::BeginPopup("Image Popup")) {
-                    ImGui::Text("File: %s", image.filename.c_str());
-                    ImGui::EndPopup();
+                if (is_map_directory == false) {
+                    // Add drag-and-drop functionality for marker images
+                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
+                        selected_image = image;
+                        std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
+                        ImGui::OpenPopup("Image Popup");
+                    }
+
+                    // Begin the drag source for the markers
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
+                        ImGui::SetDragDropPayload("MARKER_IMAGE", &image, sizeof(image));  // Attach the marker image payload
+                        ImGui::Text("Drag Marker: %s", image.filename.c_str());  // Tooltip while dragging
+                        ImGui::EndDragDropSource();
+                    }
+                }
+                else {
+                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
+                        selected_image = image;
+                        std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
+                        ImGui::OpenPopup("Image Popup");
+                    }
+
+                    if (ImGui::BeginPopup("Image Popup")) {
+                        ImGui::Text("File: %s", image.filename.c_str());
+                        ImGui::EndPopup();
+                    }
                 }
                 ImGui::TextWrapped("%s", TruncateString(image.filename.c_str(), 16).c_str());
                 ImGui::PopID();
