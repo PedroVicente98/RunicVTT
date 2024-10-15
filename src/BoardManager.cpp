@@ -539,7 +539,7 @@ void BoardManager::renderEditWindow(flecs::entity entity) {
     if (entity.has<Size>() && entity.has<Visibility>()) {
         auto& size = entity.get_mut<Size>();  // Mutable access to the size
         auto& visibility = entity.get_mut<Visibility>()->isVisible;  // Mutable access to the visibility
-
+        float scale = 1.0f;
         // Slider for size change (adjust range as needed)
         if (ImGui::SliderFloat("Size", &scale, 0.1f, 10.0f, "%.1fx")) {
             // Apply the scale change, adjusting the height to maintain aspect ratio
