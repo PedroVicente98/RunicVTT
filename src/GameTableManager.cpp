@@ -55,7 +55,7 @@ void GameTableManager::closeConnection() {
 void GameTableManager::resetCamera() {
     board_manager.resetCamera();
 }
-// FunÁ„o para configurar os callbacks do GLFW
+// Fun√ß√£o para configurar os callbacks do GLFW
 void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
     glfwSetCursorPosCallback(window, cursorPositionCallback);
@@ -85,13 +85,13 @@ bool GameTableManager::isMouseInsideMapWindow() {
 }
 
 
-// Callback est·tico de bot„o do mouse
+// Callback est√°tico de bot√£o do mouse
 void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    // Recupera o ponteiro para a inst‚ncia do GameTableManager
+    // Recupera o ponteiro para a inst√¢ncia do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
 
-    glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posiÁ„o atual do mouse
+    glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posi√ß√£o atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
             if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE && game_table_manager->isMouseInsideMapWindow()) {
@@ -116,12 +116,12 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
 
 }
 
-// Callback est·tico de movimentaÁ„o do cursor
+// Callback est√°tico de movimenta√ß√£o do cursor
 void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-    // Recupera o ponteiro para a inst‚ncia do GameTableManager
+    // Recupera o ponteiro para a inst√¢ncia do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
-    game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posiÁ„o do mouse
+    game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posi√ß√£o do mouse
     if (game_table_manager->isBoardActive()) {
         if (game_table_manager->board_manager.isDragging()) {
             game_table_manager->board_manager.panBoard(game_table_manager->current_mouse_pos);
@@ -133,9 +133,9 @@ void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, d
     }
 }
 
-// Callback est·tico de scroll (zoom)
+// Callback est√°tico de scroll (zoom)
 void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-    // Recupera o ponteiro para a inst‚ncia do GameTableManager
+    // Recupera o ponteiro para a inst√¢ncia do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
 
@@ -205,7 +205,7 @@ void GameTableManager::createBoardPopUp() {
         // Dividindo a janela em duas colunas
         ImGui::Columns(2, nullptr, false);
 
-        // Coluna esquerda: formul·rio de criaÁ„o do board
+        // Coluna esquerda: formul√°rio de cria√ß√£o do board
         ImGui::Text("Create a new board");
 
         // Campo para o nome do board
@@ -214,7 +214,7 @@ void GameTableManager::createBoardPopUp() {
 
         ImGui::NewLine();
 
-        // Pega a imagem selecionada do diretÛrio de mapas
+        // Pega a imagem selecionada do diret√≥rio de mapas
         DirectoryWindow::ImageData selectedImage = map_directory.getSelectedImage();
 
         if (!selectedImage.filename.empty()) {
@@ -227,23 +227,23 @@ void GameTableManager::createBoardPopUp() {
 
         ImGui::NewLine();
 
-        // Bot„o para salvar o board, habilitado apenas se houver nome e mapa selecionado
+        // Bot√£o para salvar o board, habilitado apenas se houver nome e mapa selecionado
         if (ImGui::Button("Save") && !selectedImage.filename.empty() && strlen(buffer) > 0) {
             // Cria o board com o mapa e o nome inseridos
             auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
             board.add(flecs::ChildOf, active_game_table);
 
-            // Limpa a seleÁ„o apÛs salvar
+            // Limpa a sele√ß√£o ap√≥s salvar
             map_directory.clearSelectedImage();
             memset(buffer, '\0', sizeof(buffer));
 
-            // Fecha o popup apÛs salvar
+            // Fecha o popup ap√≥s salvar
             ImGui::CloseCurrentPopup();
         }
 
         ImGui::SameLine();
 
-        // Bot„o para fechar o popup
+        // Bot√£o para fechar o popup
         if (ImGui::Button("Close")) {
             map_directory.clearSelectedImage();  // Limpa o caminho ao fechar
             ImGui::CloseCurrentPopup();
@@ -253,10 +253,10 @@ void GameTableManager::createBoardPopUp() {
 
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
-        // Coluna direita: diretÛrio de mapas para seleÁ„o de imagem
-        map_directory.renderDirectory(true);  // Renderiza o diretÛrio de mapas dentro da coluna direita
+        // Coluna direita: diret√≥rio de mapas para sele√ß√£o de imagem
+        map_directory.renderDirectory(true);  // Renderiza o diret√≥rio de mapas dentro da coluna direita
 
-        ImGui::Columns(1);  // Volta para uma ˙nica coluna
+        ImGui::Columns(1);  // Volta para uma √∫nica coluna
 
         ImGui::EndPopup();
     }
@@ -381,6 +381,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 {
     if (board_manager.isBoardActive()) {
         board_manager.marker_directory.renderDirectory();
+	board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);
     }
 }
