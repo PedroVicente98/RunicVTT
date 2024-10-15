@@ -544,7 +544,7 @@ void BoardManager::renderEditWindow(flecs::entity entity) {
         if (ImGui::SliderFloat("Size", &scale, 0.1f, 10.0f, "%.1fx")) {
             // Apply the scale change, adjusting the height to maintain aspect ratio
             size.width = size.width * scale;
-            size.height = size.heigh * scale;  // Adjust height proportionally to the width
+            size.height = size.height * scale;  // Adjust height proportionally to the width
         }
 
         // Checkbox for visibility change
