@@ -66,6 +66,11 @@ private:
 
 
 enum class Tool{ MOVE, FOG, MARKER, SELECT};
+//MOVE - Move Camera and Markers;
+//FOG - Create FOG and TOGGLE VISIBILITY
+//MARKER - Toggle Marker Visibility? MIGHT NOT BE NECESSARY
+//SELECT - Select Marker/Fog, opening an edit window(change size, visibility, and delete)
+
 
 class BoardManager {
 public:
