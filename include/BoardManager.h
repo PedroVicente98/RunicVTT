@@ -44,10 +44,20 @@ public:
     float getZoom() const {
         return zoomLevel;
     }
-    glm::mat4 getViewMatrix() const {
+/*    glm::mat4 getViewMatrix() const {
         // First translate the view by the camera position, then scale it by the zoom level
         return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
+    } */
+
+    glm::mat4 getViewMatrix() const {
+    	// Calculate the center offset based on window size and zoom level
+    	glm::vec2 centerOffset = window_size * 0.5f / zoomLevel;
+    	// Translate the camera view to the origin, apply zoom, and then translate it back
+    	glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(-position + centerOffset, 0.0f));
+ 	// Apply the zoom as scaling around the origin
+    	return glm::scale(translation, glm::vec3(zoomLevel));
     }
+
 
     glm::vec2 getWindowSize() {
         return window_size;
