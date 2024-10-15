@@ -209,14 +209,28 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
                     // Extract the marker image payload
                     //IM_ASSERT(payload->DataSize == sizeof(MarkerImageData));  // Ensure correct payload size
                     const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
-
+                    std::cout << "IMAGE DATA: " << markerImage->textureID << " FILE: " << markerImage->filename << std::endl;
                     // Calculate drop position (use the mouse position relative to the window)
-                    ImVec2 dropPos = ImGui::GetMousePos();
+                                  // 1. Get mouse position relative to the ImGui window
+                    ImVec2 imguiMousePos = ImGui::GetMousePos();
+                    ImVec2 windowSize = ImGui::GetWindowSize();
                     ImVec2 windowPos = ImGui::GetWindowPos();
-                    ImVec2 relativeDropPos = { dropPos.x - windowPos.x, dropPos.y - windowPos.y };
-                    std::cout << "dropPos: " << dropPos.x << "," << dropPos.y << " | relativeDropPos: " << relativeDropPos.x << ',' << relativeDropPos.y << " | windowPos: " << windowPos.x << "," << windowPos.y << std::endl;
-                    //// Convert the drop position to the board's coordinate system (you may need to adjust this based on your MVP matrix)
-                    //glm::vec2 markerPosition = screenToWorldPosition(relativeDropPos);
+                    
+                    ImVec2 relativeDropPos = { imguiMousePos.x - windowPos.x, imguiMousePos.y - windowPos.y };
+                    std::cout << "dropPos: " << imguiMousePos.x << "," << imguiMousePos.y << " | relativeDropPos: " << relativeDropPos.x << ',' << relativeDropPos.y << " | windowPos: " << windowPos.x << "," << windowPos.y << std::endl;
+                    
+                    // 2. Translate ImGui coordinates to OpenGL screen coordinates
+                    float openglX = imguiMousePos.x - windowPos.x;
+                    float openglY = (windowPos.y + windowSize.y) - imguiMousePos.y;  // Flip Y-axis
+
+                    // 3. Convert to NDC coordinates
+                    float ndcX = (2.0f * openglX) / windowSize.x - 1.0f;
+                    float ndcY = (2.0f * openglY) / windowSize.y - 1.0f;
+
+                    // 4. Convert NDC to World Coordinates using the inverse MVP
+                    glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);  // Assuming z = 0.0f for a flat 2D map
+                    //glm::mat4 MVP = game_table_manager.getActiveBoardMVP();  // Fetch the MVP matrix for the board
+                    //glm::vec4 worldPos = glm::inverse(MVP) * ndcPos;
 
                     //// Create the marker at the dropped position
                     //createMarker(markerImage->name, markerPosition, markerImage->size, true, markerImage->textureID);
