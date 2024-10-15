@@ -24,21 +24,44 @@
 
 class Camera {
 public:
-    Camera() : position(0.0f, 0.0f), zoomLevel(1.0f) {}
-
+    Camera() : position(0.0f, 0.0f), zoomLevel(1.0f) {}  // Set initial zoom to 1.0f for no scaling by default
+    
     void pan(glm::vec2 delta) {
         position += delta;
     }
     void zoom(float zoomFactor) {
         zoomLevel *= zoomFactor;
     }
-    glm::mat4 getViewMatrix() {
-        return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f)), glm::vec3(zoomLevel));
+    void setPosition(glm::vec2 newPosition) {
+        position = newPosition;
+    }
+    glm::vec2 getPosition() const {
+        return position;
+    }
+    void setZoom(float newZoomLevel) {
+        zoomLevel = newZoomLevel;
+    }
+    float getZoom() const {
+        return zoomLevel;
+    }
+    glm::mat4 getViewMatrix() const {
+        // First translate the view by the camera position, then scale it by the zoom level
+        return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
     }
 
+    glm::vec2 getWindowSize() {
+        return window_size;
+    }
+
+    void setWindowSize(glm::vec2 window_size) {
+        this->window_size = window_size;
+    }
+    
+
 private:
-    glm::vec2 position;
-    float zoomLevel;
+    glm::vec2 position;  // 2D position of the camera (X, Y)
+    float zoomLevel;     // Zoom level, where 1.0f means no zoom, > 1.0f means zoom in, < 1.0f means zoom out
+    glm::vec2 window_size;
 };
 
 
@@ -46,11 +69,13 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs, std::string shader_file_path);
+	BoardManager(flecs::world ecs);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
 	void renderToolbar();  // Render toolbar
+
+    void resetCamera();
 
     // Marker interactions
     flecs::entity createMarker(const std::string& imageFilePath, glm::vec2 position);
@@ -75,7 +100,7 @@ public:
     void handleFogCreation(glm::vec2 mousePos);
 
     // Camera manipulation
-    void panBoard(glm::vec2 delta);
+    void panBoard(glm::vec2 currentMousePos);
     void zoomBoard(float zoomFactor);
 
     // Toolbar tool management
@@ -92,19 +117,19 @@ public:
 
 
     void startMouseDrag(glm::vec2 mousePos);
+    void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
-
-
+    bool isDragging();
 	std::string board_name;
     DirectoryWindow marker_directory;
 private:
 
     //Shader grid_shader;  // Shader used for grid rendering
 
-    void renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
-    void renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
-    void addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices);
-    void renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp);
+    //void renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
+    //void renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
+    //void addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices);
+    //void renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp);
 
     // Snap to grid helper functions
     glm::vec2 snapToSquareGrid(const glm::vec2& position, const Grid& grid);
@@ -116,10 +141,10 @@ private:
     glm::vec2 roundAxial(const glm::vec2& axial);
 
     // Render functions (private)
-    void renderImage(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
-    void renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight);
-    void renderMarker(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
-    void renderFog(const Position &pos, const Size &size, const glm::mat4 &viewMatrix, const float alpha);
+    //void renderImage(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
+    //void renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight);
+    //void renderMarker(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
+    //void renderFog(const Position &pos, const Size &size, const glm::mat4 &viewMatrix, const float alpha);
 
     glm::vec2 mouseStartPos;
 
@@ -127,9 +152,4 @@ private:
 	flecs::entity active_board = flecs::entity();
     Camera camera;
     Tool currentTool;  // Active tool for interaction
-    // Rendering resources
-    VertexArray vertexArray;
-    IndexBuffer indexBuffer;
-    Shader shader;  // Shared shader used across renderings
-
 };

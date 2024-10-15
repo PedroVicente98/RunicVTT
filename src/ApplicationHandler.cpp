@@ -3,8 +3,8 @@
 #include "glm/glm.hpp"
 
 
-ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string shader_directory_path)
-    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs, shader_directory_path), window(window)
+ApplicationHandler::ApplicationHandler(GLFWwindow* window)
+    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs), window(window)
 {
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -39,8 +39,8 @@ int ApplicationHandler::run()
 
     game_table_manager.setInputCallbacks(window);
     glfwSetWindowUserPointer(window, &game_table_manager);
-    int minWidth = 800;// AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÂO QUEBRA O LAYOUT
-    int minHeight = 600;
+    int minWidth = 1280; // AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÂO QUEBRA O LAYOUT
+    int minHeight = 960;
     glfwSetWindowSizeLimits(window, minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
     std::cout << glGetString(GL_VERSION) << std::endl;
@@ -262,6 +262,9 @@ void ApplicationHandler::renderMainMenuBar() {
                 close_current_board = true;
             }
             if (ImGui::MenuItem("Open", "Ctrl+Y")) {
+            }
+            if (ImGui::MenuItem("Reset Camera")) {
+                game_table_manager.resetCamera();
             }
             ImGui::EndMenu();
         }

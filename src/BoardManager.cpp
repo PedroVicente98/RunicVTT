@@ -15,8 +15,8 @@
 #include "Components.h"
 #include <filesystem>
 
-BoardManager::BoardManager(flecs::world ecs, std::string shader_file_path)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), vertexArray(), indexBuffer(nullptr, 0), shader(shader_file_path), mouseStartPos({0,0}), marker_directory(std::string(), std::string()){
+BoardManager::BoardManager(flecs::world ecs)
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()){
     
     std::filesystem::path base_path = std::filesystem::current_path();
     std::filesystem::path marker_directory_path = base_path / "res" / "markers";
@@ -108,14 +108,14 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     const Size* size = active_board.get<Size>();
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
 
-
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
     model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
         
     ImVec2 window_size = ImGui::GetWindowSize();
-    glm::mat4 projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
     glm::mat4 mvp = projection * viewMatrix * model;
-    
+    camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
+
     shader.Bind();
     shader.SetUniformMat4f("u_MVP", mvp);
     shader.SetUniform1f("u_Alpha", 1.0f);
@@ -270,11 +270,36 @@ void BoardManager::handleMarkerSelection(glm::vec2 mousePos) {
 
 void BoardManager::startMouseDrag(glm::vec2 mousePos) {
     mouseStartPos = mousePos;  // Captura a posição inicial do mouse
+    active_board.set<Panning>({ true });
+
+}
+
+
+void BoardManager::endMouseDrag() {
+    active_board.set<Panning>({ false });
+
+}
+
+bool BoardManager::isDragging() {
+    const Panning* panning = active_board.get<Panning>();
+    return panning->isPanning;
 }
 
 glm::vec2 BoardManager::getMouseStartPosition() const {
     return mouseStartPos;
 }
+
+void BoardManager::panBoard(glm::vec2 currentMousePos) {
+    glm::vec2 delta =  mouseStartPos - currentMousePos;
+    camera.pan(delta);
+    mouseStartPos = currentMousePos;
+}
+
+
+void BoardManager::resetCamera() {
+    camera.setPosition(glm::vec2(0.0f, 0.0f));
+}
+
 
 //void BoardManager::renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight) {
 //    ecs.each([&](flecs::entity entity, const Grid& grid) {
@@ -466,9 +491,6 @@ void BoardManager::handleFogCreation(glm::vec2 mousePos) {
     createFogOfWar(startPos, size);
 }
 
-void BoardManager::panBoard(glm::vec2 delta) {
-    camera.pan(delta);
-}
 
 void BoardManager::zoomBoard(float zoomFactor) {
     camera.zoom(zoomFactor);

@@ -28,7 +28,7 @@ GLFWwindow* initializeOpenGLContext() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
     // Retorna o ponteiro da janela
@@ -46,7 +46,7 @@ int main() {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::filesystem::path shader_directory_path = base_path / "res" / "shaders" / "Basic.shader";
 
-    ApplicationHandler app(window, shader_directory_path.string());
+    ApplicationHandler app(window);
     app.run();  // Executa o loop principal da aplicação
 
     glfwTerminate();  // Limpa os recursos do GLFW quando terminar

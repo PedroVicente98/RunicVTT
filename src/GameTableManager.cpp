@@ -1,8 +1,8 @@
 #include "GameTableManager.h"
 #include "imgui/imgui_internal.h"
 
-GameTableManager::GameTableManager(flecs::world ecs, std::string shader_directory_path)
-    : ecs(ecs), board_manager(ecs, shader_directory_path), map_directory(std::string(), std::string())
+GameTableManager::GameTableManager(flecs::world ecs)
+    : ecs(ecs), board_manager(ecs), map_directory(std::string(), std::string())
 {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::string map_directory_name = "MapDiretory";
@@ -52,7 +52,9 @@ void GameTableManager::closeConnection() {
     std::cout << "Connection closed." << std::endl;
 }
 
-
+void GameTableManager::resetCamera() {
+    board_manager.resetCamera();
+}
 // Função para configurar os callbacks do GLFW
 void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -64,13 +66,15 @@ void GameTableManager::setInputCallbacks(GLFWwindow* window) {
 void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
-    // Certifique-se de que o ponteiro foi corretamente recuperado
     if (!game_table_manager) return;
-    //std::cout << "MOUSE BUTTON CALLBACK: " << button << " | " << action << " | " << mods << std::endl;
+
     glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
-            game_table_manager->board_manager.startMouseDrag(mouse_pos);
+            if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
+                game_table_manager->board_manager.startMouseDrag(mouse_pos);
+            }
+
             if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
                 game_table_manager->board_manager.handleFogCreation(mouse_pos);
             }
@@ -79,6 +83,14 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
             }
         }
     }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) 
+    {
+        if (game_table_manager->isBoardActive()) {
+            game_table_manager->board_manager.endMouseDrag();
+        }
+    }
+
 }
 
 // Callback estático de movimentação do cursor
@@ -86,9 +98,12 @@ void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, d
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
-    //std::cout << "CURSOR POSITION CALLBACK: " << xpos << " | " << ypos << std::endl;
     game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
     if (game_table_manager->isBoardActive()) {
+        if (game_table_manager->board_manager.isDragging()) {
+            game_table_manager->board_manager.panBoard(game_table_manager->current_mouse_pos);
+        }
+
         if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
             game_table_manager->board_manager.handleMarkerDragging(game_table_manager->current_mouse_pos);
         }
@@ -101,7 +116,6 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
 
-    //std::cout << "SCROLL CALLBACK: " << yoffset << std::endl;
     float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
     if (game_table_manager->isBoardActive()) {
         game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager

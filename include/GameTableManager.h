@@ -9,7 +9,7 @@
 
 class GameTableManager {
 public:
-	GameTableManager(flecs::world ecs, std::string shader_directory_path);
+	GameTableManager(flecs::world ecs);
 	~GameTableManager();
 
 	void saveGameTable();
@@ -21,6 +21,8 @@ public:
 	
 	void openConnection(unsigned short port);
 	void closeConnection();
+
+	void resetCamera();
 
 	void createGameTablePopUp();
 	void closeGameTablePopUp();

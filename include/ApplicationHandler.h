@@ -32,7 +32,7 @@
 class ApplicationHandler {
 
 public:
-	ApplicationHandler(GLFWwindow* window, std::string shader_directory_path);
+	ApplicationHandler(GLFWwindow* window);
 	~ApplicationHandler();
 	int run();
 
