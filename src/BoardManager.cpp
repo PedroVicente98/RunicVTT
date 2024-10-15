@@ -271,12 +271,26 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
         });
 }
 
-bool BoardManager::isMouseOverMarker(const Position& markerPos, const Size& markerSize, glm::vec2 mousePos) {
-    // Verifica se o mouse está dentro dos limites do marcador
-    bool withinXBounds = mousePos.x >= markerPos.x && mousePos.x <= (markerPos.x + markerSize.width);
-    bool withinYBounds = mousePos.y >= markerPos.y && mousePos.y <= (markerPos.y + markerSize.height);
+bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
+    bool hovered = false;
+    
+    // Query all markers that are children of the active board and have MarkerComponent
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize) {
+        // Check if the marker is a child of the active board
+        if (entity.has(flecs::ChildOf, active_board)) {
+            // Check if the mouse is within the bounds of the marker
+            bool withinXBounds = mousePos.x >= markerPos.x && mousePos.x <= (markerPos.x + markerSize.width);
+            bool withinYBounds = mousePos.y >= markerPos.y && mousePos.y <= (markerPos.y + markerSize.height);
 
-    return withinXBounds && withinYBounds;
+            // If within bounds, set hovered_marker to the current entity and mark as hovered
+            if (withinXBounds && withinYBounds) {
+                hovered_marker = entity;  // Set the hovered marker
+                hovered = true;           // Mark as hovered
+            }
+        }
+    });
+
+    return hovered;
 }
 
 
