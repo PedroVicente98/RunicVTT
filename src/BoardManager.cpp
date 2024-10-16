@@ -140,7 +140,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     shader.Unbind();
 
 
-    GLCall(glActiveTexture(GL_TEXTURE0));
+    GLCall(glActiveTexture(GL_TEXTURE0)); //https://learnopengl.com/Getting-started/Coordinate-Systems REDO THE SHADER FOR THE COORDINATE SYSTEM, MAKE MORE READABLE AND KEEP THE MATRIXES SEPARATE IN THE UNIFORMS
     GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
 
     renderer.Draw(va, ib, shader);
