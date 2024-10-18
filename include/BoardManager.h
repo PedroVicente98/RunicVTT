@@ -60,12 +60,21 @@ public:
     void setWindowSize(glm::vec2 window_size) {
         this->window_size = window_size;
     }
-    
+
+    glm::vec2 getWindowPosition() {
+        return window_position;
+    }
+
+    void setWindowPosition(glm::vec2 window_position) {
+        this->window_position = window_position;
+    }
+
 
 private:
     glm::vec2 position;  // 2D position of the camera (X, Y)
     float zoomLevel;     // Zoom level, where 1.0f means no zoom, > 1.0f means zoom in, < 1.0f means zoom out
     glm::vec2 window_size;
+    glm::vec2 window_position;
 };
 
 
