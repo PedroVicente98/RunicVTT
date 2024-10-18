@@ -42,6 +42,7 @@ public:
 	void createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+        void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos)
 
 
 	std::string game_table_name; 
@@ -53,14 +54,14 @@ private:
 	BoardManager board_manager;
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
-	glm::vec2 current_mouse_pos;  // PosiÁ„o atual do mouse em snake_case
+	glm::vec2 current_mouse_pos;  // Posi√ß√£o atual do mouse em snake_case
 
 	char buffer[124] = "";
 	char pass_buffer[124] = "";
 	char port_buffer[124] = "";
 	char network_password[124] = "";
 
-	// Vari·vel para armazenar o caminho do arquivo selecionado
+	// Vari√°vel para armazenar o caminho do arquivo selecionado
 	std::string map_image_path = "";
 
 };
