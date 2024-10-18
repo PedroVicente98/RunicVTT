@@ -107,7 +107,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     const Size* size = active_board.get<Size>();
         
     ImVec2 window_size = ImGui::GetWindowSize();
+    ImVec2 window_position = ImGui::GetWindowPos();
     camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
+    camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));
 
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
     glm::mat4 projection = camera.getProjectionMatrix();
