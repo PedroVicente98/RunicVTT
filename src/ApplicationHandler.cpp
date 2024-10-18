@@ -233,7 +233,8 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
                     glm::vec4 worldPos = glm::inverse(MVP) * ndcPos;
                     std::cout << "World Pos: " << worldPos.x << " , " << worldPos.y << "z w" << worldPos.z << " " << worldPos.w << std::endl;
                     //// Create the marker at the dropped position
-
+                    //USE ScreenToWorldPosition use glfwMousePos(its opengl friendly) 
+                
                     game_table_manager.createBoardMarker(markerImage->filename, markerImage->textureID, glm::vec2(0,0), markerImage->size);
                 }
                 ImGui::EndDragDropTarget();
