@@ -95,16 +95,19 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
             if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE && game_table_manager->isMouseInsideMapWindow()) {
-		if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
-			//game_table_manager->board_manager.startMarkerDrag();
-		}else{
-                	game_table_manager->board_manager.startMouseDrag(mouse_pos);
-		}
+		        if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
+			        game_table_manager->board_manager.startMouseDrag(mouse_pos, true);
+		        }else{
+                	game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
+		        }
             }
+
 
             if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
                 game_table_manager->board_manager.handleFogCreation(mouse_pos);
             }
+
+
             //else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
             //    game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
             //}
@@ -120,18 +123,26 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
 
 }
 
+glm::mat4 GameTableManager::getBoardViewMatrix() {
+    return board_manager.camera.getViewMatrix();
+}
+
+void GameTableManager::createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size) {
+    board_manager.createMarker(imageFilePath, textureId, position, size);
+}
 // Callback estático de movimentação do cursor
 void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
     // Recupera o ponteiro para a instância do GameTableManager
     GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
     if (!game_table_manager) return;
     game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
+
     if (game_table_manager->isBoardActive()) {
-        if (game_table_manager->board_manager.isDragging()) {
+        if (game_table_manager->board_manager.isPanning()) {
             game_table_manager->board_manager.panBoard(game_table_manager->current_mouse_pos);
         }
 
-        if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE) {
+        if (game_table_manager->board_manager.isDragginMarker()) {
             game_table_manager->board_manager.handleMarkerDragging(game_table_manager->current_mouse_pos);
         }
     }
@@ -385,7 +396,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 {
     if (board_manager.isBoardActive()) {
         board_manager.marker_directory.renderDirectory();
-	board_manager.renderToolbar();
+	    board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);
     }
 }

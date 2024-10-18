@@ -229,11 +229,12 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
 
                     // 4. Convert NDC to World Coordinates using the inverse MVP
                     glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);  // Assuming z = 0.0f for a flat 2D map
-                    //glm::mat4 MVP = game_table_manager.getActiveBoardMVP();  // Fetch the MVP matrix for the board
-                    //glm::vec4 worldPos = glm::inverse(MVP) * ndcPos;
-
+                    glm::mat4 MVP = game_table_manager.getBoardViewMatrix();  // Fetch the MVP matrix for the board
+                    glm::vec4 worldPos = glm::inverse(MVP) * ndcPos;
+                    std::cout << "World Pos: " << worldPos.x << " , " << worldPos.y << "z w" << worldPos.z << " " << worldPos.w << std::endl;
                     //// Create the marker at the dropped position
-                    //createMarker(markerImage->name, markerPosition, markerImage->size, true, markerImage->textureID);
+
+                    game_table_manager.createBoardMarker(markerImage->filename, markerImage->textureID, glm::vec2(0,0), markerImage->size);
                 }
                 ImGui::EndDragDropTarget();
             }

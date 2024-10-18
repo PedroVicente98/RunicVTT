@@ -38,6 +38,8 @@ public:
 	void setInputCallbacks(GLFWwindow* window);
 	bool isMouseInsideMapWindow();
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
+	glm::mat4 getBoardViewMatrix();
+	void createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 

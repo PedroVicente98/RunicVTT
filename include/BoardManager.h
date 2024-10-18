@@ -44,20 +44,14 @@ public:
     float getZoom() const {
         return zoomLevel;
     }
-/*    glm::mat4 getViewMatrix() const {
+    glm::mat4 getViewMatrix() const {
         // First translate the view by the camera position, then scale it by the zoom level
         return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
-    } */
+    } 
 
-    glm::mat4 getViewMatrix() const {
-    	// Calculate the center offset based on window size and zoom level
-    	glm::vec2 centerOffset = window_size * 0.5f / zoomLevel;
-    	// Translate the camera view to the origin, apply zoom, and then translate it back
-    	glm::mat4 translation = glm::translate(glm::mat4(1.0f), glm::vec3(-position + centerOffset, 0.0f));
- 	// Apply the zoom as scaling around the origin
-    	return glm::scale(translation, glm::vec3(zoomLevel));
+    glm::mat4 getProjectionMatrix() const {
+        return  glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
     }
-
 
     glm::vec2 getWindowSize() {
         return window_size;
@@ -93,25 +87,14 @@ public:
     void resetCamera();
 	
     // Marker interactions
-    flecs::entity createMarker(const std::string& imageFilePath, glm::vec2 position);
+    flecs::entity createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size);
     void deleteMarker(flecs::entity markerEntity);
-    void toggleMarkerVisibility(flecs::entity markerEntity);
-    void changeMarkerSize(flecs::entity markerEntity, glm::vec2 newSize);
     void handleMarkerDragging(glm::vec2 mousePos);
-    void handleMarkerSelection(glm::vec2 mousePos);
-    bool isMouseOverMarker(const Position& markerPos, const Size& markerSize, glm::vec2 mousePos);
-
-    // Grid-related methods
-   
-    void handleGridTool(const glm::vec2& mouseDelta, float scrollDelta);
-    void toggleGridType();  // Switch between square and hex grid
-    void toggleSnapToGrid();  // Enable/disable snap to grid
-    glm::vec2 snapToGrid(const glm::vec2& position);
+    bool isMouseOverMarker(glm::vec2 mousePos);
 
     // Fog of War interactions
     flecs::entity createFogOfWar(glm::vec2 startPos, glm::vec2 size);
     void deleteFogOfWar(flecs::entity fogEntity);
-    void toggleFogVisibility(flecs::entity fogEntity);
     void handleFogCreation(glm::vec2 mousePos);
 
     // Camera manipulation
@@ -123,48 +106,29 @@ public:
     void setCurrentTool(Tool newTool);
 
 	bool isBoardActive();
-    flecs::entity createBoard();
     flecs::entity createBoard(std::string board_name, std::string map_image_path, GLuint texture_id, glm::vec2 size);
-	//flecs::entity createBoard(std::string map_image_path);
 
     void closeBoard();
     void setActiveBoard(flecs::entity board_entity);
 
     void renderEditWindow(flecs::entity entity);
-    void startMouseDrag(glm::vec2 mousePos);
+    void startMouseDrag(glm::vec2 mousePos, bool draggingMarker);
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
-    bool isDragging();
+    bool isPanning();
+    bool isDragginMarker();
 	std::string board_name;
     DirectoryWindow marker_directory;
+    glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
+    glm::vec2 worldToScreenPosition(glm::vec2 world_position);
+
+    Camera camera;
 private:
-
-    //Shader grid_shader;  // Shader used for grid rendering
-
-    //void renderSquareGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
-    //void renderHexGrid(glm::mat4& mvp, float windowWidth, float windowHeight, const Grid& grid);
-    //void addHexagonVertices(float x, float y, float radius, std::vector<glm::vec2>& vertices);
-    //void renderLineVertices(const std::vector<glm::vec2>& vertices, glm::mat4& mvp);
-
-    // Snap to grid helper functions
-    glm::vec2 snapToSquareGrid(const glm::vec2& position, const Grid& grid);
-    glm::vec2 snapToHexGrid(const glm::vec2& position, const Grid& grid);
-
-    // Helper functions for hex grid math
-    glm::vec2 worldToAxial(const glm::vec2& pos, const Grid& grid);
-    glm::vec2 axialToWorld(const glm::vec2& axialPos, const Grid& grid);
-    glm::vec2 roundAxial(const glm::vec2& axial);
-
-    // Render functions (private)
-    //void renderImage(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
-    //void renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight);
-    //void renderMarker(GLuint textureID, const Position &pos, const Size &size, glm::mat4 &viewMatrix);
-    //void renderFog(const Position &pos, const Size &size, const glm::mat4 &viewMatrix, const float alpha);
 
     glm::vec2 mouseStartPos;
 
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
-    Camera camera;
+	flecs::entity* hovered_marker = nullptr;
     Tool currentTool;  // Active tool for interaction
 };
