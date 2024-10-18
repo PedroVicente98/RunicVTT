@@ -62,7 +62,10 @@ void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetScrollCallback(window, scrollCallback);
 }
 
-
+void GameTableManager::setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos){
+	board_manager.camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
+	board_manager.camera.setWindowPosition(glm::vec2(window_pos.x, window_pos.y));
+}
 
 bool GameTableManager::isMouseInsideMapWindow() {
     // Get the pointer to the MapWindow by name
