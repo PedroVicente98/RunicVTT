@@ -115,7 +115,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
     model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
 
-    glm::mat4 mvp = projection * viewMatrix * model;
+    glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
 
 
     shader.Bind();
@@ -144,7 +144,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
             model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
-            glm::mat4 mvp = projection * viewMatrix * model;
+            glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
             camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
 
             shader.Bind();
@@ -233,6 +233,7 @@ void BoardManager::deleteMarker(flecs::entity markerEntity) {
 
 
 void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
+    //mousePos(Screen Position) use screenToWorldPosition(mousePos)  position(World Position) 
     auto position = hovered_marker->get_mut<Position>();
     position->x = mousePos.x;
     position->y = mousePos.y;
@@ -292,6 +293,7 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
     // Query all markers that are children of the active board and have MarkerComponent
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize) {
         // Check if the marker is a child of the active board
+        //use mousePos(Screen Position) screenToWorldPosition(mousePos) when comparing to markerPos(World Position)
         if (entity.has(flecs::ChildOf, active_board)) {
             bool withinXBounds = mousePos.x >= markerPos.x && mousePos.x <= (markerPos.x + markerSize.width);
             bool withinYBounds = mousePos.y >= markerPos.y && mousePos.y <= (markerPos.y + markerSize.height);
