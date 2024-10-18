@@ -200,6 +200,7 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
 
             ImVec2 window_size = ImGui::GetWindowSize();
             ImVec2 window_pos = ImGui::GetWindowPos();
+            game_table_manager.setCameraWindowSizePos(window_size, window_pos);
 
             ImGui::SetCursorScreenPos(window_pos);
             ImGui::InvisibleButton("##MapDropArea", window_size);
