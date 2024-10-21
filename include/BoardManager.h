@@ -21,6 +21,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "Components.h"
 #include "DirectoryWindow.h"
+#include "NetworkManager.h"
 
 class Camera {
 public:
@@ -89,7 +90,7 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs);
+	BoardManager(flecs::world ecs, NetworkManager* network_manager;);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
@@ -135,7 +136,7 @@ public:
 
     Camera camera;
 private:
-
+	NetworkManager* network_manager;
     glm::vec2 mouseStartPos;
 
 	flecs::world ecs;
