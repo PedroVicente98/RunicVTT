@@ -15,8 +15,8 @@
 #include "Components.h"
 #include <filesystem>
 
-BoardManager::BoardManager(flecs::world ecs)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()){
+BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager)
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), network_manager(network_manager){
     
     std::filesystem::path base_path = std::filesystem::current_path();
     std::filesystem::path marker_directory_path = base_path / "res" / "markers";
