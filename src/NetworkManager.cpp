@@ -26,6 +26,53 @@ bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open
 }
 
+
+std::string NetworkManager::getNetworkInfo() {
+    try {
+        // Resolve the local IP address using the hostname
+        asio::ip::tcp::resolver resolver(io_context_);
+        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
+        asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        asio::ip::tcp::resolver::iterator end;
+
+        // Loop through the results to find the first IPv4 address
+        for (; it != end; ++it) {
+            asio::ip::tcp::endpoint ep = *it;
+            if (ep.address().is_v4() && !ep.address().is_loopback()) {
+                // Ensure the acceptor is bound and return the IP and port
+                return ep.address().to_string() + ":" + std::to_string(acceptor_.local_endpoint().port());
+            }
+        }
+
+        return "No valid local IPv4 address found";
+    } catch (std::exception& e) {
+        return "Could not retrieve IP address or port: " + std::string(e.what());
+    }
+}
+
+std::string NetworkManager::getLocalIPAddress() {
+    try {
+        asio::ip::tcp::resolver resolver(io_context_);
+        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
+        asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        asio::ip::tcp::resolver::iterator end;
+
+        // Loop through the results to find the first valid IPv4 address
+        for (; it != end; ++it) {
+            asio::ip::tcp::endpoint ep = *it;
+            if (ep.address().is_v4() && !ep.address().is_loopback()) {
+                return ep.address().to_string();  // Return the valid IPv4 address
+            }
+        }
+
+        return "No valid local IPv4 address found";
+    } catch (std::exception& e) {
+        return "Unable to retrieve IP: " + std::string(e.what());
+    }
+}
+
+
+/*
 std::string NetworkManager::getNetworkInfo() {
     try {
         // Get local IP address
@@ -55,7 +102,7 @@ std::string NetworkManager::getLocalIPAddress() {
     }
 }
 
-
+*/
 // Start the server with the given port
 void NetworkManager::startServer(unsigned short port) {
     asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
