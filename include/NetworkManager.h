@@ -45,6 +45,7 @@ private:
     asio::io_context io_context_;
     asio::ip::tcp::acceptor acceptor_;
     std::unordered_map<std::string, std::shared_ptr<asio::ip::tcp::socket>> peers_;
+    char network_password[124] = "";
 
     std::deque<Message> realTimeQueue;
     std::deque<Message> nonRealTimeQueue;
