@@ -52,11 +52,17 @@ int ApplicationHandler::run()
         GLCall(glEnable(GL_BLEND));
         GLCall(glDisable(GL_DEPTH_TEST));
 
+        /*float positions[] = {
+             -1.0f, -1.0f, 0.0f, 0.0f,//0
+              1.0f, -1.0f, 1.0f, 0.0f,//1
+              1.0f, 1.0f,  1.0f, 1.0f,//2
+              -1.0f, 1.0f, 0.0f, 1.0f //3
+        };*/
         float positions[] = {
-         -1.0f, -1.0f, 0.0f, 0.0f,//0
-          1.0f, -1.0f, 1.0f, 0.0f,//1
-          1.0f, 1.0f,  1.0f, 1.0f,//2
-          -1.0f, 1.0f, 0.0f, 1.0f //3
+            -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left corner
+             0.5f, -0.5f, 1.0f, 0.0f, // bottom-right corner
+             0.5f,  0.5f, 1.0f, 1.0f, // top-right corner
+            -0.5f,  0.5f, 0.0f, 1.0f  // top-left corner
         };
 
         unsigned int indices[] = {
