@@ -50,7 +50,9 @@ public:
     } 
 
     glm::mat4 getProjectionMatrix() const {
-        return  glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
+	auto projection = glm::ortho(-window_size.x, window_size.x, -window_size.y, window_size.y, -1.0f, 1.0f);
+	//auto projection = glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
+        return projection;
     }
 
     glm::vec2 getWindowSize() {
