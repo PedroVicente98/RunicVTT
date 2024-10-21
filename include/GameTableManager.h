@@ -42,16 +42,16 @@ public:
 	void createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-        void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos)
+	void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
 
 	std::string game_table_name; 
 	Chat chat;
 	DirectoryWindow map_directory;
+	BoardManager board_manager;
 
 private:
 	NetworkManager network_manager;
-	BoardManager board_manager;
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
 	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case

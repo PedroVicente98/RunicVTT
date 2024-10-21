@@ -43,6 +43,9 @@ int ApplicationHandler::run()
     int minHeight = 960;
     glfwSetWindowSizeLimits(window, minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
+    // Force the window to maximize
+    glfwMaximizeWindow(window);
+
     std::cout << glGetString(GL_VERSION) << std::endl;
     {//Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -200,43 +203,23 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
 
             ImVec2 window_size = ImGui::GetWindowSize();
             ImVec2 window_pos = ImGui::GetWindowPos();
-            game_table_manager.setCameraWindowSizePos(window_size, window_pos);
+            game_table_manager.setCameraWindowSizePos(glm::vec2(window_size.x, window_size.y), glm::vec2(window_pos.x, window_pos.y));
 
             ImGui::SetCursorScreenPos(window_pos);
             ImGui::InvisibleButton("##MapDropArea", window_size);
             // Handle the drop payload
             if (ImGui::BeginDragDropTarget()) {
                 if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
-                    // Extract the marker image payload
-                    //IM_ASSERT(payload->DataSize == sizeof(MarkerImageData));  // Ensure correct payload size
+                    
                     const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
-                    std::cout << "IMAGE DATA: " << markerImage->textureID << " FILE: " << markerImage->filename << std::endl;
-                    // Calculate drop position (use the mouse position relative to the window)
-                                  // 1. Get mouse position relative to the ImGui window
-                    ImVec2 imguiMousePos = ImGui::GetMousePos();
-                    ImVec2 windowSize = ImGui::GetWindowSize();
-                    ImVec2 windowPos = ImGui::GetWindowPos();
-                    
-                    ImVec2 relativeDropPos = { imguiMousePos.x - windowPos.x, imguiMousePos.y - windowPos.y };
-                    std::cout << "dropPos: " << imguiMousePos.x << "," << imguiMousePos.y << " | relativeDropPos: " << relativeDropPos.x << ',' << relativeDropPos.y << " | windowPos: " << windowPos.x << "," << windowPos.y << std::endl;
-                    
-                    // 2. Translate ImGui coordinates to OpenGL screen coordinates
-                    float openglX = imguiMousePos.x - windowPos.x;
-                    float openglY = (windowPos.y + windowSize.y) - imguiMousePos.y;  // Flip Y-axis
 
-                    // 3. Convert to NDC coordinates
-                    float ndcX = (2.0f * openglX) / windowSize.x - 1.0f;
-                    float ndcY = (2.0f * openglY) / windowSize.y - 1.0f;
+                    ImVec2 mouse_position = ImGui::GetMousePos();
+   
+                    glm::vec2 relative_screen_position = { mouse_position.x - window_pos.x, mouse_position.y - window_pos.y };
 
-                    // 4. Convert NDC to World Coordinates using the inverse MVP
-                    glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);  // Assuming z = 0.0f for a flat 2D map
-                    glm::mat4 MVP = game_table_manager.getBoardViewMatrix();  // Fetch the MVP matrix for the board
-                    glm::vec4 worldPos = glm::inverse(MVP) * ndcPos;
-                    std::cout << "World Pos: " << worldPos.x << " , " << worldPos.y << "z w" << worldPos.z << " " << worldPos.w << std::endl;
-                    //// Create the marker at the dropped position
-                    //USE ScreenToWorldPosition use glfwMousePos(its opengl friendly) 
-                
-                    game_table_manager.createBoardMarker(markerImage->filename, markerImage->textureID, glm::vec2(0,0), markerImage->size);
+                    glm::vec2 world_position = game_table_manager.board_manager.screenToWorldPosition(relative_screen_position);
+                    game_table_manager.board_manager.createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
+
                 }
                 ImGui::EndDragDropTarget();
             }
@@ -311,7 +294,7 @@ void ApplicationHandler::renderMainMenuBar() {
             if (ImGui::MenuItem("Open", "Ctrl+Y")) {
             }
             if (ImGui::MenuItem("Reset Camera")) {
-                game_table_manager.resetCamera();
+                game_table_manager.board_manager.resetCamera();
             }
             ImGui::EndMenu();
         }

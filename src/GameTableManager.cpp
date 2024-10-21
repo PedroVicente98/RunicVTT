@@ -52,9 +52,6 @@ void GameTableManager::closeConnection() {
     std::cout << "Connection closed." << std::endl;
 }
 
-void GameTableManager::resetCamera() {
-    board_manager.resetCamera();
-}
 // Função para configurar os callbacks do GLFW
 void GameTableManager::setInputCallbacks(GLFWwindow* window) {
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
@@ -119,20 +116,13 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) 
     {
-        if (game_table_manager->isBoardActive()) {
+        if (game_table_manager->isBoardActive() && (game_table_manager->board_manager.isPanning() || game_table_manager->board_manager.isDragginMarker())) {
             game_table_manager->board_manager.endMouseDrag();
         }
     }
 
 }
 
-glm::mat4 GameTableManager::getBoardViewMatrix() {
-    return board_manager.camera.getViewMatrix();
-}
-
-void GameTableManager::createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size) {
-    board_manager.createMarker(imageFilePath, textureId, position, size);
-}
 // Callback estático de movimentação do cursor
 void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
     // Recupera o ponteiro para a instância do GameTableManager

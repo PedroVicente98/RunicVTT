@@ -236,9 +236,26 @@ void BoardManager::deleteMarker(flecs::entity markerEntity) {
 
 void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
     //mousePos(Screen Position) use screenToWorldPosition(mousePos)  position(World Position) 
-    auto position = hovered_marker->get_mut<Position>();
-    position->x = mousePos.x;
-    position->y = mousePos.y;
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position) {
+        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
+            glm::vec2 world_position = screenToWorldPosition(mousePos);
+            glm::vec2 start_world_position = screenToWorldPosition(mouseStartPos);
+            glm::vec2 delta = world_position - start_world_position;
+            position.x += delta.x;
+            position.y += delta.y;
+            mouseStartPos = mousePos;
+        }
+     });
+
+
+ /*   if (hovered_marker != nullptr) {
+        auto position = hovered_marker->get_mut<Position>();
+        glm::vec2 world_position = screenToWorldPosition(mousePos);
+        glm::vec2 start_world_position = screenToWorldPosition(mouseStartPos);
+        glm::vec2 delta = world_position - start_world_position;
+        position->x += delta.x;
+        position->y += delta.y;
+    }*/
 }
 
 //TODO
@@ -283,6 +300,7 @@ glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
     float screenY = (1.0f - (clipPos.y / clipPos.w)) * 0.5f * windowSize.y;  // Flip Y-axis
 
     // Step 4: Return screen position as 2D (x, y) coordinates
+
     glm::vec2 screen_position =  glm::vec2(screenX, screenY);
 
     return screen_position;
@@ -293,15 +311,35 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
     bool hovered = false;
     
     // Query all markers that are children of the active board and have MarkerComponent
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize) {
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving) {
         // Check if the marker is a child of the active board
         //use mousePos(Screen Position) screenToWorldPosition(mousePos) when comparing to markerPos(World Position)
-        if (entity.has(flecs::ChildOf, active_board)) {
-            bool withinXBounds = mousePos.x >= markerPos.x && mousePos.x <= (markerPos.x + markerSize.width);
-            bool withinYBounds = mousePos.y >= markerPos.y && mousePos.y <= (markerPos.y + markerSize.height);
+        glm::vec2 world_position = screenToWorldPosition(mousePos);
+      
 
+        if (entity.has(flecs::ChildOf, active_board)) {
+            auto text = entity.get<TextureComponent>();
+            //bool withinXBounds = world_position.x >= markerPos.x - markerSize.width/2 && world_position.x <= (markerPos.x + markerSize.width/2);
+            //bool withinYBounds = world_position.y >= markerPos.y - markerSize.height/2 && world_position.y <= (markerPos.y + markerSize.height/2);
+
+            bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
+                (world_position.x <= (markerPos.x + markerSize.width / 2));
+
+            bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
+                (world_position.y <= (markerPos.y + markerSize.height / 2));
+
+
+            std::cout << "File Name: " << text->image_path << std::endl;
+            std::cout << "Mouse ScreenPosition: " << mousePos.x << " | " << mousePos.y << std::endl;
+            std::cout << "Mouse WorldPosition: " << world_position.x << " | " << world_position.y << std::endl;
+            std::cout << "Marker WorldPosition: " << markerPos.x << " | " << markerPos.y << std::endl;
+            std::cout << "Marker Size: " << markerSize.width << " | " << markerSize.height << std::endl;
+            std::cout << "BOUNDS x : " << markerPos.x - markerSize.width / 2 << " | " << markerPos.x + markerSize.width / 2 << std::endl;
+            std::cout << "BOUNDS y : " << markerPos.y - markerSize.height / 2 << " | " << markerPos.y + markerSize.height / 2 << std::endl;
+            std::cout << "IN BOUNDS: " << withinXBounds << " | " << withinYBounds << std::endl;
+            std::cout << "-------------------------------------------------------------------" << std::endl;
             if (withinXBounds && withinYBounds) {
-                hovered_marker = &entity;  // Set the hovered marker
+                moving.isDragging = true;
                 hovered = true;           // Mark as hovered
             }
         }
@@ -313,19 +351,19 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
 
 void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMarker) {
     mouseStartPos = mousePos;  // Captura a posição inicial do mouse
-    if (draggingMarker) {
-        hovered_marker->set<Moving>({ true });
-    }
-    else {
+    if (not draggingMarker) {
         active_board.set<Panning>({ true });
     }
-
 }
 
 
 void BoardManager::endMouseDrag() {
     active_board.set<Panning>({ false });
-    hovered_marker = nullptr;
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
+        if (entity.has(flecs::ChildOf, active_board)) {
+            moving.isDragging = false;
+        }
+    });
 }
 
 bool BoardManager::isPanning() {
@@ -334,7 +372,13 @@ bool BoardManager::isPanning() {
 }
 
 bool BoardManager::isDragginMarker() {
-    return hovered_marker != nullptr;
+    bool isDragginMarker = false;
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
+        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
+            isDragginMarker =  true;
+        }
+    });
+    return isDragginMarker;
 }
 
 glm::vec2 BoardManager::getMouseStartPosition() const {

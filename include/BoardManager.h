@@ -138,6 +138,6 @@ private:
 
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
-	flecs::entity* hovered_marker = nullptr;
+	//flecs::entity* hovered_marker = nullptr;
     Tool currentTool;  // Active tool for interaction
 };
