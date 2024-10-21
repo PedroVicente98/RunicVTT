@@ -114,8 +114,8 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
     glm::mat4 projection = camera.getProjectionMatrix();
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
-    model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+    glm::mat4 model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+    model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
 
     glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
 
@@ -138,23 +138,26 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     active_board.children([&](flecs::entity child){
         if (child.has<MarkerComponent>()) {
             const MarkerComponent* marker_component = child.get<MarkerComponent>();
-            const Moving* moving_marker = child.get<Moving>();
             const Position* position_marker = child.get<Position>();
             const Visibility* visibility_marker = child.get<Visibility>();
             const TextureComponent* texture_marker = child.get<TextureComponent>();
             const Size* size_marker = child.get<Size>();
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-            model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+            glm::mat4 model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+            model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+            
             glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
-            camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
-
+            float alpha = 1.0f;
+            if(!visibility_marker->isVisible){
+                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
+                alpha = 0.5f;
+            }
             shader.Bind();
             shader.SetUniformMat4f("u_MVP", mvp);
             //shader.SetUniformMat4f("u_Projection", projection);
             //shader.SetUniformMat4f("u_View", viewMatrix);
             //shader.SetUniformMat4f("u_Model", model);
-            shader.SetUniform1f("u_Alpha", 1.0f);
+            shader.SetUniform1f("u_Alpha", alpha);
             shader.SetUniform1i("u_Texture", 0);
             shader.Unbind();
 
