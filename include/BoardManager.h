@@ -45,8 +45,8 @@ public:
         return zoomLevel;
     }
     glm::mat4 getViewMatrix() const {
-        // First translate the view by the camera position, then scale it by the zoom level
-        return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
+	auto view = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel, zoomLevel, 1));
+        return glm::translate(view, glm::vec3(-position, 0.0f));
     } 
 
     glm::mat4 getProjectionMatrix() const {
