@@ -46,13 +46,14 @@ public:
         return zoomLevel;
     }
     glm::mat4 getViewMatrix() const {
-	auto view = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel, zoomLevel, 1));
+	    auto view = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel, zoomLevel, 1));
         return glm::translate(view, glm::vec3(-position, 0.0f));
+        //return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
     } 
 
     glm::mat4 getProjectionMatrix() const {
-	auto projection = glm::ortho(-window_size.x, window_size.x, -window_size.y, window_size.y, -1.0f, 1.0f);
-	//auto projection = glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
+	    //auto projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
+	    auto projection = glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
         return projection;
     }
 

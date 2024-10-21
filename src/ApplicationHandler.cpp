@@ -52,12 +52,12 @@ int ApplicationHandler::run()
         GLCall(glEnable(GL_BLEND));
         GLCall(glDisable(GL_DEPTH_TEST));
 
-        /*float positions[] = {
-             -1.0f, -1.0f, 0.0f, 0.0f,//0
-              1.0f, -1.0f, 1.0f, 0.0f,//1
-              1.0f, 1.0f,  1.0f, 1.0f,//2
-              -1.0f, 1.0f, 0.0f, 1.0f //3
-        };*/
+        //float positions[] = {
+        //     -1.0f, -1.0f, 0.0f, 0.0f,//0
+        //      1.0f, -1.0f, 1.0f, 0.0f,//1
+        //      1.0f, 1.0f,  1.0f, 1.0f,//2
+        //      -1.0f, 1.0f, 0.0f, 1.0f //3
+        //};
         float positions[] = {
             -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left corner
              0.5f, -0.5f, 1.0f, 0.0f, // bottom-right corner
@@ -203,7 +203,7 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
         game_table_manager.chat.renderChat();
 
         //ImGui::ShowMetricsWindow();
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration;
         ImGui::Begin("MapWindow", nullptr, window_flags);
         if (game_table_manager.isBoardActive()) {
 

@@ -114,8 +114,12 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
     glm::mat4 projection = camera.getProjectionMatrix();
 
-    glm::mat4 model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
-    model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
+    //glm::mat4 model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+    //model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
+
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
+    model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+
 
     glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
 
@@ -143,15 +147,19 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             const TextureComponent* texture_marker = child.get<TextureComponent>();
             const Size* size_marker = child.get<Size>();
 
-            glm::mat4 model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
-            model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+            //glm::mat4 model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+            //model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
             
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+            model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+
             glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
             float alpha = 1.0f;
-            if(!visibility_marker->isVisible){
-                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
-                alpha = 0.5f;
-            }
+            //if(!visibility_marker->isVisible){
+            //    //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
+            //    alpha = 0.5f;
+            //}
+
             shader.Bind();
             shader.SetUniformMat4f("u_MVP", mvp);
             //shader.SetUniformMat4f("u_Projection", projection);
@@ -267,25 +275,60 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
 //Fazer camada que transforma coordenadas quando interagindo com o mundo(para os Marker e FogOfWar
 
 
+//glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
+//    // Step 1: Get window size
+//    glm::vec2 windowSize = camera.getWindowSize();
+//
+//    // Step 2: Normalize screen coordinates to NDC (Normalized Device Coordinates)
+//    float ndcX = (2.0f * screen_position.x) / windowSize.x - 1.0f;
+//    float ndcY = 1.0f - (2.0f * screen_position.y) / windowSize.y;  // Invert Y-axis
+//
+//    // Step 3: Create NDC position vector (z = 0, w = 1)
+//    glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 1.0f, 1.0f);
+//
+//    // Step 4: Get the combined MVP matrix and calculate its inverse
+//    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
+//    glm::mat4 inverseMVP = glm::inverse(MVP);
+//
+//    // Step 5: Transform NDC to world coordinates
+//    glm::vec4 world_position = inverseMVP * ndcPos;
+//
+//    // Step 6: Return the world position as 2D (x, y) coordinates (ignore z)
+//    return glm::vec2(world_position.x, world_position.y);
+//}
+
 glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
-    // Step 1: Get window size
-    glm::vec2 windowSize = camera.getWindowSize();
 
-    // Step 2: Normalize screen coordinates to NDC (Normalized Device Coordinates)
-    float ndcX = (2.0f * screen_position.x) / windowSize.x - 1.0f;
-    float ndcY = 1.0f - (2.0f * screen_position.y) / windowSize.y;  // Invert Y-axis
+    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
+    
+    // Get the view matrix (which handles panning and zoom)
+    glm::mat4 view_matrix = camera.getViewMatrix();
 
-    // Step 3: Create NDC position vector (z = 0, w = 1)
-    glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 0.0f, 1.0f);
+    // Get the projection matrix (which might handle window size)
+    glm::mat4 proj_matrix = camera.getProjectionMatrix();
 
-    // Step 4: Get the combined MVP matrix and calculate its inverse
-    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
-    glm::mat4 inverseMVP = glm::inverse(MVP);
+    // Create a normalized device coordinate from the screen position
+    glm::vec2 window_size = camera.getWindowSize();
 
-    // Step 5: Transform NDC to world coordinates
-    glm::vec4 world_position = inverseMVP * ndcPos;
+    // Convert the screen position to normalized device coordinates (NDC)
+    float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
+    float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
+    std::cout << "X: " << ndc_x << " | " << "Y: " << ndc_y << std::endl;
+    glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
 
-    // Step 6: Return the world position as 2D (x, y) coordinates (ignore z)
+    // Calculate the inverse MVP matrix (to map from NDC back to world space)
+    glm::mat4 mvp = proj_matrix * view_matrix;
+    glm::mat4 inverse_mvp = glm::inverse(mvp);
+
+    // Transform the NDC position back to world coordinates
+    glm::vec4 world_position = inverse_mvp * ndc_position;
+
+    // Perform perspective divide to get the correct world position
+    if (world_position.w != 0.0f) {
+        world_position /= world_position.w;
+    }
+
+    // Return the world position as a 2D vector (we're ignoring the Z-axis for 2D rendering)
     return glm::vec2(world_position.x, world_position.y);
 }
 
