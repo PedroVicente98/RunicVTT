@@ -46,7 +46,6 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
     auto board = ecs.entity()
         .set(Board{ board_name })
         .set(Panning{false})
-        .set(Zoom{1.0f})
         .set(Position{0,0})
         .set(Grid{ {0.0f,0.0f},{1.0f,1.0f} })
         .set(TextureComponent{ texture_id, map_image_path, size})
@@ -100,7 +99,6 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
     const Board* board = active_board.get<Board>();
     const Panning* panning = active_board.get<Panning>();
-    const Zoom* zoom = active_board.get<Zoom>();
     const Position* position = active_board.get<Position>();
     const Grid* grid = active_board.get<Grid>();
     const TextureComponent* texture = active_board.get<TextureComponent>();
