@@ -39,9 +39,9 @@ struct TextureComponent {
 };
 
 // Zoom Component
-struct Zoom {
-    float zoomLevel;
-};
+//struct Zoom {
+//    float zoomLevel;
+//};
 
 // Panning Component
 struct Panning {
@@ -59,18 +59,14 @@ struct Grid {
 // Board Component
 struct Board {
     std::string board_name;
-    /*std::vector<flecs::entity> markers;
-    std::vector<flecs::entity> fogOfWar;*/
 };
 
 // Marker Component
 struct MarkerComponent {
-    bool isWindowActive;
 };
 
 // FogOfWar Component
 struct FogOfWar {
-    bool isWindowActive;
 };
 
 // GameTable Component
@@ -98,7 +94,3 @@ struct Notes {
     std::vector<flecs::entity> notes;
 };
 
-// Tool Component (for managing active tools)
-struct ToolComponent {
-    std::string currentTool;
-};
