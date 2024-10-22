@@ -89,6 +89,7 @@ int ApplicationHandler::run()
         shader.Bind();
         shader.SetUniform1i("u_Texture", 0);
         shader.SetUniformMat4f("u_MVP", proj);
+        shader.SetUniform1i("u_UseTexture", 1);
         shader.SetUniform1f("u_Alpha", 0.5f);
 
         va.Unbind();
@@ -198,8 +199,15 @@ void ApplicationHandler::renderDockSpace()
 
 void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
 
+
     if (game_table_manager.isGameTableActive()) {
 
+        if (game_table_manager.board_manager.isEditWindowOpen()) {
+            game_table_manager.board_manager.renderEditWindow();
+        }
+        else {
+            game_table_manager.board_manager.setShowEditWindow(false);
+        }
         game_table_manager.chat.renderChat();
 
         //ImGui::ShowMetricsWindow();

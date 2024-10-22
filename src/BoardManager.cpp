@@ -65,6 +65,19 @@ void BoardManager::setActiveBoard(flecs::entity board_entity)
 }
 
 void BoardManager::renderToolbar() {
+
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse 
+        | ImGuiWindowFlags_NoDocking 
+        | ImGuiWindowFlags_NoMove 
+        | ImGuiWindowFlags_NoResize 
+        | ImGuiWindowFlags_NoScrollbar 
+        | ImGuiWindowFlags_NoTitleBar
+        | ImGuiWindowFlags_AlwaysAutoResize;
+    auto window_position = camera.getWindowPosition();
+    auto offset = ImGui::GetFrameHeight();
+    ImGui::SetNextWindowPos(ImVec2(window_position.x, window_position.y + offset), ImGuiCond_Always);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
+    ImGui::Begin("Toolbar", 0, window_flags);
     ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
     ImVec4 activeColor = ImVec4(0.2f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
     // Tool: Move
@@ -94,6 +107,8 @@ void BoardManager::renderToolbar() {
         currentTool = Tool::SELECT;
     }
     ImGui::PopStyleColor();
+    ImGui::End();
+    ImGui::PopStyleColor(); // Restore the original background color
 }
 
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
@@ -130,6 +145,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     shader.SetUniformMat4f("u_Model", model);*/
     shader.SetUniformMat4f("u_MVP", mvp);
     shader.SetUniform1f("u_Alpha", 1.0f);
+    shader.SetUniform1f("u_UseTexture", 1);
     shader.SetUniform1i("u_Texture", 0);
     shader.Unbind();
 
@@ -147,32 +163,58 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             const TextureComponent* texture_marker = child.get<TextureComponent>();
             const Size* size_marker = child.get<Size>();
 
-            //glm::mat4 model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
-            //model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-            
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
             model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
             glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
             float alpha = 1.0f;
-            //if(!visibility_marker->isVisible){
-            //    //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
-            //    alpha = 0.5f;
-            //}
+            if(!visibility_marker->isVisible){
+                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
+                alpha = 0.5f;
+            }
 
             shader.Bind();
             shader.SetUniformMat4f("u_MVP", mvp);
-            //shader.SetUniformMat4f("u_Projection", projection);
-            //shader.SetUniformMat4f("u_View", viewMatrix);
-            //shader.SetUniformMat4f("u_Model", model);
             shader.SetUniform1f("u_Alpha", alpha);
             shader.SetUniform1i("u_Texture", 0);
+            shader.SetUniform1f("u_UseTexture", 1);
             shader.Unbind();
 
             GLCall(glActiveTexture(GL_TEXTURE0));
             GLCall(glBindTexture(GL_TEXTURE_2D, texture_marker->textureID));
 
             renderer.Draw(va, ib, shader);
+        }
+
+        if (child.has<FogOfWar>()) {
+            const MarkerComponent* marker_component = child.get<MarkerComponent>();
+            const Position* position_marker = child.get<Position>();
+            const Visibility* visibility_marker = child.get<Visibility>();
+            const TextureComponent* texture_marker = child.get<TextureComponent>();
+            const Size* size_marker = child.get<Size>();
+
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+            model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+
+            glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+            float alpha = 1.0f;
+            if (!visibility_marker->isVisible) {
+                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
+                alpha = 0.5f;
+            }
+
+            shader.Bind();
+            shader.SetUniformMat4f("u_MVP", mvp);
+            shader.SetUniform1f("u_Alpha", alpha);
+            shader.SetUniform1i("u_UseTexture", 0);
+            shader.Unbind();
+
+            //GLCall(glActiveTexture(GL_TEXTURE0));
+            //GLCall(glBindTexture(GL_TEXTURE_2D, texture_marker->textureID));
+
+            renderer.Draw(va, ib, shader);
+        
+        
         }
     });
 
@@ -358,32 +400,15 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
     
     // Query all markers that are children of the active board and have MarkerComponent
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving) {
-        // Check if the marker is a child of the active board
-        //use mousePos(Screen Position) screenToWorldPosition(mousePos) when comparing to markerPos(World Position)
         glm::vec2 world_position = screenToWorldPosition(mousePos);
-      
 
         if (entity.has(flecs::ChildOf, active_board)) {
-            auto text = entity.get<TextureComponent>();
-            //bool withinXBounds = world_position.x >= markerPos.x - markerSize.width/2 && world_position.x <= (markerPos.x + markerSize.width/2);
-            //bool withinYBounds = world_position.y >= markerPos.y - markerSize.height/2 && world_position.y <= (markerPos.y + markerSize.height/2);
-
             bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
                 (world_position.x <= (markerPos.x + markerSize.width / 2));
 
             bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
                 (world_position.y <= (markerPos.y + markerSize.height / 2));
 
-
-            std::cout << "File Name: " << text->image_path << std::endl;
-            std::cout << "Mouse ScreenPosition: " << mousePos.x << " | " << mousePos.y << std::endl;
-            std::cout << "Mouse WorldPosition: " << world_position.x << " | " << world_position.y << std::endl;
-            std::cout << "Marker WorldPosition: " << markerPos.x << " | " << markerPos.y << std::endl;
-            std::cout << "Marker Size: " << markerSize.width << " | " << markerSize.height << std::endl;
-            std::cout << "BOUNDS x : " << markerPos.x - markerSize.width / 2 << " | " << markerPos.x + markerSize.width / 2 << std::endl;
-            std::cout << "BOUNDS y : " << markerPos.y - markerSize.height / 2 << " | " << markerPos.y + markerSize.height / 2 << std::endl;
-            std::cout << "IN BOUNDS: " << withinXBounds << " | " << withinYBounds << std::endl;
-            std::cout << "-------------------------------------------------------------------" << std::endl;
             if (withinXBounds && withinYBounds) {
                 moving.isDragging = true;
                 hovered = true;           // Mark as hovered
@@ -395,10 +420,16 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
 }
 
 
-void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMarker) {
+void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
     mouseStartPos = mousePos;  // Captura a posição inicial do mouse
-    if (not draggingMarker) {
-        active_board.set<Panning>({ true });
+    if (currentTool == Tool::MOVE) {
+        if (draggingMap) {
+            active_board.set<Panning>({ true });
+        }
+    }
+    else if (currentTool == Tool::FOG)
+    {
+        is_creating_fog = true;
     }
 }
 
@@ -410,6 +441,7 @@ void BoardManager::endMouseDrag() {
             moving.isDragging = false;
         }
     });
+    is_creating_fog = false;
 }
 
 bool BoardManager::isPanning() {
@@ -456,6 +488,9 @@ void BoardManager::resetCamera() {
 //        });
 //}
 
+void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
+    fogEntity.destruct();
+}
 
 flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
     auto fog = ecs.entity()
@@ -467,15 +502,30 @@ flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
     return fog;
 }
 
-void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
-    fogEntity.destruct();
+void BoardManager::handleFogCreation(glm::vec2 mousePos) {
+    glm::vec2 startPos = getMouseStartPosition();  // Tracks the starting drag point
+    glm::vec2 start_world_position = screenToWorldPosition(startPos);
+    glm::vec2 end_world_position = screenToWorldPosition(mousePos);
+
+    // Calculate size
+    glm::vec2 size = glm::abs(end_world_position - start_world_position);  // Make sure size is positive
+
+    // Determine the corrected top-left position for the fog
+    glm::vec2 corrected_start_position;
+    corrected_start_position.x = start_world_position.x + size.x/2;
+    corrected_start_position.y = start_world_position.y + size.y / 2;
+
+    // Create the fog of war at the corrected position with the correct size
+    createFogOfWar(corrected_start_position, size);
 }
 
-void BoardManager::handleFogCreation(glm::vec2 mousePos) {
-    glm::vec2 startPos = getMouseStartPosition();  // Assuming this tracks the starting drag point
-    glm::vec2 size = mousePos - startPos;
-    createFogOfWar(startPos, size);
-}
+//void BoardManager::handleFogCreation(glm::vec2 mousePos) {
+//    glm::vec2 startPos = getMouseStartPosition();  // Assuming this tracks the starting drag point
+//    glm::vec2 start_world_position = screenToWorldPosition(startPos);
+//    glm::vec2 end_world_position = screenToWorldPosition(mousePos);
+//    glm::vec2 size(end_world_position.x - start_world_position.x, end_world_position.y - start_world_position.y);
+//    createFogOfWar(start_world_position, size);
+//}
 
 
 void BoardManager::zoomBoard(float zoomFactor) {
@@ -490,26 +540,60 @@ void BoardManager::setCurrentTool(Tool newTool) {
     currentTool = newTool;
 }
 
-void BoardManager::renderEditWindow(flecs::entity entity) {
+
+flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
+
+    auto entity_at_mouse = flecs::entity();
+    ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size) {
+        
+        glm::vec2 world_position = screenToWorldPosition(mouse_position);
+        
+        if (entity.has(flecs::ChildOf, active_board)) {
+
+            bool withinXBounds = (world_position.x >= (entity_pos.x - entity_size.width / 2)) &&
+                (world_position.x <= (entity_pos.x + entity_size.width / 2));
+
+            bool withinYBounds = (world_position.y >= (entity_pos.y - entity_size.height / 2)) &&
+                (world_position.y <= (entity_pos.y + entity_size.height / 2));
+
+            if (withinXBounds && withinYBounds) {
+                entity_at_mouse = entity;
+            }
+        }
+        });
+    return entity_at_mouse;
+}
+bool BoardManager::isEditWindowOpen() {
+    return showEditWindow;
+}
+
+void BoardManager::renderEditWindow() {
+    if (!showEditWindow) return;  // If the window is closed, skip rendering it
+
     // Get the current mouse position to set the window position
     ImVec2 mousePos = ImGui::GetMousePos();
-    // Set the cursor position to the current mouse position
-    ImGui::SetNextWindowPos(mousePos, ImGuiCond_Always);
-    // Define the window title (you can customize this as needed)
-    ImGui::Begin("Edit Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
+    ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
+    ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
     // Retrieve the Size and Visibility components of the entity
-    if (entity.has<Size>() && entity.has<Visibility>()) {
-        auto size = entity.get_mut<Size>();  // Mutable access to the size
-        auto visibility = entity.get_mut<Visibility>()->isVisible;  // Mutable access to the visibility
-        float scale = 1.0f;
-        // Slider for size change (adjust range as needed)
-        if (ImGui::SliderFloat("Size", &scale, 0.1f, 10.0f, "%.1fx")) {
-            // Apply the scale change, adjusting the height to maintain aspect ratio
-            size->width = size->width * scale;
-            size->height = size->height * scale;  // Adjust height proportionally to the width
+    if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>()) {
+        auto size = edit_window_entity.get_mut<Size>();  // Mutable access to the size
+        auto visibility = edit_window_entity.get_mut<Visibility>();  // Mutable access to the visibility
+
+        ImGui::BeginGroup();
+        if (ImGui::Button("+ Size")) {
+            size->width = size->width * 1.1;
+            size->height = size->height * 1.1;  // Adjust height proportionally to the width
         }
+        ImGui::SameLine();
+        if (ImGui::Button("- Size")) {
+            size->width = size->width * 0.90;
+            size->height = size->height * 0.90;  // Adjust height proportionally to the width
+        }
+
+        ImGui::EndGroup();
         // Checkbox for visibility change
-        ImGui::Checkbox("Visible", &visibility);
+        ImGui::Checkbox("Visible", &visibility->isVisible);
 
         ImGui::Separator();
 
@@ -523,7 +607,10 @@ void BoardManager::renderEditWindow(flecs::entity entity) {
             ImGui::Separator();
 
             if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                entity.destruct();  // Delete the entity
+                if (edit_window_entity.is_alive()) {
+                    edit_window_entity.destruct();  // Delete the entity
+                    showEditWindow = false;
+                }
                 ImGui::CloseCurrentPopup();  // Close the popup after deletion
             }
             ImGui::SameLine();
@@ -537,5 +624,10 @@ void BoardManager::renderEditWindow(flecs::entity entity) {
     }
 
     ImGui::End();
+    ImGui::PopStyleColor(); // Restore the original background color
+
+    if (!showEditWindow) {
+        edit_window_entity = flecs::entity();
+    }
 }
 

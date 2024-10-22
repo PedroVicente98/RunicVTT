@@ -94,17 +94,25 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
     glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         if (game_table_manager->isBoardActive()) {
-            if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE && game_table_manager->isMouseInsideMapWindow()) {
-		        if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
-			        game_table_manager->board_manager.startMouseDrag(mouse_pos, true);
-		        }else{
-                	game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
-		        }
-            }
+            if (game_table_manager->isMouseInsideMapWindow()) {
+                if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE ) {
+		            if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
+			            game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
+		            }else{
+                	    game_table_manager->board_manager.startMouseDrag(mouse_pos, true);
+		            }
+                }
 
-
-            if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
-                game_table_manager->board_manager.handleFogCreation(mouse_pos);
+                if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
+                    game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
+                }
+            
+                if (game_table_manager->board_manager.getCurrentTool() == Tool::SELECT) {
+                    auto entity = game_table_manager->board_manager.getEntityAtMousePosition(mouse_pos);
+                    if (entity. is_valid()) {
+                        game_table_manager->board_manager.setShowEditWindow(true, entity);
+                    }
+                }
             }
 
 
@@ -116,9 +124,18 @@ void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int a
 
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) 
     {
-        if (game_table_manager->isBoardActive() && (game_table_manager->board_manager.isPanning() || game_table_manager->board_manager.isDragginMarker())) {
-            game_table_manager->board_manager.endMouseDrag();
+        if (game_table_manager->isBoardActive()) {
+
+            if (game_table_manager->board_manager.isPanning() || game_table_manager->board_manager.isDragginMarker()) {
+                game_table_manager->board_manager.endMouseDrag();
+            }
+            if (game_table_manager->board_manager.isCreatingFog()) {
+                auto imgui_mouse_pos = ImGui::GetMousePos();
+                game_table_manager->board_manager.handleFogCreation(glm::vec2(imgui_mouse_pos.x , imgui_mouse_pos.y));
+                game_table_manager->board_manager.endMouseDrag();
+            }
         }
+
     }
 
 }

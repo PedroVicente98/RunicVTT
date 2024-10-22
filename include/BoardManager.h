@@ -123,8 +123,8 @@ public:
 
     void closeBoard();
     void setActiveBoard(flecs::entity board_entity);
-
-    void renderEditWindow(flecs::entity entity);
+    bool isEditWindowOpen();
+    void renderEditWindow();
     void startMouseDrag(glm::vec2 mousePos, bool draggingMarker);
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
@@ -134,14 +134,25 @@ public:
     DirectoryWindow marker_directory;
     glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
     glm::vec2 worldToScreenPosition(glm::vec2 world_position);
+    flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
 
     Camera camera;
+
+    bool isCreatingFog() { return is_creating_fog; };
+    bool getShowEditWindow() { return showEditWindow; };
+    void setShowEditWindow(bool show, flecs::entity edit_entity = flecs::entity()) {
+        showEditWindow = show; 
+        edit_window_entity = edit_entity;
+    };
+
 private:
+    bool showEditWindow = false;
+	flecs::entity edit_window_entity = flecs::entity();
 	NetworkManager* network_manager;
     glm::vec2 mouseStartPos;
 
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
-	//flecs::entity* hovered_marker = nullptr;
+    bool is_creating_fog = false;
     Tool currentTool;  // Active tool for interaction
 };

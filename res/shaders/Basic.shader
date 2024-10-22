@@ -22,14 +22,30 @@ out vec4 color;
 
 in vec2 v_TextCoord;
 
-//uniform vec4 u_Color;
-uniform sampler2D u_Texture;
-uniform float u_Alpha;
+uniform bool u_UseTexture;    // Flag to choose between texture and solid color
+uniform sampler2D u_Texture;  // Texture for rendering (used if u_UseTexture is true)
+uniform float u_Alpha;        // Alpha for transparency control
 
 void main()
 {
-    vec4 textColor = texture(u_Texture, v_TextCoord);
-    textColor.a = textColor.a * u_Alpha;
-    color = textColor;
+    // Conditional: Use texture or solid color
+    if (u_UseTexture)
+    {
+        // Sample the texture (map)
+        vec4 textColor = texture(u_Texture, v_TextCoord);
+        // Apply alpha transparency to the texture
+        textColor.a *= u_Alpha;
 
-};
+        // Set the final color
+        color = textColor;
+    }
+    else
+    {
+        // Use solid color with alpha blending
+        vec4 solidColor = vec4(0.0, 0.0 ,0.0, 1.0);
+        solidColor.a *= u_Alpha;
+
+        // Set the final color to the solid color
+        color = solidColor;
+    }
+}
