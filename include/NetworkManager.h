@@ -9,8 +9,25 @@
 #include <vector>
 #include <functional>
 #include <deque>
-#include "Message.h"
+//#include "Message.h"
 #include <thread>
+
+enum class MessageType {
+    MarkerUpdate,
+    CreateMarker,
+    FogUpdate,
+    CreateFog,
+    ImageChunk,
+    ChatMessage,
+    GamestateStart,
+    GamestateEnd
+};
+
+struct Message {
+    MessageType type;
+    unsigned char payload;
+};
+
 
 class NetworkManager {
 public:
