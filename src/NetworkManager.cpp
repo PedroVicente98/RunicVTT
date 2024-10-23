@@ -151,6 +151,37 @@ void  NetworkManager::handleMessage(std::shared_ptr<asio::ip::tcp::socket> socke
 }
 
 
+void NetworkManager::queueMessage(const Message& message) {
+    if (message.messageType == MessageType::REAL_TIME_UPDATE) {
+        realTimeQueue.push(message);  // High-priority queue
+    } else {
+        nonRealTimeQueue.push(message);  // Low-priority queue
+    }
+}
+
+
+void NetworkManager::processMessages() {
+    // Process 5 real-time messages for every 1 non-real-time message
+    int realTimeMessagesProcessed = 0;
+
+    // Process all real-time messages first
+    while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
+        Message message = realTimeQueue.front();
+        realTimeQueue.pop();
+        handleMessage(message);
+        realTimeMessagesProcessed++;
+    }
+
+    // After processing some real-time messages, process one non-real-time message
+    if (!nonRealTimeQueue.empty()) {
+        Message message = nonRealTimeQueue.front();
+        nonRealTimeQueue.pop();
+        handleMessage(message);
+    }
+}
+
+
+
 
 
 
