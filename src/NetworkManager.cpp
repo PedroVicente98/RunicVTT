@@ -160,7 +160,7 @@ void NetworkManager::queueMessage(const Message& message) {
 }
 
 
-void NetworkManager::processMessages() {
+void NetworkManager::processSentMessages() {
     // Process 5 real-time messages for every 1 non-real-time message
     int realTimeMessagesProcessed = 0;
 
@@ -168,7 +168,7 @@ void NetworkManager::processMessages() {
     while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
         Message message = realTimeQueue.front();
         realTimeQueue.pop();
-        handleMessage(message);
+        sendMessageToPeers(message);  // Function to send the message to peers
         realTimeMessagesProcessed++;
     }
 
@@ -176,17 +176,24 @@ void NetworkManager::processMessages() {
     if (!nonRealTimeQueue.empty()) {
         Message message = nonRealTimeQueue.front();
         nonRealTimeQueue.pop();
-        handleMessage(message);
+        sendMessageToPeers(message);  // Function to send the message to peers
+        realTimeCounter = 0;  // Reset the counter after sending the non-real-time message
     }
 }
 
 
-
-
-
-
-
-
+void NetworkManager::sendMessageToPeers(const Message& message) {
+    for (auto& peer : connectedPeers) {  // Assume connectedPeers is a list of active connections
+        asio::async_write(*peer, asio::buffer(message.data, message.size), 
+                          [](const asio::error_code& ec, std::size_t /*length*/) {
+            if (!ec) {
+                std::cout << "Message sent successfully" << std::endl;
+            } else {
+                std::cerr << "Error sending message: " << ec.message() << std::endl;
+            }
+        });
+    }
+}
 
 
 
