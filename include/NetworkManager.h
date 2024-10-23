@@ -27,7 +27,17 @@ struct Message {
     MessageType type;
     unsigned char payload;
 };
+/*
+mover a connection para o gametable. iniciar o gametable iniciar a conection
+com a rede iniciada, tentar conectar com outro peer no computador
+quando connectar começar a fazer o envio do gamestate.
+quando terminar o envio fazer o recebimento
+depois do recebimento fazer o envio de atualizações
+depois fazer o recebimento de atualizações
 
+em algum momento depois de conectar o peer, fazer o peer discovery
+
+*/
 
 class NetworkManager {
 public:
