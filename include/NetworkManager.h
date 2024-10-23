@@ -40,8 +40,9 @@ private:
     std::unordered_map<std::string, std::shared_ptr<asio::ip::tcp::socket>> peers_;
     char network_password[124] = "";
 
-    std::deque<Message> realTimeQueue;
-    std::deque<Message> nonRealTimeQueue;
+    
+    std::queue<Message> realTimeQueue;
+    std::queue<Message> nonRealTimeQueue;
     std::mutex queueMutex;
 
 };
