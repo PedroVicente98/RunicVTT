@@ -8,9 +8,10 @@
 #include <unordered_map>
 #include <vector>
 #include <functional>
-#include <deque>
+#include <queue>
 //#include "Message.h"
 #include <thread>
+#include <regex>
 
 enum class MessageType {
     MarkerUpdate,
@@ -39,6 +40,13 @@ em algum momento depois de conectar o peer, fazer o peer discovery
 
 */
 
+enum class Role {
+    NONE,
+    GAMEMASTER,
+    PLAYER
+};
+
+
 class NetworkManager {
 public:
     NetworkManager();
@@ -48,6 +56,9 @@ public:
     void startServer(unsigned short port);   // Start the server (server start)
     void stopServer();                       // Stop the server (server stop)
     bool isConnectionOpen() const;           // Check if server is running (status check)
+
+    unsigned short getPort() const;
+    bool connectToPeer(const std::string& connection_string);
 
     // Peer handling methods
     void acceptConnections();  // Accept new connections (server main loop)
@@ -67,6 +78,14 @@ public:
     std::string getNetworkInfo();     // Get network info (IP and port) (server utility)
     std::string getLocalIPAddress();  // Get local IP address (server utility)
 
+
+    void setNetworkPassword(const char* password) {
+        strncpy(network_password, password, sizeof(network_password) - 1);
+        network_password[sizeof(network_password) - 1] = '\0';
+    }
+
+    Role getPeerRole() const { return peer_role; }
+
 private:
     asio::io_context io_context_;  // ASIO context for handling async operations
     asio::ip::tcp::acceptor acceptor_;  // ASIO acceptor for incoming connections
@@ -76,5 +95,5 @@ private:
     std::queue<Message> realTimeQueue;
     std::queue<Message> nonRealTimeQueue;
     std::mutex queueMutex;
-
+    Role peer_role = Role::NONE;
 };

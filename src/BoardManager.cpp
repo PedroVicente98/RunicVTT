@@ -76,6 +76,7 @@ void BoardManager::renderToolbar() {
     auto offset = ImGui::GetFrameHeight();
     ImGui::SetNextWindowPos(ImVec2(window_position.x, window_position.y + offset), ImGuiCond_Always);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
+
     ImGui::Begin("Toolbar", 0, window_flags);
     ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
     ImVec4 activeColor = ImVec4(0.2f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
@@ -86,32 +87,41 @@ void BoardManager::renderToolbar() {
     }
     ImGui::PopStyleColor();
     ImGui::SameLine(); // Ensure buttons are on the same row
-    // Tool: Fog
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
-    if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
-        currentTool = Tool::FOG;
+
+    if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+        // Tool: Fog
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
+        if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
+            currentTool = Tool::FOG;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
+        // Tool: Marker
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MARKER ? activeColor : defaultColor);
+        if (ImGui::Button("Marker Tool", ImVec2(80, 40))) {
+            currentTool = Tool::MARKER;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
+        // Tool: Select
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
+        if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
+            currentTool = Tool::SELECT;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
     }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    // Tool: Marker
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MARKER ? activeColor : defaultColor);
-    if (ImGui::Button("Marker Tool", ImVec2(80, 40))) {
-        currentTool = Tool::MARKER;
+
+    if (ImGui::Button("Reset Camera", ImVec2(90, 40))) {
+        resetCamera();
     }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    // Tool: Select
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
-    if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
-        currentTool = Tool::SELECT;
-    }
-    ImGui::PopStyleColor();
+
     ImGui::End();
-    ImGui::PopStyleColor(); // Restore the original background color
+    ImGui::PopStyleColor();
 }
 
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
-
+    
     const Board* board = active_board.get<Board>();
     const Panning* panning = active_board.get<Panning>();
     const Position* position = active_board.get<Position>();
@@ -127,20 +137,12 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
     glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
     glm::mat4 projection = camera.getProjectionMatrix();
 
-    //glm::mat4 model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
-    //model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
-
     glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
     model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
 
-
     glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
 
-
     shader.Bind();
-   /* shader.SetUniformMat4f("u_Projection", projection);
-    shader.SetUniformMat4f("u_View", viewMatrix);
-    shader.SetUniformMat4f("u_Model", model);*/
     shader.SetUniformMat4f("u_MVP", mvp);
     shader.SetUniform1f("u_Alpha", 1.0f);
     shader.SetUniform1f("u_UseTexture", 1);
@@ -153,9 +155,12 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
     renderer.Draw(va, ib, shader);
 
+    ////RENDER GRID HERE
+
+
     active_board.children([&](flecs::entity child){
+        //if (child.has<MarkerComponent>()) {
         if (child.has<MarkerComponent>()) {
-            const MarkerComponent* marker_component = child.get<MarkerComponent>();
             const Position* position_marker = child.get<Position>();
             const Visibility* visibility_marker = child.get<Visibility>();
             const TextureComponent* texture_marker = child.get<TextureComponent>();
@@ -167,8 +172,12 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
             float alpha = 1.0f;
             if(!visibility_marker->isVisible){
-                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
-                alpha = 0.5f;
+                if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                    alpha = 0.5f;
+                }
+                else {
+                    alpha = 0.0f;
+                }
             }
 
             shader.Bind();
@@ -185,7 +194,6 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         }
 
         if (child.has<FogOfWar>()) {
-            const MarkerComponent* marker_component = child.get<MarkerComponent>();
             const Position* position_marker = child.get<Position>();
             const Visibility* visibility_marker = child.get<Visibility>();
             const TextureComponent* texture_marker = child.get<TextureComponent>();
@@ -197,8 +205,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
             float alpha = 1.0f;
             if (!visibility_marker->isVisible) {
-                //NETWORK ROLE CHECK - alpha GAMEMASTER 0.5f - alpha PLAYER 0.0f
-                alpha = 0.5f;
+                if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                    alpha = 0.3f;
+                }
+                else
+                {
+                    alpha = 0.0f;
+                }
             }
 
             shader.Bind();
@@ -207,74 +220,25 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             shader.SetUniform1i("u_UseTexture", 0);
             shader.Unbind();
 
-            //GLCall(glActiveTexture(GL_TEXTURE0));
-            //GLCall(glBindTexture(GL_TEXTURE_2D, texture_marker->textureID));
-
             renderer.Draw(va, ib, shader);
-        
         
         }
     });
 
 
-    ////RENDER GRID
-
-    //// Renderizar os marcadores
-    //ecs.each([&](flecs::entity e, const MarkerComponent& marker, const Position& pos, const Size& size, const TextureComponent& texture, const Visibility& visibility) {
-    //    if (visibility.isVisible) {
-    //        renderMarker(texture.textureID, pos, size, viewMatrix);  // Renderizar o marcador
-    //    }
-    //    });
-    //// Renderizar a névoa de guerra (Fog of War)
-    //ecs.each([&](flecs::entity e, const FogOfWar& fog, const Position& pos, const Size& size, const Visibility& visibility) {
-    //    if (visibility.isVisible) {
-    //        renderFog(pos, size, viewMatrix, 1.0f);  // Renderizar a névoa com transparência
-    //    }
-    //    });
 }
 
-//// Render Marker
-//void BoardManager::renderMarker(GLuint textureID, const Position& pos, const Size& size, glm::mat4& viewMatrix) {
-//    shader.Bind();
-//    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-//    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
-//    glm::mat4 mvp = viewMatrix * model;
-//    shader.SetUniformMat4f("u_MVP", mvp);
-//    shader.SetUniform1i("u_Texture", 0);
-//    shader.SetUniform1i("useTexture", 1);
-//    Texture markerTexture("");  // Assuming you have the path to the marker's texture
-//    markerTexture.Bind();
-//    Renderer renderer;
-//    renderer.Draw(vertexArray, indexBuffer, shader);
-//    markerTexture.Unbind();
-//    shader.Unbind();
-//}
-
-//// Render Fog with transparency
-//void BoardManager::renderFog(const Position& pos, const Size& size, const glm::mat4& viewMatrix, const float alpha) {
-//    shader.Bind();
-//    shader.SetUniform1i("useTexture", 0);
-//    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos.x, pos.y, 0.0f));
-//    model = glm::scale(model, glm::vec3(size.width, size.height, 1.0f));
-//    glm::mat4 mvp = viewMatrix * model;
-//    shader.SetUniformMat4f("u_MVP", mvp);
-//    shader.SetUniform1f("u_Alpha", alpha);  // Set transparency for fog
-//
-//    Renderer renderer;
-//    renderer.Draw(vertexArray, indexBuffer, shader);
-//    shader.Unbind();
-//}
 
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size) {
 
     flecs::entity marker = ecs.entity()
-        .set(MarkerComponent{ false })
         .set(Position{ (int)position.x, (int)position.y }) //World Position
         .set(Size{ size.x , size.y })
         .set(TextureComponent{ textureId , imageFilePath, size })
         .set(Visibility{ true })
         .set(Moving{ false });
 
+    marker.add<MarkerComponent>();
     marker.add(flecs::ChildOf, active_board);
 
     return marker;
@@ -492,10 +456,11 @@ void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
 
 flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
     auto fog = ecs.entity()
-        .set(FogOfWar{ false })
         .set(Position{ (int)startPos.x, (int)startPos.y })
         .set(Size{ size.x, size.y })
         .set(Visibility{ true });
+
+    fog.add<FogOfWar>();
     fog.add(flecs::ChildOf, active_board);
     return fog;
 }
@@ -561,7 +526,7 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
         });
     return entity_at_mouse;
 }
-bool BoardManager::isEditWindowOpen() {
+bool BoardManager::isEditWindowOpen() const {
     return showEditWindow;
 }
 

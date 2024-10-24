@@ -185,16 +185,28 @@ void GameTableManager::createGameTablePopUp()
         game_table_name = buffer;
 
         ImGui::Separator();
-        ImGui::InputText("Password", pass_buffer, sizeof(buffer), ImGuiInputTextFlags_Password);
-        
+
+        auto network_info = network_manager.getLocalIPAddress();
+        ImGui::Text("Network Info");
+        ImGui::Text(network_info.c_str());
+        ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
+        network_manager.setNetworkPassword(pass_buffer);
+
+        ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+
         if (ImGui::Button("Save") && strlen(buffer) > 0)
         {
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
-            ImGui::CloseCurrentPopup();
+
+            int port = atoi(port_buffer);
+            network_manager.startServer(port);
 
             memset(buffer, '\0', sizeof(buffer));
             memset(pass_buffer, '\0', sizeof(pass_buffer));
+            memset(port_buffer, '\0', sizeof(port_buffer));
+
+            ImGui::CloseCurrentPopup();
         }
 
         ImGui::SameLine();
@@ -334,52 +346,88 @@ void GameTableManager::closeGameTablePopUp()
     }
 }
 
-
-void GameTableManager::createNetworkPopUp() {
+void GameTableManager::connectToGameTablePopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-    if (ImGui::BeginPopupModal("CreateNetwork")) {
+    if (ImGui::BeginPopupModal("ConnectToGameTable"))
+    {
         ImGui::SetItemDefaultFocus();
-
-        // Display local IP address (use NetworkManager to get IP)
-        std::string localIp = network_manager.getLocalIPAddress();  // New method to get IP address
-        ImGui::Text("Local IP Address: %s", localIp.c_str());
-
-        // Input field for port
-        ImGui::InputText("Port", port_buffer, sizeof(port_buffer));
-
-        // Optional password field
-        ImGui::InputText("Password (optional)", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-
+        ImGui::InputText("Connection String", buffer, sizeof(buffer));
         ImGui::Separator();
 
-        // Save button to start the network
-        if (ImGui::Button("Start Network")) {
-            unsigned short port = static_cast<unsigned short>(std::stoi(port_buffer));
-            // Start the network with the given port and save the password
-            network_manager.startServer(port);
-            memcpy(network_password, pass_buffer, sizeof(pass_buffer));
-            ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Connect") && strlen(buffer) > 0)
+        {
+            if (network_manager.connectToPeer(buffer)) 
+            {  
+                memset(buffer, '\0', sizeof(buffer));
 
-            // Clear buffers after saving
-            memset(port_buffer, '\0', sizeof(port_buffer));
-            memset(pass_buffer, '\0', sizeof(pass_buffer));
+                ImGui::CloseCurrentPopup();
+            }
+            else
+            {
+                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Failed to Connect!!");
+            }
+            
         }
 
         ImGui::SameLine();
 
-        // Close button to exit the pop-up
-        if (ImGui::Button("Close")) {
+        if (ImGui::Button("Close"))
+        {
             ImGui::CloseCurrentPopup();
-            memset(port_buffer, '\0', sizeof(port_buffer));
-            memset(pass_buffer, '\0', sizeof(pass_buffer));
+            memset(buffer, '\0', sizeof(buffer));
         }
         ImGui::EndPopup();
     }
 }
 
-
+//
+//void GameTableManager::createNetworkPopUp() {
+//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+//
+//    if (ImGui::BeginPopupModal("CreateNetwork")) {
+//        ImGui::SetItemDefaultFocus();
+//
+//        // Display local IP address (use NetworkManager to get IP)
+//        std::string localIp = network_manager.getLocalIPAddress();  // New method to get IP address
+//        ImGui::Text("Local IP Address: %s", localIp.c_str());
+//
+//        // Input field for port
+//        ImGui::InputText("Port", port_buffer, sizeof(port_buffer));
+//
+//        // Optional password field
+//        ImGui::InputText("Password (optional)", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
+//
+//        ImGui::Separator();
+//
+//        // Save button to start the network
+//        if (ImGui::Button("Start Network")) {
+//            unsigned short port = static_cast<unsigned short>(std::stoi(port_buffer));
+//            // Start the network with the given port and save the password
+//            network_manager.startServer(port);
+//            memcpy(network_password, pass_buffer, sizeof(pass_buffer));
+//            ImGui::CloseCurrentPopup();
+//
+//            // Clear buffers after saving
+//            memset(port_buffer, '\0', sizeof(port_buffer));
+//            memset(pass_buffer, '\0', sizeof(pass_buffer));
+//        }
+//
+//        ImGui::SameLine();
+//
+//        // Close button to exit the pop-up
+//        if (ImGui::Button("Close")) {
+//            ImGui::CloseCurrentPopup();
+//            memset(port_buffer, '\0', sizeof(port_buffer));
+//            memset(pass_buffer, '\0', sizeof(pass_buffer));
+//        }
+//        ImGui::EndPopup();
+//    }
+//}
+//
+//
 void GameTableManager::closeNetworkPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -402,10 +450,50 @@ void GameTableManager::closeNetworkPopUp() {
     }
 }
 
+void GameTableManager::openNetworkInfoPopUp()
+{
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("NetworkInfo"))
+    {
+
+        auto connection_string = network_manager.getNetworkInfo();
+        auto ip = network_manager.getLocalIPAddress();
+        auto port = network_manager.getPort();
+
+        ImGui::Text("IP: ");
+        ImGui::SameLine();
+        ImGui::Text(ip.c_str());
+        
+        ImGui::Text("PORT: ");
+        ImGui::SameLine();
+        ImGui::Text(std::to_string(port).c_str());
+        
+        ImGui::Text("Connection String: ");
+        ImGui::SameLine();
+        ImGui::Text(connection_string.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Copy")) {
+            ImGui::SetClipboardText(connection_string.c_str());  // Copy the connection string to the clipboard
+            ImGui::Text("Copied to clipboard!");
+        }
+
+        ImGui::NewLine();
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer)
 {
     if (board_manager.isBoardActive()) {
-        board_manager.marker_directory.renderDirectory();
+        if (network_manager.getPeerRole() == Role::GAMEMASTER) {
+            board_manager.marker_directory.renderDirectory();
+        }
 	    board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);
     }

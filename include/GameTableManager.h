@@ -26,12 +26,13 @@ public:
 
 	void createGameTablePopUp();
 	void closeGameTablePopUp();
+	void connectToGameTablePopUp();
 	void createBoardPopUp();
 
 	void closeBoardPopUp();
 	void createNetworkPopUp();
 	void closeNetworkPopUp();
-
+	void openNetworkInfoPopUp();
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 
@@ -59,7 +60,6 @@ private:
 	char buffer[124] = "";
 	char pass_buffer[124] = "";
 	char port_buffer[124] = "";
-	char network_password[124] = "";
 
 	// Variável para armazenar o caminho do arquivo selecionado
 	std::string map_image_path = "";

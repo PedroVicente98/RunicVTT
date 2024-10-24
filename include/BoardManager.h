@@ -83,6 +83,7 @@ private:
 
 
 enum class Tool{ MOVE, FOG, MARKER, SELECT};
+
 //MOVE - Move Camera and Markers;
 //FOG - Create FOG and TOGGLE VISIBILITY
 //MARKER - Toggle Marker Visibility? MIGHT NOT BE NECESSARY
@@ -123,23 +124,23 @@ public:
 
     void closeBoard();
     void setActiveBoard(flecs::entity board_entity);
-    bool isEditWindowOpen();
+    bool isEditWindowOpen() const;
     void renderEditWindow();
     void startMouseDrag(glm::vec2 mousePos, bool draggingMarker);
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
     bool isPanning();
     bool isDragginMarker();
-	std::string board_name;
-    DirectoryWindow marker_directory;
     glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
     glm::vec2 worldToScreenPosition(glm::vec2 world_position);
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
 
+	std::string board_name;
+    DirectoryWindow marker_directory;
     Camera camera;
 
-    bool isCreatingFog() { return is_creating_fog; };
-    bool getShowEditWindow() { return showEditWindow; };
+    bool isCreatingFog() const { return is_creating_fog; };
+    bool getShowEditWindow() const { return showEditWindow; };
     void setShowEditWindow(bool show, flecs::entity edit_entity = flecs::entity()) {
         showEditWindow = show; 
         edit_window_entity = edit_entity;

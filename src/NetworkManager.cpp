@@ -14,7 +14,8 @@ NetworkManager::~NetworkManager() {
     }
 }
 
-// Stop the server and close all connections
+//Server Methods
+
 void NetworkManager::stopServer() {
     io_context_.stop();  // Stop the ASIO context
     if (acceptor_.is_open()) {
@@ -26,28 +27,32 @@ bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open
 }
 
+unsigned short NetworkManager::getPort() const {
+    if (acceptor_.is_open()) {
+        return acceptor_.local_endpoint().port();  // Return the actual port number
+    }
+    else {
+        return 0;  // Return 0 if the connection is not open
+    }
+}
+
+void NetworkManager::startServer(unsigned short port) {
+    asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
+    acceptor_.open(endpoint.protocol());
+    acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
+    acceptor_.bind(endpoint);
+    acceptor_.listen();
+    peer_role = Role::GAMEMASTER;
+    acceptConnections();  // Start accepting connections
+
+    std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
+}
 
 std::string NetworkManager::getNetworkInfo() {
-    try {
-        // Resolve the local IP address using the hostname
-        asio::ip::tcp::resolver resolver(io_context_);
-        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
-        asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
-        asio::ip::tcp::resolver::iterator end;
-
-        // Loop through the results to find the first IPv4 address
-        for (; it != end; ++it) {
-            asio::ip::tcp::endpoint ep = *it;
-            if (ep.address().is_v4() && !ep.address().is_loopback()) {
-                // Ensure the acceptor is bound and return the IP and port
-                return ep.address().to_string() + ":" + std::to_string(acceptor_.local_endpoint().port());
-            }
-        }
-
-        return "No valid local IPv4 address found";
-    } catch (std::exception& e) {
-        return "Could not retrieve IP address or port: " + std::string(e.what());
-    }
+    auto ip_address = getLocalIPAddress();
+    auto port = getPort();
+    std::string network_info = "runic:" + ip_address + ":" + std::to_string(port) + "?" + network_password;
+    return network_info;
 }
 
 std::string NetworkManager::getLocalIPAddress() {
@@ -70,7 +75,6 @@ std::string NetworkManager::getLocalIPAddress() {
         return "Unable to retrieve IP: " + std::string(e.what());
     }
 }
-
 
 /*
 std::string NetworkManager::getNetworkInfo() {
@@ -104,16 +108,7 @@ std::string NetworkManager::getLocalIPAddress() {
 
 */
 // Start the server with the given port
-void NetworkManager::startServer(unsigned short port) {
-    asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
-    acceptor_.open(endpoint.protocol());
-    acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
-    acceptor_.bind(endpoint);
-    acceptor_.listen();
-    acceptConnections();  // Start accepting connections
 
-    std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
-}
 
 // Method to accept incoming connections
 void NetworkManager::acceptConnections() {
@@ -139,63 +134,106 @@ void  NetworkManager::startReceiving(std::shared_ptr<asio::ip::tcp::socket> sock
     socket->async_read_some(asio::buffer(*buffer), [this, socket, buffer](asio::error_code ec, std::size_t length) {
         if (!ec) {
             // Process the received message (deserialize, handle data)
-            handleMessage(socket, buffer->data(), length);
+            //handleMessage(socket, buffer->data(), length);
             startReceiving(socket);  // Continue reading from this peer
         }
         });
 }
 
+//Client Methods
+
+bool NetworkManager::connectToPeer(const std::string& connection_string) {
+    std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+    std::smatch match;
+
+    // Parse the connection string using regex
+    if (std::regex_match(connection_string, match, rgx)) {
+        std::string ip = match[1];             // Extract the IP address
+        unsigned short port = std::stoi(match[2]);  // Extract the port
+        std::string password = match[3];       // Extract the optional password
+
+        // Check if the password matches (if provided)
+        if (!password.empty() && password != network_password) {
+            std::cout << "Invalid password!" << std::endl;
+            return false;  // Password mismatch, reject the connection
+        }
+
+        // Establish a connection using ASIO
+        try {
+            asio::ip::tcp::resolver resolver(io_context_);
+            asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(ip, std::to_string(port));
+            auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
+            asio::connect(*socket, endpoints);
+
+            std::cout << "Connected to peer: " << ip << ":" << port << std::endl;
+
+            // You can now start communication with the peer
+            startReceiving(socket);  // Start receiving messages from this peer
+            return true;
+        }
+        catch (std::exception& e) {
+            std::cerr << "Failed to connect: " << e.what() << std::endl;
+            return false;
+        }
+    }
+    else {
+        std::cerr << "Invalid connection string format!" << std::endl;
+        return false;
+    }
+}
+
+
 // Process received message
-void  NetworkManager::handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length) {
-    // Deserialize and process the message here
-}
+//void  NetworkManager::handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length) {
+//    // Deserialize and process the message here
+//}
+//
+//
+//void NetworkManager::queueMessage(const Message& message) {
+//    if (message.messageType == MessageType::REAL_TIME_UPDATE) {
+//        realTimeQueue.push(message);  // High-priority queue
+//    } else {
+//        nonRealTimeQueue.push(message);  // Low-priority queue
+//    }
+//}
 
-
-void NetworkManager::queueMessage(const Message& message) {
-    if (message.messageType == MessageType::REAL_TIME_UPDATE) {
-        realTimeQueue.push(message);  // High-priority queue
-    } else {
-        nonRealTimeQueue.push(message);  // Low-priority queue
-    }
-}
-
-
-void NetworkManager::processSentMessages() {
-    // Process 5 real-time messages for every 1 non-real-time message
-    int realTimeMessagesProcessed = 0;
-
-    // Process all real-time messages first
-    while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
-        Message message = realTimeQueue.front();
-        realTimeQueue.pop();
-        sendMessageToPeers(message);  // Function to send the message to peers
-        realTimeMessagesProcessed++;
-    }
-
-    // After processing some real-time messages, process one non-real-time message
-    if (!nonRealTimeQueue.empty()) {
-        Message message = nonRealTimeQueue.front();
-        nonRealTimeQueue.pop();
-        sendMessageToPeers(message);  // Function to send the message to peers
-        realTimeCounter = 0;  // Reset the counter after sending the non-real-time message
-    }
-}
-
-
-void NetworkManager::sendMessageToPeers(const Message& message) {
-    for (auto& peer : connectedPeers) {  // Assume connectedPeers is a list of active connections
-        asio::async_write(*peer, asio::buffer(message.data, message.size), 
-                          [](const asio::error_code& ec, std::size_t /*length*/) {
-            if (!ec) {
-                std::cout << "Message sent successfully" << std::endl;
-            } else {
-                std::cerr << "Error sending message: " << ec.message() << std::endl;
-            }
-        });
-    }
-}
-
-
+//
+//void NetworkManager::processSentMessages() {
+//    // Process 5 real-time messages for every 1 non-real-time message
+//    int realTimeMessagesProcessed = 0;
+//
+//    // Process all real-time messages first
+//    while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
+//        Message message = realTimeQueue.front();
+//        realTimeQueue.pop();
+//        sendMessageToPeers(message);  // Function to send the message to peers
+//        realTimeMessagesProcessed++;
+//    }
+//
+//    // After processing some real-time messages, process one non-real-time message
+//    if (!nonRealTimeQueue.empty()) {
+//        Message message = nonRealTimeQueue.front();
+//        nonRealTimeQueue.pop();
+//        sendMessageToPeers(message);  // Function to send the message to peers
+//        realTimeCounter = 0;  // Reset the counter after sending the non-real-time message
+//    }
+//}
+//
+//
+//void NetworkManager::sendMessageToPeers(const Message& message) {
+//    for (auto& peer : connectedPeers) {  // Assume connectedPeers is a list of active connections
+//        asio::async_write(*peer, asio::buffer(message.data, message.size), 
+//                          [](const asio::error_code& ec, std::size_t /*length*/) {
+//            if (!ec) {
+//                std::cout << "Message sent successfully" << std::endl;
+//            } else {
+//                std::cerr << "Error sending message: " << ec.message() << std::endl;
+//            }
+//        });
+//    }
+//}
+//
+//
 
 
 
