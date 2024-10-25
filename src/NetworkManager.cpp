@@ -125,7 +125,12 @@ void NetworkManager::acceptConnections() {
 
 // Handle when a peer connects
 void  NetworkManager::handlePeerConnected(std::shared_ptr<asio::ip::tcp::socket> socket) {
-    // Logic for when a peer connects, e.g., storing the socket or notifying the application
+        std::cout << "Client connected from: "
+            << socket->remote_endpoint().address().to_string()
+            << ":" << socket->remote_endpoint().port() << std::endl;
+        connectedPeers.emplace( socket->remote_endpoint().address().to_string(), socket );
+        // Begin receiving messages from this peer
+        startReceiving(socket);
 }
 
 // Begin receiving messages from the connected peer

@@ -434,6 +434,7 @@ void BoardManager::panBoard(glm::vec2 currentMousePos) {
 
 void BoardManager::resetCamera() {
     camera.setPosition(glm::vec2(0.0f, 0.0f));
+    camera.setZoom(1.0f);
 }
 
 
