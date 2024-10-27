@@ -84,9 +84,14 @@ std::string NetworkManager::getLocalIPAddress() {
 
 //Message Operations ------------------------------------------------------------------------------
 
-void  NetworkManager::handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length) {
-    // Deserialize and process the message here
+void NetworkManager::handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::vector<unsigned char>& buffer, std::size_t length) {
+    // Create a temporary vector with the actual data received, up to 'length'
+    std::vector<unsigned char> actualBuffer(buffer.begin(), buffer.begin() + length);
+    Message message = deserializeMessage(actualBuffer);
+    // Handle the message based on the type
+    // Your message handling logic here
 }
+
 
 void NetworkManager::startReceiving(std::shared_ptr<asio::ip::tcp::socket> socket) {
     auto buffer = std::make_shared<std::vector<unsigned char>>(1024);  // 1KB buffer size
@@ -97,7 +102,7 @@ void NetworkManager::startReceiving(std::shared_ptr<asio::ip::tcp::socket> socke
                 std::string receivedPassword = data.substr(9);  // Extract the password part
                 verifyPassword(socket, receivedPassword);
             } else {
-                handleMessage(socket, buffer->data(), length);  // Handle other messages
+                handleMessage(socket, *buffer, length);  // Handle other messages
             }
 
             startReceiving(socket);  // Continue reading from this peer
@@ -106,6 +111,40 @@ void NetworkManager::startReceiving(std::shared_ptr<asio::ip::tcp::socket> socke
         }
     });
 }
+
+std::vector<unsigned char> NetworkManager::serializeMessage(const Message& message) {
+    // Prepare a vector to hold the serialized message
+    std::vector<unsigned char> buffer;
+
+    // Serialize the message type
+    MessageType type = message.type;
+    unsigned char* typePtr = reinterpret_cast<unsigned char*>(&type);
+    buffer.insert(buffer.end(), typePtr, typePtr + sizeof(MessageType));
+
+    // Serialize the payload
+    buffer.insert(buffer.end(), message.payload.begin(), message.payload.end());
+
+    return buffer;
+}
+
+Message NetworkManager::deserializeMessage(const std::vector<unsigned char>& buffer) {
+    // Check if the buffer is large enough
+    if (buffer.size() < sizeof(MessageType)) {
+        throw std::runtime_error("Buffer is too small to contain a valid message.");
+    }
+
+    // Extract the message type
+    MessageType type;
+    std::memcpy(&type, buffer.data(), sizeof(MessageType));
+
+    // Extract the payload
+    std::vector<unsigned char> payload(buffer.begin() + sizeof(MessageType), buffer.end());
+
+    // Return the reconstructed message
+    return Message{ type, payload };
+}
+
+
 //Message Operations END ------------------------------------------------------------------------------------- END
 
 
@@ -119,41 +158,34 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
         std::string ip = match[1];             // Extract the IP address
         unsigned short port = std::stoi(match[2]);  // Extract the port
         std::string password = match[3];       // Extract the optional password
-        
+
         // Establish a connection using ASIO
         try {
             asio::ip::tcp::resolver resolver(io_context_);
             auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
             asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip), port);
 
-            //asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(ip, std::to_string(port));
-            //asio::connect(*socket, endpoints);
+            // Perform a synchronous connect operation
+            socket->connect(endpoint);
 
-            socket->async_connect(endpoint, [this, ip, port, socket, password](asio::error_code ec) {
-                if (!ec) {
-                    std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
-                
-                    if (socket->is_open()) {
-                        std::cout << "Connection established. Socket is open." << std::endl;
-                        std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
-                                    << " | Local Port: " << socket->local_endpoint().port() << std::endl;
-                        std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
-                                    << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
-                    }
-                    // Send the password to the server
-                    sendPassword(socket, password);
-                    startReceiving(socket);  // Start receiving messages from the server
+            std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
 
-                } else {
-                    std::cout << "Connection failed: " << ec.message() << std::endl;
-                }
-            });
+            if (socket->is_open()) {
+                std::cout << "Connection established. Socket is open." << std::endl;
+                std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
+                    << " | Local Port: " << socket->local_endpoint().port() << std::endl;
+                std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
+                    << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
+            }
 
-            //// You can now start communication with the peer
-            //std::cout << "Connected to peer: " << ip << ":" << port << std::endl;
-            //startReceiving(socket);  // Start receiving messages from this peer
+            // Send the password to the server
+            sendPassword(socket, password);
+
+            // Start receiving messages from the server (this remains asynchronous)
+            startReceiving(socket);
 
             return true;
+
         }
         catch (std::exception& e) {
             std::cerr << "Failed to connect: " << e.what() << std::endl;
@@ -167,13 +199,70 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
     }
 }
 
+//bool NetworkManager::connectToPeer(const std::string& connection_string) {
+//    std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+//    std::smatch match;
+//
+//    // Parse the connection string using regex
+//    if (std::regex_match(connection_string, match, rgx)) {
+//        std::string ip = match[1];             // Extract the IP address
+//        unsigned short port = std::stoi(match[2]);  // Extract the port
+//        std::string password = match[3];       // Extract the optional password
+//        
+//        // Establish a connection using ASIO
+//        try {
+//            asio::ip::tcp::resolver resolver(io_context_);
+//            auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
+//            asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip), port);
+//
+//            //asio::ip::tcp::resolver::results_type endpoints = resolver.resolve(ip, std::to_string(port));
+//            //asio::connect(*socket, endpoints);
+//
+//            socket->async_connect(endpoint, [this, ip, port, socket, password](asio::error_code ec) {
+//                if (!ec) {
+//                    std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
+//                
+//                    if (socket->is_open()) {
+//                        std::cout << "Connection established. Socket is open." << std::endl;
+//                        std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
+//                                    << " | Local Port: " << socket->local_endpoint().port() << std::endl;
+//                        std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
+//                                    << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
+//                    }
+//                    // Send the password to the server
+//                    sendPassword(socket, password);
+//                    startReceiving(socket);  // Start receiving messages from the server
+//
+//                } else {
+//                    std::cout << "Connection failed: " << ec.message() << std::endl;
+//                }
+//            });
+//
+//            //// You can now start communication with the peer
+//            //std::cout << "Connected to peer: " << ip << ":" << port << std::endl;
+//            //startReceiving(socket);  // Start receiving messages from this peer
+//
+//            return true;
+//        }
+//        catch (std::exception& e) {
+//            std::cerr << "Failed to connect: " << e.what() << std::endl;
+//            return false;
+//        }
+//
+//    }
+//    else {
+//        std::cerr << "Invalid connection string format!" << std::endl;
+//        return false;
+//    }
+//}
+
 // Handle when a peer connects
 void  NetworkManager::handlePeerConnected(std::shared_ptr<asio::ip::tcp::socket> socket) {
     std::cout << "Client connected from: "
         << socket->remote_endpoint().address().to_string()
         << ":" << socket->remote_endpoint().port() << std::endl;
     connectedPeers.emplace(socket->remote_endpoint().address().to_string(), socket);
-    // Begin receiving messages from this peer
+    // Begin receiving messages from  this peer
     startReceiving(socket);
 }
 
@@ -193,15 +282,19 @@ void NetworkManager::acceptConnections() {
 
 //Password Operations ------------------------------------------------------------------------------------------------
 void NetworkManager::sendPassword(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& password) {
-    std::string message = "PASSWORD:" + password;
-    asio::async_write(*socket, asio::buffer(message), [this, socket](asio::error_code ec, std::size_t length) {
-        if (!ec) {
-            std::cout << "Password sent to server.\n";
-        } else {
-            std::cout << "Failed to send password: " << ec.message() << std::endl;
-        }
-    });
+    try {
+        std::string message = "PASSWORD:" + password;
+        // Write the message synchronously
+        asio::write(*socket, asio::buffer(message));
+
+        std::cout << "Password sent to server.\n";
+        socket->close();  // Close the connection after sending the disconnection message
+    }
+    catch (const asio::system_error& e) {
+        std::cout << "Failed to send password: " << e.what() << std::endl;
+    }
 }
+
 void NetworkManager::verifyPassword(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& receivedPassword) {
     if (!strlen(network_password) == 0 && receivedPassword != network_password) {
         std::cout << "Invalid password from peer. Disconnecting.\n";
@@ -212,19 +305,65 @@ void NetworkManager::verifyPassword(std::shared_ptr<asio::ip::tcp::socket> socke
     }
 }
 void NetworkManager::sendDisconnectMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& reason) {
-    std::string message = "DISCONNECT:" + reason;
-    asio::async_write(*socket, asio::buffer(message), [this, reason, socket](asio::error_code ec, std::size_t length) {
-        if (!ec) {
-            std::cout << "Disconnection message sent: " << reason << std::endl;
-            socket->close();  // Close the connection after sending the disconnection message
-        } else {
-            std::cout << "Failed to send disconnection message: " << ec.message() << std::endl;
-        }
-    });
+    try {
+        std::string message = "DISCONNECT:" + reason;
+        // Write the message synchronously
+        asio::write(*socket, asio::buffer(message));
+
+        std::cout << "Disconnection message sent: " << reason << std::endl;
+        socket->close();  // Close the connection after sending the disconnection message
+    }
+    catch (const asio::system_error& e) {
+        std::cout << "Failed to send disconnection message: " << e.what() << std::endl;
+    }
 }
 //Password Operations END -------------------------------------------------------------------------------------------------- END
 
 
+//Sending Messages Operation -----------------------------------------------------------------------------------------------
+void NetworkManager::startSending() {
+    asio::post(io_context_, [this]() { processSentMessages(); });
+}
+
+void NetworkManager::processSentMessages() {
+    // Process 5 real-time messages for every 1 non-real-time message
+    int realTimeMessagesProcessed = 0;
+
+    // Process all real-time messages first
+    std::lock_guard<std::mutex> lock(queueMutex);
+    {
+        while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
+            Message message = realTimeQueue.front();
+            realTimeQueue.pop();
+            sendMessageToPeers(message);  // Function to send the message to peers
+            realTimeMessagesProcessed++;
+        }
+
+        if (!nonRealTimeQueue.empty()) {
+            Message message = nonRealTimeQueue.front();
+            nonRealTimeQueue.pop();
+            sendMessageToPeers(message);  // Function to send the message to peers
+            realTimeMessagesProcessed = 0;  // Reset the counter after sending the non-real-time message
+        }
+    }
+    asio::post(io_context_, [this]() { processSentMessages(); });
+}
+
+void NetworkManager::sendMessageToPeers(const Message& message) {
+    for (auto& peer : connectedPeers) {  // Assume connectedPeers is a list of active connections
+        std::vector<unsigned char> buffer = serializeMessage(message);
+
+        try {
+            asio::write(*peer.second, asio::buffer(buffer));
+            std::cout << "Message sent successfully" << std::endl;
+        }
+        catch (const asio::system_error& e) {
+            std::cerr << "Error sending message: " << e.what() << std::endl;
+        }
+    }
+}
+
+//Sending Messages Operation END ------------------------------------------------------------------------------------------- END
 
 ////Network Connection Logic for Password
 //

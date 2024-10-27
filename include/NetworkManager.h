@@ -26,7 +26,7 @@ enum class MessageType {
 
 struct Message {
     MessageType type;
-    unsigned char payload;
+    std::vector<unsigned char> payload;  // Use std::vector to manage dynamic byte arrays
 };
 /*
 mover a connection para o gametable. iniciar o gametable iniciar a conection
@@ -63,14 +63,21 @@ public:
 
     // Peer handling methods
     void startReceiving(std::shared_ptr<asio::ip::tcp::socket> socket);  // Start receiving messages from a peer (initialize receive)
+
+    std::vector<unsigned char> serializeMessage(const Message& message);
+    Message deserializeMessage(const std::vector<unsigned char>& buffer);
+
+
     void acceptConnections();  // Accept new connections (server main loop)
     void handlePeerConnected(std::shared_ptr<asio::ip::tcp::socket> socket);  // Process peer connection (peer management)
 
     void disconnectPeer(const std::string& peer_id);  // Disconnect a peer (disconnect management)
 
-    void handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length);
+    void handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::vector<unsigned char>& buffer, std::size_t length);
 
     void queueMessage(const Message& message);
+
+    void startSending();
 
     // Message processing methods (sending)
     void processSentMessages();   // Process outgoing messages, with real-time and non-real-time prioritization
