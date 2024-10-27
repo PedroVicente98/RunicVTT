@@ -1,77 +1,7 @@
 .vs
-# Prerequisites
-*.d
-*.dll
-*.exe
-*.so
-*.dylib
-
-# Compiled Object files
-*.obj
-*.o
-*.lo
-*.slo
-
-# Compiled Dynamic libraries
-*.dll
-*.dylib
-*.so
-
-# Compiled Static libraries
-*.lib
-*.a
-*.la
-
-# Executables
-*.exe
-*.out
-*.app
-
-# Debug files
-*.gch
-*.pch
-*.pdb
-*.idb
-
-# Dependency Files
-*.d
-
-# Other C++ specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-
-# IDE specific files (Visual Studio, Eclipse, Code::Blocks, Xcode, CLion, etc.)
 .vscode/
 .idea/
-*.code-workspace
-*.cproject
-*.project
-*.workspace
-*.launch
-*.settings/
-*.sublime-*
 nbproject/
 .DS_Store
-
 x64/
 RunicVTT/
-
-# Qt Creator
-*.pro.user
-*.moc
-*.qrc.depends
-*.pro.user.*
-
-# Temporary files
-*.log
-*.tmp
-*.temp
-*.swp
-*.swo
-
-# System specific
-Thumbs.db
-.DS_Store
-*.stackdump
