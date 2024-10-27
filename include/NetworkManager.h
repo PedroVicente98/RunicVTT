@@ -59,19 +59,33 @@ public:
 
     unsigned short getPort() const;
     bool connectToPeer(const std::string& connection_string);
+    void sendPassword(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& password);
 
     // Peer handling methods
+    void startReceiving(std::shared_ptr<asio::ip::tcp::socket> socket);  // Start receiving messages from a peer (initialize receive)
     void acceptConnections();  // Accept new connections (server main loop)
     void handlePeerConnected(std::shared_ptr<asio::ip::tcp::socket> socket);  // Process peer connection (peer management)
+
     void disconnectPeer(const std::string& peer_id);  // Disconnect a peer (disconnect management)
+
+    void handleMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length);
+
+    void queueMessage(const Message& message);
 
     // Message processing methods (sending)
     void processSentMessages();   // Process outgoing messages, with real-time and non-real-time prioritization
+
+    void sendMessageToPeers(const Message& message);
+
     void sendMessage(const std::string& peer_id, const Message& message);  // Send a message to a specific peer
+
     void broadcastMessage(const Message& message);  // Send a message to all connected peers
 
     // Message processing methods (receiving)
-    void startReceiving(std::shared_ptr<asio::ip::tcp::socket> socket);  // Start receiving messages from a peer (initialize receive)
+    void verifyPassword(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& receivedPassword);
+    void sendDisconnectMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& reason);
+
+
     void handleReceivedMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const unsigned char* data, std::size_t length);  // Handle incoming messages
 
     // Utility methods
@@ -91,7 +105,7 @@ private:
     asio::ip::tcp::acceptor acceptor_;  // ASIO acceptor for incoming connections
     std::unordered_map<std::string, std::shared_ptr<asio::ip::tcp::socket>> connectedPeers;  // Connected peers map
     
-    char network_password[124] = "";
+    char network_password[124] = "\0";
     std::queue<Message> realTimeQueue;
     std::queue<Message> nonRealTimeQueue;
     std::mutex queueMutex;
