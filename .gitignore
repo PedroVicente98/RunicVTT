@@ -55,9 +55,9 @@
 nbproject/
 .DS_Store
 
-# CMake generated files
 x64/
 RunicVTT/
+
 # Qt Creator
 *.pro.user
 *.moc
