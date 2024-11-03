@@ -2,11 +2,11 @@
 #include "imgui/imgui_internal.h"
 
 GameTableManager::GameTableManager(flecs::world ecs)
-    : ecs(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string())
+    : ecs(ecs), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(ecs)
 {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::string map_directory_name = "MapDiretory";
-    std::filesystem::path map_directory_path = base_path / "res" / "textures";
+    std::filesystem::path map_directory_path = base_path / "Maps";
     map_directory.directoryName = map_directory_name;
     map_directory.directoryPath = map_directory_path.string();
     map_directory.startMonitoring();
@@ -50,6 +50,32 @@ void GameTableManager::openConnection(unsigned short port) {
 void GameTableManager::closeConnection() {
     network_manager.stopServer();
     std::cout << "Connection closed." << std::endl;
+}
+
+
+void GameTableManager::processReceivedMessages() {
+    std::lock_guard<std::mutex> lock(network_manager.receivedQueueMutex);
+    // Process all messages in the queue
+    while (!network_manager.receivedQueue.empty()) {
+        const ReceivedMessage& receivedMessage = network_manager.receivedQueue.front();
+
+        switch (receivedMessage.type) {
+        case MessageType::ChatMessage:
+            // Process chat message, you can pass it to your chat system
+            std::cout << "[Chat] " << receivedMessage.user << ": " << receivedMessage.chatMessage << std::endl;
+            chat.addTextMessage(receivedMessage.user, receivedMessage.chatMessage);
+            break;
+
+        case MessageType::CreateMarker:
+            std::cout << "Creating marker from received message." << std::endl;
+            break;
+
+        default:
+            std::cerr << "Unknown message type received!" << std::endl;
+            break;
+        }
+        network_manager.receivedQueue.pop();
+    }
 }
 
 // Função para configurar os callbacks do GLFW
@@ -170,6 +196,64 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
     }
 }
 
+// Save and Load Operations ------------------------------------------------------------------------------
+
+
+
+void GameTableManager::createGameTableFile(flecs::entity game_table) {
+    namespace fs = std::filesystem;
+    auto root_directory = fs::current_path();
+    auto game_tables_directory = root_directory / "GameTables";
+    auto active_game_table_folder = game_tables_directory / game_table_name;
+    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
+        std::filesystem::create_directory(active_game_table_folder);
+    }
+
+    std::vector<unsigned char> buffer;
+    auto game_table_component = game_table.get<GameTable>();
+    Serializer::serializeGameTable(buffer, game_table_component);
+    if (isBoardActive()) {
+        auto active_board = board_manager.getActiveBoard();
+        board_manager.serializeBoard(active_board, buffer);
+    }
+
+    auto game_table_file = active_game_table_folder / (game_table_name + ".runic");
+    std::ofstream file(game_table_file.string(), std::ios::binary);
+    if (file.is_open()) {
+        // Write the data using data() to get the pointer to the internal array
+        file.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+        file.close();
+    }
+    else {
+        std::cerr << "Failed to open the file." << std::endl;
+    }
+
+}
+
+
+void GameTableManager::listBoardFiles() {
+    namespace fs = std::filesystem;
+    auto root_directory = fs::current_path();
+    auto game_tables_directory = root_directory / "GameTables";
+    auto active_game_table_folder = game_tables_directory / game_table_name;
+    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
+        std::filesystem::create_directory(active_game_table_folder);
+    }
+    auto game_table_boards_folder = active_game_table_folder / "Boards";
+
+    if (!fs::exists(game_table_boards_folder) && !fs::is_directory(game_table_boards_folder)) {
+        std::filesystem::create_directory(game_table_boards_folder);
+    }
+
+    for (const auto& entry : std::filesystem::directory_iterator(game_table_boards_folder)) {
+        if (entry.is_regular_file()) {
+            std::cout << entry.path().filename() << std::endl;  // Print file name
+        }
+    }
+
+}
+
+
 
 
 
@@ -198,6 +282,7 @@ void GameTableManager::createGameTablePopUp()
         {
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
+            createGameTableFile(game_table);
 
             int port = atoi(port_buffer);
             network_manager.startServer(port);
@@ -382,52 +467,50 @@ void GameTableManager::connectToGameTablePopUp()
     }
 }
 
-//
-//void GameTableManager::createNetworkPopUp() {
-//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-//
-//    if (ImGui::BeginPopupModal("CreateNetwork")) {
-//        ImGui::SetItemDefaultFocus();
-//
-//        // Display local IP address (use NetworkManager to get IP)
-//        std::string localIp = network_manager.getLocalIPAddress();  // New method to get IP address
-//        ImGui::Text("Local IP Address: %s", localIp.c_str());
-//
-//        // Input field for port
-//        ImGui::InputText("Port", port_buffer, sizeof(port_buffer));
-//
-//        // Optional password field
-//        ImGui::InputText("Password (optional)", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-//
-//        ImGui::Separator();
-//
-//        // Save button to start the network
-//        if (ImGui::Button("Start Network")) {
-//            unsigned short port = static_cast<unsigned short>(std::stoi(port_buffer));
-//            // Start the network with the given port and save the password
-//            network_manager.startServer(port);
-//            memcpy(network_password, pass_buffer, sizeof(pass_buffer));
-//            ImGui::CloseCurrentPopup();
-//
-//            // Clear buffers after saving
-//            memset(port_buffer, '\0', sizeof(port_buffer));
-//            memset(pass_buffer, '\0', sizeof(pass_buffer));
-//        }
-//
-//        ImGui::SameLine();
-//
-//        // Close button to exit the pop-up
-//        if (ImGui::Button("Close")) {
-//            ImGui::CloseCurrentPopup();
-//            memset(port_buffer, '\0', sizeof(port_buffer));
-//            memset(pass_buffer, '\0', sizeof(pass_buffer));
-//        }
-//        ImGui::EndPopup();
-//    }
-//}
-//
-//
+void GameTableManager::createNetworkPopUp() {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("CreateNetwork")) {
+        ImGui::SetItemDefaultFocus();
+
+        // Display local IP address (use NetworkManager to get IP)
+        std::string localIp = network_manager.getLocalIPAddress();  // New method to get IP address
+        ImGui::Text("Local IP Address: %s", localIp.c_str());
+
+        // Input field for port
+        ImGui::InputText("Port", port_buffer, sizeof(port_buffer));
+
+        // Optional password field
+        ImGui::InputText("Password (optional)", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
+
+        ImGui::Separator();
+
+        // Save button to start the network
+        if (ImGui::Button("Start Network")) {
+            unsigned short port = static_cast<unsigned short>(std::stoi(port_buffer));
+            // Start the network with the given port and save the password
+            network_manager.setNetworkPassword(pass_buffer);
+            network_manager.startServer(port);
+            ImGui::CloseCurrentPopup();
+
+            // Clear buffers after saving
+            memset(port_buffer, '\0', sizeof(port_buffer));
+            memset(pass_buffer, '\0', sizeof(pass_buffer));
+        }
+
+        ImGui::SameLine();
+
+        // Close button to exit the pop-up
+        if (ImGui::Button("Close")) {
+            ImGui::CloseCurrentPopup();
+            memset(port_buffer, '\0', sizeof(port_buffer));
+            memset(pass_buffer, '\0', sizeof(pass_buffer));
+        }
+        ImGui::EndPopup();
+    }
+}
+
 void GameTableManager::closeNetworkPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -487,6 +570,63 @@ void GameTableManager::openNetworkInfoPopUp()
         ImGui::EndPopup();
     }
 }
+
+
+
+
+void GameTableManager::saveBoardPopUp() {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("SaveBoard"))
+    {
+
+        ImGui::Text("IP: ");
+       
+
+
+        ImGui::NewLine();
+        if (ImGui::Button("Save")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+
+}
+
+
+void GameTableManager::loadBoardPopUp() {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("LoadBoard"))
+    {
+
+        ImGui::Text("IP: ");
+
+
+
+        ImGui::NewLine();
+        if (ImGui::Button("Save")) {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer)
 {

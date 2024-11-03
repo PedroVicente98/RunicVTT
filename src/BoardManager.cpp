@@ -19,7 +19,7 @@ BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager)
     : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), network_manager(network_manager){
     
     std::filesystem::path base_path = std::filesystem::current_path();
-    std::filesystem::path marker_directory_path = base_path / "res" / "markers";
+    std::filesystem::path marker_directory_path = base_path / "Markers";
 
     marker_directory.directoryName = "MarkerDiretory";
     marker_directory.directoryPath = marker_directory_path.string();
@@ -122,108 +122,114 @@ void BoardManager::renderToolbar() {
 
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
     
-    const Board* board = active_board.get<Board>();
-    const Panning* panning = active_board.get<Panning>();
-    const Position* position = active_board.get<Position>();
-    const Grid* grid = active_board.get<Grid>();
     const TextureComponent* texture = active_board.get<TextureComponent>();
-    const Size* size = active_board.get<Size>();
-        
-    ImVec2 window_size = ImGui::GetWindowSize();
-    ImVec2 window_position = ImGui::GetWindowPos();
-    camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
-    camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));
+    if (texture->textureID != 0) {
+        const Board* board = active_board.get<Board>();
+        const Panning* panning = active_board.get<Panning>();
+        const Position* position = active_board.get<Position>();
+        const Grid* grid = active_board.get<Grid>();
+        const Size* size = active_board.get<Size>();
 
-    glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
-    glm::mat4 projection = camera.getProjectionMatrix();
+        ImVec2 window_size = ImGui::GetWindowSize();
+        ImVec2 window_position = ImGui::GetWindowPos();
+        camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
+        camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));
 
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
-    model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
+        glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
+        glm::mat4 projection = camera.getProjectionMatrix();
 
-    glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
+        model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
 
-    shader.Bind();
-    shader.SetUniformMat4f("u_MVP", mvp);
-    shader.SetUniform1f("u_Alpha", 1.0f);
-    shader.SetUniform1f("u_UseTexture", 1);
-    shader.SetUniform1i("u_Texture", 0);
-    shader.Unbind();
+        glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
 
-
-    GLCall(glActiveTexture(GL_TEXTURE0)); //https://learnopengl.com/Getting-started/Coordinate-Systems REDO THE SHADER FOR THE COORDINATE SYSTEM, MAKE MORE READABLE AND KEEP THE MATRIXES SEPARATE IN THE UNIFORMS
-    GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
-
-    renderer.Draw(va, ib, shader);
-
-    ////RENDER GRID HERE
+        shader.Bind();
+        shader.SetUniformMat4f("u_MVP", mvp);
+        shader.SetUniform1f("u_Alpha", 1.0f);
+        shader.SetUniform1f("u_UseTexture", 1);
+        shader.SetUniform1i("u_Texture", 0);
+        shader.Unbind();
 
 
-    active_board.children([&](flecs::entity child){
-        //if (child.has<MarkerComponent>()) {
-        if (child.has<MarkerComponent>()) {
-            const Position* position_marker = child.get<Position>();
-            const Visibility* visibility_marker = child.get<Visibility>();
-            const TextureComponent* texture_marker = child.get<TextureComponent>();
-            const Size* size_marker = child.get<Size>();
+        GLCall(glActiveTexture(GL_TEXTURE0)); //https://learnopengl.com/Getting-started/Coordinate-Systems REDO THE SHADER FOR THE COORDINATE SYSTEM, MAKE MORE READABLE AND KEEP THE MATRIXES SEPARATE IN THE UNIFORMS
+        GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-            model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+        renderer.Draw(va, ib, shader);
 
-            glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
-            float alpha = 1.0f;
-            if(!visibility_marker->isVisible){
-                if (network_manager->getPeerRole() == Role::GAMEMASTER) {
-                    alpha = 0.5f;
-                }
-                else {
-                    alpha = 0.0f;
-                }
-            }
 
-            shader.Bind();
-            shader.SetUniformMat4f("u_MVP", mvp);
-            shader.SetUniform1f("u_Alpha", alpha);
-            shader.SetUniform1i("u_Texture", 0);
-            shader.SetUniform1f("u_UseTexture", 1);
-            shader.Unbind();
+        active_board.children([&](flecs::entity child) {
+            //if (child.has<MarkerComponent>()) {
+            if (child.has<MarkerComponent>()) {
+                const TextureComponent* texture_marker = child.get<TextureComponent>();
+                if (texture_marker->textureID != 0) {
+                    const Position* position_marker = child.get<Position>();
+                    const Visibility* visibility_marker = child.get<Visibility>();
+                    const Size* size_marker = child.get<Size>();
 
-            GLCall(glActiveTexture(GL_TEXTURE0));
-            GLCall(glBindTexture(GL_TEXTURE_2D, texture_marker->textureID));
+                    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+                    model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
-            renderer.Draw(va, ib, shader);
-        }
+                    glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+                    float alpha = 1.0f;
+                    if (!visibility_marker->isVisible) {
+                        if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                            alpha = 0.5f;
+                        }
+                        else {
+                            alpha = 0.0f;
+                        }
+                    }
 
-        if (child.has<FogOfWar>()) {
-            const Position* position_marker = child.get<Position>();
-            const Visibility* visibility_marker = child.get<Visibility>();
-            const TextureComponent* texture_marker = child.get<TextureComponent>();
-            const Size* size_marker = child.get<Size>();
+                    shader.Bind();
+                    shader.SetUniformMat4f("u_MVP", mvp);
+                    shader.SetUniform1f("u_Alpha", alpha);
+                    shader.SetUniform1i("u_Texture", 0);
+                    shader.SetUniform1f("u_UseTexture", 1);
+                    shader.Unbind();
 
-            glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-            model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+                    GLCall(glActiveTexture(GL_TEXTURE0));
+                    GLCall(glBindTexture(GL_TEXTURE_2D, texture_marker->textureID));
 
-            glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
-            float alpha = 1.0f;
-            if (!visibility_marker->isVisible) {
-                if (network_manager->getPeerRole() == Role::GAMEMASTER) {
-                    alpha = 0.3f;
-                }
-                else
-                {
-                    alpha = 0.0f;
+                    renderer.Draw(va, ib, shader);
                 }
             }
 
-            shader.Bind();
-            shader.SetUniformMat4f("u_MVP", mvp);
-            shader.SetUniform1f("u_Alpha", alpha);
-            shader.SetUniform1i("u_UseTexture", 0);
-            shader.Unbind();
+            if (child.has<FogOfWar>()) {
+                const Position* position_marker = child.get<Position>();
+                const Visibility* visibility_marker = child.get<Visibility>();
+                const TextureComponent* texture_marker = child.get<TextureComponent>();
+                const Size* size_marker = child.get<Size>();
 
-            renderer.Draw(va, ib, shader);
-        
-        }
-    });
+                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+                model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+
+                glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+                float alpha = 1.0f;
+                if (!visibility_marker->isVisible) {
+                    if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                        alpha = 0.3f;
+                    }
+                    else
+                    {
+                        alpha = 0.0f;
+                    }
+                }
+
+                shader.Bind();
+                shader.SetUniformMat4f("u_MVP", mvp);
+                shader.SetUniform1f("u_Alpha", alpha);
+                shader.SetUniform1i("u_UseTexture", 0);
+                shader.Unbind();
+
+                renderer.Draw(va, ib, shader);
+
+            }
+        });
+    }
+   
+
+
+    
 
 
 }
@@ -241,6 +247,8 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
     marker.add<MarkerComponent>();
     marker.add(flecs::ChildOf, active_board);
 
+    auto message = network_manager->buildCreateMarkerMessage(marker);
+    network_manager->queueMessage(message);
     return marker;
 }
 
@@ -259,47 +267,13 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
             position.x += delta.x;
             position.y += delta.y;
             mouseStartPos = mousePos;
+
+            auto message = network_manager->buildUpdateMarkerMessage(entity);
+            network_manager->queueMessage(message);
         }
      });
-
-
- /*   if (hovered_marker != nullptr) {
-        auto position = hovered_marker->get_mut<Position>();
-        glm::vec2 world_position = screenToWorldPosition(mousePos);
-        glm::vec2 start_world_position = screenToWorldPosition(mouseStartPos);
-        glm::vec2 delta = world_position - start_world_position;
-        position->x += delta.x;
-        position->y += delta.y;
-    }*/
 }
 
-//TODO
-//ANALISAR AS COORDENADAS NO CODIGO, DEFINIR CADA TIPO DE COODENADA QUANDO SALVO(WORLD OR SCREEN) 
-//Ver todos os lugares que usam e revisar, ver os componentes que tem positions e sizes, ver o que ta sendo usado e como
-//Fazer camada que transforma coordenadas quando interagindo com o mundo(para os Marker e FogOfWar
-
-
-//glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
-//    // Step 1: Get window size
-//    glm::vec2 windowSize = camera.getWindowSize();
-//
-//    // Step 2: Normalize screen coordinates to NDC (Normalized Device Coordinates)
-//    float ndcX = (2.0f * screen_position.x) / windowSize.x - 1.0f;
-//    float ndcY = 1.0f - (2.0f * screen_position.y) / windowSize.y;  // Invert Y-axis
-//
-//    // Step 3: Create NDC position vector (z = 0, w = 1)
-//    glm::vec4 ndcPos = glm::vec4(ndcX, ndcY, 1.0f, 1.0f);
-//
-//    // Step 4: Get the combined MVP matrix and calculate its inverse
-//    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
-//    glm::mat4 inverseMVP = glm::inverse(MVP);
-//
-//    // Step 5: Transform NDC to world coordinates
-//    glm::vec4 world_position = inverseMVP * ndcPos;
-//
-//    // Step 6: Return the world position as 2D (x, y) coordinates (ignore z)
-//    return glm::vec2(world_position.x, world_position.y);
-//}
 
 glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
 
@@ -317,7 +291,6 @@ glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
     // Convert the screen position to normalized device coordinates (NDC)
     float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
     float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
-    std::cout << "X: " << ndc_x << " | " << "Y: " << ndc_y << std::endl;
     glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
 
     // Calculate the inverse MVP matrix (to map from NDC back to world space)
@@ -437,20 +410,6 @@ void BoardManager::resetCamera() {
     camera.setZoom(1.0f);
 }
 
-
-//void BoardManager::renderGrid(const glm::mat4& viewMatrix, float windowWidth, float windowHeight) {
-//    ecs.each([&](flecs::entity entity, const Grid& grid) {
-//        glm::mat4 mvp = viewMatrix;  // Use viewMatrix as part of the MVP
-//
-//        if (grid.is_hex) {
-//            renderHexGrid(mvp, windowWidth, windowHeight, grid);
-//        }
-//        else {
-//            renderSquareGrid(mvp, windowWidth, windowHeight, grid);
-//        }
-//        });
-//}
-
 void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
     fogEntity.destruct();
 }
@@ -479,18 +438,8 @@ void BoardManager::handleFogCreation(glm::vec2 mousePos) {
     corrected_start_position.x = start_world_position.x + size.x/2;
     corrected_start_position.y = start_world_position.y + size.y / 2;
 
-    // Create the fog of war at the corrected position with the correct size
     createFogOfWar(corrected_start_position, size);
 }
-
-//void BoardManager::handleFogCreation(glm::vec2 mousePos) {
-//    glm::vec2 startPos = getMouseStartPosition();  // Assuming this tracks the starting drag point
-//    glm::vec2 start_world_position = screenToWorldPosition(startPos);
-//    glm::vec2 end_world_position = screenToWorldPosition(mousePos);
-//    glm::vec2 size(end_world_position.x - start_world_position.x, end_world_position.y - start_world_position.y);
-//    createFogOfWar(start_world_position, size);
-//}
-
 
 void BoardManager::zoomBoard(float zoomFactor) {
     camera.zoom(zoomFactor);
@@ -527,6 +476,305 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
         });
     return entity_at_mouse;
 }
+
+
+void BoardManager::sendEntityUpdate(flecs::entity entity, MessageType message_type) 
+{
+    if (message_type == MessageType::MarkerUpdate) {
+        Message markerMessage;
+        markerMessage.type = MessageType::MarkerUpdate;
+        std::vector<unsigned char> buffer;
+        auto pos =  entity.get<Position>();
+        auto size =  entity.get<Size>();
+        auto texture =  entity.get<TextureComponent>();
+        auto visibility =  entity.get<Visibility>();
+        auto moving =  entity.get<Moving>();
+        // Serialize marker components
+        Serializer::serializePosition(buffer, pos);
+        Serializer::serializeSize(buffer, size);
+        Serializer::serializeTextureComponent(buffer, texture);
+        Serializer::serializeVisibility(buffer, visibility);
+        Serializer::serializeMoving(buffer, moving);
+
+        markerMessage.payload = buffer;
+        // Queue the message for the network manager
+        network_manager->queueMessage(markerMessage);
+    } 
+    else if (message_type == MessageType::FogUpdate)
+    {
+        Message fogMessage;
+        fogMessage.type = MessageType::FogUpdate;
+        std::vector<unsigned char> buffer;
+
+        auto pos = entity.get<Position>();
+        auto size = entity.get<Size>();
+        auto visibility = entity.get<Visibility>();
+        // Serialize marker components
+        Serializer::serializePosition(buffer, pos);
+        Serializer::serializeSize(buffer, size);
+        Serializer::serializeVisibility(buffer, visibility);
+
+        fogMessage.payload = buffer;
+        // Queue the message for the network manager
+        network_manager->queueMessage(fogMessage);
+
+    }
+    else if (message_type == MessageType::CreateMarker)
+    {
+        Message markerMessage;
+        markerMessage.type = MessageType::MarkerUpdate;
+        std::vector<unsigned char> buffer;
+        auto pos = entity.get<Position>();
+        auto size = entity.get<Size>();
+        auto texture = entity.get<TextureComponent>();
+        auto visibility = entity.get<Visibility>();
+        auto moving = entity.get<Moving>();
+        // Serialize marker components
+        Serializer::serializePosition(buffer, pos);
+        Serializer::serializeSize(buffer, size);
+        Serializer::serializeTextureComponent(buffer, texture);
+        Serializer::serializeVisibility(buffer, visibility);
+        Serializer::serializeMoving(buffer, moving);
+
+        markerMessage.payload = buffer;
+        // Queue the message for the network manager
+        network_manager->queueMessage(markerMessage);
+
+    }
+    else if (message_type == MessageType::CreateFog)
+    {
+        Message fogMessage;
+        fogMessage.type = MessageType::FogUpdate;
+        std::vector<unsigned char> buffer;
+
+        auto pos = entity.get<Position>();
+        auto size = entity.get<Size>();
+        auto visibility = entity.get<Visibility>();
+        // Serialize marker components
+        Serializer::serializePosition(buffer, pos);
+        Serializer::serializeSize(buffer, size);
+        Serializer::serializeVisibility(buffer, visibility);
+
+        fogMessage.payload = buffer;
+        // Queue the message for the network manager
+        network_manager->queueMessage(fogMessage);
+    }
+}
+
+//Save and Load Board --------------------------------------------------------------------
+
+void BoardManager::saveActiveBoard(const std::string& filePath) {
+    if (!active_board.is_alive()) {
+        std::cerr << "No active board to save." << std::endl;
+        return;
+    }
+
+    std::vector<unsigned char> buffer;
+    serializeBoard(active_board, buffer);
+
+    std::ofstream outFile(filePath, std::ios::binary);
+    if (outFile) {
+        outFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+        outFile.close();
+        std::cout << "Board saved successfully to " << filePath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to save board to " << filePath << std::endl;
+    }
+}
+
+void BoardManager::loadActiveBoard(const std::string& filePath) {
+    std::ifstream inFile(filePath, std::ios::binary);
+    if (inFile) {
+        std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+        inFile.close();
+
+        size_t offset = 0;
+        active_board = deserializeBoard(buffer, offset);
+        std::cout << "Board loaded successfully from " << filePath << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load board from " << filePath << std::endl;
+    }
+}
+
+flecs::entity BoardManager::getActiveBoard() const {
+    return active_board;
+}
+
+void BoardManager::serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer) {
+    // Serialize board name
+    auto boardData = board.get<Board>();
+    Serializer::serializeString(buffer, boardData->board_name);
+
+    // Serialize markers
+    int markerCount = 0;
+    board.children([&](flecs::entity child) {
+        if (child.has<MarkerComponent>()) {
+            markerCount++;
+        }
+        });
+    Serializer::serializeInt(buffer, markerCount);
+
+    // Serialize each marker's data
+    board.children([&](flecs::entity child) {
+        if (child.has<MarkerComponent>()) {
+            Serializer::serializeInt(buffer, child.id());
+            auto pos = child.get<Position>();
+            Serializer::serializeInt(buffer, pos->x);
+            Serializer::serializeInt(buffer, pos->y);
+
+            // Serialize additional components like Size, TextureComponent, etc.
+            auto size = child.get<Size>();
+            Serializer::serializeFloat(buffer, size->width);
+            Serializer::serializeFloat(buffer, size->height);
+
+            if (auto texture = child.get<TextureComponent>()) {
+                Serializer::serializeInt(buffer, texture->textureID);
+                Serializer::serializeString(buffer, texture->image_path);
+                Serializer::serializeFloat(buffer, texture->size.x);
+                Serializer::serializeFloat(buffer, texture->size.y);
+            }
+        }
+        });
+
+    // Serialize fog entities
+    int fogCount = 0;
+    board.children([&](flecs::entity child) {
+        if (child.has<FogOfWar>()) {
+            fogCount++;
+        }
+        });
+    Serializer::serializeInt(buffer, fogCount);
+
+    // Serialize each fog's data
+    board.children([&](flecs::entity child) {
+        if (child.has<FogOfWar>()) {
+            Serializer::serializeInt(buffer, child.id());
+            auto pos = child.get<Position>();
+            Serializer::serializeInt(buffer, pos->x);
+            Serializer::serializeInt(buffer, pos->y);
+
+            // Serialize additional components like Size, Visibility, etc.
+            auto size = child.get<Size>();
+            Serializer::serializeFloat(buffer, size->width);
+            Serializer::serializeFloat(buffer, size->height);
+
+            if (auto visibility = child.get<Visibility>()) {
+                Serializer::serializeBool(buffer, visibility->isVisible);
+            }
+        }
+        });
+}
+
+
+flecs::entity BoardManager::deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset) {
+    std::string boardName = Serializer::deserializeString(buffer, offset);
+    auto newBoard = ecs.entity().set(Board{ boardName });
+
+    // Deserialize markers
+    int markerCount = Serializer::deserializeInt(buffer, offset);
+    for (int i = 0; i < markerCount; ++i) {
+        int markerID = Serializer::deserializeInt(buffer, offset);
+        int x = Serializer::deserializeInt(buffer, offset);
+        int y = Serializer::deserializeInt(buffer, offset);
+        auto marker = ecs.entity(markerID).set(Position{ x, y });
+        marker.add<MarkerComponent>();
+        marker.add(flecs::ChildOf, newBoard);
+        // Deserialize other components and attach them to the marker
+    }
+
+    // Deserialize fog entities
+    int fogCount = Serializer::deserializeInt(buffer, offset);
+    for (int i = 0; i < fogCount; ++i) {
+        int fogID = Serializer::deserializeInt(buffer, offset);
+        int x = Serializer::deserializeInt(buffer, offset);
+        int y = Serializer::deserializeInt(buffer, offset);
+        auto fog = ecs.entity(fogID).set(Position{ x, y });
+        fog.add<FogOfWar>();
+        fog.add(flecs::ChildOf, newBoard);
+        // Deserialize other components and attach them to the fog
+    }
+
+    return newBoard;
+}
+
+
+
+
+//Save and Load Board END -------------------------------------------------------------------- END
+//
+//
+//void BoardManager::sendGameState() {
+//    // 1. Create the message for the gamestate start
+//    Message startMessage;
+//    startMessage.type = MessageType::GamestateStart;
+//    network_manager->queueMessage(startMessage);
+//
+//    // 2. Send the board data
+//    if (active_board.is_alive()) {
+//        Board board = active_board.get<Board>();
+//        Grid grid = active_board.get<Grid>();
+//
+//        Message boardMessage;
+//        boardMessage.type = MessageType::BoardUpdate;
+//        std::vector<unsigned char> boardBuffer;
+//
+//        // Serialize the board and grid
+//        Serializer::serializeBoard(boardBuffer, board);
+//        Serializer::serializeGrid(boardBuffer, grid);
+//        boardMessage.payload = boardBuffer;
+//        network_manager->queueMessage(boardMessage);
+//
+//        // Send the map image
+//        TextureComponent texture = active_board.get<TextureComponent>();
+//        network_manager->sendImage(texture.image_path, texture.textureID);
+//    }
+//
+//    // 3. Send all markers
+//    ecs.each([this](flecs::entity entity, const MarkerComponent&, const Position& pos, const Size& size, const TextureComponent& texture, const Visibility& visibility) {
+//        if (entity.has(flecs::ChildOf, active_board)) {
+//            Message markerMessage;
+//            markerMessage.type = MessageType::CreateMarker;
+//            std::vector<unsigned char> markerBuffer;
+//
+//            // Serialize the marker data
+//            Serializer::serializePosition(markerBuffer, pos);
+//            Serializer::serializeSize(markerBuffer, size);
+//            Serializer::serializeTextureComponent(markerBuffer, texture);
+//            Serializer::serializeBool(markerBuffer, visibility.isVisible);
+//            markerMessage.payload = markerBuffer;
+//
+//            network_manager->queueMessage(markerMessage);
+//
+//            // Send the marker's image if necessary
+//            network_manager->sendImage(texture.image_path, texture.textureID);
+//        }
+//    });
+//
+//    // 4. Send all fog entities
+//    ecs.each([this](flecs::entity entity, const FogOfWar&, const Position& pos, const Size& size, const Visibility& visibility) {
+//        if (entity.has(flecs::ChildOf, active_board)) {
+//            Message fogMessage;
+//            fogMessage.type = MessageType::CreateFog;
+//            std::vector<unsigned char> fogBuffer;
+//
+//            // Serialize the fog data
+//            Serializer::serializePosition(fogBuffer, pos);
+//            Serializer::serializeSize(fogBuffer, size);
+//            Serializer::serializeBool(fogBuffer, visibility.isVisible);
+//            fogMessage.payload = fogBuffer;
+//
+//            network_manager->queueMessage(fogMessage);
+//        }
+//    });
+//
+//    // 5. Create the message for the gamestate end
+//    Message endMessage;
+//    endMessage.type = MessageType::GamestateEnd;
+//    network_manager->queueMessage(endMessage);
+//}
+
 bool BoardManager::isEditWindowOpen() const {
     return showEditWindow;
 }

@@ -1,7 +1,6 @@
 
 #include "ApplicationHandler.h"
 
-
 GLFWwindow* initializeOpenGLContext() {
     if (!glfwInit()) {
         std::cerr << "Falha ao inicializar o GLFW!" << std::endl;
@@ -36,6 +35,34 @@ GLFWwindow* initializeOpenGLContext() {
 }
 
 
+static std::string setupRootDirectory() {
+    auto rootDirectory = std::filesystem::current_path();
+    if (rootDirectory.filename() == "RunicVTT") {
+        auto games_tables_directory = rootDirectory / "GameTables";
+        if (!fs::exists(games_tables_directory)) {
+            if (fs::create_directory(games_tables_directory)) {
+                std::cout << "GameTables directory created successfully: " << games_tables_directory << std::endl;
+            }
+        }
+
+        auto maps_directory = rootDirectory / "Maps";
+        if (!fs::exists(maps_directory)) {
+            if (fs::create_directory(maps_directory)) {
+                std::cout << "Maps directory created successfully: " << maps_directory << std::endl;
+            }
+        }
+
+        auto markers_directory = rootDirectory / "Markers";
+        if (!fs::exists(markers_directory)) {
+            if (fs::create_directory(markers_directory)) {
+                std::cout << "Markers directory created successfully: " << markers_directory << std::endl;
+            }
+        }
+    }
+    return rootDirectory.string();
+
+}
+
 
 int main() {
     // Inicializa o contexto OpenGL
@@ -43,10 +70,10 @@ int main() {
     if (!window) {
         return -1;  // Falha na inicialização
     }
-    std::filesystem::path base_path = std::filesystem::current_path();
-    std::filesystem::path shader_directory_path = base_path / "res" / "shaders" / "Basic.shader";
 
-    ApplicationHandler app(window);
+    auto rootDirectory = setupRootDirectory();
+
+    ApplicationHandler app(window, rootDirectory);
     app.run();  // Executa o loop principal da aplicação
 
     glfwTerminate();  // Limpa os recursos do GLFW quando terminar

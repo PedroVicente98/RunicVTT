@@ -26,16 +26,18 @@
 #include "imgui/imgui_impl_opengl3.h"
 #include "GameTableManager.h"
 #include "DirectoryWindow.h"
-
 #include "flecs.h"
+
+namespace fs = std::filesystem;
 
 class ApplicationHandler {
 
 public:
-	ApplicationHandler(GLFWwindow* window);
+	ApplicationHandler(GLFWwindow* window, std::string rootDirectory);
 	~ApplicationHandler();
 	int run();
 
+	
 private:
 	void renderMainMenuBar();
 	void renderDockSpace();
@@ -46,4 +48,6 @@ private:
 	GameTableManager game_table_manager;
 	DirectoryWindow map_directory;
 	DirectoryWindow marker_directory;
+	std::string rootDirectory;
+
 };

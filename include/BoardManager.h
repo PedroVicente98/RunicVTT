@@ -89,7 +89,6 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 //MARKER - Toggle Marker Visibility? MIGHT NOT BE NECESSARY
 //SELECT - Select Marker/Fog, opening an edit window(change size, visibility, and delete)
 
-
 class BoardManager {
 public:
 	BoardManager(flecs::world ecs, NetworkManager* network_manager);
@@ -134,6 +133,16 @@ public:
     glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
     glm::vec2 worldToScreenPosition(glm::vec2 world_position);
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
+
+    //Network 
+    void sendGameState();
+    void sendEntityUpdate(flecs::entity entity, MessageType message_type);
+
+    flecs::entity deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset);
+    void serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer);
+    flecs::entity getActiveBoard() const;
+    void loadActiveBoard(const std::string& filePath);
+    void saveActiveBoard(const std::string& filePath);
 
 	std::string board_name;
     DirectoryWindow marker_directory;

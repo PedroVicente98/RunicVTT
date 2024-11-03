@@ -172,6 +172,7 @@
     <ClInclude Include="include\GameTableManager.h" />
     <ClInclude Include="include\Message.h" />
     <ClInclude Include="include\NetworkManager.h" />
+    <ClInclude Include="include\Serializer.h" />
     <ClInclude Include="src\renderer\IndexBuffer.h" />
     <ClInclude Include="src\renderer\Renderer.h" />
     <ClInclude Include="src\renderer\Shader.h" />

@@ -22,7 +22,7 @@ public:
 	void openConnection(unsigned short port);
 	void closeConnection();
 
-	void resetCamera();
+	void processReceivedMessages();
 
 	void createGameTablePopUp();
 	void closeGameTablePopUp();
@@ -33,16 +33,21 @@ public:
 	void createNetworkPopUp();
 	void closeNetworkPopUp();
 	void openNetworkInfoPopUp();
+	void saveBoardPopUp();
+	void loadBoardPopUp();
+
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 
 	void setInputCallbacks(GLFWwindow* window);
 	bool isMouseInsideMapWindow();
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-	glm::mat4 getBoardViewMatrix();
-	void createBoardMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
 	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
+	void createGameTableFile(flecs::entity game_table);
+
+	void listBoardFiles();
 	void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
 

@@ -11,7 +11,7 @@
 class Chat {
 public:
 
-    Chat() {};
+    Chat(flecs::world ecs) : network_manager(ecs){};
     ~Chat() {};
     // Message structure with different types of content
     struct Message {
@@ -27,6 +27,9 @@ public:
 
     // Adding text message
     void addTextMessage(const std::string& sender, const std::string& content) {
+        auto user_name = network_manager.getUsername();
+        auto  message = network_manager.buildChatMessage(user_name, content);
+        network_manager.queueMessage(message);
         messages.push_back({ Message::TEXT, sender, content });
     }
 
@@ -114,7 +117,7 @@ public:
         std::regex commandRegex(R"(/(roll\s+)?(\d+)d(\d+)([+-]\d+)?(\+\d+d\d+)*)"); // Extended to handle /roll and modifiers
         std::regex linkRegex(R"(https?://[^\s]+)");
         std::regex imageRegex(R"(https?://[^\s]+(\.png|\.jpg|\.jpeg))");
-
+        auto user_name = network_manager.getUsername();
         std::smatch matches;
         if (std::regex_match(input, matches, commandRegex)) {
             std::string command = matches[0].str();
@@ -122,13 +125,13 @@ public:
             addTextMessage("System", result);  // Display result as a system message
         }
         else if (std::regex_search(input, matches, imageRegex)) {
-            addImageMessage("User", 0);  // Assuming texture ID is managed elsewhere
+            addImageMessage(user_name, 0);  // Assuming texture ID is managed elsewhere
         }
         else if (std::regex_search(input, matches, linkRegex)) {
-            addLinkMessage("User", matches[0].str(), matches[0].str()); // Add a link message
+            addLinkMessage(user_name, matches[0].str(), matches[0].str()); // Add a link message
         }
         else {
-            addTextMessage("User", input);  // Regular text message
+            addTextMessage(user_name, input);  // Regular text message
         }
     }
 
@@ -167,6 +170,7 @@ public:
     }
 
 private:
+    NetworkManager network_manager;
     char textInput[256] = "";
     bool shouldFocusInput = false;
 };

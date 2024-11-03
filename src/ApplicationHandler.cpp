@@ -1,10 +1,8 @@
 #include "ApplicationHandler.h"
 #include "Components.h"
-#include "glm/glm.hpp"
 
-
-ApplicationHandler::ApplicationHandler(GLFWwindow* window)
-    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs), window(window)
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string rootDirectory)
+    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs), window(window), rootDirectory(rootDirectory)
 {
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -21,15 +19,12 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window)
     ecs.component<Network>();
     ecs.component<Notes>();
     //ecs.component<ToolComponent>();
-
    
 }
 
 ApplicationHandler::~ApplicationHandler()
 {
 }
-
-
 
 int ApplicationHandler::run() 
 {
@@ -98,9 +93,6 @@ int ApplicationHandler::run()
         shader.Unbind();
 
         Renderer renderer;
-        std::filesystem::path texture_path = base_path / "res" / "textures" / "PhandalinBattlemap2.png";
-        Texture texture(texture_path.string());
-        texture.Bind();
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -139,6 +131,7 @@ int ApplicationHandler::run()
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            game_table_manager.processReceivedMessages();
             renderMainMenuBar();
             renderDockSpace();
             renderActiveGametable(va, ib, shader, renderer);
@@ -263,6 +256,10 @@ void ApplicationHandler::renderMainMenuBar() {
     bool open_create_board = false;
     bool close_current_board = false;
 
+    bool save_active_board = false;
+    bool load_active_board = false;
+
+
     bool open_network_connection = false;
     bool open_network_info = false;
     bool close_network_connection = false;
@@ -287,10 +284,11 @@ void ApplicationHandler::renderMainMenuBar() {
 
         if (ImGui::BeginMenu("Network")) {
             bool is_connection_active = game_table_manager.isConnectionActive();
-
-            //if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
-            //    open_network_connection = true;
-            //} 
+            if(!game_table_manager.isConnectionActive()){
+                if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
+                    open_network_connection = true;
+                } 
+            }
             
             if (ImGui::MenuItem("Connection Info")) {
                 open_network_info = true;
@@ -307,25 +305,49 @@ void ApplicationHandler::renderMainMenuBar() {
             if (ImGui::MenuItem("Create")) {
                 open_create_board = true;
             }
-            if (ImGui::MenuItem("Close")) {
-                close_current_board = true;
+            if (game_table_manager.board_manager.isBoardActive()) {
+                if (ImGui::MenuItem("Save")) {
+                    save_active_board - true;
+                }
+
+                if (ImGui::MenuItem("Close")) {
+                    close_current_board = true;
+                }
             }
             if (ImGui::MenuItem("Open")) {
+                load_active_board - true;
             }
-            if (ImGui::MenuItem("Save")) {
-            }
+            
+            
+            
+           
+            
             ImGui::EndMenu();
         }
     }
 
-    if (ImGui::BeginMenu("Notes")) {
+ /*   if (ImGui::BeginMenu("Notes")) {
         if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
         }
         if (ImGui::MenuItem("Redo", "Ctrl+Y")) {
         }
         ImGui::EndMenu();
-    }
+    }*/
+
     ImGui::EndMainMenuBar();
+
+
+    if (save_active_board)
+        ImGui::OpenPopup("SaveBoard");
+
+    if (ImGui::IsPopupOpen("SaveBoard"))
+        game_table_manager.saveBoardPopUp();
+
+    if (load_active_board)
+        ImGui::OpenPopup("LoadBoard");
+
+    if (ImGui::IsPopupOpen("LoadBoard"))
+        game_table_manager.loadBoardPopUp();
 
     if (close_network_connection)
         ImGui::OpenPopup("CloseNetwork");
@@ -339,11 +361,11 @@ void ApplicationHandler::renderMainMenuBar() {
     if(ImGui::IsPopupOpen("NetworkInfo"))
         game_table_manager.openNetworkInfoPopUp();
      
-    // //if (open_network_connection)
-    //    ImGui::OpenPopup("CreateNetwork");
+     if (open_network_connection)
+        ImGui::OpenPopup("CreateNetwork");
 
-    //if(ImGui::IsPopupOpen("CreateNetwork"))
-    //    game_table_manager.createNetworkPopUp();
+    if(ImGui::IsPopupOpen("CreateNetwork"))
+        game_table_manager.createNetworkPopUp();
 
     if (connect_to_gametable)
         ImGui::OpenPopup("ConnectToGameTable");
