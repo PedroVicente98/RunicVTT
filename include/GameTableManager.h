@@ -22,6 +22,7 @@ public:
 	void openConnection(unsigned short port);
 	void closeConnection();
 
+	void processSentMessages();
 	void processReceivedMessages();
 
 	void createGameTablePopUp();

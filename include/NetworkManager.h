@@ -99,7 +99,7 @@ public:
 
     void queueMessage(const Message& message);
 
-    void startSending();
+    //void startSending();
     void processSentMessages();   // Process outgoing messages, with real-time and non-real-time prioritization
 
     void sendMessageToPeers(const Message& message);
@@ -124,7 +124,6 @@ public:
     std::unordered_map<std::string, std::unordered_set<int>> imageChunksReceived;  // Tracks which chunks have been received for each image
     std::unordered_map<std::string, std::vector<unsigned char>> imageBufferMap;  // Stores the chunks for each image as they are received
 
-
     std::mutex receivedQueueMutex;
     std::queue<ReceivedMessage> receivedQueue;
 
@@ -136,10 +135,6 @@ private:
     char network_password[124] = "\0";
     std::queue<Message> realTimeQueue;
     std::queue<Message> nonRealTimeQueue;
-    std::mutex queueMutex;
-
-    
-
 
 
     Role peer_role = Role::NONE;

@@ -2,7 +2,7 @@
 #include "imgui/imgui_internal.h"
 
 GameTableManager::GameTableManager(flecs::world ecs)
-    : ecs(ecs), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(ecs)
+    : ecs(ecs), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(&network_manager)
 {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::string map_directory_name = "MapDiretory";
@@ -53,6 +53,9 @@ void GameTableManager::closeConnection() {
 }
 
 
+void GameTableManager::processSentMessages() {
+    network_manager.processSentMessages();
+}
 void GameTableManager::processReceivedMessages() {
     std::lock_guard<std::mutex> lock(network_manager.receivedQueueMutex);
     // Process all messages in the queue

@@ -23,7 +23,6 @@ void NetworkManager::startServer(unsigned short port) {
     acceptor_.listen();
     peer_role = Role::GAMEMASTER;
     acceptConnections();  // Start accepting connections
-    startSending();
     std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
 }
 
@@ -271,7 +270,7 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
 
             // Start receiving messages from the server (this remains asynchronous)
             startReceiving(socket);
-            startSending();
+            //startSending();
             return true;
 
         }
@@ -395,50 +394,46 @@ void NetworkManager::sendDisconnectMessage(std::shared_ptr<asio::ip::tcp::socket
 //Password Operations END -------------------------------------------------------------------------------------------------- END
 
 
-//Sending Messages Operation -----------------------------------------------------------------------------------------------
-void NetworkManager::startSending() {
-    asio::post(io_context_, [this]() { processSentMessages(); });
-}
-
 void NetworkManager::processSentMessages() {
     // Process 5 real-time messages for every 1 non-real-time message
     int realTimeMessagesProcessed = 0;
-
     // Process all real-time messages first
-    std::lock_guard<std::mutex> lock(queueMutex);
-    {
-        while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
-            Message message = realTimeQueue.front();
-            realTimeQueue.pop();
-            sendMessageToPeers(message);  // Function to send the message to peers
-            realTimeMessagesProcessed++;
-        }
-
-        if (!nonRealTimeQueue.empty()) {
-            Message message = nonRealTimeQueue.front();
-            nonRealTimeQueue.pop();
-            sendMessageToPeers(message);  // Function to send the message to peers
-            realTimeMessagesProcessed = 0;  // Reset the counter after sending the non-real-time message
-        }
+    while (!realTimeQueue.empty() && realTimeMessagesProcessed < 5) {
+        Message message = realTimeQueue.front();
+        realTimeQueue.pop();
+        sendMessageToPeers(message);  // Function to send the message to peers
+        realTimeMessagesProcessed++;
     }
-    asio::post(io_context_, [this]() { processSentMessages(); });
+
+    if (!nonRealTimeQueue.empty()) {
+        Message message = nonRealTimeQueue.front();
+        nonRealTimeQueue.pop();
+        sendMessageToPeers(message);  // Function to send the message to peers
+        realTimeMessagesProcessed = 0;  // Reset the counter after sending the non-real-time message
+    }
 }
-
-
 
 void NetworkManager::sendMessageToPeers(const Message& message) {
-    for (auto& peer : connectedPeers) {  // Assume connectedPeers is a list of active connections
+    for (auto& peer : connectedPeers) {
         std::vector<unsigned char> buffer = serializeMessage(message);
+        auto socket = peer.second;  // Get the socket
 
-        try {
-            asio::write(*peer.second, asio::buffer(buffer));
-            std::cout << "Message sent successfully" << std::endl;
-        }
-        catch (const asio::system_error& e) {
-            std::cerr << "Error sending message: " << e.what() << std::endl;
-        }
+        // Allocate a shared pointer to the buffer to keep it alive for async operation
+        auto sendBuffer = std::make_shared<std::vector<unsigned char>>(std::move(buffer));
+
+        // Use asio::async_write instead of asio::write to send the message asynchronously
+        asio::async_write(*socket, asio::buffer(*sendBuffer),
+            [this, sendBuffer](asio::error_code ec, std::size_t /*length*/) {
+                if (!ec) {
+                    std::cout << "Message sent successfully" << std::endl;
+                }
+                else {
+                    std::cerr << "Error sending message: " << ec.message() << std::endl;
+                }
+            });
     }
 }
+
 //Sending Messages Operation END ------------------------------------------------------------------------------------------- END
 
 
@@ -448,7 +443,8 @@ void NetworkManager::sendMessageToPeers(const Message& message) {
 void NetworkManager::queueMessage(const Message& message) {
     if (message.type != MessageType::ImageChunk) {
         realTimeQueue.push(message);  // High-priority queue
-    } else {
+    }
+    else {
         nonRealTimeQueue.push(message);  // Low-priority queue
     }
 }

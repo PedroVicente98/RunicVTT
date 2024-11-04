@@ -11,7 +11,7 @@
 class Chat {
 public:
 
-    Chat(flecs::world ecs) : network_manager(ecs){};
+    Chat(NetworkManager* network_manager) : network_manager(network_manager){};
     ~Chat() {};
     // Message structure with different types of content
     struct Message {
@@ -27,9 +27,9 @@ public:
 
     // Adding text message
     void addTextMessage(const std::string& sender, const std::string& content) {
-        auto user_name = network_manager.getUsername();
-        auto  message = network_manager.buildChatMessage(user_name, content);
-        network_manager.queueMessage(message);
+        auto user_name = network_manager->getUsername();
+        auto  message = network_manager->buildChatMessage(user_name, content);
+        network_manager->queueMessage(message);
         messages.push_back({ Message::TEXT, sender, content });
     }
 
@@ -117,7 +117,7 @@ public:
         std::regex commandRegex(R"(/(roll\s+)?(\d+)d(\d+)([+-]\d+)?(\+\d+d\d+)*)"); // Extended to handle /roll and modifiers
         std::regex linkRegex(R"(https?://[^\s]+)");
         std::regex imageRegex(R"(https?://[^\s]+(\.png|\.jpg|\.jpeg))");
-        auto user_name = network_manager.getUsername();
+        auto user_name = network_manager->getUsername();
         std::smatch matches;
         if (std::regex_match(input, matches, commandRegex)) {
             std::string command = matches[0].str();
@@ -170,7 +170,7 @@ public:
     }
 
 private:
-    NetworkManager network_manager;
+    NetworkManager* network_manager;
     char textInput[256] = "";
     bool shouldFocusInput = false;
 };
