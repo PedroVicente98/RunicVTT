@@ -79,7 +79,7 @@ std::string NetworkManager::getNetworkInfo() {
     return network_info;
 }
 
-std::string NetworkManager::getLocalIPAddress() {
+/*std::string NetworkManager::getLocalIPAddress() {
     try {
         asio::ip::tcp::resolver resolver(io_context_);
         asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
@@ -102,7 +102,42 @@ std::string NetworkManager::getLocalIPAddress() {
     catch (std::exception& e) {
         return "Unable to retrieve IP: " + std::string(e.what());
     }
+}*/
+
+std::string NetworkManager::getLocalIPAddress() {
+    try {
+        asio::ip::tcp::resolver resolver(io_context_);
+        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
+        asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+        asio::ip::tcp::resolver::iterator end;
+
+        // First loop: Look specifically for Hamachi (assumes Hamachi uses 25.x.x.x)
+        for (; it != end; ++it) {
+            asio::ip::tcp::endpoint ep = *it;
+            std::string ipAddress = ep.address().to_string();
+            if (ipAddress.find("25.") == 0) {  // Hamachi IP range starts with "25."
+                std::cout << "Found Hamachi IP: " << ipAddress << std::endl;
+                return ipAddress;  // Prioritize Hamachi
+            }
+        }
+
+        // Second loop: Look for the first valid local IPv4 address
+        it = resolver.resolve(query);  // Reset iterator
+        for (; it != end; ++it) {
+            asio::ip::tcp::endpoint ep = *it;
+            if (ep.address().is_v4() && !ep.address().is_loopback()) {
+                std::string localIp = ep.address().to_string();
+                std::cout << "Found local IP: " << localIp << std::endl;
+                return localIp;
+            }
+        }
+
+        return "No valid local IPv4 address found";
+    } catch (std::exception& e) {
+        return "Unable to retrieve IP: " + std::string(e.what());
+    }
 }
+
 
 // Auxiliar Operations END ---------------------------------------------------------------------- END
 
