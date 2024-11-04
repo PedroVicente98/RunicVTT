@@ -4,6 +4,8 @@
 #include "Message.h"
 #include <asio.hpp>
 
+#include <cstdlib>  // For system()
+
 // Start/Stop ----------------------------------------------------------------------------
 NetworkManager::NetworkManager(flecs::world ecs)
     : acceptor_(io_context_), ecs(ecs) {}
@@ -37,6 +39,21 @@ void NetworkManager::stopServer() {
 
 
 // Auxiliar Operations -----------------------------------------------------------------
+
+
+
+void NetworkManager::allowPort(int port) {
+    std::string command = "powershell.exe New-NetFirewallRule -DisplayName \"Allow TCP on Port "
+        + std::to_string(port) + "\" -Direction Inbound -Protocol TCP -LocalPort "
+        + std::to_string(port) + " -Action Allow";
+    system(command.c_str());
+
+    command = "powershell.exe New-NetFirewallRule -DisplayName \"Allow TCP Outbound on Port "
+        + std::to_string(port) + "\" -Direction Outbound -Protocol TCP -LocalPort "
+        + std::to_string(port) + " -Action Allow";
+    system(command.c_str());
+}
+
 
 bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open
@@ -273,11 +290,14 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
             std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
 
             if (socket->is_open()) {
+                auto port = socket->local_endpoint().port();
                 std::cout << "Connection established. Socket is open." << std::endl;
                 std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
-                    << " | Local Port: " << socket->local_endpoint().port() << std::endl;
+                    << " | Local Port: " << port << std::endl;
                 std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
                     << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
+
+                allowPort(port);
             }
 
             // Send the password to the server

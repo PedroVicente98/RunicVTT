@@ -107,7 +107,7 @@ public:
     void verifyPassword(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& receivedPassword);
     void sendDisconnectMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& reason);
 
-
+    void allowPort(int port);
 
 
     // Utility methods
