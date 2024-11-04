@@ -279,7 +279,11 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
 
             // Start receiving messages from the server (this remains asynchronous)
             startReceiving(socket);
-            //startSending();
+            
+            if (socket->is_open()) {
+                connectedPeers.emplace(socket->remote_endpoint().address().to_string(), socket);
+            }
+
             return true;
 
         }
