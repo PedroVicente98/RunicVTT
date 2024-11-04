@@ -32,6 +32,9 @@ public:
         network_manager->queueMessage(message);
         messages.push_back({ Message::TEXT, sender, content });
     }
+    void addReceivedTextMessage(const std::string& sender, const std::string& content) {
+        messages.push_back({ Message::TEXT, sender, content });
+    }
 
     // Adding image message
     void addImageMessage(const std::string& sender, GLuint textureId) {

@@ -70,7 +70,7 @@ void GameTableManager::processReceivedMessages() {
         case MessageType::ChatMessage:
             // Process chat message, you can pass it to your chat system
             std::cout << "[Chat] " << receivedMessage.user << ": " << receivedMessage.chatMessage << std::endl;
-            chat.addTextMessage(receivedMessage.user, receivedMessage.chatMessage);
+            chat.addReceivedTextMessage(receivedMessage.user, receivedMessage.chatMessage);
             break;
 
         case MessageType::CreateMarker:

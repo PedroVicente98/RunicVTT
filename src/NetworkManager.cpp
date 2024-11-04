@@ -193,6 +193,7 @@ void NetworkManager::startReceiving(std::shared_ptr<asio::ip::tcp::socket> socke
     auto buffer = std::make_shared<std::vector<unsigned char>>(1024);  // 1KB buffer size
     socket->async_read_some(asio::buffer(*buffer), [this, socket, buffer](asio::error_code ec, std::size_t length) {
         if (!ec) {
+            std::cout << "Receiving Message from " << socket->remote_endpoint().address().to_string() << std::endl;
             std::string data(buffer->begin(), buffer->begin() + length);
             if (data.rfind("PASSWORD:", 0) == 0) {  // Check if the message starts with "PASSWORD:"
                 std::string receivedPassword = data.substr(9);  // Extract the password part
@@ -430,14 +431,15 @@ void NetworkManager::sendMessageToPeers(const Message& message) {
         std::vector<unsigned char> buffer = serializeMessage(message);
         auto socket = peer.second;  // Get the socket
 
+        std::cout << "Sending Message to " << socket->remote_endpoint().address().to_string() << std::endl;
         // Allocate a shared pointer to the buffer to keep it alive for async operation
         auto sendBuffer = std::make_shared<std::vector<unsigned char>>(std::move(buffer));
 
         // Use asio::async_write instead of asio::write to send the message asynchronously
         asio::async_write(*socket, asio::buffer(*sendBuffer),
-            [this, sendBuffer](asio::error_code ec, std::size_t /*length*/) {
+            [this, sendBuffer, socket](asio::error_code ec, std::size_t /*length*/) {
                 if (!ec) {
-                    std::cout << "Message sent successfully" << std::endl;
+                    std::cout << "Message sent successfully to " << socket->remote_endpoint().address().to_string() << std::endl;
                 }
                 else {
                     std::cerr << "Error sending message: " << ec.message() << std::endl;
