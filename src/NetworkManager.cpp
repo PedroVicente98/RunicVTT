@@ -375,7 +375,6 @@ void NetworkManager::sendPassword(std::shared_ptr<asio::ip::tcp::socket> socket,
         asio::write(*socket, asio::buffer(message));
 
         std::cout << "Password sent to server.\n";
-        socket->close();  // Close the connection after sending the disconnection message
     }
     catch (const asio::system_error& e) {
         std::cout << "Failed to send password: " << e.what() << std::endl;
