@@ -42,6 +42,10 @@ bool GameTableManager::isConnectionActive() {
     return network_manager.isConnectionOpen();
 }
 
+bool GameTableManager::isConnected() const {
+    return network_manager.isConnected();
+}
+
 void GameTableManager::openConnection(unsigned short port) {
     network_manager.startServer(port);
     std::cout << "Connection opened: " << network_manager.getNetworkInfo() << std::endl;

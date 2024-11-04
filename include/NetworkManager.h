@@ -126,7 +126,7 @@ public:
 
     std::mutex receivedQueueMutex;
     std::queue<ReceivedMessage> receivedQueue;
-
+    bool isConnected() const;
 private:
     asio::io_context io_context_;  // ASIO context for handling async operations
     asio::ip::tcp::acceptor acceptor_;  // ASIO acceptor for incoming connections

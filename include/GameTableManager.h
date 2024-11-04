@@ -18,6 +18,8 @@ public:
 	bool isBoardActive();
 	bool isGameTableActive();
 	bool isConnectionActive();
+
+	bool isConnected() const;
 	
 	void openConnection(unsigned short port);
 	void closeConnection();

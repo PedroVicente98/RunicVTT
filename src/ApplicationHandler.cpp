@@ -194,7 +194,7 @@ void ApplicationHandler::renderDockSpace()
 void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
 
 
-    if (game_table_manager.isGameTableActive() || game_table_manager.isConnectionActive()) {
+    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected()) {
 
         if (game_table_manager.board_manager.isEditWindowOpen()) {
             game_table_manager.board_manager.renderEditWindow();

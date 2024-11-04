@@ -42,6 +42,15 @@ bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open
 }
 
+bool NetworkManager::isConnected() const {
+    for (auto& peer : connectedPeers) {
+        auto socket = peer.second.get();
+        if (socket->is_open())
+            return true;
+    }
+    return false;
+}
+
 unsigned short NetworkManager::getPort() const {
     if (acceptor_.is_open()) {
         return acceptor_.local_endpoint().port();  // Return the actual port number
