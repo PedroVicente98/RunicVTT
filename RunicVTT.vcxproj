@@ -112,6 +112,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)dependencies\GLFW\lib-vc2022;$(SolutionDir)dependencies\GLEW\lib\Release\x64</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3.lib;opengl32.lib;User32.lib;Gdi32.lib;Shell32.lib;glew32s.lib</AdditionalDependencies>
+      <AdditionalManifestDependencies>
+      </AdditionalManifestDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -25,6 +25,7 @@ void NetworkManager::startServer(unsigned short port) {
     acceptor_.listen();
     peer_role = Role::GAMEMASTER;
     acceptConnections();  // Start accepting connections
+    allowPort(port);
     std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
 }
 
@@ -37,23 +38,17 @@ void NetworkManager::stopServer() {
 
 // Start/Stop END ---------------------------------------------------------------------- END
 
-
 // Auxiliar Operations -----------------------------------------------------------------
 
 
 
 void NetworkManager::allowPort(int port) {
-    std::string command = "powershell.exe New-NetFirewallRule -DisplayName \"Allow TCP on Port "
-        + std::to_string(port) + "\" -Direction Inbound -Protocol TCP -LocalPort "
-        + std::to_string(port) + " -Action Allow";
-    system(command.c_str());
+    std::string inboundCommand = "powershell.exe New-NetFirewallRule -DisplayName 'Allow TCP Inbound on Port " + std::to_string(port) + "' -Direction Inbound -Action Allow -Protocol TCP -LocalPort " + std::to_string(port);
+    std::string outboundCommand = "powershell.exe New-NetFirewallRule -DisplayName 'Allow TCP Outbound on Port " + std::to_string(port) + "' -Direction Outbound -Action Allow -Protocol TCP -LocalPort " + std::to_string(port);
 
-    command = "powershell.exe New-NetFirewallRule -DisplayName \"Allow TCP Outbound on Port "
-        + std::to_string(port) + "\" -Direction Outbound -Protocol TCP -LocalPort "
-        + std::to_string(port) + " -Action Allow";
-    system(command.c_str());
+    system(inboundCommand.c_str());
+    system(outboundCommand.c_str());
 }
-
 
 bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open
