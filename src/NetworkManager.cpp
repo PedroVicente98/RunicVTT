@@ -74,19 +74,24 @@ std::string NetworkManager::getLocalIPAddress() {
         asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
         asio::ip::tcp::resolver::iterator end;
 
-        // Loop through the results to find the first valid IPv4 address
+        // Loop through the results to find the first valid local IPv4 address
         for (; it != end; ++it) {
             asio::ip::tcp::endpoint ep = *it;
-            if (ep.address().is_v4() && !ep.address().is_loopback()) {
-                return ep.address().to_string();  // Return the valid IPv4 address
+            asio::ip::address addr = ep.address();
+
+            // Only return addresses that are local (private) IPv4 (e.g., 192.168.x.x, 10.x.x.x)
+            if (addr.is_v4() && addr.to_string().find("192.168.") == 0 || addr.to_string().find("10.") == 0) {
+                return addr.to_string();  // Return the local IPv4 address
             }
         }
 
         return "No valid local IPv4 address found";
-    } catch (std::exception& e) {
+    }
+    catch (std::exception& e) {
         return "Unable to retrieve IP: " + std::string(e.what());
     }
 }
+
 // Auxiliar Operations END ---------------------------------------------------------------------- END
 
 
