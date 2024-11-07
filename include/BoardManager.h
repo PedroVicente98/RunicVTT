@@ -143,6 +143,7 @@ public:
     flecs::entity getActiveBoard() const;
     void loadActiveBoard(const std::string& filePath);
     void saveActiveBoard(const std::string& filePath);
+    void saveActiveBoard(std::filesystem::path& filePath);
 
 	std::string board_name;
     DirectoryWindow marker_directory;

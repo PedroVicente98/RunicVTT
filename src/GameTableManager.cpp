@@ -1,8 +1,8 @@
 #include "GameTableManager.h"
 #include "imgui/imgui_internal.h"
 
-GameTableManager::GameTableManager(flecs::world ecs)
-    : ecs(ecs), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(&network_manager)
+GameTableManager::GameTableManager(flecs::world ecs, std::string rootDirectory)
+    : ecs(ecs), rootDirectory(rootDirectory), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(&network_manager)
 {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::string map_directory_name = "MapDiretory";
@@ -21,10 +21,23 @@ GameTableManager::~GameTableManager()
 
 void GameTableManager::saveGameTable()
 {
+    createGameTableFile(active_game_table);
 }
 
-void GameTableManager::loadGameTable()
+void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
 {
+    std::ifstream inFile(game_table_file_path, std::ios::binary);
+    if (inFile) {
+        std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+        inFile.close();
+
+        size_t offset = 0;
+        active_game_table = Serializer::deserializeGameTableEntity(buffer, offset, ecs);
+        std::cout << "GameTable loaded successfully from " << game_table_file_path.string() << std::endl;
+    }
+    else {
+        std::cerr << "Failed to load GameTable from " << game_table_file_path.string() << std::endl;
+    }
 }
 
 
@@ -237,8 +250,8 @@ void GameTableManager::createGameTableFile(flecs::entity game_table) {
 
 }
 
-
-void GameTableManager::listBoardFiles() {
+//
+std::vector<std::string> GameTableManager::listBoardFiles() {
     namespace fs = std::filesystem;
     auto root_directory = fs::current_path();
     auto game_tables_directory = root_directory / "GameTables";
@@ -251,13 +264,43 @@ void GameTableManager::listBoardFiles() {
     if (!fs::exists(game_table_boards_folder) && !fs::is_directory(game_table_boards_folder)) {
         std::filesystem::create_directory(game_table_boards_folder);
     }
-
+    std::vector<std::string> boards;
     for (const auto& entry : std::filesystem::directory_iterator(game_table_boards_folder)) {
         if (entry.is_regular_file()) {
             std::cout << entry.path().filename() << std::endl;  // Print file name
+            boards.emplace_back(entry.path().filename().string());
         }
     }
 
+    return boards;
+
+}
+
+std::vector<std::string> GameTableManager::listGameTableFiles() {
+    namespace fs = std::filesystem;
+    auto root_directory = fs::current_path();
+    auto game_tables_directory = root_directory / "GameTables";
+
+    // Verifica se o diretório "GameTables" existe
+    if (!fs::exists(game_tables_directory) || !fs::is_directory(game_tables_directory)) {
+        std::cerr << "GameTables directory does not exist!" << std::endl;
+        return {};
+    }
+    std::vector<std::string> game_tables;
+    // Itera sobre todos os diretórios dentro de "GameTables"
+    for (const auto& folder : fs::directory_iterator(game_tables_directory)) {
+        if (folder.is_directory()) {
+            std::string folder_name = folder.path().filename().string();
+            auto runic_file_path = folder.path() / (folder_name + ".runic");
+
+            // Verifica se o arquivo "folder_name.runic" existe dentro da pasta
+            if (fs::exists(runic_file_path) && fs::is_regular_file(runic_file_path)) {
+                game_tables.emplace_back(runic_file_path.filename().string());  // Adiciona o nome do arquivo na lista
+            }
+        }
+    }
+
+    return game_tables;
 }
 
 
@@ -607,6 +650,48 @@ void GameTableManager::saveBoardPopUp() {
 
 }
 
+void GameTableManager::loadGameTablePopUp() {
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+    if (ImGui::BeginPopupModal("LoadGameTable"))
+    {
+
+        ImGui::Text("Load Board: ");
+        auto game_tables = listGameTableFiles();
+        for (auto& game_table : game_tables) {
+            if (ImGui::Button(game_table.c_str()))
+            {
+                std::string suffix = ".runic";
+                size_t pos = game_table.rfind(suffix);  // Find the position of ".runic"
+                if (pos != std::string::npos && pos == game_table.length() - suffix.length()) {
+                    game_table_name = game_table.substr(0, pos);
+
+                }
+                else {
+                    game_table_name = game_table;
+                }
+
+
+                std::filesystem::path game_table_file_path(rootDirectory);
+                game_table_file_path = game_table_file_path / "GameTables" / game_table_name / game_table;
+                loadGameTable(game_table_file_path);
+                ImGui::CloseCurrentPopup();
+            }
+        }
+
+        ImGui::NewLine();
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("Close"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+
 
 void GameTableManager::loadBoardPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -614,14 +699,19 @@ void GameTableManager::loadBoardPopUp() {
     if (ImGui::BeginPopupModal("LoadBoard"))
     {
 
-        ImGui::Text("IP: ");
-
-
+        ImGui::Text("Load Board: ");
+        auto boards = listBoardFiles();
+        for (auto& board : boards) {
+            if (ImGui::Button(board.c_str())) 
+            {
+                std::filesystem::path board_file_path(rootDirectory);
+                board_file_path = board_file_path / "GameTables" / game_table_name / "Boards" / board;
+                board_manager.loadActiveBoard(board_file_path.string());
+                ImGui::CloseCurrentPopup();
+            }
+        }
 
         ImGui::NewLine();
-        if (ImGui::Button("Save")) {
-            ImGui::CloseCurrentPopup();
-        }
 
         ImGui::SameLine();
 

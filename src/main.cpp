@@ -63,6 +63,26 @@ static std::string setupRootDirectory() {
 
 }
 
+// Função para definir o ícone da janela
+void setWindowIcon(GLFWwindow* window, const char* iconPath) {
+    // Carrega a imagem do ícone usando stb_image
+    int width, height, channels;
+    unsigned char* image = stbi_load(iconPath, &width, &height, &channels, 4);  // Força 4 canais (RGBA)
+    if (!image) {
+        std::cerr << "Erro: Não foi possível carregar o ícone: " << iconPath << std::endl;
+        return;
+    }
+
+    // Cria o objeto GLFWimage e configura o ícone
+    GLFWimage icon;
+    icon.width = width;
+    icon.height = height;
+    icon.pixels = image;
+    glfwSetWindowIcon(window, 1, &icon);  // Define o ícone
+
+    // Libera a memória usada pela imagem
+    stbi_image_free(image);
+}
 
 int main() {
     // Inicializa o contexto OpenGL
@@ -72,7 +92,8 @@ int main() {
     }
 
     auto rootDirectory = setupRootDirectory();
-
+    auto iconPath = rootDirectory + "/res/RunicVTTIcon.png";
+    setWindowIcon(window, iconPath.c_str());
     ApplicationHandler app(window, rootDirectory);
     app.run();  // Executa o loop principal da aplicação
 

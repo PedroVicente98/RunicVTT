@@ -2,7 +2,7 @@
 #include "Components.h"
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string rootDirectory)
-    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs), window(window), rootDirectory(rootDirectory)
+    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs, rootDirectory), window(window), rootDirectory(rootDirectory)
 {
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -253,6 +253,7 @@ void ApplicationHandler::renderMainMenuBar() {
     bool open_create_gametable = false;
     bool close_current_gametable = false;
     bool connect_to_gametable = false;
+    bool load_active_gametable = false;
     
     bool open_create_board = false;
     bool close_current_board = false;
@@ -273,7 +274,16 @@ void ApplicationHandler::renderMainMenuBar() {
         if (ImGui::MenuItem("Connect")) {
             connect_to_gametable = true;
         }
-        if (ImGui::MenuItem("Open", "Ctrl+Y")) {
+        if (game_table_manager.isGameTableActive()) {
+            if (ImGui::MenuItem("Save"))
+            {
+                game_table_manager.saveGameTable();
+            }
+        }
+        
+        if (ImGui::MenuItem("Open")) 
+        {
+            load_active_gametable = true;
         }
         if (ImGui::MenuItem("Close")) {
             close_current_gametable = true;
@@ -308,7 +318,11 @@ void ApplicationHandler::renderMainMenuBar() {
             }
             if (game_table_manager.board_manager.isBoardActive()) {
                 if (ImGui::MenuItem("Save")) {
-                    save_active_board - true;
+                    //save_active_board = true;
+                    auto board_name = game_table_manager.board_manager.board_name;
+                    std::filesystem::path board_path(rootDirectory);
+                    auto board_folder_path = board_path / "GameTables" / game_table_manager.game_table_name / "Boards";
+                    game_table_manager.board_manager.saveActiveBoard(board_folder_path);
                 }
 
                 if (ImGui::MenuItem("Close")) {
@@ -316,13 +330,9 @@ void ApplicationHandler::renderMainMenuBar() {
                 }
             }
             if (ImGui::MenuItem("Open")) {
-                load_active_board - true;
+                load_active_board = true;
             }
-            
-            
-            
-           
-            
+         
             ImGui::EndMenu();
         }
     }
@@ -338,11 +348,17 @@ void ApplicationHandler::renderMainMenuBar() {
     ImGui::EndMainMenuBar();
 
 
-    if (save_active_board)
-        ImGui::OpenPopup("SaveBoard");
+    if (load_active_gametable)
+        ImGui::OpenPopup("LoadGameTable");
 
-    if (ImGui::IsPopupOpen("SaveBoard"))
-        game_table_manager.saveBoardPopUp();
+    if (ImGui::IsPopupOpen("LoadGameTable"))
+        game_table_manager.loadGameTablePopUp();
+
+    //if (save_active_board)
+    //    ImGui::OpenPopup("SaveBoard");
+
+    //if (ImGui::IsPopupOpen("SaveBoard"))
+    //    game_table_manager.saveBoardPopUp();
 
     if (load_active_board)
         ImGui::OpenPopup("LoadBoard");

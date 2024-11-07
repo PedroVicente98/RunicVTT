@@ -563,16 +563,22 @@ void BoardManager::sendEntityUpdate(flecs::entity entity, MessageType message_ty
 
 //Save and Load Board --------------------------------------------------------------------
 
-void BoardManager::saveActiveBoard(const std::string& filePath) {
+void BoardManager::saveActiveBoard(std::filesystem::path& filePath) {
     if (!active_board.is_alive()) {
         std::cerr << "No active board to save." << std::endl;
         return;
     }
+    auto board = active_board.get<Board>();
+    if (!std::filesystem::exists(filePath)) {
+        std::filesystem::create_directory(filePath);
+    }
+
+    auto board_file_path = filePath / (board->board_name + ".runic");
 
     std::vector<unsigned char> buffer;
-    serializeBoard(active_board, buffer);
+    Serializer::serializeBoardEntity(buffer, active_board);
 
-    std::ofstream outFile(filePath, std::ios::binary);
+    std::ofstream outFile(board_file_path, std::ios::binary);
     if (outFile) {
         outFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         outFile.close();
@@ -603,68 +609,7 @@ flecs::entity BoardManager::getActiveBoard() const {
 }
 
 void BoardManager::serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer) {
-    // Serialize board name
-    auto boardData = board.get<Board>();
-    Serializer::serializeString(buffer, boardData->board_name);
-
-    // Serialize markers
-    int markerCount = 0;
-    board.children([&](flecs::entity child) {
-        if (child.has<MarkerComponent>()) {
-            markerCount++;
-        }
-        });
-    Serializer::serializeInt(buffer, markerCount);
-
-    // Serialize each marker's data
-    board.children([&](flecs::entity child) {
-        if (child.has<MarkerComponent>()) {
-            Serializer::serializeInt(buffer, child.id());
-            auto pos = child.get<Position>();
-            Serializer::serializeInt(buffer, pos->x);
-            Serializer::serializeInt(buffer, pos->y);
-
-            // Serialize additional components like Size, TextureComponent, etc.
-            auto size = child.get<Size>();
-            Serializer::serializeFloat(buffer, size->width);
-            Serializer::serializeFloat(buffer, size->height);
-
-            if (auto texture = child.get<TextureComponent>()) {
-                Serializer::serializeInt(buffer, texture->textureID);
-                Serializer::serializeString(buffer, texture->image_path);
-                Serializer::serializeFloat(buffer, texture->size.x);
-                Serializer::serializeFloat(buffer, texture->size.y);
-            }
-        }
-        });
-
-    // Serialize fog entities
-    int fogCount = 0;
-    board.children([&](flecs::entity child) {
-        if (child.has<FogOfWar>()) {
-            fogCount++;
-        }
-        });
-    Serializer::serializeInt(buffer, fogCount);
-
-    // Serialize each fog's data
-    board.children([&](flecs::entity child) {
-        if (child.has<FogOfWar>()) {
-            Serializer::serializeInt(buffer, child.id());
-            auto pos = child.get<Position>();
-            Serializer::serializeInt(buffer, pos->x);
-            Serializer::serializeInt(buffer, pos->y);
-
-            // Serialize additional components like Size, Visibility, etc.
-            auto size = child.get<Size>();
-            Serializer::serializeFloat(buffer, size->width);
-            Serializer::serializeFloat(buffer, size->height);
-
-            if (auto visibility = child.get<Visibility>()) {
-                Serializer::serializeBool(buffer, visibility->isVisible);
-            }
-        }
-        });
+    Serializer::serializeBoardEntity(buffer, board);
 }
 
 

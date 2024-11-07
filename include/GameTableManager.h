@@ -9,11 +9,11 @@
 
 class GameTableManager {
 public:
-	GameTableManager(flecs::world ecs);
+	GameTableManager(flecs::world ecs, std::string rootDirectory);
 	~GameTableManager();
 
 	void saveGameTable();
-	void loadGameTable();
+	void loadGameTable(std::filesystem::path game_table_file_path);
 
 	bool isBoardActive();
 	bool isGameTableActive();
@@ -37,6 +37,7 @@ public:
 	void closeNetworkPopUp();
 	void openNetworkInfoPopUp();
 	void saveBoardPopUp();
+	void loadGameTablePopUp();
 	void loadBoardPopUp();
 
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
@@ -50,7 +51,8 @@ public:
 
 	void createGameTableFile(flecs::entity game_table);
 
-	void listBoardFiles();
+	std::vector<std::string> listBoardFiles();
+	std::vector<std::string> listGameTableFiles();
 	void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
 
@@ -58,7 +60,7 @@ public:
 	Chat chat;
 	DirectoryWindow map_directory;
 	BoardManager board_manager;
-
+	std::string rootDirectory;
 private:
 	NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();

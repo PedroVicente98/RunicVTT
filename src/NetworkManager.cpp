@@ -18,14 +18,21 @@ NetworkManager::~NetworkManager() {
 }
 
 void NetworkManager::startServer(unsigned short port) {
-    asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
+
+    auto ip_address = getLocalIPAddress();
+    if (ip_address == "No valid local IPv4 address found" || ip_address.find("Unable to retrieve IP") == 0) {
+        std::cerr << "Failed to start server: " << ip_address << std::endl;
+        return;
+    }
+    asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip_address), port);
+    //asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
     acceptor_.open(endpoint.protocol());
     acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
     peer_role = Role::GAMEMASTER;
     acceptConnections();  // Start accepting connections
-    allowPort(port);
+    //allowPort(port);
     std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
 }
 
@@ -103,7 +110,6 @@ std::string NetworkManager::getNetworkInfo() {
         return "Unable to retrieve IP: " + std::string(e.what());
     }
 }*/
-
 std::string NetworkManager::getLocalIPAddress() {
     try {
         asio::ip::tcp::resolver resolver(io_context_);
@@ -111,32 +117,64 @@ std::string NetworkManager::getLocalIPAddress() {
         asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
         asio::ip::tcp::resolver::iterator end;
 
-        // First loop: Look specifically for Hamachi (assumes Hamachi uses 25.x.x.x)
+        std::string fallbackIp;
+
+        // Loop through available IP addresses
         for (; it != end; ++it) {
             asio::ip::tcp::endpoint ep = *it;
             std::string ipAddress = ep.address().to_string();
-            if (ipAddress.find("25.") == 0) {  // Hamachi IP range starts with "25."
-                std::cout << "Found Hamachi IP: " << ipAddress << std::endl;
-                return ipAddress;  // Prioritize Hamachi
+
+            if (ipAddress.find("25.") == 0) {  // Check for Hamachi IP
+                return ipAddress;  // Return immediately if Hamachi IP is found
+            }
+            else if (ep.address().is_v4() && !ep.address().is_loopback()) {
+                // Save the first valid local IP as a fallback
+                fallbackIp = ipAddress;
             }
         }
 
-        // Second loop: Look for the first valid local IPv4 address
-        it = resolver.resolve(query);  // Reset iterator
-        for (; it != end; ++it) {
-            asio::ip::tcp::endpoint ep = *it;
-            if (ep.address().is_v4() && !ep.address().is_loopback()) {
-                std::string localIp = ep.address().to_string();
-                std::cout << "Found local IP: " << localIp << std::endl;
-                return localIp;
-            }
-        }
+        // If no Hamachi IP was found, return the fallback IP or an error message
+        return !fallbackIp.empty() ? fallbackIp : "No valid local IPv4 address found";
 
-        return "No valid local IPv4 address found";
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         return "Unable to retrieve IP: " + std::string(e.what());
     }
 }
+
+//std::string NetworkManager::getLocalIPAddress() {
+//    try {
+//        asio::ip::tcp::resolver resolver(io_context_);
+//        asio::ip::tcp::resolver::query query(asio::ip::host_name(), "");
+//        asio::ip::tcp::resolver::iterator it = resolver.resolve(query);
+//        asio::ip::tcp::resolver::iterator end;
+//
+//        // First loop: Look specifically for Hamachi (assumes Hamachi uses 25.x.x.x)
+//        for (; it != end; ++it) {
+//            asio::ip::tcp::endpoint ep = *it;
+//            std::string ipAddress = ep.address().to_string();
+//            if (ipAddress.find("25.") == 0) {  // Hamachi IP range starts with "25."
+//                //std::cout << "Found Hamachi IP: " << ipAddress << std::endl;
+//                return ipAddress;  // Prioritize Hamachi
+//            }
+//        }
+//
+//        // Second loop: Look for the first valid local IPv4 address
+//        it = resolver.resolve(query);  // Reset iterator
+//        for (; it != end; ++it) {
+//            asio::ip::tcp::endpoint ep = *it;
+//            if (ep.address().is_v4() && !ep.address().is_loopback()) {
+//                std::string localIp = ep.address().to_string();
+//                std::cout << "Found local IP: " << localIp << std::endl;
+//                return localIp;
+//            }
+//        }
+//
+//        return "No valid local IPv4 address found";
+//    } catch (std::exception& e) {
+//        return "Unable to retrieve IP: " + std::string(e.what());
+//    }
+//}
 
 
 // Auxiliar Operations END ---------------------------------------------------------------------- END
@@ -296,46 +334,118 @@ Message NetworkManager::deserializeMessage(const std::vector<unsigned char>& buf
 
 //Message Operations END ------------------------------------------------------------------------------------- END
 
+//
+////Connect to Peer Operations ---------------------------------------------------------------------------------
+//bool NetworkManager::connectToPeer(const std::string& connection_string) {
+//    std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+//    std::smatch match;
+//
+//    // Parse the connection string using regex
+//    if (std::regex_match(connection_string, match, rgx)) {
+//        std::string ip = match[1];             // Extract the IP address
+//        unsigned short port = std::stoi(match[2]);  // Extract the port
+//        std::string password = match[3];       // Extract the optional password
+//
+//        // Establish a connection using ASIO
+//        try {
+//            asio::ip::tcp::resolver resolver(io_context_);
+//            auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
+//            asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip), port);
+//
+//            // Perform a synchronous connect operation
+//            socket->connect(endpoint);
+//
+//            std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
+//
+//            if (socket->is_open()) {
+//                auto port = socket->local_endpoint().port();
+//                std::cout << "Connection established. Socket is open." << std::endl;
+//                std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
+//                    << " | Local Port: " << port << std::endl;
+//                std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
+//                    << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
+//
+//                allowPort(port);
+//            }
+//
+//            // Send the password to the server
+//            sendPassword(socket, password);
+//
+//            // Start receiving messages from the server (this remains asynchronous)
+//            startReceiving(socket);
+//            
+//            if (socket->is_open()) {
+//                connectedPeers.emplace(socket->remote_endpoint().address().to_string(), socket);
+//            }
+//
+//            return true;
+//
+//        }
+//        catch (std::exception& e) {
+//            std::cerr << "Failed to connect: " << e.what() << std::endl;
+//            return false;
+//        }
+//
+//    }
+//    else {
+//        std::cerr << "Invalid connection string format!" << std::endl;
+//        return false;
+//    }
+//}
 
-//Connect to Peer Operations ---------------------------------------------------------------------------------
 bool NetworkManager::connectToPeer(const std::string& connection_string) {
     std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
     std::smatch match;
 
     // Parse the connection string using regex
     if (std::regex_match(connection_string, match, rgx)) {
-        std::string ip = match[1];             // Extract the IP address
-        unsigned short port = std::stoi(match[2]);  // Extract the port
-        std::string password = match[3];       // Extract the optional password
+        std::string server_ip = match[1];             // Extract the server's Hamachi IP address
+        unsigned short port = std::stoi(match[2]);    // Extract the port
+        std::string password = match[3];              // Extract the optional password
 
-        // Establish a connection using ASIO
+        // Get the client's Hamachi IP
+        std::string client_ip = getLocalIPAddress();
+        if (client_ip == "No valid local IPv4 address found" || client_ip.find("Unable to retrieve IP") == 0) {
+            std::cerr << "Failed to find a valid Hamachi IP for the client." << std::endl;
+            return false;
+        }
+
         try {
             asio::ip::tcp::resolver resolver(io_context_);
             auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
-            asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip), port);
+
+            // Bind the socket to the Hamachi IP to ensure it uses this interface
+            asio::ip::tcp::endpoint client_endpoint(asio::ip::make_address(client_ip), 0); // Port 0 lets the OS choose a free port
+            socket->open(client_endpoint.protocol());
+            socket->bind(client_endpoint);
+
+            // Define the server endpoint
+            asio::ip::tcp::endpoint server_endpoint(asio::ip::make_address(server_ip), port);
 
             // Perform a synchronous connect operation
-            socket->connect(endpoint);
+            socket->connect(server_endpoint);
 
-            std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
+            std::cout << "Successfully connected to server at " << server_ip << ":" << port << std::endl;
 
             if (socket->is_open()) {
-                auto port = socket->local_endpoint().port();
+                auto local_port = socket->local_endpoint().port();
+
                 std::cout << "Connection established. Socket is open." << std::endl;
-                std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
-                    << " | Local Port: " << port << std::endl;
+                std::cout << "Client Hamachi IP: " << client_ip
+                    << " | Local Port: " << local_port << std::endl;
                 std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
                     << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
 
-                allowPort(port);
+                //allowPort(local_port);  // Ensure the port is open on the firewall
             }
 
             // Send the password to the server
             sendPassword(socket, password);
 
-            // Start receiving messages from the server (this remains asynchronous)
+            // Start receiving messages from the server asynchronously
             startReceiving(socket);
-            
+
+            // Add the connection to connected peers
             if (socket->is_open()) {
                 connectedPeers.emplace(socket->remote_endpoint().address().to_string(), socket);
             }
@@ -343,8 +453,9 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
             return true;
 
         }
-        catch (std::exception& e) {
-            std::cerr << "Failed to connect: " << e.what() << std::endl;
+        catch (const std::exception& e) {
+            std::cerr << "Failed to connect to " << server_ip << ":" << port
+                << " | Exception: " << e.what() << std::endl;
             return false;
         }
 
