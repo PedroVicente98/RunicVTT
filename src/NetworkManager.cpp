@@ -416,6 +416,7 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
 
             // Bind the socket to the Hamachi IP to ensure it uses this interface
             asio::ip::tcp::endpoint client_endpoint(asio::ip::make_address(client_ip), 0); // Port 0 lets the OS choose a free port
+            socket->set_option(asio::socket_base::keep_alive(true));
             socket->open(client_endpoint.protocol());
             socket->bind(client_endpoint);
 
