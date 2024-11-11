@@ -15,8 +15,8 @@
 #include "Components.h"
 #include <filesystem>
 
-BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), network_manager(network_manager){
+BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager, DirectoryWindow* map_directory)
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), map_directory(map_directory), network_manager(network_manager) {
     
     std::filesystem::path base_path = std::filesystem::current_path();
     std::filesystem::path marker_directory_path = base_path / "Markers";
@@ -24,7 +24,7 @@ BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager)
     marker_directory.directoryName = "MarkerDiretory";
     marker_directory.directoryPath = marker_directory_path.string();
     marker_directory.startMonitoring();
-
+    marker_directory.generateTextureIDs();
  }
 
 BoardManager::~BoardManager()
@@ -96,13 +96,13 @@ void BoardManager::renderToolbar() {
         }
         ImGui::PopStyleColor();
         ImGui::SameLine(); // Ensure buttons are on the same row
-        // Tool: Marker
-        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MARKER ? activeColor : defaultColor);
-        if (ImGui::Button("Marker Tool", ImVec2(80, 40))) {
-            currentTool = Tool::MARKER;
-        }
-        ImGui::PopStyleColor();
-        ImGui::SameLine(); // Ensure buttons are on the same row
+        //// Tool: Marker
+        //ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MARKER ? activeColor : defaultColor);
+        //if (ImGui::Button("Marker Tool", ImVec2(80, 40))) {
+        //    currentTool = Tool::MARKER;
+        //}
+        //ImGui::PopStyleColor();
+        //ImGui::SameLine(); // Ensure buttons are on the same row
         // Tool: Select
         ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
         if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
@@ -156,7 +156,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
         renderer.Draw(va, ib, shader);
 
-
+        ecs.defer_begin(); // Start deferring modifications
         active_board.children([&](flecs::entity child) {
             //if (child.has<MarkerComponent>()) {
             if (child.has<MarkerComponent>()) {
@@ -225,6 +225,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
             }
         });
+        ecs.defer_end();
     }
    
 
@@ -259,6 +260,7 @@ void BoardManager::deleteMarker(flecs::entity markerEntity) {
 
 void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
     //mousePos(Screen Position) use screenToWorldPosition(mousePos)  position(World Position) 
+    ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position) {
         if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
             glm::vec2 world_position = screenToWorldPosition(mousePos);
@@ -272,6 +274,7 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
             network_manager->queueMessage(message);
         }
      });
+    ecs.defer_end();
 }
 
 
@@ -334,6 +337,7 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
     bool hovered = false;
     
     // Query all markers that are children of the active board and have MarkerComponent
+    ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving) {
         glm::vec2 world_position = screenToWorldPosition(mousePos);
 
@@ -350,7 +354,7 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
             }
         }
     });
-
+    ecs.defer_end();
     return hovered;
 }
 
@@ -371,11 +375,13 @@ void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
 
 void BoardManager::endMouseDrag() {
     active_board.set<Panning>({ false });
+    ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
         if (entity.has(flecs::ChildOf, active_board)) {
             moving.isDragging = false;
         }
     });
+    ecs.defer_end();
     is_creating_fog = false;
 }
 
@@ -386,11 +392,13 @@ bool BoardManager::isPanning() {
 
 bool BoardManager::isDragginMarker() {
     bool isDragginMarker = false;
+    ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
         if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
             isDragginMarker =  true;
         }
     });
+    ecs.defer_end();
     return isDragginMarker;
 }
 
@@ -457,6 +465,7 @@ void BoardManager::setCurrentTool(Tool newTool) {
 flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
 
     auto entity_at_mouse = flecs::entity();
+    ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size) {
         
         glm::vec2 world_position = screenToWorldPosition(mouse_position);
@@ -473,7 +482,8 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
                 entity_at_mouse = entity;
             }
         }
-        });
+    });
+    ecs.defer_end();
     return entity_at_mouse;
 }
 
@@ -576,7 +586,7 @@ void BoardManager::saveActiveBoard(std::filesystem::path& filePath) {
     auto board_file_path = filePath / (board->board_name + ".runic");
 
     std::vector<unsigned char> buffer;
-    Serializer::serializeBoardEntity(buffer, active_board);
+    Serializer::serializeBoardEntity(buffer, active_board, ecs);
 
     std::ofstream outFile(board_file_path, std::ios::binary);
     if (outFile) {
@@ -596,7 +606,23 @@ void BoardManager::loadActiveBoard(const std::string& filePath) {
         inFile.close();
 
         size_t offset = 0;
-        active_board = deserializeBoard(buffer, offset);
+        active_board = Serializer::deserializeBoardEntity(buffer, offset, ecs);
+        auto texture = active_board.get_mut<TextureComponent>();
+        auto map_image = map_directory->getImageByPath(texture->image_path);
+        texture->textureID = map_image.textureID;
+        texture->size = map_image.size;
+
+        ecs.defer_begin();
+        active_board.children([&](flecs::entity child) {
+            if (child.has<MarkerComponent>()) {
+                auto child_texture = child.get_mut<TextureComponent>();
+                auto marker_image = marker_directory.getImageByPath(child_texture->image_path);
+                child_texture->textureID = marker_image.textureID;
+                child_texture->size = marker_image.size;
+            }
+        });
+        ecs.defer_end();
+
         std::cout << "Board loaded successfully from " << filePath << std::endl;
     }
     else {
@@ -604,121 +630,11 @@ void BoardManager::loadActiveBoard(const std::string& filePath) {
     }
 }
 
+
 flecs::entity BoardManager::getActiveBoard() const {
     return active_board;
 }
 
-void BoardManager::serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer) {
-    Serializer::serializeBoardEntity(buffer, board);
-}
-
-
-flecs::entity BoardManager::deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset) {
-    std::string boardName = Serializer::deserializeString(buffer, offset);
-    auto newBoard = ecs.entity().set(Board{ boardName });
-
-    // Deserialize markers
-    int markerCount = Serializer::deserializeInt(buffer, offset);
-    for (int i = 0; i < markerCount; ++i) {
-        int markerID = Serializer::deserializeInt(buffer, offset);
-        int x = Serializer::deserializeInt(buffer, offset);
-        int y = Serializer::deserializeInt(buffer, offset);
-        auto marker = ecs.entity(markerID).set(Position{ x, y });
-        marker.add<MarkerComponent>();
-        marker.add(flecs::ChildOf, newBoard);
-        // Deserialize other components and attach them to the marker
-    }
-
-    // Deserialize fog entities
-    int fogCount = Serializer::deserializeInt(buffer, offset);
-    for (int i = 0; i < fogCount; ++i) {
-        int fogID = Serializer::deserializeInt(buffer, offset);
-        int x = Serializer::deserializeInt(buffer, offset);
-        int y = Serializer::deserializeInt(buffer, offset);
-        auto fog = ecs.entity(fogID).set(Position{ x, y });
-        fog.add<FogOfWar>();
-        fog.add(flecs::ChildOf, newBoard);
-        // Deserialize other components and attach them to the fog
-    }
-
-    return newBoard;
-}
-
-
-
-
-//Save and Load Board END -------------------------------------------------------------------- END
-//
-//
-//void BoardManager::sendGameState() {
-//    // 1. Create the message for the gamestate start
-//    Message startMessage;
-//    startMessage.type = MessageType::GamestateStart;
-//    network_manager->queueMessage(startMessage);
-//
-//    // 2. Send the board data
-//    if (active_board.is_alive()) {
-//        Board board = active_board.get<Board>();
-//        Grid grid = active_board.get<Grid>();
-//
-//        Message boardMessage;
-//        boardMessage.type = MessageType::BoardUpdate;
-//        std::vector<unsigned char> boardBuffer;
-//
-//        // Serialize the board and grid
-//        Serializer::serializeBoard(boardBuffer, board);
-//        Serializer::serializeGrid(boardBuffer, grid);
-//        boardMessage.payload = boardBuffer;
-//        network_manager->queueMessage(boardMessage);
-//
-//        // Send the map image
-//        TextureComponent texture = active_board.get<TextureComponent>();
-//        network_manager->sendImage(texture.image_path, texture.textureID);
-//    }
-//
-//    // 3. Send all markers
-//    ecs.each([this](flecs::entity entity, const MarkerComponent&, const Position& pos, const Size& size, const TextureComponent& texture, const Visibility& visibility) {
-//        if (entity.has(flecs::ChildOf, active_board)) {
-//            Message markerMessage;
-//            markerMessage.type = MessageType::CreateMarker;
-//            std::vector<unsigned char> markerBuffer;
-//
-//            // Serialize the marker data
-//            Serializer::serializePosition(markerBuffer, pos);
-//            Serializer::serializeSize(markerBuffer, size);
-//            Serializer::serializeTextureComponent(markerBuffer, texture);
-//            Serializer::serializeBool(markerBuffer, visibility.isVisible);
-//            markerMessage.payload = markerBuffer;
-//
-//            network_manager->queueMessage(markerMessage);
-//
-//            // Send the marker's image if necessary
-//            network_manager->sendImage(texture.image_path, texture.textureID);
-//        }
-//    });
-//
-//    // 4. Send all fog entities
-//    ecs.each([this](flecs::entity entity, const FogOfWar&, const Position& pos, const Size& size, const Visibility& visibility) {
-//        if (entity.has(flecs::ChildOf, active_board)) {
-//            Message fogMessage;
-//            fogMessage.type = MessageType::CreateFog;
-//            std::vector<unsigned char> fogBuffer;
-//
-//            // Serialize the fog data
-//            Serializer::serializePosition(fogBuffer, pos);
-//            Serializer::serializeSize(fogBuffer, size);
-//            Serializer::serializeBool(fogBuffer, visibility.isVisible);
-//            fogMessage.payload = fogBuffer;
-//
-//            network_manager->queueMessage(fogMessage);
-//        }
-//    });
-//
-//    // 5. Create the message for the gamestate end
-//    Message endMessage;
-//    endMessage.type = MessageType::GamestateEnd;
-//    network_manager->queueMessage(endMessage);
-//}
 
 bool BoardManager::isEditWindowOpen() const {
     return showEditWindow;

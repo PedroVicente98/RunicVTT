@@ -2,7 +2,7 @@
 #include "imgui/imgui_internal.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::string rootDirectory)
-    : ecs(ecs), rootDirectory(rootDirectory), network_manager(ecs), board_manager(ecs, &network_manager), map_directory(std::string(), std::string()), chat(&network_manager)
+    : ecs(ecs), rootDirectory(rootDirectory), network_manager(ecs), map_directory(std::string(), std::string()), board_manager(ecs, &network_manager, &map_directory), chat(&network_manager)
 {
     std::filesystem::path base_path = std::filesystem::current_path();
     std::string map_directory_name = "MapDiretory";
@@ -33,7 +33,33 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
 
         size_t offset = 0;
         active_game_table = Serializer::deserializeGameTableEntity(buffer, offset, ecs);
-        std::cout << "GameTable loaded successfully from " << game_table_file_path.string() << std::endl;
+        ecs.defer_begin();
+        try
+        {   
+            active_game_table.children([&](flecs::entity child) {
+                if (child.has<Board>()) {
+                    board_manager.setActiveBoard(child);
+                    auto texture = child.get_mut<TextureComponent>();
+                    auto board_image = map_directory.getImageByPath(texture->image_path);
+                    texture->textureID = board_image.textureID;
+                    texture->size = board_image.size;
+
+                    child.children([&](flecs::entity grand_child) {
+                        if (grand_child.has<MarkerComponent>()) {
+                            auto grand_child_texture = grand_child.get_mut<TextureComponent>();
+                            auto marker_image = board_manager.marker_directory.getImageByPath(grand_child_texture->image_path);
+                            grand_child_texture->textureID = marker_image.textureID;
+                            grand_child_texture->size = marker_image.size;
+                        }
+                    });
+                }
+            });
+        }
+        catch (const std::exception&)
+        {
+            std::cout << "ERROR LOADING IMAGES" << std::endl;
+        }
+        ecs.defer_end();
     }
     else {
         std::cerr << "Failed to load GameTable from " << game_table_file_path.string() << std::endl;
@@ -61,12 +87,10 @@ bool GameTableManager::isConnected() const {
 
 void GameTableManager::openConnection(unsigned short port) {
     network_manager.startServer(port);
-    std::cout << "Connection opened: " << network_manager.getNetworkInfo() << std::endl;
 }
 
 void GameTableManager::closeConnection() {
     network_manager.stopServer();
-    std::cout << "Connection closed." << std::endl;
 }
 
 
@@ -230,17 +254,11 @@ void GameTableManager::createGameTableFile(flecs::entity game_table) {
     }
 
     std::vector<unsigned char> buffer;
-    auto game_table_component = game_table.get<GameTable>();
-    Serializer::serializeGameTable(buffer, game_table_component);
-    if (isBoardActive()) {
-        auto active_board = board_manager.getActiveBoard();
-        board_manager.serializeBoard(active_board, buffer);
-    }
+    Serializer::serializeGameTableEntity(buffer, game_table, ecs);
 
     auto game_table_file = active_game_table_folder / (game_table_name + ".runic");
     std::ofstream file(game_table_file.string(), std::ios::binary);
     if (file.is_open()) {
-        // Write the data using data() to get the pointer to the internal array
         file.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         file.close();
     }
@@ -312,7 +330,7 @@ void GameTableManager::createGameTablePopUp()
 {   
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CreateGameTable"))
+    if (ImGui::BeginPopupModal("CreateGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::SetItemDefaultFocus();
         ImGui::InputText("GameTable Name", buffer, sizeof(buffer));
@@ -328,7 +346,7 @@ void GameTableManager::createGameTablePopUp()
 
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
-        if (ImGui::Button("Save") && strlen(buffer) > 0)
+        if (ImGui::Button("Save") && strlen(buffer) > 0 && strlen(port_buffer) > 0)
         {
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
@@ -438,7 +456,7 @@ void GameTableManager::closeBoardPopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CloseBoard"))
+    if (ImGui::BeginPopupModal("CloseBoard", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
@@ -461,13 +479,14 @@ void GameTableManager::closeGameTablePopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CloseGameTable"))
+    if (ImGui::BeginPopupModal("CloseGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
         {
             board_manager.closeBoard();
             active_game_table = flecs::entity();
+            network_manager.stopServer();
             ImGui::CloseCurrentPopup();
         }
 
@@ -485,7 +504,7 @@ void GameTableManager::connectToGameTablePopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("ConnectToGameTable"))
+    if (ImGui::BeginPopupModal("ConnectToGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::SetItemDefaultFocus();
         ImGui::InputText("Connection String", buffer, sizeof(buffer));
@@ -521,7 +540,7 @@ void GameTableManager::createNetworkPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("CreateNetwork")) {
+    if (ImGui::BeginPopupModal("CreateNetwork", 0, ImGuiWindowFlags_AlwaysAutoResize)) {
         ImGui::SetItemDefaultFocus();
 
         // Display local IP address (use NetworkManager to get IP)
@@ -564,7 +583,7 @@ void GameTableManager::createNetworkPopUp() {
 void GameTableManager::closeNetworkPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CloseNetwork"))
+    if (ImGui::BeginPopupModal("CloseNetwork", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::Text("Close Current Conection?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close Connection"))
@@ -587,7 +606,7 @@ void GameTableManager::openNetworkInfoPopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("NetworkInfo"))
+    if (ImGui::BeginPopupModal("NetworkInfo", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
 
         auto connection_string = network_manager.getNetworkInfo();
@@ -627,7 +646,7 @@ void GameTableManager::openNetworkInfoPopUp()
 void GameTableManager::saveBoardPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("SaveBoard"))
+    if (ImGui::BeginPopupModal("SaveBoard", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
 
         ImGui::Text("IP: ");
@@ -653,53 +672,75 @@ void GameTableManager::saveBoardPopUp() {
 void GameTableManager::loadGameTablePopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("LoadGameTable"))
+    if (ImGui::BeginPopupModal("LoadGameTable",0, ImGuiWindowFlags_AlwaysAutoResize))
     {
 
-        ImGui::Text("Load Board: ");
+        ImGui::Text("Load GameTable: ");
+        auto network_info = network_manager.getLocalIPAddress();
+        ImGui::Text("Network Info");
+        ImGui::Text(network_info.c_str());
+        ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
+        network_manager.setNetworkPassword(pass_buffer);
+
+        ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+
+        ImGui::NewLine();
+        ImGui::Separator();
+
         auto game_tables = listGameTableFiles();
         for (auto& game_table : game_tables) {
-            if (ImGui::Button(game_table.c_str()))
+            if (ImGui::Button(game_table.c_str()) && strlen(port_buffer) > 0)
             {
                 std::string suffix = ".runic";
                 size_t pos = game_table.rfind(suffix);  // Find the position of ".runic"
                 if (pos != std::string::npos && pos == game_table.length() - suffix.length()) {
                     game_table_name = game_table.substr(0, pos);
-
                 }
                 else {
                     game_table_name = game_table;
                 }
 
-
                 std::filesystem::path game_table_file_path(rootDirectory);
                 game_table_file_path = game_table_file_path / "GameTables" / game_table_name / game_table;
                 loadGameTable(game_table_file_path);
+
+                int port = atoi(port_buffer);
+                network_manager.startServer(port);
+
+                memset(buffer, '\0', sizeof(buffer));
+                memset(pass_buffer, '\0', sizeof(pass_buffer));
+                memset(port_buffer, '\0', sizeof(port_buffer));
+
+
                 ImGui::CloseCurrentPopup();
             }
         }
 
         ImGui::NewLine();
-
-        ImGui::SameLine();
+        ImGui::Separator();
 
         if (ImGui::Button("Close"))
         {
             ImGui::CloseCurrentPopup();
+            memset(buffer, '\0', sizeof(buffer));
+            memset(pass_buffer, '\0', sizeof(pass_buffer));
         }
         ImGui::EndPopup();
     }
 }
 
 
-
 void GameTableManager::loadBoardPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("LoadBoard"))
+    if (ImGui::BeginPopupModal("LoadBoard", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
 
         ImGui::Text("Load Board: ");
+
+        ImGui::NewLine();
+        ImGui::Separator();
+
         auto boards = listBoardFiles();
         for (auto& board : boards) {
             if (ImGui::Button(board.c_str())) 
@@ -712,8 +753,7 @@ void GameTableManager::loadBoardPopUp() {
         }
 
         ImGui::NewLine();
-
-        ImGui::SameLine();
+        ImGui::Separator();
 
         if (ImGui::Button("Close"))
         {

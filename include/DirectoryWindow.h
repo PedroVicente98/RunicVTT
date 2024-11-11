@@ -152,6 +152,24 @@ public:
         stopMonitoring();
     }
 
+
+    ImageData getImageByPath(const std::string& file_name) {
+        auto it = std::find_if(images.begin(), images.end(), [&](const ImageData& image) {
+            // Check if image.filename is a substring at the end of file_name
+            if (file_name.size() >= image.filename.size()) {
+                return file_name.compare(file_name.size() - image.filename.size(), image.filename.size(), image.filename) == 0;
+            }
+            return false;
+            });
+
+        if (it != images.end()) {
+            return *it;
+        }
+        else {
+            throw std::runtime_error("Image not found: " + file_name);
+        }
+    }
+
     std::string directoryPath;
     std::string directoryName;
 private:
@@ -224,7 +242,7 @@ private:
     ImageData LoadTextureFromFile(const char* path) {
 
         // Record the start time using std::chrono::high_resolution_clock
-        std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
+        //std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
 
         int width, height, nrChannels;
         unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 4);
@@ -249,10 +267,10 @@ private:
         stbi_image_free(data);
 
         // Record the end time using std::chrono::high_resolution_clock
-        std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
+        //std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();
 
         // Calculate the duration in milliseconds
-        std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
+        //std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
 
         // Output the duration in milliseconds
         //std::cout << "Operation for file "<< path <<"took " << duration.count() << " seconds" << std::endl;

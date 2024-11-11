@@ -471,7 +471,7 @@ Message NetworkManager::buildCreateMarkerMessage(flecs::entity marker_entity) {
     Message create_marker_message = {};
     create_marker_message.type = MessageType::CreateMarker;
     std::vector<unsigned char> buffer;
-    Serializer::serializeMarkerEntity(buffer, marker_entity);
+    Serializer::serializeMarkerEntity(buffer, marker_entity, ecs);
     create_marker_message.payload = buffer;
     return create_marker_message;
 }
@@ -480,7 +480,7 @@ Message NetworkManager::buildUpdateMarkerMessage(flecs::entity marker_entity) {
     Message update_marker_message = {};
     update_marker_message.type = MessageType::MarkerUpdate;
     std::vector<unsigned char> buffer;
-    Serializer::serializeMarkerEntity(buffer, marker_entity);
+    Serializer::serializeMarkerEntity(buffer, marker_entity, ecs);
     update_marker_message.payload = buffer;
     return update_marker_message;
 }
@@ -489,7 +489,7 @@ Message NetworkManager::buildCreateBoardMessage(flecs::entity board_entity) {
     Message create_board_message = {};
     create_board_message.type = MessageType::CreateBoard;
     std::vector<unsigned char> buffer;
-    Serializer::serializeBoardEntity(buffer, board_entity);
+    Serializer::serializeBoardEntity(buffer, board_entity, ecs);
     create_board_message.payload = buffer;
     return create_board_message;
 }

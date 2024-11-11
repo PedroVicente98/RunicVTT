@@ -91,7 +91,7 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs, NetworkManager* network_manager);
+	BoardManager(flecs::world ecs, NetworkManager* network_manager, DirectoryWindow* map_directory);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
@@ -138,8 +138,8 @@ public:
     void sendGameState();
     void sendEntityUpdate(flecs::entity entity, MessageType message_type);
 
-    flecs::entity deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset);
-    void serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer);
+    //flecs::entity deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset);
+    //void serializeBoard(flecs::entity board, std::vector<unsigned char>& buffer);
     flecs::entity getActiveBoard() const;
     void loadActiveBoard(const std::string& filePath);
     void saveActiveBoard(const std::string& filePath);
@@ -161,7 +161,7 @@ private:
 	flecs::entity edit_window_entity = flecs::entity();
 	NetworkManager* network_manager;
     glm::vec2 mouseStartPos;
-
+    DirectoryWindow* map_directory;
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
     bool is_creating_fog = false;

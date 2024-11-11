@@ -51,32 +51,32 @@ public:
     static void serializeGameTable(std::vector<unsigned char>& buffer, const GameTable* gameTable);
     static GameTable deserializeGameTable(const std::vector<unsigned char>& buffer, size_t& offset);
 
-    static void serializeMarkerEntity(std::vector<unsigned char>& buffer, const flecs::entity entity);
-    static flecs::entity deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs);
+    static void serializeMarkerEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs);
+    static flecs::entity deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs);
 
-    static void serializeFogEntity(std::vector<unsigned char>& buffer, const flecs::entity entity);
-    static flecs::entity deserializeFogEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs);
+    static void serializeFogEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs);
+    static flecs::entity deserializeFogEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs);
 
 
-    static void serializeGameTableEntity(std::vector<unsigned char>& buffer, const flecs::entity entity);
-    static flecs::entity deserializeGameTableEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs);
+    static void serializeGameTableEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs);
+    static flecs::entity deserializeGameTableEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs);
 
-    static void serializeBoardEntity(std::vector<unsigned char>& buffer, const flecs::entity entity);
-    static flecs::entity deserializeBoardEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs);
+    static void serializeBoardEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs);
+    static flecs::entity deserializeBoardEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs);
 
 };
 
 
 // Serialize and Deserialize MarkerEntity
-inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer, const flecs::entity entity) {
+inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs) {
     auto position = entity.get<Position>();
     auto size = entity.get<Size>();
     auto texture = entity.get<TextureComponent>();
     auto visibility = entity.get<Visibility>();
     auto moving = entity.get<Moving>();
-    auto marker_id = entity.id();
+    //auto marker_id = entity.id();
 
-    serializeInt(buffer, marker_id);
+    //serializeInt(buffer, marker_id);
     serializePosition(buffer, position);
     serializeSize(buffer, size);
     serializeMoving(buffer, moving);
@@ -85,16 +85,16 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
 
 }
 
-inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs) {
+inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs) {
 
-    auto marker_id = deserializeInt(buffer, offset);
+    //auto marker_id = deserializeInt(buffer, offset);
     auto position = deserializePosition(buffer, offset);
     auto size = deserializeSize(buffer, offset);
     auto moving = deserializeMoving(buffer, offset);
     auto visibility = deserializeVisibility(buffer, offset);
     auto texture = deserializeTextureComponent(buffer, offset);
 
-    auto marker = ecs.entity(marker_id)
+    auto marker = ecs.entity()
         .set<Position>(position)
         .set<Size>(size)
         .set<Moving>(moving)
@@ -105,26 +105,26 @@ inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsig
 }
 
 // Serialize and Deserialize FogEntity
-inline void Serializer::serializeFogEntity(std::vector<unsigned char>& buffer, const flecs::entity entity) {
+inline void Serializer::serializeFogEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs) {
     auto position = entity.get<Position>();
     auto size = entity.get<Size>();
     auto visibility = entity.get<Visibility>();
-    auto fog_id = entity.id();
+ /*   auto fog_id = entity.id();
 
-    serializeInt(buffer, fog_id);
+    serializeInt(buffer, fog_id);*/
     serializePosition(buffer, position);
     serializeSize(buffer, size);
     serializeVisibility(buffer, visibility);
 }
 
-inline flecs::entity Serializer::deserializeFogEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs) {
+inline flecs::entity Serializer::deserializeFogEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs) {
     
-    auto fog_id = deserializeInt(buffer, offset);
+   /* auto fog_id = deserializeInt(buffer, offset);*/
     auto position = deserializePosition(buffer, offset);
     auto size = deserializeSize(buffer, offset);
     auto visibility = deserializeVisibility(buffer, offset);
 
-    auto fog = ecs.entity(fog_id)
+    auto fog = ecs.entity()
         .set<Position>(position)
         .set<Size>(size)
         .set<Visibility>(visibility);
@@ -133,32 +133,36 @@ inline flecs::entity Serializer::deserializeFogEntity(const std::vector<unsigned
 }
 
 
-inline void Serializer::serializeGameTableEntity(std::vector<unsigned char>& buffer, const flecs::entity entity)
+inline void Serializer::serializeGameTableEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
     auto game_table = entity.get<GameTable>();
-    auto game_table_id = entity.id();
+    //auto game_table_id = entity.id();
 
-    serializeInt(buffer, game_table_id);
+    //serializeInt(buffer, game_table_id);
     serializeGameTable(buffer, game_table);
 
     int boardCount = 0;
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<Board>()) {
             boardCount++;
         }
     });
+    ecs.defer_end();
     Serializer::serializeInt(buffer, boardCount);
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
-        serializeBoardEntity(buffer, child);
+        serializeBoardEntity(buffer, child, ecs);
     });
+    ecs.defer_end();
 
 }
 
-inline flecs::entity Serializer::deserializeGameTableEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs)
+inline flecs::entity Serializer::deserializeGameTableEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
 {
-    auto game_table_id = deserializeInt(buffer, offset);
+    //auto game_table_id = deserializeInt(buffer, offset);
     auto game_table = deserializeGameTable(buffer, offset);
-    auto game_table_entity = ecs.entity(game_table_id).set<GameTable>(game_table);
+    auto game_table_entity = ecs.entity().set<GameTable>(game_table);
 
     int board_count = Serializer::deserializeInt(buffer, offset);
     for (int i = 1; i <= board_count; i++) {
@@ -169,7 +173,7 @@ inline flecs::entity Serializer::deserializeGameTableEntity(const std::vector<un
     return game_table_entity;
 }
 
-inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer, const flecs::entity entity)
+inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
     auto boardData = entity.get<Board>();
     auto panning = entity.get<Panning>();
@@ -177,10 +181,10 @@ inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer,
     auto grid = entity.get<Grid>();
     auto texture = entity.get<TextureComponent>();
     auto size = entity.get<Size>();
-    auto board_id = entity.id();
+    //auto board_id = entity.id();
 
 
-    Serializer::serializeInt(buffer, board_id);
+    //Serializer::serializeInt(buffer, board_id);
     Serializer::serializeBoard(buffer, boardData);
     Serializer::serializePanning(buffer, panning);
     Serializer::serializePosition(buffer, position);
@@ -190,38 +194,46 @@ inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer,
 
     // Serialize markers
     int markerCount = 0;
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<MarkerComponent>()) {
             markerCount++;
         }
      });
+    ecs.defer_end();
     Serializer::serializeInt(buffer, markerCount);
     // Serialize each marker's data
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<MarkerComponent>()) {
-            serializeMarkerEntity(buffer, child);
+            serializeMarkerEntity(buffer, child, ecs);
         }
     });
+    ecs.defer_end();
     // Serialize fog entities
     int fogCount = 0;
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<FogOfWar>()) {
             fogCount++;
         }
     });
+    ecs.defer_end();
     Serializer::serializeInt(buffer, fogCount);
     // Serialize each fog's data
+    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<FogOfWar>()) {
-            serializeFogEntity(buffer, child);
+            serializeFogEntity(buffer, child, ecs);
         }
     });
+    ecs.defer_end();
 }
 
-inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world ecs)
+inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
 {
 
-    auto board_id = Serializer::deserializeInt(buffer, offset);
+    //auto board_id = Serializer::deserializeInt(buffer, offset);
     auto boardData = Serializer::deserializeBoard(buffer, offset);
     auto panning = Serializer::deserializePanning(buffer, offset);
     auto position = Serializer::deserializePosition(buffer, offset);
@@ -229,7 +241,7 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
     auto texture = Serializer::deserializeTextureComponent(buffer, offset);
     auto size = Serializer::deserializeSize(buffer, offset);
 
-    auto newBoard = ecs.entity(board_id)
+    auto newBoard = ecs.entity()
         .set<Board>(boardData)
         .set<Panning>(panning)
         .set<Position>(position)
@@ -243,6 +255,7 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
         auto marker = deserializeMarkerEntity(buffer, offset, ecs);
         marker.add<MarkerComponent>();
         marker.add(flecs::ChildOf, newBoard);
+
     }
 
     // Deserialize fog entities
