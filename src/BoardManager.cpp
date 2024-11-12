@@ -312,6 +312,31 @@ glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
     return glm::vec2(world_position.x, world_position.y);
 }
 
+// Generates a unique 64-bit ID
+uint64_t BoardManager::generateUniqueId() {
+    static std::atomic<uint64_t> counter{0};            // Atomic counter for thread safety
+    static std::mt19937_64 rng(std::random_device{}()); // Random number generator
+    static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
+
+    uint64_t random_part = dist(rng);                   // Generate a random 64-bit number
+    uint64_t unique_id = (random_part & 0xFFFFFFFFFFFF0000) | (counter++ & 0xFFFF);  // Combine random and counter
+
+    return unique_id;
+}
+
+// Finds an entity by its Identifier component with the specified ID
+flecs::entity BoardManager::findEntityById(uint64_t target_id) {
+    flecs::entity result;
+
+    // Iterate over all entities with Identifier component
+    ecs_.each<Identifier>([&](flecs::entity e, Identifier& identifier) {
+        if (identifier.id == target_id) {
+            result = e;  // Store matching entity
+        }
+    });
+
+    return result;  // Returns the found entity, or an empty entity if not found
+}
 
 glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
     // Step 1: Get the combined MVP matrix
