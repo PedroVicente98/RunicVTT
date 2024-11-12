@@ -44,6 +44,7 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
 {   
     //Texture texture = Texture(map_image_path);
     auto board = ecs.entity()
+        .set(Identifier{ generateUniqueId() })
         .set(Board{ board_name })
         .set(Panning{false})
         .set(Position{0,0})
@@ -239,6 +240,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size) {
 
     flecs::entity marker = ecs.entity()
+        .set(Identifier{ generateUniqueId() })
         .set(Position{ (int)position.x, (int)position.y }) //World Position
         .set(Size{ size.x , size.y })
         .set(TextureComponent{ textureId , imageFilePath, size })
@@ -449,6 +451,7 @@ void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
 
 flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
     auto fog = ecs.entity()
+        .set(Identifier{ generateUniqueId() })
         .set(Position{ (int)startPos.x, (int)startPos.y })
         .set(Size{ size.x, size.y })
         .set(Visibility{ true });
