@@ -15,7 +15,7 @@ public:
     static void serializeBool(std::vector<unsigned char>& buffer, bool value);
     static void serializeString(std::vector<unsigned char>& buffer, const std::string& str);
     static void serializeVec2(std::vector<unsigned char>& buffer, const glm::vec2& vec);
-    static void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value);
+    static void serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value);
 
     // Deserialize methods for basic types
     static int deserializeInt(const std::vector<unsigned char>& buffer, size_t& offset);
@@ -23,7 +23,7 @@ public:
     static bool deserializeBool(const std::vector<unsigned char>& buffer, size_t& offset);
     static std::string deserializeString(const std::vector<unsigned char>& buffer, size_t& offset);
     static glm::vec2 deserializeVec2(const std::vector<unsigned char>& buffer, size_t& offset);
-    static uint64_t Serializer::deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset);
+    static uint64_t deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset);
 
     // Serialize methods for components
     static void serializePosition(std::vector<unsigned char>& buffer, const Position* position);

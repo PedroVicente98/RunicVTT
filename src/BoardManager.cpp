@@ -14,6 +14,9 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Components.h"
 #include <filesystem>
+#include <random>    // For random number generation
+#include <atomic>    // For atomic counter
+#include <cstdint>   // For uint64_t and UINT64_MAX
 
 BoardManager::BoardManager(flecs::world ecs, NetworkManager* network_manager, DirectoryWindow* map_directory)
     : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), map_directory(map_directory), network_manager(network_manager) {
@@ -331,7 +334,7 @@ flecs::entity BoardManager::findEntityById(uint64_t target_id) {
     flecs::entity result;
 
     // Iterate over all entities with Identifier component
-    ecs_.each<Identifier>([&](flecs::entity e, Identifier& identifier) {
+    ecs.each<Identifier>([&](flecs::entity e, Identifier& identifier) {
         if (identifier.id == target_id) {
             result = e;  // Store matching entity
         }

@@ -25,9 +25,7 @@ enum class MessageType {
     ChatMessage,
     CreateBoard,
     GamestateStart,
-    GamestateEnd,
-    PeerDiscovery,  // New message type for requesting peer discovery
-    PeerList        // New message type for responding with a list of peers
+    GamestateEnd
 };
 
 struct Message {
