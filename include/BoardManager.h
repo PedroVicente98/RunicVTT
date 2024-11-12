@@ -133,6 +133,12 @@ public:
     glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
     glm::vec2 worldToScreenPosition(glm::vec2 world_position);
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
+    
+    // Generates a unique 64-bit ID
+    uint64_t generateUniqueId();
+    // Finds an entity by its Identifier component with the specified ID
+    flecs::entity findEntityById(uint64_t target_id);
+
 
     //Network 
     void sendGameState();
