@@ -18,6 +18,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string rootDirec
     ecs.component<GameTable>();
     ecs.component<Network>();
     ecs.component<Notes>();
+    ecs.component<Identifier>();
     //ecs.component<ToolComponent>();
    
 }
