@@ -9,6 +9,13 @@
 #include "flecs.h"
 #include <shared_mutex>
 
+
+
+// Identifier Component
+struct Identifier {
+    uint64_t id;  // Unique identifier for each entity
+};
+
 // Position Component
 struct Position {
     int x;
