@@ -15,6 +15,7 @@ public:
     static void serializeBool(std::vector<unsigned char>& buffer, bool value);
     static void serializeString(std::vector<unsigned char>& buffer, const std::string& str);
     static void serializeVec2(std::vector<unsigned char>& buffer, const glm::vec2& vec);
+    static void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value);
 
     // Deserialize methods for basic types
     static int deserializeInt(const std::vector<unsigned char>& buffer, size_t& offset);
@@ -22,6 +23,7 @@ public:
     static bool deserializeBool(const std::vector<unsigned char>& buffer, size_t& offset);
     static std::string deserializeString(const std::vector<unsigned char>& buffer, size_t& offset);
     static glm::vec2 deserializeVec2(const std::vector<unsigned char>& buffer, size_t& offset);
+    static uint64_t Serializer::deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset);
 
     // Serialize methods for components
     static void serializePosition(std::vector<unsigned char>& buffer, const Position* position);
@@ -74,9 +76,9 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
     auto texture = entity.get<TextureComponent>();
     auto visibility = entity.get<Visibility>();
     auto moving = entity.get<Moving>();
-    //auto marker_id = entity.id();
+    auto identifier = entity.get<Identifier>();
 
-    //serializeInt(buffer, marker_id);
+    serializeUInt64(buffer, identifier->id);  
     serializePosition(buffer, position);
     serializeSize(buffer, size);
     serializeMoving(buffer, moving);
@@ -87,7 +89,7 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
 
 inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs) {
 
-    //auto marker_id = deserializeInt(buffer, offset);
+    uint64_t marker_id = Serializer::deserializeUInt64(buffer, offset);
     auto position = deserializePosition(buffer, offset);
     auto size = deserializeSize(buffer, offset);
     auto moving = deserializeMoving(buffer, offset);
@@ -95,6 +97,7 @@ inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsig
     auto texture = deserializeTextureComponent(buffer, offset);
 
     auto marker = ecs.entity()
+        .set<Identifier>({ marker_id })
         .set<Position>(position)
         .set<Size>(size)
         .set<Moving>(moving)
@@ -109,9 +112,9 @@ inline void Serializer::serializeFogEntity(std::vector<unsigned char>& buffer, c
     auto position = entity.get<Position>();
     auto size = entity.get<Size>();
     auto visibility = entity.get<Visibility>();
- /*   auto fog_id = entity.id();
+    auto identifier = entity.get<Identifier>();
 
-    serializeInt(buffer, fog_id);*/
+    serializeUInt64(buffer, identifier->id);  
     serializePosition(buffer, position);
     serializeSize(buffer, size);
     serializeVisibility(buffer, visibility);
@@ -119,12 +122,13 @@ inline void Serializer::serializeFogEntity(std::vector<unsigned char>& buffer, c
 
 inline flecs::entity Serializer::deserializeFogEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs) {
     
-   /* auto fog_id = deserializeInt(buffer, offset);*/
+    uint64_t fog_id = Serializer::deserializeUInt64(buffer, offset);
     auto position = deserializePosition(buffer, offset);
     auto size = deserializeSize(buffer, offset);
     auto visibility = deserializeVisibility(buffer, offset);
 
     auto fog = ecs.entity()
+        .set<Identifier>({ fog_id })
         .set<Position>(position)
         .set<Size>(size)
         .set<Visibility>(visibility);
@@ -181,10 +185,9 @@ inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer,
     auto grid = entity.get<Grid>();
     auto texture = entity.get<TextureComponent>();
     auto size = entity.get<Size>();
-    //auto board_id = entity.id();
+    auto identifier = entity.get<Identifier>();
 
-
-    //Serializer::serializeInt(buffer, board_id);
+    Serializer::serializeUInt64(buffer, identifier->id);  
     Serializer::serializeBoard(buffer, boardData);
     Serializer::serializePanning(buffer, panning);
     Serializer::serializePosition(buffer, position);
@@ -233,7 +236,7 @@ inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer,
 inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
 {
 
-    //auto board_id = Serializer::deserializeInt(buffer, offset);
+    uint64_t board_id = Serializer::deserializeUInt64(buffer, offset);
     auto boardData = Serializer::deserializeBoard(buffer, offset);
     auto panning = Serializer::deserializePanning(buffer, offset);
     auto position = Serializer::deserializePosition(buffer, offset);
@@ -242,6 +245,7 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
     auto size = Serializer::deserializeSize(buffer, offset);
 
     auto newBoard = ecs.entity()
+        .set<Identifier>({ board_id })
         .set<Board>(boardData)
         .set<Panning>(panning)
         .set<Position>(position)
@@ -293,6 +297,16 @@ inline void Serializer::serializeString(std::vector<unsigned char>& buffer, cons
 inline void Serializer::serializeVec2(std::vector<unsigned char>& buffer, const glm::vec2& vec) {
     serializeFloat(buffer, vec.x);
     serializeFloat(buffer, vec.y);
+}
+
+inline void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value) {
+    buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint64_t));
+}
+
+inline uint64_t Serializer::deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset) {
+    uint64_t value = *reinterpret_cast<const uint64_t*>(&buffer[offset]);
+    offset += sizeof(uint64_t);
+    return value;
 }
 
 inline int Serializer::deserializeInt(const std::vector<unsigned char>& buffer, size_t& offset) {
