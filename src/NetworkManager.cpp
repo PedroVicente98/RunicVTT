@@ -17,7 +17,7 @@ NetworkManager::~NetworkManager() {
     }
 }
 
-void NetworkManager::startServer(unsigned short port) {
+void NetworkManager::startServer(unsigned short port, bool connected_peer) {
 
     auto ip_address = getLocalIPAddress();
     if (ip_address == "No valid local IPv4 address found" || ip_address.find("Unable to retrieve IP") == 0) {
@@ -30,7 +30,12 @@ void NetworkManager::startServer(unsigned short port) {
     acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
-    peer_role = Role::GAMEMASTER;
+    if (connected_peer) {
+        peer_role = Role::PLAYER;
+    }
+    else {
+        peer_role = Role::GAMEMASTER;
+    }
     acceptConnections();  // Start accepting connections
     //allowPort(port);
     std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
@@ -41,6 +46,7 @@ void NetworkManager::stopServer() {
     if (acceptor_.is_open()) {
         acceptor_.close();  // Close the acceptor to stop accepting connections
     }
+    connectedPeers.clear();
 }
 
 // Start/Stop END ---------------------------------------------------------------------- END
@@ -406,7 +412,7 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
             }
 
             if (!acceptor_.is_open()) {
-                startServer(port);
+                startServer(port, true);
             }
             // Send the password to the server
             sendPassword(socket, password);

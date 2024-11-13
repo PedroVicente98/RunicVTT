@@ -68,7 +68,7 @@ public:
     ~NetworkManager();
 
     // Server control methods
-    void startServer(unsigned short port);   // Start the server (server start)
+    void startServer(unsigned short port, bool connected_peer = false);   // Start the server (server start)
     void stopServer();                       // Stop the server (server stop)
     bool isConnectionOpen() const;           // Check if server is running (status check)
 
