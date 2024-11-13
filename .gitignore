@@ -1,1 +1,7 @@
 .vs
+.vscode/
+.idea/
+nbproject/
+.DS_Store
+x64/
+RunicVTT/
