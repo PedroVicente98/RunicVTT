@@ -13,6 +13,8 @@ NetworkManager::NetworkManager(flecs::world ecs)
 NetworkManager::~NetworkManager() {
     io_context_.stop();
     if (acceptor_.is_open()) {
+        auto port = acceptor_.local_endpoint().port();
+        disallowPort(port);
         acceptor_.close();
     }
 }
@@ -37,7 +39,7 @@ void NetworkManager::startServer(unsigned short port, bool connected_peer) {
         peer_role = Role::GAMEMASTER;
     }
     acceptConnections();  // Start accepting connections
-    //allowPort(port);
+    allowPort(port);
     std::thread([this]() { io_context_.run(); }).detach();  // Run io_context in a separate thread
 }
 
@@ -62,6 +64,20 @@ void NetworkManager::allowPort(int port) {
     system(inboundCommand.c_str());
     system(outboundCommand.c_str());
 }
+
+void NetworkManager::disallowPort(unsigned short port) {
+    std::string portStr = std::to_string(port);
+
+    // Remove inbound rule for the specified port
+    std::string inboundCommand = "powershell -Command \"Remove-NetFirewallRule -DisplayName 'Allow TCP Inbound on Port " + portStr + "'\"";
+
+    // Remove outbound rule for the specified port
+    std::string outboundCommand = "powershell -Command \"Remove-NetFirewallRule -DisplayName 'Allow TCP Outbound on Port " + portStr + "'\"";
+
+    system(inboundCommand.c_str());
+    system(outboundCommand.c_str());
+}
+
 
 bool NetworkManager::isConnectionOpen() const {
     return acceptor_.is_open();  // Return true if the acceptor is open

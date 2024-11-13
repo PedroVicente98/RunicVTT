@@ -110,7 +110,7 @@ public:
     void sendDisconnectMessage(std::shared_ptr<asio::ip::tcp::socket> socket, const std::string& reason);
 
     void allowPort(int port);
-
+    void disallowPort(unsigned short port);
 
     // Utility methods
     std::string getNetworkInfo();     // Get network info (IP and port) (server utility)
