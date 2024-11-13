@@ -27,7 +27,6 @@ void NetworkManager::startServer(unsigned short port, bool connected_peer) {
         return;
     }
     asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip_address), port);
-    //asio::ip::tcp::endpoint endpoint(asio::ip::tcp::v4(), port);
     acceptor_.open(endpoint.protocol());
     acceptor_.set_option(asio::ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
@@ -321,65 +320,6 @@ Message NetworkManager::deserializeMessage(const std::vector<unsigned char>& buf
 
 //Message Operations END ------------------------------------------------------------------------------------- END
 
-//
-////Connect to Peer Operations ---------------------------------------------------------------------------------
-//bool NetworkManager::connectToPeer(const std::string& connection_string) {
-//    std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
-//    std::smatch match;
-//
-//    // Parse the connection string using regex
-//    if (std::regex_match(connection_string, match, rgx)) {
-//        std::string ip = match[1];             // Extract the IP address
-//        unsigned short port = std::stoi(match[2]);  // Extract the port
-//        std::string password = match[3];       // Extract the optional password
-//
-//        // Establish a connection using ASIO
-//        try {
-//            asio::ip::tcp::resolver resolver(io_context_);
-//            auto socket = std::make_shared<asio::ip::tcp::socket>(io_context_);
-//            asio::ip::tcp::endpoint endpoint(asio::ip::make_address(ip), port);
-//
-//            // Perform a synchronous connect operation
-//            socket->connect(endpoint);
-//
-//            std::cout << "Successfully connected to server at " << ip << ":" << port << std::endl;
-//
-//            if (socket->is_open()) {
-//                auto port = socket->local_endpoint().port();
-//                std::cout << "Connection established. Socket is open." << std::endl;
-//                std::cout << "Local IP: " << socket->local_endpoint().address().to_string()
-//                    << " | Local Port: " << port << std::endl;
-//                std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
-//                    << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
-//
-//                allowPort(port);
-//            }
-//
-//            // Send the password to the server
-//            sendPassword(socket, password);
-//
-//            // Start receiving messages from the server (this remains asynchronous)
-//            startReceiving(socket);
-//            
-//            if (socket->is_open()) {
-//                connectedPeers.emplace(socket->remote_endpoint().address().to_string(), socket);
-//            }
-//
-//            return true;
-//
-//        }
-//        catch (std::exception& e) {
-//            std::cerr << "Failed to connect: " << e.what() << std::endl;
-//            return false;
-//        }
-//
-//    }
-//    else {
-//        std::cerr << "Invalid connection string format!" << std::endl;
-//        return false;
-//    }
-//}
-
 bool NetworkManager::connectToPeer(const std::string& connection_string) {
     std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
     std::smatch match;
@@ -424,7 +364,6 @@ bool NetworkManager::connectToPeer(const std::string& connection_string) {
                 std::cout << "Connected to: " << socket->remote_endpoint().address().to_string()
                     << " | Remote Port: " << socket->remote_endpoint().port() << std::endl;
 
-                //allowPort(local_port);  // Ensure the port is open on the firewall
             }
 
             if (!acceptor_.is_open()) {
@@ -517,6 +456,9 @@ void NetworkManager::acceptConnections() {
     acceptor_.async_accept(*socket, [this, socket](asio::error_code ec) {
         if (!ec) {
             handlePeerConnected(socket);
+        }
+        else {
+            std::cerr << "ERROR CONNECTING PEER: " << ec.message() << std::endl;
         }
         acceptConnections();  // Continue accepting new connections
         });
