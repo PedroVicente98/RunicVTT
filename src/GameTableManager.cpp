@@ -348,6 +348,11 @@ void GameTableManager::createGameTablePopUp()
 
         if (ImGui::Button("Save") && strlen(buffer) > 0 && strlen(port_buffer) > 0)
         {
+
+            board_manager.closeBoard();
+            active_game_table = flecs::entity();
+            network_manager.stopServer();
+
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
             createGameTableFile(game_table);
@@ -691,6 +696,10 @@ void GameTableManager::loadGameTablePopUp() {
         for (auto& game_table : game_tables) {
             if (ImGui::Button(game_table.c_str()) && strlen(port_buffer) > 0)
             {
+                board_manager.closeBoard();
+                active_game_table = flecs::entity();
+                network_manager.stopServer();
+
                 std::string suffix = ".runic";
                 size_t pos = game_table.rfind(suffix);  // Find the position of ".runic"
                 if (pos != std::string::npos && pos == game_table.length() - suffix.length()) {
