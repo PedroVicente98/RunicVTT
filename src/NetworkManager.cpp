@@ -56,13 +56,36 @@ void NetworkManager::stopServer() {
 
 
 
-void NetworkManager::allowPort(int port) {
+/*void NetworkManager::allowPort(int port) {
     std::string inboundCommand = "powershell.exe New-NetFirewallRule -DisplayName 'Allow TCP Inbound on Port " + std::to_string(port) + "' -Direction Inbound -Action Allow -Protocol TCP -LocalPort " + std::to_string(port);
     std::string outboundCommand = "powershell.exe New-NetFirewallRule -DisplayName 'Allow TCP Outbound on Port " + std::to_string(port) + "' -Direction Outbound -Action Allow -Protocol TCP -LocalPort " + std::to_string(port);
 
     system(inboundCommand.c_str());
     system(outboundCommand.c_str());
+}*/
+
+void NetworkManager::allowPort(int port) {
+    std::string portStr = std::to_string(port);
+
+    // Check if the rule already exists
+    std::string checkCommand = 
+        "powershell.exe -Command \"if (-not(Get-NetFirewallRule -DisplayName 'Allow TCP Inbound on Port " 
+        + portStr + "' -ErrorAction SilentlyContinue)) { "
+        "New-NetFirewallRule -DisplayName 'Allow TCP Inbound on Port " + portStr + "' "
+        "-Direction Inbound -Action Allow -Protocol TCP -LocalPort " + portStr + " -Profile Any -RemoteAddress Any }\"";
+
+    system(checkCommand.c_str());
+
+    // Create outbound rule if it doesn’t exist
+    checkCommand = 
+        "powershell.exe -Command \"if (-not(Get-NetFirewallRule -DisplayName 'Allow TCP Outbound on Port " 
+        + portStr + "' -ErrorAction SilentlyContinue)) { "
+        "New-NetFirewallRule -DisplayName 'Allow TCP Outbound on Port " + portStr + "' "
+        "-Direction Outbound -Action Allow -Protocol TCP -LocalPort " + portStr + " -Profile Any -RemoteAddress Any }\"";
+
+    system(checkCommand.c_str());
 }
+
 
 void NetworkManager::disallowPort(unsigned short port) {
     std::string portStr = std::to_string(port);
