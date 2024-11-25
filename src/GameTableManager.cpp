@@ -492,6 +492,7 @@ void GameTableManager::closeGameTablePopUp()
             board_manager.closeBoard();
             active_game_table = flecs::entity();
             network_manager.stopServer();
+            chat.clearChat();
             ImGui::CloseCurrentPopup();
         }
 

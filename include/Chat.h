@@ -22,6 +22,9 @@ public:
         //std::function<void()> onClick;  // Action for link
     };
 
+    void clearChat() {
+        messages.clear();
+    }
 
     std::vector<Message> messages;  
 
