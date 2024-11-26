@@ -85,6 +85,11 @@ void setWindowIcon(GLFWwindow* window, const char* iconPath) {
 }
 
 int main() {
+
+#ifndef _DEBUG
+    // Hide the console window in Release mode
+    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+#endif
     // Inicializa o contexto OpenGL
     GLFWwindow* window = initializeOpenGLContext();
     if (!window) {
