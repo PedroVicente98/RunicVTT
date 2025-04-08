@@ -1,0 +1,117 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"vendor/flecs/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 82,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 89,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 95,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "include",
+			"paths" : 
+			[
+				{
+					"from" : "vendor/flecs/include",
+					"to" : "."
+				}
+			],
+			"type" : "directory"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/flecs/flecs.lib"
+			],
+			"targetId" : "flecs::@ec2b73370464d765193b",
+			"targetIndex" : 14,
+			"targetIsImportLibrary" : true,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "bin",
+			"paths" : 
+			[
+				"C:/Dev/RunicVTT/bin/flecs.dll"
+			],
+			"targetId" : "flecs::@ec2b73370464d765193b",
+			"targetIndex" : 14,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/flecs/flecs_static.lib"
+			],
+			"targetId" : "flecs_static::@ec2b73370464d765193b",
+			"targetIndex" : 15,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/flecs",
+			"exportName" : "flecs-export",
+			"exportTargets" : 
+			[
+				{
+					"id" : "flecs::@ec2b73370464d765193b",
+					"index" : 14
+				},
+				{
+					"id" : "flecs_static::@ec2b73370464d765193b",
+					"index" : 15
+				}
+			],
+			"paths" : 
+			[
+				"vendor/flecs/CMakeFiles/Export/dd2a5a6f66f0d12b1be0feafeb08c769/flecs-config.cmake"
+			],
+			"type" : "export"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "vendor/flecs",
+		"source" : "vendor/flecs"
+	}
+}

@@ -49,11 +49,11 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    // 🔹 Flecs Init
-    flecs::world ecs;
-    ecs.entity("MyEntity").set([] {
-        std::cout << "[Flecs] Entity created successfully ✅\n";
-        });
+    //// 🔹 Flecs Init
+    //flecs::world ecs;
+    //ecs.entity("MyEntity").set([] {
+    //    std::cout << "[Flecs] Entity created successfully ✅\n";
+    //    });
 
     // 🔹 WebRTC Init (Dummy Test)
     rtc::Configuration config;

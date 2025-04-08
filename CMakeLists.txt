@@ -50,12 +50,23 @@ add_subdirectory(vendor/libdatachannel)
 target_link_libraries(RunicVTT PRIVATE datachannel)
 
 # ----------------------
+# GLFW (Static)
+# ----------------------
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
+add_subdirectory(vendor/glfw)
+target_link_libraries(RunicVTT PRIVATE glfw)
+
+# ----------------------
 # GLEW (Static)
 # ----------------------
 target_link_libraries(RunicVTT PRIVATE
     ${CMAKE_SOURCE_DIR}/dependencies/GLEW/lib/Release/x64/glew32s.lib
 )
 target_compile_definitions(RunicVTT PRIVATE GLEW_STATIC)
+target_link_libraries(RunicVTT PRIVATE opengl32)
 
 # ----------------------
 # Flecs (Static)

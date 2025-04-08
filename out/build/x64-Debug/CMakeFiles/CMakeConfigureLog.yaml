@@ -8,3 +8,1422 @@ events:
       - "CMakeLists.txt:2 (project)"
     message: |
       The system is: Windows - 10.0.22631 - AMD64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      Microsoft (R) C/C++ Optimizing Compiler Versão 19.43.34809 para x64
+      Copyright (C) Microsoft Corporation. Todos os direitos reservados.
+      
+      CMakeCXXCompilerId.cpp
+      Microsoft (R) Incremental Linker Version 14.43.34809.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+      
+      /out:CMakeCXXCompilerId.exe 
+      CMakeCXXCompilerId.obj 
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.exe"
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.obj"
+      
+      The CXX compiler identification is MSVC, found in:
+        C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/3.30.5-msvc23/CompilerIdCXX/CMakeCXXCompilerId.exe
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:1243 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:250 (CMAKE_DETERMINE_MSVC_SHOWINCLUDES_PREFIX)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Detecting CXX compiler /showIncludes prefix:
+        main.c
+        Observação: incluindo arquivo: C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\ShowIncludes\\foo.h
+        
+      Found prefix "Observação: incluindo arquivo: "
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:74 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-l82vap"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-l82vap"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-l82vap'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_a01e6
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_a01e6.dir\\CMakeCXXCompilerABI.cpp.obj /FdCMakeFiles\\cmTC_a01e6.dir\\ /FS -c "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.30\\Modules\\CMakeCXXCompilerABI.cpp"
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_a01e6.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_a01e6.dir\\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_a01e6.exe /implib:cmTC_a01e6.lib /pdb:cmTC_a01e6.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:218 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'CXX': C:/PROGRA~1/MICROS~3/2022/COMMUN~1/VC/Tools/MSVC/1443~1.348/bin/Hostx64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CMakeDetermineLinkerId.cmake:40 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:255 (cmake_determine_linker_id)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Running the CXX compiler's linker: "C:/PROGRA~1/MICROS~3/2022/COMMUN~1/VC/Tools/MSVC/1443~1.348/bin/Hostx64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.43.34809.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckCXXSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:99 (CHECK_CXX_SOURCE_COMPILES)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "vendor/libdatachannel/CMakeLists.txt:284 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-isjqaq"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-isjqaq"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-isjqaq'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_56ee7
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_56ee7.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_56ee7.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-isjqaq\\src.cxx
+        FAILED: CMakeFiles/cmTC_56ee7.dir/src.cxx.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP -DCMAKE_HAVE_LIBC_PTHREAD  /DWIN32 /D_WINDOWS /EHsc  /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_56ee7.dir\\src.cxx.obj /FdCMakeFiles\\cmTC_56ee7.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-isjqaq\\src.cxx
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-isjqaq\\src.cxx(1): fatal error C1083: Não é possível abrir arquivo incluir: 'pthread.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckLibraryExists.cmake:69 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:112 (CHECK_LIBRARY_EXISTS)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:175 (_threads_check_lib)"
+      - "vendor/libdatachannel/CMakeLists.txt:284 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthreads"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-nd7n6r"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-nd7n6r"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREADS_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-nd7n6r'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_c7c6e
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /EHsc -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_c7c6e.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_c7c6e.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-nd7n6r\\CheckFunctionExists.cxx
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_c7c6e.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c7c6e.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c7c6e.exe /implib:cmTC_c7c6e.lib /pdb:cmTC_c7c6e.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_c7c6e.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_c7c6e.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c7c6e.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_c7c6e.exe /implib:cmTC_c7c6e.lib /pdb:cmTC_c7c6e.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthreads.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_c7c6e.dir\\CheckFunctionExists.cxx.obj /out:cmTC_c7c6e.exe /implib:cmTC_c7c6e.lib /pdb:cmTC_c7c6e.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthreads.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_c7c6e.dir/intermediate.manifest CMakeFiles\\cmTC_c7c6e.dir/manifest.res" failed (exit code 1104) with the following output:
+        LINK : fatal error LNK1104: não é possível abrir o arquivo 'pthreads.lib'\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckLibraryExists.cmake:69 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:112 (CHECK_LIBRARY_EXISTS)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/FindThreads.cmake:176 (_threads_check_lib)"
+      - "vendor/libdatachannel/CMakeLists.txt:284 (find_package)"
+    checks:
+      - "Looking for pthread_create in pthread"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-kmb14v"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-kmb14v"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "/DWIN32 /D_WINDOWS /EHsc"
+      CMAKE_CXX_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "CMAKE_HAVE_PTHREAD_CREATE"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-kmb14v'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_53666
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo /TP   /DWIN32 /D_WINDOWS /EHsc -DCHECK_FUNCTION_EXISTS=pthread_create /Zi /Ob0 /Od /RTC1 -std:c++20 -MDd /showIncludes /FoCMakeFiles\\cmTC_53666.dir\\CheckFunctionExists.cxx.obj /FdCMakeFiles\\cmTC_53666.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-kmb14v\\CheckFunctionExists.cxx
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_53666.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_53666.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_53666.exe /implib:cmTC_53666.lib /pdb:cmTC_53666.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_53666.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_53666.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_53666.dir\\CheckFunctionExists.cxx.obj  /out:cmTC_53666.exe /implib:cmTC_53666.lib /pdb:cmTC_53666.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  pthread.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_53666.dir\\CheckFunctionExists.cxx.obj /out:cmTC_53666.exe /implib:cmTC_53666.lib /pdb:cmTC_53666.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console pthread.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_53666.dir/intermediate.manifest CMakeFiles\\cmTC_53666.dir/manifest.res" failed (exit code 1104) with the following output:
+        LINK : fatal error LNK1104: não é possível abrir o arquivo 'pthread.lib'\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:32 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.43.34808/bin/Hostx64/x64/cl.exe 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      0
+      Microsoft (R) C/C++ Optimizing Compiler Versão 19.43.34809 para x64
+      Copyright (C) Microsoft Corporation. Todos os direitos reservados.
+      
+      CMakeCCompilerId.c
+      Microsoft (R) Incremental Linker Version 14.43.34809.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+      
+      /out:CMakeCCompilerId.exe 
+      CMakeCCompilerId.obj 
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.exe"
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "CMakeCCompilerId.obj"
+      
+      The C compiler identification is MSVC, found in:
+        C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/3.30.5-msvc23/CompilerIdC/CMakeCCompilerId.exe
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:1243 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerId.cmake:250 (CMAKE_DETERMINE_MSVC_SHOWINCLUDES_PREFIX)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:32 (project)"
+    message: |
+      Detecting C compiler /showIncludes prefix:
+        main.c
+        Observação: incluindo arquivo: C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\ShowIncludes\\foo.h
+        
+      Found prefix "Observação: incluindo arquivo: "
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:74 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:32 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ybr00k"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ybr00k"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ybr00k'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_cf2d2
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_cf2d2.dir\\CMakeCCompilerABI.c.obj /FdCMakeFiles\\cmTC_cf2d2.dir\\ /FS -c "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\share\\cmake-3.30\\Modules\\CMakeCCompilerABI.c"
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_cf2d2.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_cf2d2.dir\\CMakeCCompilerABI.c.obj  /out:cmTC_cf2d2.exe /implib:cmTC_cf2d2.lib /pdb:cmTC_cf2d2.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:218 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:32 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?|link\\.exe|lld-link(\\.exe)?))("|,| |$)]
+        linker tool for 'C': C:/PROGRA~1/MICROS~3/2022/COMMUN~1/VC/Tools/MSVC/1443~1.348/bin/Hostx64/x64/link.exe
+        implicit libs: []
+        implicit objs: []
+        implicit dirs: []
+        implicit fwks: []
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CMakeDetermineLinkerId.cmake:40 (message)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeDetermineCompilerABI.cmake:255 (cmake_determine_linker_id)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:32 (project)"
+    message: |
+      Running the C compiler's linker: "C:/PROGRA~1/MICROS~3/2022/COMMUN~1/VC/Tools/MSVC/1443~1.348/bin/Hostx64/x64/link.exe" "-v"
+      Microsoft (R) Incremental Linker Version 14.43.34809.0
+      Copyright (C) Microsoft Corporation.  All rights reserved.
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:93 (check_include_files)"
+    checks:
+      - "Looking for include file sys/queue.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-d2vwnt"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-d2vwnt"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_sys_queue_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-d2vwnt'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_9d2bb
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_9d2bb.dir\\have_sys_queue_h.c.obj /FdCMakeFiles\\cmTC_9d2bb.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-d2vwnt\\have_sys_queue_h.c
+        FAILED: CMakeFiles/cmTC_9d2bb.dir/have_sys_queue_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_9d2bb.dir\\have_sys_queue_h.c.obj /FdCMakeFiles\\cmTC_9d2bb.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-d2vwnt\\have_sys_queue_h.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-d2vwnt\\have_sys_queue_h.c(2): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/queue.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:98 (check_include_files)"
+    checks:
+      - "Looking for include files sys/socket.h, linux/if_addr.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-3s087l"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-3s087l"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_linux_if_addr_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-3s087l'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_37015
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_37015.dir\\have_linux_if_addr_h.c.obj /FdCMakeFiles\\cmTC_37015.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-3s087l\\have_linux_if_addr_h.c
+        FAILED: CMakeFiles/cmTC_37015.dir/have_linux_if_addr_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_37015.dir\\have_linux_if_addr_h.c.obj /FdCMakeFiles\\cmTC_37015.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-3s087l\\have_linux_if_addr_h.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-3s087l\\have_linux_if_addr_h.c(2): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/socket.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:103 (check_include_files)"
+    checks:
+      - "Looking for include files sys/socket.h, linux/rtnetlink.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s5zzt3"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s5zzt3"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_linux_rtnetlink_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s5zzt3'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_43da6
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_43da6.dir\\have_linux_rtnetlink_h.c.obj /FdCMakeFiles\\cmTC_43da6.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-s5zzt3\\have_linux_rtnetlink_h.c
+        FAILED: CMakeFiles/cmTC_43da6.dir/have_linux_rtnetlink_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_43da6.dir\\have_linux_rtnetlink_h.c.obj /FdCMakeFiles\\cmTC_43da6.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-s5zzt3\\have_linux_rtnetlink_h.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-s5zzt3\\have_linux_rtnetlink_h.c(2): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/socket.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:108 (check_include_files)"
+    checks:
+      - "Looking for 4 include files sys/types.h, ..., netinet/ip_icmp.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-7avbui"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-7avbui"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_netinet_ip_icmp_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-7avbui'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_80681
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_80681.dir\\have_netinet_ip_icmp_h.c.obj /FdCMakeFiles\\cmTC_80681.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-7avbui\\have_netinet_ip_icmp_h.c
+        FAILED: CMakeFiles/cmTC_80681.dir/have_netinet_ip_icmp_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_80681.dir\\have_netinet_ip_icmp_h.c.obj /FdCMakeFiles\\cmTC_80681.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-7avbui\\have_netinet_ip_icmp_h.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-7avbui\\have_netinet_ip_icmp_h.c(3): fatal error C1083: Não é possível abrir arquivo incluir: 'netinet/in.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:113 (check_include_files)"
+    checks:
+      - "Looking for 3 include files sys/types.h, ..., net/route.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-4tjvkm"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-4tjvkm"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_net_route_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-4tjvkm'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_1210b
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_1210b.dir\\have_net_route_h.c.obj /FdCMakeFiles\\cmTC_1210b.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-4tjvkm\\have_net_route_h.c
+        FAILED: CMakeFiles/cmTC_1210b.dir/have_net_route_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_1210b.dir\\have_net_route_h.c.obj /FdCMakeFiles\\cmTC_1210b.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-4tjvkm\\have_net_route_h.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-4tjvkm\\have_net_route_h.c(3): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/socket.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFiles.cmake:132 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:118 (check_include_files)"
+    checks:
+      - "Looking for include file stdatomic.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqu664"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqu664"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_stdatomic_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqu664'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_99046
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_99046.dir\\have_stdatomic_h.c.obj /FdCMakeFiles\\cmTC_99046.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-oqu664\\have_stdatomic_h.c
+        FAILED: CMakeFiles/cmTC_99046.dir/have_stdatomic_h.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_99046.dir\\have_stdatomic_h.c.obj /FdCMakeFiles\\cmTC_99046.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-oqu664\\have_stdatomic_h.c
+        C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.43.34808\\include\\vcruntime_c11_stdatomic.h(16): fatal error C1189: #error:  "C atomics require C11 or later"
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:130 (check_include_file)"
+    checks:
+      - "Looking for usrsctp.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fgsqj9"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fgsqj9"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_usrsctp_h"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fgsqj9'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_facfd
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo  -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_facfd.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_facfd.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-fgsqj9\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_facfd.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_facfd.dir\\CheckIncludeFile.c.obj  /out:cmTC_facfd.exe /implib:cmTC_facfd.lib /pdb:cmTC_facfd.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:135 (check_struct_has_member)"
+    checks:
+      - "Performing Test have_sa_len"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uw3q2a"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uw3q2a"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_sa_len"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uw3q2a'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_72612
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sa_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_72612.dir\\src.c.obj /FdCMakeFiles\\cmTC_72612.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uw3q2a\\src.c
+        FAILED: CMakeFiles/cmTC_72612.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sa_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_72612.dir\\src.c.obj /FdCMakeFiles\\cmTC_72612.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uw3q2a\\src.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uw3q2a\\src.c(3): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/socket.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:141 (check_struct_has_member)"
+    checks:
+      - "Performing Test have_sin_len"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-k7vqhm"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-k7vqhm"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_sin_len"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-k7vqhm'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_28bc1
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sin_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_28bc1.dir\\src.c.obj /FdCMakeFiles\\cmTC_28bc1.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-k7vqhm\\src.c
+        FAILED: CMakeFiles/cmTC_28bc1.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sin_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_28bc1.dir\\src.c.obj /FdCMakeFiles\\cmTC_28bc1.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-k7vqhm\\src.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-k7vqhm\\src.c(3): fatal error C1083: Não é possível abrir arquivo incluir: 'netinet/in.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:147 (check_struct_has_member)"
+    checks:
+      - "Performing Test have_sin6_len"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-chwg84"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-chwg84"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_sin6_len"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-chwg84'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_55cfc
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sin6_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_55cfc.dir\\src.c.obj /FdCMakeFiles\\cmTC_55cfc.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-chwg84\\src.c
+        FAILED: CMakeFiles/cmTC_55cfc.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sin6_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_55cfc.dir\\src.c.obj /FdCMakeFiles\\cmTC_55cfc.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-chwg84\\src.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-chwg84\\src.c(3): fatal error C1083: Não é possível abrir arquivo incluir: 'netinet/in.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckSourceCompiles.cmake:77 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckStructHasMember.cmake:77 (CHECK_SOURCE_COMPILES)"
+      - "vendor/libdatachannel/deps/usrsctp/CMakeLists.txt:153 (check_struct_has_member)"
+    checks:
+      - "Performing Test have_sconn_len"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2geqhy"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2geqhy"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "have_sconn_len"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2geqhy'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_23602
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sconn_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_23602.dir\\src.c.obj /FdCMakeFiles\\cmTC_23602.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2geqhy\\src.c
+        FAILED: CMakeFiles/cmTC_23602.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhave_sconn_len -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_23602.dir\\src.c.obj /FdCMakeFiles\\cmTC_23602.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2geqhy\\src.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2geqhy\\src.c(6): error C2039: ' sconn_len': não é um membro de 'sockaddr_conn'
+        C:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib\\usrsctp.h(131): note: consulte a declaração de 'sockaddr_conn'
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeLists.txt:72 (check_c_compiler_flag)"
+    checks:
+      - "Performing Test has_wno_address_of_packed_member"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fzpten"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fzpten"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "has_wno_address_of_packed_member"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fzpten'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_35b4d
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhas_wno_address_of_packed_member -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244  /Zi /Ob0 /Od /RTC1 -MDd   -Wno-address-of-packed-member /showIncludes /FoCMakeFiles\\cmTC_35b4d.dir\\src.c.obj /FdCMakeFiles\\cmTC_35b4d.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-fzpten\\src.c
+        FAILED: CMakeFiles/cmTC_35b4d.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhas_wno_address_of_packed_member -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244  /Zi /Ob0 /Od /RTC1 -MDd   -Wno-address-of-packed-member /showIncludes /FoCMakeFiles\\cmTC_35b4d.dir\\src.c.obj /FdCMakeFiles\\cmTC_35b4d.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-fzpten\\src.c
+        cl : Linha de comando error D8021 : argumento numérico inválido '/Wno-address-of-packed-member'
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckCCompilerFlag.cmake:51 (cmake_check_compiler_flag)"
+      - "vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeLists.txt:77 (check_c_compiler_flag)"
+    checks:
+      - "Performing Test has_wno_deprecated_declarations"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0atex5"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0atex5"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/usrsctp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "has_wno_deprecated_declarations"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0atex5'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_36435
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhas_wno_deprecated_declarations -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244  /Zi /Ob0 /Od /RTC1 -MDd   -Wno-deprecated-declarations /showIncludes /FoCMakeFiles\\cmTC_36435.dir\\src.c.obj /FdCMakeFiles\\cmTC_36435.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-0atex5\\src.c
+        FAILED: CMakeFiles/cmTC_36435.dir/src.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -Dhas_wno_deprecated_declarations -IC:\\Dev\\RunicVTT\\vendor\\libdatachannel\\deps\\usrsctp\\usrsctplib /DWIN32 /D_WINDOWS /W4 /wd4100 /wd4127 /wd4200 /wd4214 /wd4706 /wd4245 /wd4389 /wd4702 /wd4701 /wd4244  /Zi /Ob0 /Od /RTC1 -MDd   -Wno-deprecated-declarations /showIncludes /FoCMakeFiles\\cmTC_36435.dir\\src.c.obj /FdCMakeFiles\\cmTC_36435.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-0atex5\\src.c
+        cl : Linha de comando error D8021 : argumento numérico inválido '/Wno-deprecated-declarations'
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:24 (check_include_file)"
+    checks:
+      - "Looking for arpa/inet.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yglwzv"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yglwzv"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_ARPA_INET_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yglwzv'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_19fe9
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_19fe9.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_19fe9.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-yglwzv\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_19fe9.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_19fe9.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_19fe9.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-yglwzv\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-yglwzv\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'arpa/inet.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:25 (check_include_file)"
+    checks:
+      - "Looking for byteswap.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uubyag"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uubyag"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_BYTESWAP_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-uubyag'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_33d2d
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_33d2d.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_33d2d.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uubyag\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_33d2d.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_33d2d.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_33d2d.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uubyag\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-uubyag\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'byteswap.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:26 (check_include_file)"
+    checks:
+      - "Looking for inttypes.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqni6t"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqni6t"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_INTTYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-oqni6t'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_2392f
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_2392f.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_2392f.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-oqni6t\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_2392f.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2392f.dir\\CheckIncludeFile.c.obj  /out:cmTC_2392f.exe /implib:cmTC_2392f.lib /pdb:cmTC_2392f.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:27 (check_include_file)"
+    checks:
+      - "Looking for machine/types.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-heufe6"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-heufe6"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_MACHINE_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-heufe6'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_69295
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_69295.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_69295.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-heufe6\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_69295.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_69295.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_69295.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-heufe6\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-heufe6\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'machine/types.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:28 (check_include_file)"
+    checks:
+      - "Looking for netinet/in.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2hu5nv"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2hu5nv"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_NETINET_IN_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2hu5nv'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_dc239
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_dc239.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_dc239.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2hu5nv\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_dc239.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_dc239.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_dc239.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2hu5nv\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2hu5nv\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'netinet/in.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:29 (check_include_file)"
+    checks:
+      - "Looking for stdint.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-taj2lc"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-taj2lc"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_STDINT_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-taj2lc'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_256fa
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_256fa.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_256fa.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-taj2lc\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_256fa.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_256fa.dir\\CheckIncludeFile.c.obj  /out:cmTC_256fa.exe /implib:cmTC_256fa.lib /pdb:cmTC_256fa.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:30 (check_include_file)"
+    checks:
+      - "Looking for stdlib.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-32dbap"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-32dbap"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_STDLIB_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-32dbap'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_951e4
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_951e4.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_951e4.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-32dbap\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_951e4.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_951e4.dir\\CheckIncludeFile.c.obj  /out:cmTC_951e4.exe /implib:cmTC_951e4.lib /pdb:cmTC_951e4.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:31 (check_include_file)"
+    checks:
+      - "Looking for sys/int_types.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-v61wmp"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-v61wmp"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SYS_INT_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-v61wmp'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_9f1a7
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_9f1a7.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_9f1a7.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-v61wmp\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_9f1a7.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_9f1a7.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_9f1a7.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-v61wmp\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-v61wmp\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/int_types.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:32 (check_include_file)"
+    checks:
+      - "Looking for sys/socket.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ohquza"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ohquza"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SYS_SOCKET_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ohquza'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_43f9a
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_43f9a.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_43f9a.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-ohquza\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_43f9a.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_43f9a.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_43f9a.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-ohquza\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-ohquza\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'sys/socket.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:33 (check_include_file)"
+    checks:
+      - "Looking for sys/types.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-8w186m"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-8w186m"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SYS_TYPES_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-8w186m'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_be2ca
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_be2ca.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_be2ca.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-8w186m\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_be2ca.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_be2ca.dir\\CheckIncludeFile.c.obj  /out:cmTC_be2ca.exe /implib:cmTC_be2ca.lib /pdb:cmTC_be2ca.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:34 (check_include_file)"
+    checks:
+      - "Looking for unistd.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-y6raen"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-y6raen"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_UNISTD_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-y6raen'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_e29a4
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_e29a4.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_e29a4.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-y6raen\\CheckIncludeFile.c
+        FAILED: CMakeFiles/cmTC_e29a4.dir/CheckIncludeFile.c.obj 
+        C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_e29a4.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_e29a4.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-y6raen\\CheckIncludeFile.c
+        C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-y6raen\\CheckIncludeFile.c(1): fatal error C1083: Não é possível abrir arquivo incluir: 'unistd.h': No such file or directory
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:35 (check_include_file)"
+    checks:
+      - "Looking for windows.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h65uri"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h65uri"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_WINDOWS_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h65uri'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_0e8b0
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_0e8b0.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_0e8b0.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-h65uri\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_0e8b0.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_0e8b0.dir\\CheckIncludeFile.c.obj  /out:cmTC_0e8b0.exe /implib:cmTC_0e8b0.lib /pdb:cmTC_0e8b0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:36 (check_include_file)"
+    checks:
+      - "Looking for winsock2.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-mg9w5r"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-mg9w5r"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_WINSOCK2_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-mg9w5r'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_e5734
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_e5734.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_e5734.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-mg9w5r\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_e5734.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_e5734.dir\\CheckIncludeFile.c.obj  /out:cmTC_e5734.exe /implib:cmTC_e5734.lib /pdb:cmTC_e5734.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:38 (check_function_exists)"
+    checks:
+      - "Looking for sigaction"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-1w21at"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-1w21at"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SIGACTION"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-1w21at'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_d4371
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=sigaction /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_d4371.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_d4371.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-1w21at\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_d4371.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d4371.dir\\CheckFunctionExists.c.obj  /out:cmTC_d4371.exe /implib:cmTC_d4371.lib /pdb:cmTC_d4371.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_d4371.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_d4371.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d4371.dir\\CheckFunctionExists.c.obj  /out:cmTC_d4371.exe /implib:cmTC_d4371.lib /pdb:cmTC_d4371.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_d4371.dir\\CheckFunctionExists.c.obj /out:cmTC_d4371.exe /implib:cmTC_d4371.lib /pdb:cmTC_d4371.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_d4371.dir/intermediate.manifest CMakeFiles\\cmTC_d4371.dir/manifest.res" failed (exit code 1120) with the following output:
+        CheckFunctionExists.c.obj : error LNK2019: símbolo externo não resolvido, sigaction, referenciado na função main\x0d
+        cmTC_d4371.exe : fatal error LNK1120: 1 externo não resolvidos\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:39 (check_function_exists)"
+    checks:
+      - "Looking for inet_aton"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-vu6u51"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-vu6u51"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_INET_ATON"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-vu6u51'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_4ddc4
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=inet_aton /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_4ddc4.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_4ddc4.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-vu6u51\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_4ddc4.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_4ddc4.dir\\CheckFunctionExists.c.obj  /out:cmTC_4ddc4.exe /implib:cmTC_4ddc4.lib /pdb:cmTC_4ddc4.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_4ddc4.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_4ddc4.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_4ddc4.dir\\CheckFunctionExists.c.obj  /out:cmTC_4ddc4.exe /implib:cmTC_4ddc4.lib /pdb:cmTC_4ddc4.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_4ddc4.dir\\CheckFunctionExists.c.obj /out:cmTC_4ddc4.exe /implib:cmTC_4ddc4.lib /pdb:cmTC_4ddc4.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_4ddc4.dir/intermediate.manifest CMakeFiles\\cmTC_4ddc4.dir/manifest.res" failed (exit code 1120) with the following output:
+        CheckFunctionExists.c.obj : error LNK2019: símbolo externo não resolvido, inet_aton, referenciado na função main\x0d
+        cmTC_4ddc4.exe : fatal error LNK1120: 1 externo não resolvidos\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:40 (check_function_exists)"
+    checks:
+      - "Looking for inet_pton"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s7ph68"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s7ph68"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_INET_PTON"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-s7ph68'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_712f0
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=inet_pton /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_712f0.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_712f0.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-s7ph68\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_712f0.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_712f0.dir\\CheckFunctionExists.c.obj  /out:cmTC_712f0.exe /implib:cmTC_712f0.lib /pdb:cmTC_712f0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_712f0.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_712f0.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_712f0.dir\\CheckFunctionExists.c.obj  /out:cmTC_712f0.exe /implib:cmTC_712f0.lib /pdb:cmTC_712f0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_712f0.dir\\CheckFunctionExists.c.obj /out:cmTC_712f0.exe /implib:cmTC_712f0.lib /pdb:cmTC_712f0.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_712f0.dir/intermediate.manifest CMakeFiles\\cmTC_712f0.dir/manifest.res" failed (exit code 1120) with the following output:
+        CheckFunctionExists.c.obj : error LNK2019: símbolo externo não resolvido, inet_pton, referenciado na função main\x0d
+        cmTC_712f0.exe : fatal error LNK1120: 1 externo não resolvidos\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckFunctionExists.cmake:86 (try_compile)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:41 (check_function_exists)"
+    checks:
+      - "Looking for usleep"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-jjmas5"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-jjmas5"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_USLEEP"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-jjmas5'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_bc93c
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS -DCHECK_FUNCTION_EXISTS=usleep /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_bc93c.dir\\CheckFunctionExists.c.obj /FdCMakeFiles\\cmTC_bc93c.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-jjmas5\\CheckFunctionExists.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_bc93c.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_bc93c.dir\\CheckFunctionExists.c.obj  /out:cmTC_bc93c.exe /implib:cmTC_bc93c.lib /pdb:cmTC_bc93c.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        FAILED: cmTC_bc93c.exe 
+        C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_bc93c.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_bc93c.dir\\CheckFunctionExists.c.obj  /out:cmTC_bc93c.exe /implib:cmTC_bc93c.lib /pdb:cmTC_bc93c.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        LINK Pass 1: command "C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_bc93c.dir\\CheckFunctionExists.c.obj /out:cmTC_bc93c.exe /implib:cmTC_bc93c.lib /pdb:cmTC_bc93c.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\\cmTC_bc93c.dir/intermediate.manifest CMakeFiles\\cmTC_bc93c.dir/manifest.res" failed (exit code 1120) with the following output:
+        CheckFunctionExists.c.obj : error LNK2019: símbolo externo não resolvido, usleep, referenciado na função main\x0d
+        cmTC_bc93c.exe : fatal error LNK1120: 1 externo não resolvidos\x0d
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckIncludeFile.cmake:90 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:253 (check_include_file)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:43 (check_type_size)"
+    checks:
+      - "Looking for stddef.h"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yhfvs6"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yhfvs6"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_STDDEF_H"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-yhfvs6'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_0a2fe
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_0a2fe.dir\\CheckIncludeFile.c.obj /FdCMakeFiles\\cmTC_0a2fe.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-yhfvs6\\CheckIncludeFile.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_0a2fe.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_0a2fe.dir\\CheckIncludeFile.c.obj  /out:cmTC_0a2fe.exe /implib:cmTC_0a2fe.lib /pdb:cmTC_0a2fe.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:43 (check_type_size)"
+    checks:
+      - "Check size of uint8_t"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-edospr"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-edospr"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_UINT8_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-edospr'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_ead2a
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_ead2a.dir\\UINT8_T.c.obj /FdCMakeFiles\\cmTC_ead2a.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-edospr\\UINT8_T.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_ead2a.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_ead2a.dir\\UINT8_T.c.obj  /out:cmTC_ead2a.exe /implib:cmTC_ead2a.lib /pdb:cmTC_ead2a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:44 (check_type_size)"
+    checks:
+      - "Check size of uint16_t"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0klzlj"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0klzlj"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_UINT16_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-0klzlj'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_e8db7
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_e8db7.dir\\UINT16_T.c.obj /FdCMakeFiles\\cmTC_e8db7.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-0klzlj\\UINT16_T.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_e8db7.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_e8db7.dir\\UINT16_T.c.obj  /out:cmTC_e8db7.exe /implib:cmTC_e8db7.lib /pdb:cmTC_e8db7.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:45 (check_type_size)"
+    checks:
+      - "Check size of uint32_t"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fwbb4s"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fwbb4s"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_UINT32_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-fwbb4s'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_455d9
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_455d9.dir\\UINT32_T.c.obj /FdCMakeFiles\\cmTC_455d9.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-fwbb4s\\UINT32_T.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_455d9.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_455d9.dir\\UINT32_T.c.obj  /out:cmTC_455d9.exe /implib:cmTC_455d9.lib /pdb:cmTC_455d9.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:46 (check_type_size)"
+    checks:
+      - "Check size of uint64_t"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2gtn0l"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2gtn0l"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_UINT64_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-2gtn0l'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_a728b
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_a728b.dir\\UINT64_T.c.obj /FdCMakeFiles\\cmTC_a728b.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-2gtn0l\\UINT64_T.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_a728b.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_a728b.dir\\UINT64_T.c.obj  /out:cmTC_a728b.exe /implib:cmTC_a728b.lib /pdb:cmTC_a728b.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:47 (check_type_size)"
+    checks:
+      - "Check size of int32_t"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h2m6s0"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h2m6s0"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_INT32_T"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-h2m6s0'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_4956a
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_4956a.dir\\INT32_T.c.obj /FdCMakeFiles\\cmTC_4956a.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-h2m6s0\\INT32_T.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_4956a.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_4956a.dir\\INT32_T.c.obj  /out:cmTC_4956a.exe /implib:cmTC_4956a.lib /pdb:cmTC_4956a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:48 (check_type_size)"
+    checks:
+      - "Check size of unsigned long"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-zeyxb6"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-zeyxb6"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SIZEOF_UNSIGNED_LONG"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-zeyxb6'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_2ca0a
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_2ca0a.dir\\SIZEOF_UNSIGNED_LONG.c.obj /FdCMakeFiles\\cmTC_2ca0a.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-zeyxb6\\SIZEOF_UNSIGNED_LONG.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_2ca0a.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_2ca0a.dir\\SIZEOF_UNSIGNED_LONG.c.obj  /out:cmTC_2ca0a.exe /implib:cmTC_2ca0a.lib /pdb:cmTC_2ca0a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:147 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckTypeSize.cmake:272 (__check_type_size_impl)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:49 (check_type_size)"
+    checks:
+      - "Check size of unsigned long long"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-lgedvi"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-lgedvi"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_SIZEOF_UNSIGNED_LONG_LONG"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-lgedvi'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_6af70
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo   /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_6af70.dir\\SIZEOF_UNSIGNED_LONG_LONG.c.obj /FdCMakeFiles\\cmTC_6af70.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-lgedvi\\SIZEOF_UNSIGNED_LONG_LONG.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_6af70.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_6af70.dir\\SIZEOF_UNSIGNED_LONG_LONG.c.obj  /out:cmTC_6af70.exe /implib:cmTC_6af70.lib /pdb:cmTC_6af70.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.30/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "vendor/libdatachannel/deps/libsrtp/CMakeLists.txt:51 (check_c_source_compiles)"
+    checks:
+      - "Performing Test HAVE_INLINE"
+    directories:
+      source: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ngzwvo"
+      binary: "C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ngzwvo"
+    cmakeVariables:
+      CMAKE_C_FLAGS: "/DWIN32 /D_WINDOWS"
+      CMAKE_C_FLAGS_DEBUG: "/Zi /Ob0 /Od /RTC1"
+      CMAKE_EXE_LINKER_FLAGS: "/machine:x64"
+      CMAKE_MODULE_PATH: "C:/Dev/RunicVTT/vendor/libdatachannel/cmake/Modules;C:/Dev/RunicVTT/vendor/libdatachannel/deps/libsrtp/cmake"
+      CMAKE_POSITION_INDEPENDENT_CODE: "ON"
+    buildResult:
+      variable: "HAVE_INLINE"
+      cached: true
+      stdout: |
+        Change Dir: 'C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/CMakeScratch/TryCompile-ngzwvo'
+        
+        Run Build Command(s): "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe" -v cmTC_e05cc
+        [1/2] C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\cl.exe  /nologo -DHAVE_INLINE  /DWIN32 /D_WINDOWS  /Zi /Ob0 /Od /RTC1 -MDd /showIncludes /FoCMakeFiles\\cmTC_e05cc.dir\\src.c.obj /FdCMakeFiles\\cmTC_e05cc.dir\\ /FS -c C:\\Dev\\RunicVTT\\out\\build\\x64-Debug\\CMakeFiles\\CMakeScratch\\TryCompile-ngzwvo\\src.c
+        [2/2] C:\\WINDOWS\\system32\\cmd.exe /C "cd . && "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\\cmTC_e05cc.dir --rc=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\rc.exe --mt=C:\\PROGRA~2\\WI3CF2~1\\10\\bin\\100226~1.0\\x64\\mt.exe --manifests  -- C:\\PROGRA~1\\MICROS~3\\2022\\COMMUN~1\\VC\\Tools\\MSVC\\1443~1.348\\bin\\Hostx64\\x64\\link.exe /nologo CMakeFiles\\cmTC_e05cc.dir\\src.c.obj  /out:cmTC_e05cc.exe /implib:cmTC_e05cc.lib /pdb:cmTC_e05cc.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+        
+      exitCode: 0
+...
