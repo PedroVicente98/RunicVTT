@@ -1,82 +1,93 @@
 ﻿#include <iostream>
-
-// 🔹 OpenGL & GLFW (Graphics)
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-// 🔹 ImGui (UI)
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-// 🔹 WebRTC (Networking)
+#include "flecs.h"
+
 #include <rtc/rtc.hpp>
 
-// 🔹 Ensure OpenGL, GLFW, and WebRTC Work
-void test_systems() {
-    std::cout << "[Test] OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "[Test] WebRTC Initialized" << std::endl;
+void error_callback(int error, const char* description) {
+    std::cerr << "GLFW Error (" << error << "): " << description << std::endl;
 }
 
 int main() {
-    // ✅ Step 1: Initialize GLFW
+    // 🔹 GLFW Init
+    glfwSetErrorCallback(error_callback);
     if (!glfwInit()) {
-        std::cerr << "[Error] Failed to initialize GLFW" << std::endl;
+        std::cerr << "Failed to initialize GLFW\n";
         return -1;
     }
 
-    // ✅ Step 2: Create OpenGL Window
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Runic VTT - Test", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "RunicVTT - Test", nullptr, nullptr);
     if (!window) {
-        std::cerr << "[Error] Failed to create GLFW window" << std::endl;
+        std::cerr << "Failed to create GLFW window\n";
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
 
-    // ✅ Step 3: Initialize GLEW
+    glfwMakeContextCurrent(window);
+    glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) {
-        std::cerr << "[Error] Failed to initialize GLEW" << std::endl;
+        std::cerr << "Failed to initialize GLEW\n";
         return -1;
     }
 
-    // ✅ Step 4: Initialize ImGui
+    // 🔹 ImGui Init
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-    // ✅ Step 5: WebRTC Setup (Test Only)
-    rtc::InitLogger(rtc::LogLevel::Debug);
-    std::cout << "[Test] WebRTC Setup Complete" << std::endl;
+    // 🔹 Flecs Init
+    flecs::world ecs;
+    ecs.entity("MyEntity").set([] {
+        std::cout << "[Flecs] Entity created successfully ✅\n";
+        });
 
-    // ✅ Step 6: Main Loop
+    // 🔹 WebRTC Init (Dummy Test)
+    rtc::Configuration config;
+    auto pc = std::make_shared<rtc::PeerConnection>(config);
+    pc->onStateChange([](rtc::PeerConnection::State state) {
+        std::cout << "[WebRTC] Connection state changed: " << (int)state << std::endl;
+        });
+
+    std::cout << "[Init] All systems GO 🚀\n";
+
+    // 🔁 Main Loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        // Start ImGui Frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Runic VTT Test");
-        ImGui::Text("CMake Configuration Works!");
+        ImGui::Begin("Test Window");
+        ImGui::Text("If you see this, ImGui + OpenGL + GLFW are working! 🎉");
         ImGui::End();
 
-        // Render
         ImGui::Render();
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
 
-    // ✅ Cleanup
+    // 🔻 Cleanup
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
