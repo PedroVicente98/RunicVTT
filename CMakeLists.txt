@@ -62,10 +62,8 @@ target_link_libraries(RunicVTT PRIVATE glfw)
 # ----------------------
 # GLEW (Static)
 # ----------------------
-target_link_libraries(RunicVTT PRIVATE
-    ${CMAKE_SOURCE_DIR}/dependencies/GLEW/lib/Release/x64/glew32s.lib
-)
 target_compile_definitions(RunicVTT PRIVATE GLEW_STATIC)
+target_link_libraries(RunicVTT PRIVATE ${CMAKE_SOURCE_DIR}/dependencies/GLEW/lib/Release/x64/glew32s.lib)
 target_link_libraries(RunicVTT PRIVATE opengl32)
 
 # ----------------------
@@ -73,7 +71,7 @@ target_link_libraries(RunicVTT PRIVATE opengl32)
 # ----------------------
 set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/flecs)
-target_link_libraries(RunicVTT PRIVATE flecs)
+target_link_libraries(RunicVTT PRIVATE flecs::flecs_static)
 
 
 # ----------------------
