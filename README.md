@@ -43,14 +43,14 @@ Runic VTT uses the following libraries:
 ## 🛠️ Building Runic VTT
 
 ### 🔹 **Prerequisites**
-- **C++17** or later
+- **Windows** 10/11 OS
+- **C++20** or later
 - **CMake** (>= 3.16)
 - **OpenSSL** (for `libdatachannel`)
 - **A C++ Compiler**:
-  - **Windows**: MSVC (Visual Studio 2019+ recommended)
-  - **Linux/macOS**: GCC or Clang
+  - **Windows**: MSVC (Visual Studio 2022+ recommended)
 
 ### 🔹 **Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/runic-vtt.git
-cd runic-vtt
+git clone https://github.com/yourusername/RunicVTT.git
+cd RunicVTT

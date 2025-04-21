@@ -3,6 +3,7 @@ project(RunicVTT VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "" FORCE)
 
 # ----------------------
 # Sources
@@ -71,10 +72,8 @@ target_link_libraries(RunicVTT PRIVATE glfw)
 # ----------------------
 # GLEW (Static)
 # ----------------------
-target_link_libraries(RunicVTT PRIVATE
-    ${CMAKE_SOURCE_DIR}/dependencies/GLEW/lib/Release/x64/glew32s.lib
-)
 target_compile_definitions(RunicVTT PRIVATE GLEW_STATIC)
+target_link_libraries(RunicVTT PRIVATE ${CMAKE_SOURCE_DIR}/dependencies/GLEW/lib/Release/x64/glew32s.lib)
 target_link_libraries(RunicVTT PRIVATE opengl32)
 
 # ----------------------
