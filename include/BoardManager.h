@@ -9,16 +9,11 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "flecs.h"
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 #include "Components.h"
 #include "DirectoryWindow.h"
 //#include "NetworkManager.h"

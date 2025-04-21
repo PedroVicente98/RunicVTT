@@ -79,7 +79,7 @@ int ApplicationHandler::run()
 
         glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 
-        std::filesystem::path base_path = std::filesystem::current_path();
+        std::filesystem::path base_path = std::filesystem::path(rootDirectory);
         std::filesystem::path shader_path = base_path / "res" / "shaders" / "Basic.shader";
         Shader shader(shader_path.string());
         shader.Bind();
@@ -132,8 +132,8 @@ int ApplicationHandler::run()
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            game_table_manager.processSentMessages();
-            game_table_manager.processReceivedMessages();
+            //game_table_manager.processSentMessages();
+            //game_table_manager.processReceivedMessages();
             renderMainMenuBar();
             renderDockSpace();
             renderActiveGametable(va, ib, shader, renderer);
@@ -195,7 +195,7 @@ void ApplicationHandler::renderDockSpace()
 void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
 
 
-    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected()) {
+    if (game_table_manager.isGameTableActive() /*|| game_table_manager.isConnected()*/) {
 
         if (game_table_manager.board_manager.isEditWindowOpen()) {
             game_table_manager.board_manager.renderEditWindow();
@@ -295,12 +295,12 @@ void ApplicationHandler::renderMainMenuBar() {
     if(game_table_manager.isGameTableActive()){
 
         if (ImGui::BeginMenu("Network")) {
-            bool is_connection_active = game_table_manager.isConnectionActive();
-            if(!game_table_manager.isConnectionActive()){
-                if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
-                    open_network_connection = true;
-                } 
-            }
+            bool is_connection_active = false/*game_table_manager.isConnectionActive()*/;
+            //if(!game_table_manager.isConnectionActive()){
+            //    if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
+            //        open_network_connection = true;
+            //    } 
+            //}
             
             if (ImGui::MenuItem("Connection Info")) {
                 open_network_info = true;

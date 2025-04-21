@@ -37,6 +37,9 @@ GLFWwindow* initializeOpenGLContext() {
 
 static std::string setupRootDirectory() {
     auto rootDirectory = std::filesystem::current_path();
+	if (rootDirectory.filename() == "bin") {
+		rootDirectory = rootDirectory.parent_path();
+	}
     if (rootDirectory.filename() == "RunicVTT") {
         auto games_tables_directory = rootDirectory / "GameTables";
         if (!fs::exists(games_tables_directory)) {
@@ -97,7 +100,7 @@ int main() {
     }
 
     auto rootDirectory = setupRootDirectory();
-    auto iconPath = rootDirectory + "/res/RunicVTTIcon.png";
+    auto iconPath = rootDirectory + "\\res\\RunicVTTIcon.png";
     setWindowIcon(window, iconPath.c_str());
     ApplicationHandler app(window, rootDirectory);
     app.run();  // Executa o loop principal da aplicação

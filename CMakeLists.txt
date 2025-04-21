@@ -43,7 +43,7 @@ set(OPENSSL_ROOT_DIR "${CMAKE_SOURCE_DIR}/dependencies/OpenSSL" CACHE PATH "Path
 set(OPENSSL_INCLUDE_DIR "${OPENSSL_ROOT_DIR}/include" CACHE PATH "Path to OpenSSL include")
 set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_ROOT_DIR}/lib/libcrypto.lib" CACHE FILEPATH "OpenSSL crypto lib")
 set(OPENSSL_SSL_LIBRARY "${OPENSSL_ROOT_DIR}/lib/libssl.lib" CACHE FILEPATH "OpenSSL ssl lib")
-set(OPENSSL_USE_STATIC_LIBS OFF CACHE BOOL "Use OpenSSL static libs")
+set(OPENSSL_USE_STATIC_LIBS ON CACHE BOOL "Use OpenSSL static libs")
 
 
 # Link to RunicVTT (optional but fine)

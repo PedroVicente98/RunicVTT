@@ -5,7 +5,7 @@
 GameTableManager::GameTableManager(flecs::world ecs, std::string rootDirectory)
     : ecs(ecs), rootDirectory(rootDirectory),/* network_manager(ecs),*/ map_directory(std::string(), std::string()), board_manager(ecs, &map_directory), chat()
 {
-    std::filesystem::path base_path = std::filesystem::current_path();
+    std::filesystem::path base_path = std::filesystem::path(rootDirectory);
     std::string map_directory_name = "MapDiretory";
     std::filesystem::path map_directory_path = base_path / "Maps";
     map_directory.directoryName = map_directory_name;

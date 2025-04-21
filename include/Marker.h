@@ -8,7 +8,6 @@
 #include "VertexBufferLayout.h"
 #include "Texture.h"
 #include "glm/glm.hpp"
-#include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp> 
 
 class Marker {

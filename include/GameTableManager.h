@@ -17,15 +17,15 @@ public:
 
 	bool isBoardActive();
 	bool isGameTableActive();
-	bool isConnectionActive();
+	//bool isConnectionActive();
 
-	bool isConnected() const;
+	//bool isConnected() const;
 	
-	void openConnection(unsigned short port);
-	void closeConnection();
+	//void openConnection(unsigned short port);
+	//void closeConnection();
 
-	void processSentMessages();
-	void processReceivedMessages();
+	//void processSentMessages();
+	//void processReceivedMessages();
 
 	void createGameTablePopUp();
 	void closeGameTablePopUp();
