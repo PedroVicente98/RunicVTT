@@ -1,6 +1,6 @@
 # ninja log v6
 682	1167	7657862750255241	vendor/libdatachannel/deps/libsrtp/CMakeFiles/srtp2.dir/crypto/cipher/null_cipher.c.obj	d696dc16f54ea325
-49	75	7657868203481424	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
+55	83	7657871975215642	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
 1395	1734	7657862757388474	vendor/libdatachannel/deps/libjuice/CMakeFiles/juice.dir/src/hash.c.obj	8a44a5e82b2ddf99
 240	549	7657862745846005	vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeFiles/usrsctp.dir/netinet/sctp_sha1.c.obj	71a59676b2d200f1
 117	579	7657862744614442	vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeFiles/usrsctp.dir/netinet/sctp_bsd_addr.c.obj	1de5be5a2a4d5268
@@ -13,7 +13,7 @@
 736	899	7657862750794066	vendor/libdatachannel/deps/libsrtp/CMakeFiles/srtp2.dir/crypto/hash/auth_test_cases.c.obj	4209c272d67d8dc9
 1438	1818	7657862757819060	vendor/libdatachannel/deps/libjuice/CMakeFiles/juice.dir/src/hmac.c.obj	5cebd5232088082d
 1499	2192	7657862758425392	vendor/libdatachannel/deps/libjuice/CMakeFiles/juice.dir/src/juice.c.obj	f004dd642e83059
-12941	16556	7657862906829580	vendor/libdatachannel/datachannel.lib	fafbd5b856bd4f96
+122	745	7657871975883517	vendor/libdatachannel/datachannel.lib	fafbd5b856bd4f96
 10446	10704	7657862847907955	vendor/flecs/CMakeFiles/flecs.dir/src/addons/metrics.c.obj	129896761ee388fd
 151	641	7657862744949794	vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeFiles/usrsctp.dir/netinet/sctp_cc_functions.c.obj	5ed310700cfec445
 16737	17063	7657862910801796	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/stats/monitor.c.obj	d1ace85333051747
@@ -61,9 +61,9 @@
 10108	10385	7657862844520519	vendor/flecs/CMakeFiles/flecs.dir/src/addons/json/serialize_value.c.obj	a559e666be7c5c54
 550	1149	7657862748942796	vendor/libdatachannel/deps/usrsctp/usrsctplib/CMakeFiles/usrsctp.dir/netinet6/sctp6_usrreq.c.obj	3b457bde65b950dd
 1682	2460	7657862760255307	vendor/libdatachannel/deps/libjuice/CMakeFiles/juice.dir/src/turn.c.obj	93ed7db4dbf30174
-16436	16930	7657862907807122	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/functions_builtin.c.obj	ee6e62da66986263
 722	1182	7657862750665744	vendor/libdatachannel/deps/libsrtp/CMakeFiles/srtp2.dir/crypto/hash/auth.c.obj	6375b24f127edc9e
 10410	10856	7657862847535539	vendor/flecs/CMakeFiles/flecs.dir/src/addons/meta/meta.c.obj	8551e222adc9f9ce
+16436	16930	7657862907807122	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/functions_builtin.c.obj	ee6e62da66986263
 641	1472	7657862749843598	vendor/libdatachannel/deps/libsrtp/CMakeFiles/srtp2.dir/srtp/srtp.c.obj	d28f74208b52beba
 1805	3310	7657862761491110	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/channel.cpp.obj	f8287ff997ec2f9e
 815	1547	7657862751589528	vendor/libdatachannel/deps/libsrtp/CMakeFiles/srtp2.dir/crypto/kernel/crypto_kernel.c.obj	ab4f99405844b230
@@ -150,7 +150,7 @@
 2076	5675	7657862764206055	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/peerconnection.cpp.obj	d92864195e58bdef
 16702	17074	7657862910453674	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/visit_eval.c.obj	9343b4137b633c8b
 5497	7027	7657862798408174	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/impl/channel.cpp.obj	2ba58b80b9459501
-18019	18679	7657862923626086	C:/Dev/RunicVTT/bin/answerer-capi.exe	711e6e83e52354ed
+912	1277	7657871983780181	C:/Dev/RunicVTT/bin/answerer-capi.exe	711e6e83e52354ed
 5444	7550	7657862797876418	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/rembhandler.cpp.obj	aa010c514645020a
 10435	10694	7657862847795403	vendor/flecs/CMakeFiles/flecs.dir/src/addons/meta/serialized.c.obj	a572fb80bba541f8
 11727	12022	7657862860709141	vendor/flecs/CMakeFiles/flecs.dir/src/id.c.obj	462f4912ceeced11
@@ -187,7 +187,7 @@
 7808	9656	7657862821521029	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/impl/pollservice.cpp.obj	13555b83e0bc6279
 9257	9932	7657862836006696	vendor/flecs/CMakeFiles/flecs.dir/src/addons/http.c.obj	18ba18d682ad63d9
 9554	9995	7657862838972749	vendor/flecs/CMakeFiles/flecs.dir/src/addons/journal.c.obj	1c31f431f2656076
-17906	18560	7657862922503083	C:/Dev/RunicVTT/bin/media-sender.exe	9df281e90c9a8533
+819	1276	7657871982854924	C:/Dev/RunicVTT/bin/media-sender.exe	9df281e90c9a8533
 9615	10019	7657862839588692	vendor/flecs/CMakeFiles/flecs.dir/src/addons/json/deserialize.c.obj	8fb8555bddb9c539
 9630	10034	7657862839730704	vendor/flecs/CMakeFiles/flecs.dir/src/addons/json/deserialize_value.c.obj	16b1c43ddac37662
 17639	18046	7657862919826877	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/validator.c.obj	9e5bec386e3be908
@@ -203,7 +203,7 @@
 5661	10142	7657862800050522	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/impl/track.cpp.obj	111bf3d7065fe785
 11818	12216	7657862861621646	vendor/flecs/CMakeFiles/flecs.dir/src/query/compiler/compiler_term.c.obj	345b3a37e57c359f
 16726	16973	7657862910693861	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/visit_to_str.c.obj	542f804912ad67e
-17935	18692	7657862922791342	C:/Dev/RunicVTT/bin/streamer.exe	e6f07f1063f84676
+846	1332	7657871983114905	C:/Dev/RunicVTT/bin/streamer.exe	e6f07f1063f84676
 8596	10171	7657862829406238	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/impl/transport.cpp.obj	34c5cc5b60a4f09f
 12053	12277	7657862863975689	vendor/flecs/CMakeFiles/flecs.dir/src/query/engine/eval_up.c.obj	4102f88786f2b86e
 12508	16603	7657862868519218	vendor/libdatachannel/examples/client/CMakeFiles/datachannel-client.dir/main.cpp.obj	5fe1fa295c55cf91
@@ -230,7 +230,7 @@
 12202	12602	7657862865459101	vendor/flecs/CMakeFiles/flecs.dir/src/query/validator.c.obj	44dd7dcd20cdeaa1
 10424	10685	7657862847680310	vendor/flecs/CMakeFiles/flecs.dir/src/addons/meta/rtt_lifecycle.c.obj	b372a462a0db4ae5
 10385	10717	7657862847286699	vendor/flecs/CMakeFiles/flecs.dir/src/addons/meta/cursor.c.obj	a5d2b79229b13dec
-774	3089	7657868210729252	CMakeFiles/RunicVTT.dir/src/main.cpp.obj	1f0e48dbff657aa5
+144	2194	7657871679122439	CMakeFiles/RunicVTT.dir/src/main.cpp.obj	1f0e48dbff657aa5
 8174	10735	7657862825175070	vendor/libdatachannel/CMakeFiles/datachannel.dir/src/impl/tcptransport.cpp.obj	eb94b863352cc278
 10398	10820	7657862847415519	vendor/flecs/CMakeFiles/flecs.dir/src/addons/meta/definitions.c.obj	d91844ae4399ead7
 11877	12178	7657862862206093	vendor/flecs/CMakeFiles/flecs.dir/src/query/engine/cache_iter.c.obj	ffd522d21eed6edb
@@ -252,7 +252,7 @@
 10695	11095	7657862850380511	vendor/flecs/CMakeFiles/flecs.dir/src/addons/script/expr/ast.c.obj	5c6f1a286c9109e6
 15453	15779	7657862897970027	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/json/serialize_value.c.obj	e64148da17fa9ed1
 10927	11106	7657862852706445	vendor/flecs/CMakeFiles/flecs.dir/src/addons/script/functions_builtin.c.obj	2dcee9bb1878487d
-17917	18679	7657862922605044	C:/Dev/RunicVTT/bin/media-sfu.exe	6c53cde6a918a8c7
+833	1280	7657871982995426	C:/Dev/RunicVTT/bin/media-sfu.exe	6c53cde6a918a8c7
 10942	11117	7657862852867080	vendor/flecs/CMakeFiles/flecs.dir/src/addons/script/functions_math.c.obj	7cee435afd23172d
 10902	11155	7657862852461589	vendor/flecs/CMakeFiles/flecs.dir/src/addons/script/expr/visit_type.c.obj	fdb39f48bfa754d2
 10870	11166	7657862852137950	vendor/flecs/CMakeFiles/flecs.dir/src/addons/script/expr/visit_free.c.obj	2a41a5247dc3e6f3
@@ -350,7 +350,7 @@
 16941	17245	7657862912853549	vendor/flecs/CMakeFiles/flecs_static.dir/src/datastructures/bitset.c.obj	cf85aa69027dadd4
 15238	15670	7657862895824973	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/json/serialize_iter_result.c.obj	c232b421c9a20361
 15970	16224	7657862903139427	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/ast.c.obj	b7f792f6f6de6b16
-17894	18560	7657862922370471	C:/Dev/RunicVTT/bin/media-receiver.exe	7ae58777558a4e8
+794	1235	7657871982594916	C:/Dev/RunicVTT/bin/media-receiver.exe	7ae58777558a4e8
 15437	15685	7657862897813944	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/json/serialize_type_info.c.obj	f6ee89c2cd2a4cd9
 15505	15795	7657862898489697	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/meta/api.c.obj	15e3f70d835e2a31
 12545	16769	7657862868888876	vendor/libdatachannel/examples/client-benchmark/CMakeFiles/datachannel-client-benchmark.dir/main.cpp.obj	b03014f39f8a33e6
@@ -358,9 +358,9 @@
 15644	15953	7657862899880844	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/meta/cursor.c.obj	5a6320ea64328d8
 17567	17845	7657862919107264	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/eval_up.c.obj	3c78ba72aa962372
 15721	15986	7657862900647010	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/metrics.c.obj	f7935006c064b7aa
-14068	15998	7657862902753098	C:/Dev/RunicVTT/bin/flecs.dll	ede907e600b36317
+150	518	7657871976154359	C:/Dev/RunicVTT/bin/flecs.dll	ede907e600b36317
 176	774	7657868204757081	vendor/glfw/src/CMakeFiles/glfw.dir/egl_context.c.obj	101b90bb5562e523
-14068	15998	7657862902753098	vendor/flecs/flecs.lib	ede907e600b36317
+150	518	7657871976154359	vendor/flecs/flecs.lib	ede907e600b36317
 15908	16116	7657862902514308	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/pipeline/pipeline.c.obj	5ebb396a8ff19e4f
 15779	16132	7657862901237678	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/module.c.obj	5d33d4b428362f8
 15887	16249	7657862902313193	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/parser/tokenizer.c.obj	cc3b0dae11d49fa2
@@ -371,7 +371,7 @@
 562	894	7657868208610089	vendor/glfw/src/CMakeFiles/glfw.dir/glfw.rc.res	583bda9576a5e296
 16147	16498	7657862904908391	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/expr/visit_eval.c.obj	d4242aa3770804e4
 17105	17328	7657862914485958	vendor/flecs/CMakeFiles/flecs_static.dir/src/datastructures/vec.c.obj	a2e00ffbc395ec0d
-12941	16556	7657862906829580	C:/Dev/RunicVTT/bin/datachannel.dll	fafbd5b856bd4f96
+122	745	7657871975883517	C:/Dev/RunicVTT/bin/datachannel.dll	fafbd5b856bd4f96
 12710	16572	7657862870535250	vendor/libdatachannel/examples/media-sfu/CMakeFiles/datachannel-media-sfu.dir/main.cpp.obj	4ae0b3c907c55f33
 12588	16591	7657862869318497	vendor/libdatachannel/examples/media-receiver/CMakeFiles/datachannel-media-receiver.dir/main.cpp.obj	86fc8d0ca89d6a4c
 16207	16737	7657862905513872	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/script/expr/visit_free.c.obj	f40d5b3c88e8d5c5
@@ -384,7 +384,7 @@
 17297	17719	7657862916412032	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/api.c.obj	33ffbd4342e5cfe6
 16770	17095	7657862911134101	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/stats/stats.c.obj	f68d073cc9b6e954
 17667	17883	7657862920109755	vendor/flecs/CMakeFiles/flecs_static.dir/src/storage/component_index.c.obj	8c48b11b71bb52f8
-17970	18681	7657862923145344	C:/Dev/RunicVTT/bin/answerer.exe	2fbf80d04b5ed3fa
+876	1284	7657871983410161	C:/Dev/RunicVTT/bin/answerer.exe	2fbf80d04b5ed3fa
 16795	17105	7657862911388667	vendor/flecs/CMakeFiles/flecs_static.dir/src/addons/stats/world_monitor.c.obj	bbf153227eafa7be
 200	883	7657868204987162	vendor/glfw/src/CMakeFiles/glfw.dir/null_monitor.c.obj	c05b937d39df49a3
 16917	17147	7657862912613206	vendor/flecs/CMakeFiles/flecs_static.dir/src/bootstrap.c.obj	2be8ba0972a08ce8
@@ -403,7 +403,7 @@
 17276	17586	7657862916200384	vendor/flecs/CMakeFiles/flecs_static.dir/src/os_api.c.obj	42687506fa161b93
 17307	17594	7657862916501975	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/compiler/compiler.c.obj	ca51ed50fbbb89a0
 17441	17614	7657862917850411	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/eval_pred.c.obj	13bdbaf1607b8657
-1074	1473	7657868217528326	C:/Dev/RunicVTT/bin/glfw3.dll	387d5360d001755c
+136	386	7657871976014369	C:/Dev/RunicVTT/bin/glfw3.dll	387d5360d001755c
 17328	17639	7657862916723912	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/cache.c.obj	a4a9b35f0c63d351
 17348	17657	7657862916919210	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/cache_order_by.c.obj	4b329b98b746d093
 17408	17667	7657862917519755	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/eval.c.obj	75b61b56023a0d94
@@ -415,10 +415,10 @@
 17595	17995	7657862919384417	vendor/flecs/CMakeFiles/flecs_static.dir/src/query/engine/trav_down_cache.c.obj	c5cf6fb0c711f2d1
 17648	18018	7657862919916875	vendor/flecs/CMakeFiles/flecs_static.dir/src/search.c.obj	6ab9dd42fad43e58
 18161	18347	7657862925054142	vendor/flecs/flecs_static.lib	b1d013509cd1eb94
-17995	18658	7657862923391098	C:/Dev/RunicVTT/bin/offerer-capi.exe	c5085390c15ad3b6
-17871	18661	7657862922150237	C:/Dev/RunicVTT/bin/client.exe	e376955996cf098d
-17953	18672	7657862922967012	C:/Dev/RunicVTT/bin/offerer.exe	2b5eece8ced9eab8
-17883	18672	7657862922268166	C:/Dev/RunicVTT/bin/client-benchmark.exe	3c21213ec2b84bb6
+893	1259	7657871983590169	C:/Dev/RunicVTT/bin/offerer-capi.exe	c5085390c15ad3b6
+762	1222	7657871982283013	C:/Dev/RunicVTT/bin/client.exe	e376955996cf098d
+860	1277	7657871983264997	C:/Dev/RunicVTT/bin/offerer.exe	2b5eece8ced9eab8
+778	1237	7657871982434926	C:/Dev/RunicVTT/bin/client-benchmark.exe	3c21213ec2b84bb6
 216	552	7657868205147079	vendor/glfw/src/CMakeFiles/glfw.dir/null_joystick.c.obj	b1e99175a65e428
 249	787	7657868205482389	vendor/glfw/src/CMakeFiles/glfw.dir/win32_init.c.obj	9e3a9fd27dd1e109
 152	808	7657868204507086	vendor/glfw/src/CMakeFiles/glfw.dir/platform.c.obj	541a614cea040bf1
@@ -430,30 +430,5 @@
 168	894	7657868204677087	vendor/glfw/src/CMakeFiles/glfw.dir/window.c.obj	5a89b34dfb8dbf40
 223	916	7657868205227229	vendor/glfw/src/CMakeFiles/glfw.dir/win32_module.c.obj	fa81e37543182d82
 552	1067	7657868208508544	vendor/glfw/src/CMakeFiles/glfw.dir/wgl_context.c.obj	b4fd013c22976460
-1074	1473	7657868217528326	vendor/glfw/src/glfw3dll.lib	387d5360d001755c
-53	76	7657869383984703	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-53	77	7657869512181272	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-126	616	7657869512901335	C:/Dev/RunicVTT/bin/RunicVTT.exe	cf78ec033e86a655
-51	74	7657870067316860	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-50	89	7657870564708200	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-52	104	7657871678197202	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-144	2194	7657871679122439	CMakeFiles/RunicVTT.dir/src/main.cpp.obj	1f0e48dbff657aa5
-56	108	7657871759076268	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-55	83	7657871975215642	C:/Dev/RunicVTT/out/build/x64-Debug/CMakeFiles/cmake.verify_globs	2f5f4cc2b6f9096f
-136	386	7657871976014369	C:/Dev/RunicVTT/bin/glfw3.dll	387d5360d001755c
 136	386	7657871976014369	vendor/glfw/src/glfw3dll.lib	387d5360d001755c
-150	518	7657871976154359	C:/Dev/RunicVTT/bin/flecs.dll	ede907e600b36317
-150	518	7657871976154359	vendor/flecs/flecs.lib	ede907e600b36317
-122	745	7657871975883517	C:/Dev/RunicVTT/bin/datachannel.dll	fafbd5b856bd4f96
-122	745	7657871975883517	vendor/libdatachannel/datachannel.lib	fafbd5b856bd4f96
-762	1222	7657871982283013	C:/Dev/RunicVTT/bin/client.exe	e376955996cf098d
-794	1235	7657871982594916	C:/Dev/RunicVTT/bin/media-receiver.exe	7ae58777558a4e8
-778	1237	7657871982434926	C:/Dev/RunicVTT/bin/client-benchmark.exe	3c21213ec2b84bb6
-893	1259	7657871983590169	C:/Dev/RunicVTT/bin/offerer-capi.exe	c5085390c15ad3b6
-819	1276	7657871982854924	C:/Dev/RunicVTT/bin/media-sender.exe	9df281e90c9a8533
-860	1277	7657871983264997	C:/Dev/RunicVTT/bin/offerer.exe	2b5eece8ced9eab8
-912	1277	7657871983780181	C:/Dev/RunicVTT/bin/answerer-capi.exe	711e6e83e52354ed
 746	1277	7657871982122918	C:/Dev/RunicVTT/bin/RunicVTT.exe	cf78ec033e86a655
-833	1280	7657871982995426	C:/Dev/RunicVTT/bin/media-sfu.exe	6c53cde6a918a8c7
-876	1284	7657871983410161	C:/Dev/RunicVTT/bin/answerer.exe	2fbf80d04b5ed3fa
-846	1332	7657871983114905	C:/Dev/RunicVTT/bin/streamer.exe	e6f07f1063f84676

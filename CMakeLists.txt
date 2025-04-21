@@ -9,8 +9,16 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 # ----------------------
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
+    src/renderer/*.cpp
     vendor/imgui/*.cpp
 )
+
+list(REMOVE_ITEM SOURCES
+    ${CMAKE_SOURCE_DIR}/src/Application_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
+    ${CMAKE_SOURCE_DIR}/src/NetworkManager_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
+    ${CMAKE_SOURCE_DIR}/include/NetworkManager_OLD.h
+)
+
 
 add_executable(RunicVTT ${SOURCES})
 
@@ -19,6 +27,7 @@ add_executable(RunicVTT ${SOURCES})
 # ----------------------
 target_include_directories(RunicVTT PRIVATE
     include
+    include/renderer
     dependencies/GLEW/include
     dependencies/OpenSSL/include
     vendor/imgui
@@ -73,7 +82,7 @@ target_link_libraries(RunicVTT PRIVATE opengl32)
 # ----------------------
 set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/flecs)
-target_link_libraries(RunicVTT PRIVATE flecs)
+target_link_libraries(RunicVTT PRIVATE flecs::flecs_static)
 
 
 # ----------------------

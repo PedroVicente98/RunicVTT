@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "vendor/libdatachannel/examples/streamer",
+		"source" : "vendor/libdatachannel/examples/streamer"
+	}
+}

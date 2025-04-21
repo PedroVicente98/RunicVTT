@@ -1,0 +1,116 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"install"
+		],
+		"files" : 
+		[
+			"vendor/libdatachannel/deps/libsrtp/CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 277,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 281,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 378,
+				"parent" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 408,
+				"parent" : 0
+			}
+		]
+	},
+	"installers" : 
+	[
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"destination" : "lib",
+			"paths" : 
+			[
+				"vendor/libdatachannel/deps/libsrtp/srtp2.lib"
+			],
+			"targetId" : "srtp2::@b8c1e0cd15c252558d85",
+			"targetIndex" : 23,
+			"type" : "target"
+		},
+		{
+			"backtrace" : 1,
+			"component" : "Unspecified",
+			"cxxModuleBmiTarget" : 
+			{
+				"id" : "srtp2::@b8c1e0cd15c252558d85",
+				"index" : 23
+			},
+			"destination" : "lib",
+			"type" : "cxxModuleBmi"
+		},
+		{
+			"backtrace" : 2,
+			"component" : "Unspecified",
+			"destination" : "include/srtp2",
+			"paths" : 
+			[
+				"vendor/libdatachannel/deps/libsrtp/include/srtp.h",
+				"vendor/libdatachannel/deps/libsrtp/crypto/include/auth.h",
+				"vendor/libdatachannel/deps/libsrtp/crypto/include/cipher.h",
+				"vendor/libdatachannel/deps/libsrtp/crypto/include/crypto_types.h"
+			],
+			"type" : "file"
+		},
+		{
+			"backtrace" : 3,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/libSRTP",
+			"exportName" : "libSRTPTargets",
+			"exportTargets" : 
+			[
+				{
+					"id" : "srtp2::@b8c1e0cd15c252558d85",
+					"index" : 23
+				}
+			],
+			"paths" : 
+			[
+				"vendor/libdatachannel/deps/libsrtp/CMakeFiles/Export/4057af6c16ac9b4df3236859d5c9bdc7/libSRTPTargets.cmake"
+			],
+			"type" : "export"
+		},
+		{
+			"backtrace" : 4,
+			"component" : "Unspecified",
+			"destination" : "lib/cmake/libSRTP",
+			"paths" : 
+			[
+				"out/build/x64-Release/vendor/libdatachannel/deps/libsrtp/libSRTPConfig.cmake",
+				"out/build/x64-Release/vendor/libdatachannel/deps/libsrtp/libSRTPConfigVersion.cmake"
+			],
+			"type" : "file"
+		}
+	],
+	"paths" : 
+	{
+		"build" : "vendor/libdatachannel/deps/libsrtp",
+		"source" : "vendor/libdatachannel/deps/libsrtp"
+	}
+}

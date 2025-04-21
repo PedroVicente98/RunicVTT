@@ -5,7 +5,19 @@ cmake_policy(SET CMP0009 NEW)
 # SOURCES at CMakeLists.txt:10 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "C:/Dev/RunicVTT/src/*.cpp")
 set(OLD_GLOB
+  "C:/Dev/RunicVTT/src/ApplicationHandler.cpp"
+  "C:/Dev/RunicVTT/src/Application_OLD.cpp"
+  "C:/Dev/RunicVTT/src/BoardManager.cpp"
+  "C:/Dev/RunicVTT/src/GameTableManager.cpp"
+  "C:/Dev/RunicVTT/src/Marker.cpp"
+  "C:/Dev/RunicVTT/src/NetworkManager_OLD.cpp"
   "C:/Dev/RunicVTT/src/main.cpp"
+  "C:/Dev/RunicVTT/src/renderer/IndexBuffer.cpp"
+  "C:/Dev/RunicVTT/src/renderer/Renderer.cpp"
+  "C:/Dev/RunicVTT/src/renderer/Shader.cpp"
+  "C:/Dev/RunicVTT/src/renderer/Texture.cpp"
+  "C:/Dev/RunicVTT/src/renderer/VertexArray.cpp"
+  "C:/Dev/RunicVTT/src/renderer/VertexBuffer.cpp"
   )
 if(NOT "${NEW_GLOB}" STREQUAL "${OLD_GLOB}")
   message("-- GLOB mismatch!")

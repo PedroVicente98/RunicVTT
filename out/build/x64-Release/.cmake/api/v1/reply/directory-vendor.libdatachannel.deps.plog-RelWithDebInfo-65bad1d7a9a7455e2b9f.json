@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "vendor/libdatachannel/deps/plog",
+		"source" : "vendor/libdatachannel/deps/plog"
+	}
+}
