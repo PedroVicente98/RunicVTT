@@ -1,5 +1,6 @@
 
 #include "ApplicationHandler.h"
+#include "PathManager.h"
 
 GLFWwindow* initializeOpenGLContext() {
     if (!glfwInit()) {
@@ -98,9 +99,12 @@ int main() {
     if (!window) {
         return -1;  // Falha na inicialização
     }
-
+    
     auto rootDirectory = setupRootDirectory();
     auto iconPath = rootDirectory + "\\res\\RunicVTTIcon.png";
+
+	PathManager().ensureDirectories();
+
     setWindowIcon(window, iconPath.c_str());
     ApplicationHandler app(window, rootDirectory);
     app.run();  // Executa o loop principal da aplicação
