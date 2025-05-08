@@ -3,5 +3,5 @@
 .idea/
 nbproject/
 .DS_Store
-RunicVTT/
-GameTables/
+bin/
+out/

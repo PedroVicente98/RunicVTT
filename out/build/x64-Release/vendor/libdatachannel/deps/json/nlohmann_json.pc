@@ -1,4 +1,0 @@
-Name: nlohmann_json
-Description: JSON for Modern C++
-Version: 3.11.3
-Cflags: -IC:/Dev/RunicVTT/out/install/x64-Release/include
