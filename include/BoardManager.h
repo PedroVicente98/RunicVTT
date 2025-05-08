@@ -20,7 +20,7 @@
 
 class Camera {
 public:
-    Camera() : position(0.0f, 0.0f), zoomLevel(1.0f) {}  // Set initial zoom to 1.0f for no scaling by default
+    Camera() : position(0.0f, 0.0f), zoomLevel(1.0f), window_position(0,0), window_size(0,0) {}  // Set initial zoom to 1.0f for no scaling by default
     
     void pan(glm::vec2 delta) {
         position += delta;
@@ -86,7 +86,7 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs, /*NetworkManager* network_manager,*/ DirectoryWindow* map_directory);
+	BoardManager(flecs::world ecs, /*NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
@@ -147,7 +147,8 @@ public:
     void saveActiveBoard(std::filesystem::path& filePath);
 
 	std::string board_name;
-    DirectoryWindow marker_directory;
+    std::shared_ptr<DirectoryWindow> map_directory;
+    std::shared_ptr<DirectoryWindow> marker_directory;
     Camera camera;
 
     bool isCreatingFog() const { return is_creating_fog; };
@@ -162,7 +163,6 @@ private:
 	flecs::entity edit_window_entity = flecs::entity();
 	//NetworkManager* network_manager;
     glm::vec2 mouseStartPos;
-    DirectoryWindow* map_directory;
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
     bool is_creating_fog = false;

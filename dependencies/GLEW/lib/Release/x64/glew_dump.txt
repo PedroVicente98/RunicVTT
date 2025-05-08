@@ -1,0 +1,26 @@
+Microsoft (R) COFF/PE Dumper Version 14.43.34809.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+
+Dump of file glew32s.lib
+
+File Type: LIBRARY
+
+   Linker Directives
+   -----------------
+   /DEFAULTLIB:LIBCMT
+   /DEFAULTLIB:OLDNAMES
+
+  Summary
+
+        5BC1 .bss
+        3270 .data
+       6859C .debug$S
+          74 .debug$T
+          2F .drectve
+        12FC .pdata
+       1750B .rdata
+          58 .rsrc$01
+        2200 .rsrc$02
+       22D43 .text$mn
+         D58 .xdata

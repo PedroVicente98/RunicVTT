@@ -100,13 +100,18 @@ int main() {
         return -1;  // Falha na inicialização
     }
     
-    auto rootDirectory = setupRootDirectory();
-    auto iconPath = rootDirectory + "\\res\\RunicVTTIcon.png";
 
-	PathManager().ensureDirectories();
+    auto pathManager = PathManager();
+    pathManager.ensureDirectories();
 
-    setWindowIcon(window, iconPath.c_str());
-    ApplicationHandler app(window, rootDirectory);
+    auto iconPath = pathManager.getResPath() / "RunicVTTIcon.png";
+    setWindowIcon(window, iconPath.string().c_str());
+
+
+
+    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(pathManager.getMapsPath().string(), "MapsDiretory");
+    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(pathManager.getMarkersPath().string(),"MarkersDirectory");
+    ApplicationHandler app(window, map_directory, marker_directory);
     app.run();  // Executa o loop principal da aplicação
 
     glfwTerminate();  // Limpa os recursos do GLFW quando terminar

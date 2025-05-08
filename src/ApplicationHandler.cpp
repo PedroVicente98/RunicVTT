@@ -1,8 +1,8 @@
 #include "ApplicationHandler.h"
 #include "Components.h"
 
-ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::string rootDirectory)
-    : marker_directory(std::string(), std::string()), map_directory(std::string(), std::string()), game_table_manager(ecs, rootDirectory), window(window), rootDirectory(rootDirectory)
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry)
+    : marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), dockspace_id(0)
 {
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -79,8 +79,7 @@ int ApplicationHandler::run()
 
         glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 
-        std::filesystem::path base_path = std::filesystem::path(rootDirectory);
-        std::filesystem::path shader_path = base_path / "res" / "shaders" / "Basic.shader";
+        std::filesystem::path shader_path = pathManager.getShaderPath() / "Basic.shader";
         Shader shader(shader_path.string());
         shader.Bind();
         shader.SetUniform1i("u_Texture", 0);
@@ -164,8 +163,7 @@ int ApplicationHandler::run()
 
 void ApplicationHandler::renderDockSpace() 
 {
-
-    ImGuiID dockspace_id = ImGui::GetID("Root");
+    dockspace_id = ImGui::GetID("Root");
     ImGuiViewport* viewport = ImGui::GetMainViewport();
     if (ImGui::DockBuilderGetNode(dockspace_id) == 0) {
         ImGui::DockBuilderRemoveNode(dockspace_id);
@@ -188,8 +186,6 @@ void ApplicationHandler::renderDockSpace()
     ImGui::Begin("RootWindow", nullptr, root_flags);
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
-
-   
 }
 
 void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
@@ -205,8 +201,11 @@ void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib,
         }
         game_table_manager.chat.renderChat();
 
-        //ImGui::ShowMetricsWindow();
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration;
+        ImGui::ShowMetricsWindow();
+        
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus /*| ImGuiWindowFlags_NoTitleBar*/ | ImGuiWindowFlags_NoDecoration;
+        
+        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Once);
         ImGui::Begin("MapWindow", nullptr, window_flags);
         if (game_table_manager.isBoardActive()) {
 
@@ -320,9 +319,7 @@ void ApplicationHandler::renderMainMenuBar() {
             if (game_table_manager.board_manager.isBoardActive()) {
                 if (ImGui::MenuItem("Save")) {
                     //save_active_board = true;
-                    auto board_name = game_table_manager.board_manager.board_name;
-                    std::filesystem::path board_path(rootDirectory);
-                    auto board_folder_path = board_path / "GameTables" / game_table_manager.game_table_name / "Boards";
+                    auto board_folder_path = pathManager.getGameTablesPath() / game_table_manager.game_table_name / "Boards";
                     game_table_manager.board_manager.saveActiveBoard(board_folder_path);
                 }
 

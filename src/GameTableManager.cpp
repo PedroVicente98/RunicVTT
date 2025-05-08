@@ -2,16 +2,14 @@
 #include "imgui_internal.h"
 #include "Serializer.h"
 
-GameTableManager::GameTableManager(flecs::world ecs, std::string rootDirectory)
-    : ecs(ecs), rootDirectory(rootDirectory),/* network_manager(ecs),*/ map_directory(std::string(), std::string()), board_manager(ecs, &map_directory), chat()
+GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
+    : ecs(ecs),/* network_manager(ecs),*/ map_directory(map_directory), board_manager(ecs, map_directory , marker_directory), chat()
 {
-    std::filesystem::path base_path = std::filesystem::path(rootDirectory);
-    std::string map_directory_name = "MapDiretory";
-    std::filesystem::path map_directory_path = base_path / "Maps";
-    map_directory.directoryName = map_directory_name;
-    map_directory.directoryPath = map_directory_path.string();
-    map_directory.startMonitoring();
-    map_directory.generateTextureIDs();
+    std::filesystem::path map_directory_path = pathManager.getMapsPath();
+    map_directory->directoryName = "MapDiretory";
+    map_directory->directoryPath = map_directory_path.string();
+    map_directory->startMonitoring();
+    map_directory->generateTextureIDs();
 }
 
 
@@ -41,14 +39,14 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
                 if (child.has<Board>()) {
                     board_manager.setActiveBoard(child);
                     auto texture = child.get_mut<TextureComponent>();
-                    auto board_image = map_directory.getImageByPath(texture->image_path);
+                    auto board_image = map_directory->getImageByPath(texture->image_path);
                     texture->textureID = board_image.textureID;
                     texture->size = board_image.size;
 
                     child.children([&](flecs::entity grand_child) {
                         if (grand_child.has<MarkerComponent>()) {
                             auto grand_child_texture = grand_child.get_mut<TextureComponent>();
-                            auto marker_image = board_manager.marker_directory.getImageByPath(grand_child_texture->image_path);
+                            auto marker_image = board_manager.marker_directory->getImageByPath(grand_child_texture->image_path);
                             grand_child_texture->textureID = marker_image.textureID;
                             grand_child_texture->size = marker_image.size;
                         }
@@ -247,8 +245,7 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
 
 void GameTableManager::createGameTableFile(flecs::entity game_table) {
     namespace fs = std::filesystem;
-    auto root_directory = fs::current_path();
-    auto game_tables_directory = root_directory / "GameTables";
+    auto game_tables_directory = pathManager.getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
     if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
         std::filesystem::create_directory(active_game_table_folder);
@@ -272,8 +269,7 @@ void GameTableManager::createGameTableFile(flecs::entity game_table) {
 //
 std::vector<std::string> GameTableManager::listBoardFiles() {
     namespace fs = std::filesystem;
-    auto root_directory = fs::current_path();
-    auto game_tables_directory = root_directory / "GameTables";
+    auto game_tables_directory = pathManager.getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
     if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
         std::filesystem::create_directory(active_game_table_folder);
@@ -297,8 +293,7 @@ std::vector<std::string> GameTableManager::listBoardFiles() {
 
 std::vector<std::string> GameTableManager::listGameTableFiles() {
     namespace fs = std::filesystem;
-    auto root_directory = fs::current_path();
-    auto game_tables_directory = root_directory / "GameTables";
+    auto game_tables_directory = pathManager.getGameTablesPath();
 
     // Verifica se o diretório "GameTables" existe
     if (!fs::exists(game_tables_directory) || !fs::is_directory(game_tables_directory)) {
@@ -411,7 +406,7 @@ void GameTableManager::createBoardPopUp() {
         ImGui::NewLine();
 
         // Pega a imagem selecionada do diretório de mapas
-        DirectoryWindow::ImageData selectedImage = map_directory.getSelectedImage();
+        DirectoryWindow::ImageData selectedImage = map_directory->getSelectedImage();
 
         if (!selectedImage.filename.empty()) {
             ImGui::Text("Selected Map: %s", selectedImage.filename.c_str());
@@ -430,7 +425,7 @@ void GameTableManager::createBoardPopUp() {
             board.add(flecs::ChildOf, active_game_table);
 
             // Limpa a seleção após salvar
-            map_directory.clearSelectedImage();
+            map_directory->clearSelectedImage();
             memset(buffer, '\0', sizeof(buffer));
 
             // Fecha o popup após salvar
@@ -441,7 +436,7 @@ void GameTableManager::createBoardPopUp() {
 
         // Botão para fechar o popup
         if (ImGui::Button("Close")) {
-            map_directory.clearSelectedImage();  // Limpa o caminho ao fechar
+            map_directory->clearSelectedImage();  // Limpa o caminho ao fechar
             ImGui::CloseCurrentPopup();
         }
 
@@ -450,7 +445,7 @@ void GameTableManager::createBoardPopUp() {
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 
         // Coluna direita: diretório de mapas para seleção de imagem
-        map_directory.renderDirectory(true);  // Renderiza o diretório de mapas dentro da coluna direita
+        map_directory->renderDirectory(true);  // Renderiza o diretório de mapas dentro da coluna direita
 
         ImGui::Columns(1);  // Volta para uma única coluna
 
@@ -711,8 +706,7 @@ void GameTableManager::loadGameTablePopUp() {
                     game_table_name = game_table;
                 }
 
-                std::filesystem::path game_table_file_path(rootDirectory);
-                game_table_file_path = game_table_file_path / "GameTables" / game_table_name / game_table;
+                std::filesystem::path game_table_file_path = pathManager.getRootDirectory() / "GameTables" / game_table_name / game_table;
                 loadGameTable(game_table_file_path);
 
                 int port = atoi(port_buffer);
@@ -756,8 +750,7 @@ void GameTableManager::loadBoardPopUp() {
         for (auto& board : boards) {
             if (ImGui::Button(board.c_str())) 
             {
-                std::filesystem::path board_file_path(rootDirectory);
-                board_file_path = board_file_path / "GameTables" / game_table_name / "Boards" / board;
+                std::filesystem::path board_file_path = pathManager.getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
                 board_manager.loadActiveBoard(board_file_path.string());
                 ImGui::CloseCurrentPopup();
             }
@@ -780,7 +773,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 {
     if (board_manager.isBoardActive()) {
         //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
-        board_manager.marker_directory.renderDirectory();
+        board_manager.marker_directory->renderDirectory();
         //}
 	    board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);

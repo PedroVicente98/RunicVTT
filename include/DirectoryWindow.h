@@ -39,14 +39,23 @@ public:
     // Function to generate the texture IDs
     void generateTextureIDs() {
         // Wait for the monitoring thread to finish one full loop
-        {
-            std::shared_lock<std::shared_mutex> lock(imagesMutex);  // Shared lock: waits if the thread is still writing
-            if (!first_scan_done) {
-                lock.unlock();
-                std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Wait and retry
-                generateTextureIDs();  // Retry generating textures
-                return;
+        //{
+        //    std::shared_lock<std::shared_mutex> lock(imagesMutex);  // Shared lock: waits if the thread is still writing
+        //    if (!first_scan_done) {
+        //        lock.unlock();
+        //        std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Wait and retry
+        //        generateTextureIDs();  // Retry generating textures
+        //        return;
+        //    }
+        //}
+
+        while (true) {
+            {
+                std::shared_lock<std::shared_mutex> lock(imagesMutex);
+                if (first_scan_done)
+                    break;
             }
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
 
         // Now generate textures
@@ -232,9 +241,11 @@ private:
 
                 images.insert(images.end(), newImages.begin(), newImages.end());
                 
-                first_scan_done = true;
                
             }
+
+
+            first_scan_done = true;
             std::this_thread::sleep_for(std::chrono::seconds(2)); // Check every 2 seconds
         }
     }

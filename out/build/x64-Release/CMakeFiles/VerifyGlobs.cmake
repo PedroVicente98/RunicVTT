@@ -9,7 +9,6 @@ set(OLD_GLOB
   "C:/Dev/RunicVTT/src/Application_OLD.cpp"
   "C:/Dev/RunicVTT/src/BoardManager.cpp"
   "C:/Dev/RunicVTT/src/GameTableManager.cpp"
-  "C:/Dev/RunicVTT/src/Marker.cpp"
   "C:/Dev/RunicVTT/src/NetworkManager_OLD.cpp"
   "C:/Dev/RunicVTT/src/main.cpp"
   "C:/Dev/RunicVTT/src/renderer/IndexBuffer.cpp"

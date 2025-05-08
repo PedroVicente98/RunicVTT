@@ -5,11 +5,13 @@
 
 #include "flecs.h"
 #include "Components.h"
+#include "PathManager.h"
+
 //#include "NetworkManager.h"
 
 class GameTableManager {
 public:
-	GameTableManager(flecs::world ecs, std::string rootDirectory);
+	GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~GameTableManager();
 
 	void saveGameTable();
@@ -58,9 +60,9 @@ public:
 
 	std::string game_table_name; 
 	Chat chat;
-	DirectoryWindow map_directory;
+	std::shared_ptr<DirectoryWindow> map_directory;
 	BoardManager board_manager;
-	std::string rootDirectory;
+	PathManager pathManager;
 private:
 	//NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();

@@ -27,13 +27,14 @@
 #include "GameTableManager.h"
 #include "DirectoryWindow.h"
 #include "flecs.h"
+#include "PathManager.h"
 
 namespace fs = std::filesystem;
 
 class ApplicationHandler {
 
 public:
-	ApplicationHandler(GLFWwindow* window, std::string rootDirectory);
+	ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~ApplicationHandler();
 	int run();
 
@@ -42,12 +43,11 @@ private:
 	void renderMainMenuBar();
 	void renderDockSpace();
 	void renderActiveGametable(VertexArray &va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
-
+	ImGuiID dockspace_id;
 	GLFWwindow* window;
 	flecs::world ecs;
 	GameTableManager game_table_manager;
-	DirectoryWindow map_directory;
-	DirectoryWindow marker_directory;
-	std::string rootDirectory;
-
+	std::shared_ptr<DirectoryWindow> map_directory;
+	std::shared_ptr<DirectoryWindow> marker_directory;
+	PathManager pathManager = PathManager();
 };

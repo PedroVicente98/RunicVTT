@@ -76,15 +76,6 @@ build CMakeFiles\RunicVTT.dir\src\GameTableManager.cpp.obj: CXX_COMPILER__RunicV
   TARGET_COMPILE_PDB = CMakeFiles\RunicVTT.dir\
   TARGET_PDB = C:\Dev\RunicVTT\bin\RunicVTT.pdb
 
-build CMakeFiles\RunicVTT.dir\src\Marker.cpp.obj: CXX_COMPILER__RunicVTT_unscanned_RelWithDebInfo C$:\Dev\RunicVTT\src\Marker.cpp || cmake_object_order_depends_target_RunicVTT
-  DEFINES = -DGLEW_STATIC -DGLFW_DLL -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -Dflecs_STATIC
-  FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /O2 /Ob1 /DNDEBUG -std:c++20 -MT
-  INCLUDES = -IC:\Dev\RunicVTT\include -IC:\Dev\RunicVTT\include\renderer -IC:\Dev\RunicVTT\dependencies\GLEW\include -IC:\Dev\RunicVTT\dependencies\OpenSSL\include -IC:\Dev\RunicVTT\vendor\imgui -IC:\Dev\RunicVTT\vendor\stb -IC:\Dev\RunicVTT\vendor\glm -IC:\Dev\RunicVTT\vendor\glfw\include -IC:\Dev\RunicVTT\vendor\flecs\include -IC:\Dev\RunicVTT\vendor\libdatachannel\include
-  OBJECT_DIR = CMakeFiles\RunicVTT.dir
-  OBJECT_FILE_DIR = CMakeFiles\RunicVTT.dir\src
-  TARGET_COMPILE_PDB = CMakeFiles\RunicVTT.dir\
-  TARGET_PDB = C:\Dev\RunicVTT\bin\RunicVTT.pdb
-
 build CMakeFiles\RunicVTT.dir\src\main.cpp.obj: CXX_COMPILER__RunicVTT_unscanned_RelWithDebInfo C$:\Dev\RunicVTT\src\main.cpp || cmake_object_order_depends_target_RunicVTT
   DEFINES = -DGLEW_STATIC -DGLFW_DLL -DRTC_ENABLE_MEDIA=1 -DRTC_ENABLE_WEBSOCKET=1 -Dflecs_STATIC
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /O2 /Ob1 /DNDEBUG -std:c++20 -MT
@@ -210,7 +201,7 @@ build CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_widgets.cpp.obj: CXX_COMPILER__
 #############################################
 # Link the executable C:\Dev\RunicVTT\bin\RunicVTT.exe
 
-build C$:\Dev\RunicVTT\bin\RunicVTT.exe: CXX_EXECUTABLE_LINKER__RunicVTT_RelWithDebInfo CMakeFiles\RunicVTT.dir\src\ApplicationHandler.cpp.obj CMakeFiles\RunicVTT.dir\src\BoardManager.cpp.obj CMakeFiles\RunicVTT.dir\src\GameTableManager.cpp.obj CMakeFiles\RunicVTT.dir\src\Marker.cpp.obj CMakeFiles\RunicVTT.dir\src\main.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\IndexBuffer.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Renderer.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Shader.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Texture.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\VertexArray.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\VertexBuffer.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_draw.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_impl_glfw.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_impl_opengl3.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_tables.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_widgets.cpp.obj | C$:\Dev\RunicVTT\dependencies\OpenSSL\lib\libssl.lib C$:\Dev\RunicVTT\dependencies\OpenSSL\lib\libcrypto.lib vendor\libdatachannel\datachannel.lib vendor\glfw\src\glfw3dll.lib C$:\Dev\RunicVTT\dependencies\GLEW\lib\Release\x64\glew32s.lib vendor\flecs\flecs_static.lib || C$:\Dev\RunicVTT\bin\datachannel.dll C$:\Dev\RunicVTT\bin\glfw3.dll vendor\flecs\flecs_static.lib
+build C$:\Dev\RunicVTT\bin\RunicVTT.exe: CXX_EXECUTABLE_LINKER__RunicVTT_RelWithDebInfo CMakeFiles\RunicVTT.dir\src\ApplicationHandler.cpp.obj CMakeFiles\RunicVTT.dir\src\BoardManager.cpp.obj CMakeFiles\RunicVTT.dir\src\GameTableManager.cpp.obj CMakeFiles\RunicVTT.dir\src\main.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\IndexBuffer.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Renderer.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Shader.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\Texture.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\VertexArray.cpp.obj CMakeFiles\RunicVTT.dir\src\renderer\VertexBuffer.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_draw.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_impl_glfw.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_impl_opengl3.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_tables.cpp.obj CMakeFiles\RunicVTT.dir\vendor\imgui\imgui_widgets.cpp.obj | C$:\Dev\RunicVTT\dependencies\OpenSSL\lib\libssl.lib C$:\Dev\RunicVTT\dependencies\OpenSSL\lib\libcrypto.lib vendor\libdatachannel\datachannel.lib vendor\glfw\src\glfw3dll.lib C$:\Dev\RunicVTT\dependencies\GLEW\lib\Release\x64\glew32s.lib vendor\flecs\flecs_static.lib || C$:\Dev\RunicVTT\bin\datachannel.dll C$:\Dev\RunicVTT\bin\glfw3.dll vendor\flecs\flecs_static.lib
   FLAGS = /DWIN32 /D_WINDOWS /EHsc /Zi /O2 /Ob1 /DNDEBUG -MT
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:console
   LINK_LIBRARIES = C:\Dev\RunicVTT\dependencies\OpenSSL\lib\libssl.lib  C:\Dev\RunicVTT\dependencies\OpenSSL\lib\libcrypto.lib  vendor\libdatachannel\datachannel.lib  vendor\glfw\src\glfw3dll.lib  C:\Dev\RunicVTT\dependencies\GLEW\lib\Release\x64\glew32s.lib  opengl32.lib  vendor\flecs\flecs_static.lib  wsock32.lib  ws2_32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib

@@ -19,18 +19,18 @@
 #include <cstdint>   // For uint64_t and UINT64_MAX
 #include "Serializer.h"
 
-BoardManager::BoardManager(flecs::world ecs,/* NetworkManager* network_manager,*/ DirectoryWindow* map_directory)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(std::string(), std::string()), map_directory(map_directory)/*, network_manager(network_manager)*/ {
+BoardManager::BoardManager(flecs::world ecs,/* NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouseStartPos({0,0}), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
     
     
     std::filesystem::path map_path = std::filesystem::path(map_directory->directoryPath);
     std::filesystem::path base_path = map_path.parent_path();
     std::filesystem::path marker_directory_path = base_path / "Markers";
 
-    marker_directory.directoryName = "MarkerDiretory";
-    marker_directory.directoryPath = marker_directory_path.string();
-    marker_directory.startMonitoring();
-    marker_directory.generateTextureIDs();
+    marker_directory->directoryName = "MarkerDiretory";
+    marker_directory->directoryPath = marker_directory_path.string();
+    marker_directory->startMonitoring();
+    marker_directory->generateTextureIDs();
  }
 
 BoardManager::~BoardManager()
@@ -650,7 +650,7 @@ void BoardManager::loadActiveBoard(const std::string& filePath) {
         active_board.children([&](flecs::entity child) {
             if (child.has<MarkerComponent>()) {
                 auto child_texture = child.get_mut<TextureComponent>();
-                auto marker_image = marker_directory.getImageByPath(child_texture->image_path);
+                auto marker_image = marker_directory->getImageByPath(child_texture->image_path);
                 child_texture->textureID = marker_image.textureID;
                 child_texture->size = marker_image.size;
             }

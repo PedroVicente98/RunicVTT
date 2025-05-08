@@ -32,6 +32,10 @@ public:
     fs::path getNotesPath() const {
         return baseDocumentsPath / "Notes";
     }
+    
+    fs::path getGameTablesPath() const {
+        return baseDocumentsPath / "GameTables";
+    }
 
     fs::path getConfigPath() const {
         return baseDocumentsPath / "Config";
@@ -62,6 +66,7 @@ public:
         createIfNotExists(getMarkersPath());
         createIfNotExists(getNotesPath());
         createIfNotExists(getConfigPath());
+        createIfNotExists(getGameTablesPath());
     }
 
 private:
