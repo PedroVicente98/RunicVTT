@@ -101,3 +101,11 @@ struct Notes {
     std::vector<flecs::entity> notes;
 };
 
+
+struct PeerInfo {
+    std::string id;
+    std::string username;
+    bool isAuthenticated = false;
+    bool isGameMaster = false;
+};
+

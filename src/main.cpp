@@ -35,38 +35,6 @@ GLFWwindow* initializeOpenGLContext() {
     return window;
 }
 
-
-static std::string setupRootDirectory() {
-    auto rootDirectory = std::filesystem::current_path();
-	if (rootDirectory.filename() == "bin") {
-		rootDirectory = rootDirectory.parent_path();
-	}
-    if (rootDirectory.filename() == "RunicVTT") {
-        auto games_tables_directory = rootDirectory / "GameTables";
-        if (!fs::exists(games_tables_directory)) {
-            if (fs::create_directory(games_tables_directory)) {
-                std::cout << "GameTables directory created successfully: " << games_tables_directory << std::endl;
-            }
-        }
-
-        auto maps_directory = rootDirectory / "Maps";
-        if (!fs::exists(maps_directory)) {
-            if (fs::create_directory(maps_directory)) {
-                std::cout << "Maps directory created successfully: " << maps_directory << std::endl;
-            }
-        }
-
-        auto markers_directory = rootDirectory / "Markers";
-        if (!fs::exists(markers_directory)) {
-            if (fs::create_directory(markers_directory)) {
-                std::cout << "Markers directory created successfully: " << markers_directory << std::endl;
-            }
-        }
-    }
-    return rootDirectory.string();
-
-}
-
 // Função para definir o ícone da janela
 void setWindowIcon(GLFWwindow* window, const char* iconPath) {
     // Carrega a imagem do ícone usando stb_image
@@ -101,16 +69,16 @@ int main() {
     }
     
 
-    auto pathManager = PathManager();
-    pathManager.ensureDirectories();
+    //auto pathManager = PathManager();
+    PathManager::ensureDirectories();
 
-    auto iconPath = pathManager.getResPath() / "RunicVTTIcon.png";
+    auto iconPath = PathManager::getResPath() / "RunicVTTIcon.png";
     setWindowIcon(window, iconPath.string().c_str());
 
 
 
-    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(pathManager.getMapsPath().string(), "MapsDiretory");
-    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(pathManager.getMarkersPath().string(),"MarkersDirectory");
+    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
+    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(),"MarkersDirectory");
     ApplicationHandler app(window, map_directory, marker_directory);
     app.run();  // Executa o loop principal da aplicação
 

@@ -62,7 +62,6 @@ public:
 	Chat chat;
 	std::shared_ptr<DirectoryWindow> map_directory;
 	BoardManager board_manager;
-	PathManager pathManager;
 private:
 	//NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();

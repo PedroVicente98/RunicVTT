@@ -19,6 +19,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<Network>();
     ecs.component<Notes>();
     ecs.component<Identifier>();
+    ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
    
 }
@@ -79,7 +80,7 @@ int ApplicationHandler::run()
 
         glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 
-        std::filesystem::path shader_path = pathManager.getShaderPath() / "Basic.shader";
+        std::filesystem::path shader_path = PathManager::getShaderPath() / "Basic.shader";
         Shader shader(shader_path.string());
         shader.Bind();
         shader.SetUniform1i("u_Texture", 0);
@@ -319,7 +320,7 @@ void ApplicationHandler::renderMainMenuBar() {
             if (game_table_manager.board_manager.isBoardActive()) {
                 if (ImGui::MenuItem("Save")) {
                     //save_active_board = true;
-                    auto board_folder_path = pathManager.getGameTablesPath() / game_table_manager.game_table_name / "Boards";
+                    auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
                     game_table_manager.board_manager.saveActiveBoard(board_folder_path);
                 }
 

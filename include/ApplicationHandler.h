@@ -49,5 +49,4 @@ private:
 	GameTableManager game_table_manager;
 	std::shared_ptr<DirectoryWindow> map_directory;
 	std::shared_ptr<DirectoryWindow> marker_directory;
-	PathManager pathManager = PathManager();
 };

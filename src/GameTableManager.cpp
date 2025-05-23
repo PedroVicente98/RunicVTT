@@ -5,7 +5,7 @@
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
     : ecs(ecs),/* network_manager(ecs),*/ map_directory(map_directory), board_manager(ecs, map_directory , marker_directory), chat()
 {
-    std::filesystem::path map_directory_path = pathManager.getMapsPath();
+    std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
     map_directory->directoryPath = map_directory_path.string();
     map_directory->startMonitoring();
@@ -245,7 +245,7 @@ void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double
 
 void GameTableManager::createGameTableFile(flecs::entity game_table) {
     namespace fs = std::filesystem;
-    auto game_tables_directory = pathManager.getGameTablesPath();
+    auto game_tables_directory = PathManager::getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
     if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
         std::filesystem::create_directory(active_game_table_folder);
@@ -269,7 +269,7 @@ void GameTableManager::createGameTableFile(flecs::entity game_table) {
 //
 std::vector<std::string> GameTableManager::listBoardFiles() {
     namespace fs = std::filesystem;
-    auto game_tables_directory = pathManager.getGameTablesPath();
+    auto game_tables_directory = PathManager::getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
     if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
         std::filesystem::create_directory(active_game_table_folder);
@@ -293,7 +293,7 @@ std::vector<std::string> GameTableManager::listBoardFiles() {
 
 std::vector<std::string> GameTableManager::listGameTableFiles() {
     namespace fs = std::filesystem;
-    auto game_tables_directory = pathManager.getGameTablesPath();
+    auto game_tables_directory = PathManager::getGameTablesPath();
 
     // Verifica se o diretório "GameTables" existe
     if (!fs::exists(game_tables_directory) || !fs::is_directory(game_tables_directory)) {
@@ -706,7 +706,7 @@ void GameTableManager::loadGameTablePopUp() {
                     game_table_name = game_table;
                 }
 
-                std::filesystem::path game_table_file_path = pathManager.getRootDirectory() / "GameTables" / game_table_name / game_table;
+                std::filesystem::path game_table_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / game_table;
                 loadGameTable(game_table_file_path);
 
                 int port = atoi(port_buffer);
@@ -750,7 +750,7 @@ void GameTableManager::loadBoardPopUp() {
         for (auto& board : boards) {
             if (ImGui::Button(board.c_str())) 
             {
-                std::filesystem::path board_file_path = pathManager.getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
+                std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
                 board_manager.loadActiveBoard(board_file_path.string());
                 ImGui::CloseCurrentPopup();
             }

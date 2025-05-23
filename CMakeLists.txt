@@ -10,6 +10,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "" FORCE)
 # ----------------------
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
+    src/network/*.cpp
     src/renderer/*.cpp
     vendor/imgui/*.cpp
 )
@@ -29,6 +30,7 @@ add_executable(RunicVTT ${SOURCES})
 target_include_directories(RunicVTT PRIVATE
     include
     include/renderer
+    include/network
     dependencies/GLEW/include
     dependencies/OpenSSL/include
     vendor/imgui
