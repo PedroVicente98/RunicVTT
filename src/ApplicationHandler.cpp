@@ -19,6 +19,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<Network>();
     ecs.component<Notes>();
     ecs.component<Identifier>();
+    ecs.component<NoteComponent>();
     ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
    

@@ -96,16 +96,34 @@ struct Network {
     bool is_gamemaster;
 };
 
-// Notes Component
-struct Notes {
-    std::vector<flecs::entity> notes;
-};
-
-
 struct PeerInfo {
     std::string id;
     std::string username;
     bool isAuthenticated = false;
     bool isGameMaster = false;
 };
+
+// Notes Component
+struct Notes {
+    std::vector<flecs::entity> notes;
+};
+
+struct NoteComponent {
+    std::string uuid;
+    std::string title;
+    std::string markdown_text;
+    std::string author;
+    std::string creation_date;
+    std::string last_update;
+
+    bool open_editor = false;
+    bool selected = false;
+    bool shared = false;
+    bool saved_locally = false;
+    bool has_conflict = false;
+    std::string shared_from;
+};
+
+
+
 
