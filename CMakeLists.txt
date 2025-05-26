@@ -41,7 +41,7 @@ target_include_directories(RunicVTT PRIVATE
     vendor/glm
     vendor/glfw/include
     vendor/flecs/include
-    vendor/libdatachannel/json/include
+    vendor/json/include
 )
 
 # --- OpenSSL config (antes de add_subdirectory(libdatachannel)) ---
@@ -59,6 +59,11 @@ target_link_libraries(RunicVTT PRIVATE
 )
 
 # ----------------------
+# nlohhmann json
+# ----------------------
+#add_subdirectory(vendor/json)
+#target_link_libraries(RunicVTT PRIVATE nlohmann_json)# ----------------------
+
 # libdatachannel (Static)
 # ----------------------
 set(DCHANNEL_BUILD_TESTS OFF CACHE BOOL "" FORCE)
