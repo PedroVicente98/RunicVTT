@@ -1,4 +1,4 @@
-#include "NoteEditorUI.h"
+﻿#include "NoteEditorUI.h"
 
 NoteEditorUI::NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager)
 : m_world (world), m_noteManager(noteManager){
@@ -98,8 +98,62 @@ void NoteEditorUI::renderNoteTab(NoteComponent& note) {
 
 
 void NoteEditorUI::renderDirectoryPanel(float height, float& leftWidth) {
+    ImGui::BeginChild("Directory", ImVec2(leftWidth, height), true);
 
+    ImGui::Text("📓 My Notes");
+    ImGui::Separator();
+
+    if (ImGui::Button("+ New Note")) {
+        NoteComponent note = m_noteManager->createNewNote("local");
+        m_noteManager->saveNoteToDisk(note);
+
+        // Deselect others
+        m_world->each<NoteComponent>([](flecs::entity, NoteComponent& n) {
+            n.selected = false;
+            });
+
+        // Auto-select the new note
+        flecs::entity new_note = m_world->lookup(note.uuid.c_str());
+        if (new_note.is_alive()) {
+            new_note.get_mut<NoteComponent>()->selected = true;
+        }
+    }
+
+    // Render local notes
+    m_world->each<NoteComponent>([&](flecs::entity e, NoteComponent& note) {
+        if (note.shared) return;
+
+        if (ImGui::Selectable(note.title.c_str(), note.selected)) {
+            note.selected = !note.selected;
+        }
+        });
+
+    ImGui::Spacing();
+    ImGui::Text("🌐 Shared with Me");
+    ImGui::Separator();
+
+    m_world->each<NoteComponent>([&](flecs::entity e, NoteComponent& note) {
+        if (!note.shared) return;
+
+        std::string label = note.title + " (@" + note.shared_from + ")";
+        if (ImGui::Selectable(label.c_str(), note.selected)) {
+            note.selected = !note.selected;
+        }
+
+        if (!note.saved_locally) {
+            ImGui::SameLine();
+            std::string saveBtnID = "##SaveBtn_" + note.uuid;
+            if (ImGui::SmallButton(("💾 Save" + saveBtnID).c_str())) {
+                m_noteManager->saveNoteToDisk(note);
+                note.saved_locally = true;
+                note.shared = false; // Move it to "My Notes"
+            }
+        }
+        });
+
+    ImGui::EndChild();
 }
+
 
 //imgui_md renderer--------------------------------------------------------------------
 

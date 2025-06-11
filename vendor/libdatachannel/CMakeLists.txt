@@ -21,7 +21,7 @@ option(USE_SYSTEM_JSON "Use system Nlohmann JSON" ${PREFER_SYSTEM_LIB})
 option(NO_WEBSOCKET "Disable WebSocket support" OFF)
 option(NO_MEDIA "Disable media transport support" OFF)
 option(NO_EXAMPLES "Disable examples" OFF)
-option(NO_TESTS "Disable tests build" ON)
+option(NO_TESTS "Disable tests build" OFF)
 option(WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 option(CAPI_STDCALL "Set calling convention of C API callbacks stdcall" OFF)
 option(SCTP_DEBUG "Enable SCTP debugging output to verbose log" OFF)
@@ -65,7 +65,9 @@ set(LIBDATACHANNEL_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/channel.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/configuration.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/datachannel.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/dependencydescriptor.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/description.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/iceudpmuxlistener.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/mediahandler.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/global.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/message.cpp
@@ -98,7 +100,9 @@ set(LIBDATACHANNEL_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/channel.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/configuration.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/datachannel.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/dependencydescriptor.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/description.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/iceudpmuxlistener.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/mediahandler.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/rtcpreceivingsession.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/include/rtc/common.hpp
@@ -139,6 +143,7 @@ set(LIBDATACHANNEL_IMPL_SOURCES
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/dtlssrtptransport.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/dtlstransport.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/icetransport.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/iceudpmuxlistener.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/init.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/peerconnection.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/logcounter.cpp
@@ -171,6 +176,7 @@ set(LIBDATACHANNEL_IMPL_HEADERS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/dtlssrtptransport.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/dtlstransport.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/icetransport.hpp
+	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/iceudpmuxlistener.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/init.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/internals.hpp
 	${CMAKE_CURRENT_SOURCE_DIR}/src/impl/peerconnection.hpp

@@ -1,16 +1,19 @@
 #pragma once
-#include <functional>
 #include <string>
+#include <functional>
 
 class SignalingServer {
 public:
     void start(const std::string& host, unsigned short port);
     void stop();
 
-    void send(const std::string& toPeerId, const std::string& message);
-    void onMessage(std::function<void(const std::string& fromPeerId, const std::string& msg)>);
+    void send(const std::string& peerId, const std::string& message);
     void onClientConnected(std::function<void(const std::string&)>);
+    void onMessage(std::function<void(const std::string& peerId, const std::string& message)>);
 
 private:
-    // Internals for WebSocket implementation
+    std::shared_ptr<rtc::WebSocketServer> server;
+    std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> clients;
+    std::function<void(const std::string&)> onConnectCb;
+    std::function<void(const std::string&, const std::string&)> onMessageCb;
 };

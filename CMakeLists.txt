@@ -64,6 +64,15 @@ target_link_libraries(RunicVTT PRIVATE
 #add_subdirectory(vendor/json)
 #target_link_libraries(RunicVTT PRIVATE nlohmann_json)# ----------------------
 
+
+# ----------------------
+# miniupnpc
+# ----------------------
+
+add_subdirectory(vendor/miniupnpc)
+target_link_libraries(RunicVTT PRIVATE miniupnpc)
+
+# ----------------------
 # libdatachannel (Static)
 # ----------------------
 set(DCHANNEL_BUILD_TESTS OFF CACHE BOOL "" FORCE)
