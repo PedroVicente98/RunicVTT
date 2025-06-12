@@ -41,7 +41,7 @@ target_include_directories(RunicVTT PRIVATE
     vendor/glm
     vendor/glfw/include
     vendor/flecs/include
-    vendor/json/include
+    vendor/json/single_include
 )
 
 # --- OpenSSL config (antes de add_subdirectory(libdatachannel)) ---
