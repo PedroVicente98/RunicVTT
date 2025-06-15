@@ -3,5 +3,5 @@
 .idea/
 nbproject/
 .DS_Store
-bin/
+/bin/
 out/
