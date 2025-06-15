@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 project(RunicVTT VERSION 1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -73,18 +73,27 @@ add_subdirectory(vendor/miniupnpc)
 target_link_libraries(RunicVTT PRIVATE miniupnpc)
 
 # ----------------------
-# libdatachannel (Static)
-# ----------------------
+# 🔒 Desativa testes de todos os submódulos antes de adicioná-los
+set(BUILD_TESTING OFF CACHE BOOL "Disable all CMake tests globally" FORCE)
+set(LIBDATACHANNEL_BUILD_TESTS OFF CACHE BOOL "Disable libdatachannel tests" FORCE)
+set(LIBSRTP_TEST_APPS OFF CACHE BOOL "Disable libsrtp tests" FORCE)
+set(TEST_APPS OFF CACHE BOOL "Disable usrsctp tests" FORCE)
+set(UPNPC_BUILD_TESTS OFF CACHE BOOL "Disable miniupnpc tests" FORCE)
 set(DCHANNEL_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
+set(NO_TESTS ON CACHE BOOL "NO TESTS PLEASE" FORCE)
+
+# ----------------------
+# libdatachannel (Static)
 add_subdirectory(vendor/libdatachannel)
 target_link_libraries(RunicVTT PRIVATE datachannel)
 
 # ----------------------
 # GLFW (Static)
 # ----------------------
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(vendor/glfw)
 target_link_libraries(RunicVTT PRIVATE glfw)
@@ -99,7 +108,6 @@ target_link_libraries(RunicVTT PRIVATE opengl32)
 # ----------------------
 # Flecs (Static)
 # ----------------------
-set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
 add_subdirectory(vendor/flecs)
 target_link_libraries(RunicVTT PRIVATE flecs::flecs_static)
 
