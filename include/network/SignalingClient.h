@@ -2,6 +2,7 @@
 #include <string>
 #include <functional>
 #include <memory>
+#include "rtc/rtc.hpp"
 
 class SignalingClient {
 public:

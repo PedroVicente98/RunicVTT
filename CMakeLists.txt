@@ -65,12 +65,6 @@ target_link_libraries(RunicVTT PRIVATE
 #target_link_libraries(RunicVTT PRIVATE nlohmann_json)# ----------------------
 
 
-# ----------------------
-# miniupnpc
-# ----------------------
-
-add_subdirectory(vendor/miniupnpc)
-target_link_libraries(RunicVTT PRIVATE miniupnpc)
 
 # ----------------------
 # 🔒 Desativa testes de todos os submódulos antes de adicioná-los
@@ -85,6 +79,15 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
 set(NO_TESTS ON CACHE BOOL "NO TESTS PLEASE" FORCE)
+
+# ----------------------
+# miniupnpc
+# ----------------------
+
+add_subdirectory(vendor/miniupnpc)
+target_link_libraries(RunicVTT PRIVATE miniupnpc)
+target_link_directories(RunicVTT PRIVATE "${CMAKE_BINARY_DIR}/vendor/miniupnpc")
+
 
 # ----------------------
 # libdatachannel (Static)
