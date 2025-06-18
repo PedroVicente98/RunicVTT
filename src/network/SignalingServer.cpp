@@ -36,6 +36,7 @@ void SignalingServer::start(const std::string& host, unsigned short port) {
 //    server->stop();
 //    clients.clear();
 //}
+// 
 //
 //void SignalingServer::send(const std::string& peerId, const std::string& message) {
 //    if (clients.count(peerId)) {

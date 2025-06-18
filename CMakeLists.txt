@@ -67,27 +67,43 @@ target_link_libraries(RunicVTT PRIVATE
 
 
 # ----------------------
-# 🔒 Desativa testes de todos os submódulos antes de adicioná-los
+# Global/Precise Test and Example Disabling Flags
+# This block sets common and specific options BEFORE adding subdirectories.
+# This ensures subprojects configure themselves without building unwanted tests/examples.
+
+# Global test disabling (kept as requested for general reassurance)
 set(BUILD_TESTING OFF CACHE BOOL "Disable all CMake tests globally" FORCE)
-set(LIBDATACHANNEL_BUILD_TESTS OFF CACHE BOOL "Disable libdatachannel tests" FORCE)
-set(LIBSRTP_TEST_APPS OFF CACHE BOOL "Disable libsrtp tests" FORCE)
-set(TEST_APPS OFF CACHE BOOL "Disable usrsctp tests" FORCE)
+
+# Precise disabling for miniupnpc, based on its options
 set(UPNPC_BUILD_TESTS OFF CACHE BOOL "Disable miniupnpc tests" FORCE)
-set(DCHANNEL_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(FLECS_TESTS OFF CACHE BOOL "" FORCE)
-set(NO_TESTS ON CACHE BOOL "NO TESTS PLEASE" FORCE)
+set(UPNPC_BUILD_SAMPLE OFF CACHE BOOL "Disable miniupnpc sample executables" FORCE)
+
+# Precise disabling for libdatachannel and its submodules, based on its options
+set(LIBSRTP_TEST_APPS OFF CACHE BOOL "Disable libsrtp tests" FORCE) # Specific for libsrtp
+set(TEST_APPS OFF CACHE BOOL "Disable usrsctp tests" FORCE)      # Specific for usrsctp
+set(JUICE_BUILD_TESTS OFF CACHE BOOL "Disable libjuice tests" FORCE) # Specific for libjuice
+
+# Explicitly use libdatachannel's NO_EXAMPLES and NO_TESTS flags
+set(NO_EXAMPLES ON CACHE BOOL "Disable libdatachannel examples" FORCE)
+set(NO_TESTS ON CACHE BOOL "Disable libdatachannel tests build" FORCE)
+
+# Precise disabling for GLFW, based on its options
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "Disable GLFW documentation" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "Disable GLFW test programs" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Disable GLFW example programs" FORCE)
+set(GLFW_INSTALL OFF CACHE BOOL "Disable GLFW installation target" FORCE) # To prevent install rules
+
+# Precise disabling for Flecs, based on its options
+set(FLECS_TESTS OFF CACHE BOOL "Build flecs tests" FORCE)
+set(FLECS_SHARED OFF CACHE BOOL "Disable building shared Flecs library" FORCE) # To ensure static linking
+
 
 # ----------------------
 # miniupnpc
 # ----------------------
-
 add_subdirectory(vendor/miniupnpc)
 target_link_libraries(RunicVTT PRIVATE miniupnpc)
 target_link_directories(RunicVTT PRIVATE "${CMAKE_BINARY_DIR}/vendor/miniupnpc")
-
 
 # ----------------------
 # libdatachannel (Static)
