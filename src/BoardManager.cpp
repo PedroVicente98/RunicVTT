@@ -79,7 +79,7 @@ void BoardManager::renderToolbar() {
         | ImGuiWindowFlags_NoScrollbar 
         | ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_AlwaysAutoResize;
-    auto window_position = camera.getWindowPosition();
+    auto window_position = camera.getPosition(); ///
     auto offset = ImGui::GetFrameHeight();
     ImGui::SetNextWindowPos(ImVec2(window_position.x, window_position.y + offset), ImGuiCond_Always);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
@@ -137,10 +137,10 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         const Grid* grid = active_board.get<Grid>();
         const Size* size = active_board.get<Size>();
 
-        ImVec2 window_size = ImGui::GetWindowSize();
+        /*ImVec2 window_size = ImGui::GetWindowSize();
         ImVec2 window_position = ImGui::GetWindowPos();
         camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
-        camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));
+        camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));*/
 
         glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
         glm::mat4 projection = camera.getProjectionMatrix();
@@ -234,11 +234,6 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         });
         ecs.defer_end();
     }
-   
-
-
-    
-
 
 }
 
@@ -271,8 +266,8 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position) {
         if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
-            glm::vec2 world_position = screenToWorldPosition(mousePos);
-            glm::vec2 start_world_position = screenToWorldPosition(mouseStartPos);
+            glm::vec2 world_position = camera.screenToWorldPosition(mousePos);
+            glm::vec2 start_world_position = camera.screenToWorldPosition(mouseStartPos);
             glm::vec2 delta = world_position - start_world_position;
             position.x += delta.x;
             position.y += delta.y;
@@ -285,40 +280,40 @@ void BoardManager::handleMarkerDragging(glm::vec2 mousePos) {
     ecs.defer_end();
 }
 
-
-glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
-
-    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
-    
-    // Get the view matrix (which handles panning and zoom)
-    glm::mat4 view_matrix = camera.getViewMatrix();
-
-    // Get the projection matrix (which might handle window size)
-    glm::mat4 proj_matrix = camera.getProjectionMatrix();
-
-    // Create a normalized device coordinate from the screen position
-    glm::vec2 window_size = camera.getWindowSize();
-
-    // Convert the screen position to normalized device coordinates (NDC)
-    float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
-    float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
-    glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
-
-    // Calculate the inverse MVP matrix (to map from NDC back to world space)
-    glm::mat4 mvp = proj_matrix * view_matrix;
-    glm::mat4 inverse_mvp = glm::inverse(mvp);
-
-    // Transform the NDC position back to world coordinates
-    glm::vec4 world_position = inverse_mvp * ndc_position;
-
-    // Perform perspective divide to get the correct world position
-    if (world_position.w != 0.0f) {
-        world_position /= world_position.w;
-    }
-
-    // Return the world position as a 2D vector (we're ignoring the Z-axis for 2D rendering)
-    return glm::vec2(world_position.x, world_position.y);
-}
+//
+//glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
+//
+//    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
+//    
+//    // Get the view matrix (which handles panning and zoom)
+//    glm::mat4 view_matrix = camera.getViewMatrix();
+//
+//    // Get the projection matrix (which might handle window size)
+//    glm::mat4 proj_matrix = camera.getProjectionMatrix();
+//
+//    // Create a normalized device coordinate from the screen position
+//    glm::vec2 window_size = camera.getWindowSize();
+//
+//    // Convert the screen position to normalized device coordinates (NDC)
+//    float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
+//    float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
+//    glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
+//
+//    // Calculate the inverse MVP matrix (to map from NDC back to world space)
+//    glm::mat4 mvp = proj_matrix * view_matrix;
+//    glm::mat4 inverse_mvp = glm::inverse(mvp);
+//
+//    // Transform the NDC position back to world coordinates
+//    glm::vec4 world_position = inverse_mvp * ndc_position;
+//
+//    // Perform perspective divide to get the correct world position
+//    if (world_position.w != 0.0f) {
+//        world_position /= world_position.w;
+//    }
+//
+//    // Return the world position as a 2D vector (we're ignoring the Z-axis for 2D rendering)
+//    return glm::vec2(world_position.x, world_position.y);
+//}
 
 // Generates a unique 64-bit ID
 uint64_t BoardManager::generateUniqueId() {
@@ -346,24 +341,24 @@ flecs::entity BoardManager::findEntityById(uint64_t target_id) {
     return result;  // Returns the found entity, or an empty entity if not found
 }
 
-glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
-    // Step 1: Get the combined MVP matrix
-    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
-
-    // Step 2: Transform world position to clip space (NDC)
-    glm::vec4 clipPos = MVP * glm::vec4(world_position, 0.0f, 1.0f);
-
-    // Step 3: Convert NDC to screen coordinates
-    glm::vec2 windowSize = camera.getWindowSize();
-    float screenX = ((clipPos.x / clipPos.w) + 1.0f) * 0.5f * windowSize.x;
-    float screenY = (1.0f - (clipPos.y / clipPos.w)) * 0.5f * windowSize.y;  // Flip Y-axis
-
-    // Step 4: Return screen position as 2D (x, y) coordinates
-
-    glm::vec2 screen_position =  glm::vec2(screenX, screenY);
-
-    return screen_position;
-}
+//glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
+//    // Step 1: Get the combined MVP matrix
+//    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
+//
+//    // Step 2: Transform world position to clip space (NDC)
+//    glm::vec4 clipPos = MVP * glm::vec4(world_position, 0.0f, 1.0f);
+//
+//    // Step 3: Convert NDC to screen coordinates
+//    glm::vec2 windowSize = camera.getWindowSize();
+//    float screenX = ((clipPos.x / clipPos.w) + 1.0f) * 0.5f * windowSize.x;
+//    float screenY = (1.0f - (clipPos.y / clipPos.w)) * 0.5f * windowSize.y;  // Flip Y-axis
+//
+//    // Step 4: Return screen position as 2D (x, y) coordinates
+//
+//    glm::vec2 screen_position =  glm::vec2(screenX, screenY);
+//
+//    return screen_position;
+//}
 
 
 bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
@@ -372,7 +367,8 @@ bool BoardManager::isMouseOverMarker(glm::vec2 mousePos) {
     // Query all markers that are children of the active board and have MarkerComponent
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving) {
-        glm::vec2 world_position = screenToWorldPosition(mousePos);
+        glm::vec2 world_position = camera.screenToWorldPosition(mousePos);
+
 
         if (entity.has(flecs::ChildOf, active_board)) {
             bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
@@ -404,6 +400,7 @@ void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
         is_creating_fog = true;
     }
 }
+
 
 
 void BoardManager::endMouseDrag() {
@@ -469,8 +466,8 @@ flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
 
 void BoardManager::handleFogCreation(glm::vec2 mousePos) {
     glm::vec2 startPos = getMouseStartPosition();  // Tracks the starting drag point
-    glm::vec2 start_world_position = screenToWorldPosition(startPos);
-    glm::vec2 end_world_position = screenToWorldPosition(mousePos);
+    glm::vec2 start_world_position = camera.screenToWorldPosition(startPos);
+    glm::vec2 end_world_position = camera.screenToWorldPosition(mousePos);
 
     // Calculate size
     glm::vec2 size = glm::abs(end_world_position - start_world_position);  // Make sure size is positive
@@ -502,7 +499,7 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size) {
         
-        glm::vec2 world_position = screenToWorldPosition(mouse_position);
+        glm::vec2 world_position = camera.screenToWorldPosition(mouse_position);
         
         if (entity.has(flecs::ChildOf, active_board)) {
 

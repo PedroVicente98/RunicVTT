@@ -15,7 +15,8 @@ public:
     NetworkManager(flecs::world ecs);
     ~NetworkManager();
 
-    void startServer(unsigned short port, bool isClient);
+    void startServer(unsigned short port);
+    void closeServer();
     bool connectToPeer(const std::string& connectionString);
 
 private:

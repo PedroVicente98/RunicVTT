@@ -20,60 +20,123 @@
 
 class Camera {
 public:
-    Camera() : position(0.0f, 0.0f), zoomLevel(1.0f), window_position(0,0), window_size(0,0) {}  // Set initial zoom to 1.0f for no scaling by default
-    
+    Camera() : position(0.0f, 0.0f), zoom_level(1.0f), window_size(0,0) {}  // Set initial zoom to 1.0f for no scaling by default
+
     void pan(glm::vec2 delta) {
         position += delta;
     }
+
     void zoom(float zoomFactor) {
-        zoomLevel *= zoomFactor;
+        zoom_level *= zoomFactor;
     }
+
     void setPosition(glm::vec2 newPosition) {
         position = newPosition;
     }
+
     glm::vec2 getPosition() const {
         return position;
     }
+
     void setZoom(float newZoomLevel) {
-        zoomLevel = newZoomLevel;
+        zoom_level = newZoomLevel;
     }
+
     float getZoom() const {
-        return zoomLevel;
+        return zoom_level;
     }
+
     glm::mat4 getViewMatrix() const {
-	    auto view = glm::scale(glm::mat4(1.0f), glm::vec3(zoomLevel, zoomLevel, 1));
+	    auto view = glm::scale(glm::mat4(1.0f), glm::vec3(zoom_level, zoom_level, 1));
         return glm::translate(view, glm::vec3(-position, 0.0f));
-        //return glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f)), glm::vec3(zoomLevel));
-    } 
+    }
 
     glm::mat4 getProjectionMatrix() const {
-	    //auto projection = glm::ortho(0.0f, window_size.x, 0.0f, window_size.y, -1.0f, 1.0f);
 	    auto projection = glm::ortho(-window_size.x, window_size.x, window_size.y, -window_size.y, -1.0f, 1.0f);
         return projection;
     }
 
-    glm::vec2 getWindowSize() {
-        return window_size;
+    // worldToScreenPosition: Converts a 3D world coordinate to a 2D pixel coordinate
+//                         within the FBO, with (0,0) at the top-left.
+    glm::vec2 worldToScreenPosition(glm::vec2 world_position) const {
+        // 1. Convert World (XY plane, Z=0) to homogeneous coordinates
+        glm::vec4 world_homogeneous = glm::vec4(world_position.x, world_position.y, 0.0f, 1.0f);
+
+        // 2. Apply View Matrix: World Space -> Camera Space
+        glm::vec4 camera_coords = getViewMatrix() * world_homogeneous;
+
+        // 3. Apply Projection Matrix: Camera Space -> Clip Space
+        glm::vec4 clip_coords = getProjectionMatrix() * camera_coords;
+
+        // 4. Convert to Normalized Device Coordinates (NDC)
+        //    Divide by w component (perspective divide)
+        glm::vec2 ndc;
+        if (clip_coords.w != 0.0f) { // Avoid division by zero
+            ndc.x = clip_coords.x / clip_coords.w;
+            ndc.y = clip_coords.y / clip_coords.w;
+        }
+        else {
+            // Handle error or return a sentinel value if w is zero
+            // For orthographic projection, w should always be 1.0, so this path is unlikely
+            // to be taken unless there's an issue with matrix construction.
+            return glm::vec2(NAN, NAN); // Indicate invalid position
+        }
+
+        // 5. Convert NDC to FBO pixels (TOP-LEFT origin)
+        //    NDC range: X [-1, 1], Y [-1, 1]
+        //    FBO pixel range: X [0, window_size.x], Y [0, window_size.y]
+        glm::vec2 fbo_pixel_top_left_origin;
+        fbo_pixel_top_left_origin.x = (ndc.x + 1.0f) * 0.5f * window_size.x;
+        // For Y, (1.0 - ndc.y) flips the Y-axis from OpenGL's bottom-up NDC to FBO's top-down.
+        fbo_pixel_top_left_origin.y = (1.0f - ndc.y) * 0.5f * window_size.y;
+
+        return fbo_pixel_top_left_origin;
     }
 
-    void setWindowSize(glm::vec2 window_size) {
-        this->window_size = window_size;
+    // screenToWorldPosition: Converts a 2D pixel coordinate from the FBO (top-left origin)
+    //                        back to a 3D world coordinate (on the Z=0 plane).
+    glm::vec2 screenToWorldPosition(glm::vec2 fbo_pixel_top_left_origin) const {
+        // 1. Convert FBO pixels (TOP-LEFT origin) to Normalized Device Coordinates (NDC)
+        //    FBO pixel range: X [0, window_size.x], Y [0, window_size.y]
+        //    NDC range: X [-1, 1], Y [-1, 1]
+        glm::vec2 ndc;
+        ndc.x = (fbo_pixel_top_left_origin.x / window_size.x) * 2.0f - 1.0f;
+        // For Y, (fbo_pixel_top_left_origin.y / window_size.y) gives 0-1, then (1.0 - ...) flips back.
+        ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / window_size.y) * 2.0f;
+
+        // For 2D map, assume we're picking on the Z=0 plane in world coordinates.
+        // In NDC, this typically means a Z value of 0.0 (middle of the near/far plane).
+        // The Z component is less critical for a purely 2D unprojection, but needed for the vec4.
+        glm::vec4 ndc_homogeneous = glm::vec4(ndc.x, ndc.y, 0.0f, 1.0f);
+
+        // 2. Compute the Inverse Projection * View matrix
+        glm::mat4 inverse_pv_matrix = glm::inverse(getProjectionMatrix() * getViewMatrix());
+
+        // 3. Transform NDC back to World Space
+        glm::vec4 world_homogeneous = inverse_pv_matrix * ndc_homogeneous;
+
+        // 4. Perform perspective divide (if necessary, though for orthographic w should be 1.0)
+        glm::vec2 world_position;
+        if (world_homogeneous.w != 0.0f) {
+            world_position.x = world_homogeneous.x / world_homogeneous.w;
+            world_position.y = world_homogeneous.y / world_homogeneous.w;
+        }
+        else {
+            // This case should ideally not happen with a valid orthographic matrix.
+            return glm::vec2(NAN, NAN); // Indicate invalid result
+        }
+
+        return world_position;
     }
 
-    glm::vec2 getWindowPosition() {
-        return window_position;
+    void setFboDimensions(glm::vec2 dims) {
+        window_size = dims;
     }
-
-    void setWindowPosition(glm::vec2 window_position) {
-        this->window_position = window_position;
-    }
-
 
 private:
     glm::vec2 position;  // 2D position of the camera (X, Y)
-    float zoomLevel;     // Zoom level, where 1.0f means no zoom, > 1.0f means zoom in, < 1.0f means zoom out
-    glm::vec2 window_size;
-    glm::vec2 window_position;
+    float zoom_level;     // Zoom level, where 1.0f means no zoom, > 1.0f means zoom in, < 1.0f means zoom out
+    glm::vec2 window_size; // current_fbo_dimension
 };
 
 
@@ -125,8 +188,8 @@ public:
     glm::vec2 getMouseStartPosition() const;
     bool isPanning();
     bool isDragginMarker();
-    glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
-    glm::vec2 worldToScreenPosition(glm::vec2 world_position);
+    //glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
+    //glm::vec2 worldToScreenPosition(glm::vec2 world_position);
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
     
     // Generates a unique 64-bit ID

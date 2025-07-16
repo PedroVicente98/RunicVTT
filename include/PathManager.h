@@ -27,9 +27,7 @@ private:
             fs::create_directories(path);
             std::cout << "[PathManager] Created folder: " << path << std::endl;
         }
-        else {
-            std::cout << "[PathManager] Found folder: " << path << std::endl;
-        }
+       
     }
 
 
@@ -63,7 +61,10 @@ public:
     }
 
     // --- APP/INSTALLATION-LOCAL FOLDERS ---
-    static fs::path getExecutableDirectory() {
+    static fs::path getUpnpcExePath() {
+        return executableDir / "upnpc-static.exe";
+
+    }static fs::path getExecutableDirectory() {
         return executableDir;
     }
 

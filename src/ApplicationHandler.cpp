@@ -2,8 +2,9 @@
 #include "Components.h"
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry)
-    : marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), dockspace_id(0)
+    : marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
+
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
     ecs.component<Visibility>();// .member<bool>("isVisible");
@@ -27,7 +28,87 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
 
 ApplicationHandler::~ApplicationHandler()
 {
+    DeleteMapFBO();
 }
+
+
+void ApplicationHandler::CreateMapFBO(int width, int height) {
+    if (map_fbo->fboID != 0) { // If FBO already exists, delete it first
+        DeleteMapFBO();
+    }
+
+    if (width <= 0 || height <= 0) {
+        std::cerr << "Warning: Attempted to create FBO with invalid dimensions: " << width << "x" << height << std::endl;
+        // Keep FBO as 0,0,0 if dimensions are invalid to avoid errors
+        map_fbo->width = 0;
+        map_fbo->height = 0;
+        return;
+    }
+
+    map_fbo->width = width;
+    map_fbo->height = height;
+
+    GLCall(glGenFramebuffers(1, &map_fbo->fboID));
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, map_fbo->fboID));
+
+    // Create a color attachment texture
+    GLCall(glGenTextures(1, &map_fbo->textureID));
+    GLCall(glBindTexture(GL_TEXTURE_2D, map_fbo->textureID));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE)); // Important for non-power-of-2 textures
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+    GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, map_fbo->textureID, 0));
+
+    // Create a renderbuffer object for depth and stencil attachment
+    // This is crucial for proper 3D rendering (correct Z-buffer, stencil for fog, etc.)
+    GLCall(glGenRenderbuffers(1, &map_fbo->rboID));
+    GLCall(glBindRenderbuffer(GL_RENDERBUFFER, map_fbo->rboID));
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+    GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, map_fbo->rboID));
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete! Status: " << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
+    }
+
+    GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
+}
+
+void ApplicationHandler::ResizeMapFBO(int newWidth, int newHeight) {
+    if (map_fbo->width == newWidth && map_fbo->height == newHeight) {
+        return; // No resize needed
+    }
+
+    if (newWidth <= 0 && newHeight <= 0) {
+        // Prevent creating FBO with invalid sizes, might occur when window is minimized
+        if (map_fbo->fboID != 0) DeleteMapFBO(); // Clean up if it exists
+        return;
+    }
+    // Only recreate if dimensions actually changed
+    if (map_fbo->width == newWidth && map_fbo->height == newHeight) {
+        return;
+    }
+    CreateMapFBO(newWidth, newHeight); // Recreate FBO with new dimensions
+}
+
+void ApplicationHandler::DeleteMapFBO() {
+    if (map_fbo->fboID != 0) {
+        GLCall(glDeleteFramebuffers(1, &map_fbo->fboID));
+        map_fbo->fboID = 0;
+    }
+    if (map_fbo->textureID != 0) {
+        GLCall(glDeleteTextures(1, &map_fbo->textureID));
+        map_fbo->textureID = 0;
+    }
+    if (map_fbo->rboID != 0) {
+        GLCall(glDeleteRenderbuffers(1, &map_fbo->rboID));
+        map_fbo->rboID = 0;
+    }
+    map_fbo->width = 0;
+    map_fbo->height = 0;
+}
+
 
 int ApplicationHandler::run() 
 {
@@ -35,7 +116,6 @@ int ApplicationHandler::run()
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
-    game_table_manager.setInputCallbacks(window);
     glfwSetWindowUserPointer(window, &game_table_manager);
     int minWidth = 1280; // AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÂO QUEBRA O LAYOUT
     int minHeight = 960;
@@ -127,6 +207,7 @@ int ApplicationHandler::run()
             /* Poll for and process events */
             glfwPollEvents();
             /* Render here */
+            GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             GLCall(glClear(GL_COLOR_BUFFER_BIT));
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
@@ -135,9 +216,17 @@ int ApplicationHandler::run()
 
             //game_table_manager.processSentMessages();
             //game_table_manager.processReceivedMessages();
+
+            ImGui::ShowMetricsWindow();
+
             renderMainMenuBar();
             renderDockSpace();
-            renderActiveGametable(va, ib, shader, renderer);
+            renderMapFBO(va, ib, shader, renderer);
+            ImGui::Begin("MAP TEST");
+            auto content_size = ImGui::GetContentRegionAvail();
+            ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
+            ImGui::End();
+            renderActiveGametable();
 
             // Rendering
             ImGui::Render();
@@ -165,88 +254,132 @@ int ApplicationHandler::run()
 
 void ApplicationHandler::renderDockSpace() 
 {
-    dockspace_id = ImGui::GetID("Root");
+    auto dockspace_id = ImGui::GetID("Root");
     ImGuiViewport* viewport = ImGui::GetMainViewport();
-    if (ImGui::DockBuilderGetNode(dockspace_id) == 0) {
+    if (g_dockspace_initialized == false) {
+        g_dockspace_initialized = true;
         ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
         ImGui::DockBuilderSetNodeSize(dockspace_id, viewport->Size);
         ImGui::DockBuilderSetNodePos(dockspace_id, viewport->Pos);
+        ImGuiID dock_panel_id;
+        ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.3f, nullptr, &dock_panel_id);
 
-        ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Right, 0.3f, nullptr, &dockspace_id);
-
-        ImGui::DockBuilderDockWindow("MapWindow", dockspace_id);
+        ImGui::DockBuilderDockWindow("MapWindow", dock_panel_id);
         ImGui::DockBuilderDockWindow("ChatWindow", dock_right_id);
-        //ImGui::DockBuilderDockWindow("MapDiretory", dock_right_id);
         ImGui::DockBuilderDockWindow("MarkerDiretory", dock_right_id);
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
     ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Always);
-    ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Always);
+    ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Once);
+    ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Once);
     ImGui::Begin("RootWindow", nullptr, root_flags);
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
 }
 
-void ApplicationHandler::renderActiveGametable(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
+void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
+    if (map_fbo->fboID != 0 && map_fbo->width > 0 && map_fbo->height > 0) {
+        GLCall(glBindFramebuffer(GL_FRAMEBUFFER, map_fbo->fboID));
+        GLCall(glViewport(0, 0, map_fbo->width, map_fbo->height)); // Crucial: Viewport matches FBO size
+        GLCall(glClearColor(0.2f, 0.2f, 0.2f, 1.0f)); // Clear FBO background
+        GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
+        // Inform the camera about the FBO's current dimensions for projection
+        game_table_manager.setCameraFboDimensions(glm::vec2(map_fbo->width, map_fbo->height));
+        game_table_manager.render(va, ib, shader, renderer); // Your board_manager.render() call
+
+        GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
+    }
+}
+
+bool ApplicationHandler::GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size)
+{
+    if (ImGui::IsItemHovered())
+    {
+        // This is the absolute screen position of the top-left of the currently hovered item (your Image)
+        ImVec2 item_screen_pos = ImGui::GetItemRectMin();
+        out_item_size = ImGui::GetItemRectSize(); // The size of the displayed image
+
+        ImVec2 mouse_pos_global = ImGui::GetMousePos();
+        out_mouse_pos_in_item = ImVec2(mouse_pos_global.x - item_screen_pos.x, mouse_pos_global.y - item_screen_pos.y);
+
+        return true;
+    }
+
+    return false;
+}
+
+void ApplicationHandler::renderActiveGametable() {
 
     if (game_table_manager.isGameTableActive() /*|| game_table_manager.isConnected()*/) {
 
-        if (game_table_manager.board_manager.isEditWindowOpen()) {
-            game_table_manager.board_manager.renderEditWindow();
-        }
-        else {
-            game_table_manager.board_manager.setShowEditWindow(false);
-        }
-        game_table_manager.chat.renderChat();
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar;
 
-        ImGui::ShowMetricsWindow();
-        
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBringToFrontOnFocus /*| ImGuiWindowFlags_NoTitleBar*/ | ImGuiWindowFlags_NoDecoration;
-        
-        ImGui::SetNextWindowDockID(dockspace_id, ImGuiCond_Once);
+        ImGui::SetNextWindowSizeConstraints(ImVec2(800, 600), ImVec2(FLT_MAX, FLT_MAX));
         ImGui::Begin("MapWindow", nullptr, window_flags);
+        ImVec2 content_size = ImGui::GetContentRegionAvail();
+
+        if (content_size.x > 0 && content_size.y > 0) {
+            ResizeMapFBO(static_cast<int>(content_size.x), static_cast<int>(content_size.y));
+        }
+        ImVec2 window_size = ImGui::GetWindowSize();
+        ImVec2 window_pos = ImGui::GetWindowPos();
+
         if (game_table_manager.isBoardActive()) {
-
-            ImVec2 window_size = ImGui::GetWindowSize();
-            ImVec2 window_pos = ImGui::GetWindowPos();
-            game_table_manager.setCameraWindowSizePos(glm::vec2(window_size.x, window_size.y), glm::vec2(window_pos.x, window_pos.y));
-
-            ImGui::SetCursorScreenPos(window_pos);
-            ImGui::InvisibleButton("##MapDropArea", window_size);
-            // Handle the drop payload
-            if (ImGui::BeginDragDropTarget()) {
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
-                    
-                    const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
-
-                    ImVec2 mouse_position = ImGui::GetMousePos();
-   
-                    glm::vec2 relative_screen_position = { mouse_position.x - window_pos.x, mouse_position.y - window_pos.y };
-
-                    glm::vec2 world_position = game_table_manager.board_manager.screenToWorldPosition(relative_screen_position);
-                    game_table_manager.board_manager.createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
-
+            if (map_fbo->textureID != 0) {
+                // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui
+                ImVec2 mouse_pos_in_image;
+                ImVec2 displayed_image_size;
+                bool is_mouse_over_map_image = false;
+                ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
+                if (ImGui::IsItemHovered()) {
+                    is_mouse_over_map_image = GetMousePosInItem(mouse_pos_in_image, displayed_image_size);
                 }
-                ImGui::EndDragDropTarget();
+
+                // --- Input Handling Overlay (see Part 2) ---
+                ImVec2 image_min_screen_pos = ImGui::GetItemRectMin();
+                ImVec2 image_actual_displayed_size = ImGui::GetItemRectSize();
+                //ImGui::SetCursorScreenPos(image_min_screen_pos);
+                //ImGui::InvisibleButton("##MapInteractionArea", image_actual_displayed_size);
+
+                if (is_mouse_over_map_image) {
+                    std::cout << "Inside Map Window" << std::endl;
+                    game_table_manager.handleInputs(
+                        mouse_pos_in_image,         // Mouse position relative to the ImGui::Image
+                        displayed_image_size, // Actual size of the displayed ImGui::Image
+                        map_fbo->width,             // Native FBO width
+                        map_fbo->height             // Native FBO height
+                    );
+                }
+                
+
+                ImGui::SetCursorScreenPos(image_min_screen_pos);
+                ImGui::InvisibleButton("##MapDropArea", image_actual_displayed_size);
+                // Handle the drop payload
+                if (ImGui::BeginDragDropTarget()) {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
+                    
+                        const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
+
+                        float fbo_pixel_x_for_drop = (mouse_pos_in_image.x / displayed_image_size.x) * map_fbo->width;
+                        float fbo_pixel_y_for_drop = (mouse_pos_in_image.y / displayed_image_size.y) * map_fbo->height;
+
+                        // Important: Flip Y for OpenGL's bottom-left origin in FBO
+                        fbo_pixel_y_for_drop = map_fbo->height - fbo_pixel_y_for_drop;
+
+                        glm::vec2 world_position = game_table_manager.board_manager.camera.screenToWorldPosition(glm::vec2(fbo_pixel_x_for_drop, fbo_pixel_y_for_drop));
+                        game_table_manager.board_manager.createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
+
+                    }
+                    ImGui::EndDragDropTarget();
+                }
             }
         }
 
-
-        ImVec2 window_pos = ImGui::GetWindowPos();
-        ImVec2 window_size = ImGui::GetWindowSize();
-        int viewport_x = (int)window_pos.x; // Cast to int, ImGui uses float which might not necessarily align with pixel units
-        int viewport_y = (int)(ImGui::GetIO().DisplaySize.y - window_pos.y - window_size.y); // Adjust for OpenGL's bottom-left origin
-        int viewport_width = (int)window_size.x;
-        int viewport_height = (int)window_size.y;
-        GLCall(glViewport(viewport_x, viewport_y, viewport_width, viewport_height));
-
-        game_table_manager.render(va, ib, shader, renderer);
-
         ImGui::End();
+        
     }
 
 }

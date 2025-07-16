@@ -7,7 +7,7 @@
 #include "Components.h"
 #include "PathManager.h"
 
-//#include "NetworkManager.h"
+#include "NetworkManager.h"
 
 class GameTableManager {
 public:
@@ -16,7 +16,7 @@ public:
 
 	void saveGameTable();
 	void loadGameTable(std::filesystem::path game_table_file_path);
-
+	void setCameraFboDimensions(glm::vec2 fbo_dimensions);
 	bool isBoardActive();
 	bool isGameTableActive();
 	//bool isConnectionActive();
@@ -45,7 +45,12 @@ public:
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 
-	void setInputCallbacks(GLFWwindow* window);
+	void handleInputs(ImVec2 mouse_pos_in_image, ImVec2 displayed_image_size, int fbo_width, int fbo_height);
+	void handleCursorInputs();
+	void handleMouseButtonInputs();
+	void handleScrollInputs();
+
+	//void setInputCallbacks(GLFWwindow* window);
 	bool isMouseInsideMapWindow();
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
@@ -63,14 +68,24 @@ public:
 	std::shared_ptr<DirectoryWindow> map_directory;
 	BoardManager board_manager;
 private:
-	//NetworkManager network_manager;
+
+	glm::vec2 convertImGuiScreenToFboPixelsBL(ImVec2 mouse_screen_pos, ImVec2 map_image_min_screen_pos, ImVec2 map_image_actual_displayed_size, int fbo_width, int fbo_height) const;
+
+	// Helper functions for clearer separation of concerns within handleInput
+	void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin,int fbo_height);
+	void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
+	void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
+
+	NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
-	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case
+	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case 
+	glm::vec2 current_mouse_world_pos;  // Posição atual do mouse em world coordinates 
+	glm::vec2 current_mouse_fbo_pos;  // Posição atual do mouse em fbo pixels coordinates 
 
 	char buffer[124] = "";
 	char pass_buffer[124] = "";
-	char port_buffer[124] = "";
+	char port_buffer[6] = "7777";
 
 	// Variável para armazenar o caminho do arquivo selecionado
 	std::string map_image_path = "";

@@ -2,8 +2,25 @@
 #include <rtc/rtc.hpp>
 #include <iostream>
 
-void SignalingServer::start(const std::string& host, unsigned short port) {
+
+SignalingServer::SignalingServer(std::function<void(const std::string&)> onConnectCb, std::function<void(const std::string&, const std::string&)> onMessageCb)
+{
+    this->onConnectCb = onConnectCb;
+    this->onMessageCb = onMessageCb;
+}
+
+SignalingServer::SignalingServer()
+{
+}
+
+SignalingServer::~SignalingServer()
+{
+    this->stop();
+}
+
+void SignalingServer::start(unsigned short port) {
     auto serverConfiguration = rtc::WebSocketServerConfiguration{};
+    serverConfiguration.bindAddress = "0.0.0.0";
     serverConfiguration.port = port;
     server = std::make_shared<rtc::WebSocketServer>(serverConfiguration);
 
@@ -29,13 +46,14 @@ void SignalingServer::start(const std::string& host, unsigned short port) {
         }
     });
 
-    std::cout << "[SignalingServer] Listening at ws://" << host << ":" << port << "\n";
+    std::cout << "[SignalingServer] Listening at ws://0.0.0.0" << ":" << port << "\n";
 }
-//
-//void SignalingServer::stop() {
-//    server->stop();
-//    clients.clear();
-//}
+
+void SignalingServer::stop() {
+    server->stop();
+    clients.clear();
+}
+
 // 
 //
 //void SignalingServer::send(const std::string& peerId, const std::string& message) {

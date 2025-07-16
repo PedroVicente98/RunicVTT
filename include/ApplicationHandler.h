@@ -31,6 +31,22 @@
 
 namespace fs = std::filesystem;
 
+struct MapFBO {
+	GLuint fboID;
+	GLuint textureID;
+	GLuint rboID; // Renderbuffer for depth/stencil (optional but recommended for 3D)
+	int width;
+	int height;
+
+	MapFBO() {
+		this->fboID = 0;
+		this->textureID = 0;
+		this->rboID = 0;
+		this->width = 0;
+		this->height = 0;
+	}
+
+};
 class ApplicationHandler {
 
 public:
@@ -42,11 +58,21 @@ public:
 private:
 	void renderMainMenuBar();
 	void renderDockSpace();
-	void renderActiveGametable(VertexArray &va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
-	ImGuiID dockspace_id;
+	void renderMapFBO(VertexArray &va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
+	void renderActiveGametable();
+
+
+	void CreateMapFBO(int width, int height);
+	void ResizeMapFBO(int newWidth, int newHeight);
+	void DeleteMapFBO();
+
+	bool GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size);
+
+	std::shared_ptr<MapFBO> map_fbo;
 	GLFWwindow* window;
 	flecs::world ecs;
 	GameTableManager game_table_manager;
 	std::shared_ptr<DirectoryWindow> map_directory;
 	std::shared_ptr<DirectoryWindow> marker_directory;
+	bool g_dockspace_initialized = false;
 };

@@ -6,7 +6,10 @@
 
 class SignalingServer {
 public:
-    void start(const std::string& host, unsigned short port);
+    SignalingServer(std::function<void(const std::string&)> onConnectCb, std::function<void(const std::string&, const std::string&)> onMessageCb);
+    SignalingServer();
+    ~SignalingServer();
+    void start(unsigned short port);
     void stop();
 
     void send(const std::string& peerId, const std::string& message);

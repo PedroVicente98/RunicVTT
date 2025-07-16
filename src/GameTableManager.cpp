@@ -3,7 +3,7 @@
 #include "Serializer.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs),/* network_manager(ecs),*/ map_directory(map_directory), board_manager(ecs, map_directory , marker_directory), chat()
+    : ecs(ecs), network_manager(ecs), map_directory(map_directory), board_manager(ecs, map_directory , marker_directory), chat()
 {
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
@@ -122,18 +122,126 @@ bool GameTableManager::isGameTableActive()
 //}
 
 // Função para configurar os callbacks do GLFW
-void GameTableManager::setInputCallbacks(GLFWwindow* window) {
-    glfwSetMouseButtonCallback(window, mouseButtonCallback);
-    glfwSetCursorPosCallback(window, cursorPositionCallback);
-    glfwSetScrollCallback(window, scrollCallback);
+
+void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
+    board_manager.camera.setFboDimensions(fbo_dimensions);
+};
+
+//void GameTableManager::setInputCallbacks(GLFWwindow* window) {
+//    glfwSetMouseButtonCallback(window, mouseButtonCallback);
+//    glfwSetCursorPosCallback(window, cursorPositionCallback);
+//    glfwSetScrollCallback(window, scrollCallback);
+//}
+
+
+
+void GameTableManager::handleInputs(ImVec2 mouse_pos_in_image, ImVec2 displayed_image_size, int fbo_width, int fbo_height) {
+    // 1. Calculate current_mouse_fbo_pos from ImGui image coordinates
+    // This is done once at the beginning of handleInputs.
+    float fbo_x = (mouse_pos_in_image.x / displayed_image_size.x) * fbo_width;
+    float fbo_y = (mouse_pos_in_image.y / displayed_image_size.y) * fbo_height;
+    current_mouse_fbo_pos = glm::vec2(fbo_x, fbo_height - fbo_y); // Y-flip for OpenGL FBO origin
+
+    // 2. Calculate current_mouse_world_pos from FBO pixel coordinates
+    // This is done once here, so all subsequent calls use the already converted world position.
+    current_mouse_world_pos = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos);
+
+    // Call individual handlers
+    handleMouseButtonInputs();
+    handleCursorInputs(); // This will primarily deal with dragging/panning
+    handleScrollInputs();
 }
 
-void GameTableManager::setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos){
-	board_manager.camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
-	board_manager.camera.setWindowPosition(glm::vec2(window_pos.x, window_pos.y));
+void GameTableManager::handleMouseButtonInputs() {
+    // Check if board is active first
+    if (!isBoardActive()) return;
+
+    // Left Mouse Button Press
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        if (board_manager.getCurrentTool() == Tool::MOVE) {
+            if (board_manager.isMouseOverMarker(current_mouse_world_pos)) { // Use world_pos
+                board_manager.startMouseDrag(current_mouse_world_pos, false); // Drag Marker
+            }
+            else {
+                board_manager.startMouseDrag(current_mouse_world_pos, true); // Pan Board
+            }
+        }
+        if (board_manager.getCurrentTool() == Tool::FOG) {
+            board_manager.startMouseDrag(current_mouse_world_pos, false); // Start fog drawing/erasing
+        }
+        if (board_manager.getCurrentTool() == Tool::SELECT) {
+            auto entity = board_manager.getEntityAtMousePosition(current_mouse_world_pos); // Use world_pos
+            if (entity.is_valid()) {
+                board_manager.setShowEditWindow(true, entity);
+            }
+        }
+    }
+
+    // Left Mouse Button Release
+    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
+        if (board_manager.isPanning() || board_manager.isDragginMarker()) {
+            board_manager.endMouseDrag();
+        }
+        if (board_manager.isCreatingFog()) {
+            board_manager.handleFogCreation(current_mouse_world_pos); // Use world_pos
+            board_manager.endMouseDrag();
+        }
+    }
 }
+
+void GameTableManager::handleCursorInputs() {
+    if (!isBoardActive()) return;
+
+    // No need for global mouse position from GLFW anymore
+    // current_mouse_pos is already updated to current_mouse_world_pos by handleInputs()
+
+    if (board_manager.isPanning()) {
+        board_manager.panBoard(current_mouse_world_pos); // Pan logic needs current world mouse position
+    }
+
+    if (board_manager.isDragginMarker()) {
+        board_manager.handleMarkerDragging(current_mouse_world_pos); // Marker dragging logic needs current world mouse position
+    }
+    // Note: If Tool::FOG drawing involves continuous updates while dragging,
+    // that logic would also go here, using current_mouse_world_pos.
+    // Example: if (board_manager.isCreatingFog() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) { ... }
+}
+
+void GameTableManager::handleScrollInputs() {
+    if (!isBoardActive()) return;
+
+    float mouse_wheel_delta = ImGui::GetIO().MouseWheel;
+
+    if (mouse_wheel_delta != 0.0f) {
+        // current_mouse_world_pos already holds the world position under the mouse *before* zoom
+        glm::vec2 world_pos_before_zoom = current_mouse_world_pos;
+
+        // Determine zoom factor
+        float zoom_speed = 0.1f;
+        // Your existing zoom factor logic from GLFW callback:
+        // float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;
+        // Translates to:
+        // ImGui::GetIO().MouseWheel > 0 means scroll up (zoom in in most UIs, but your Camera::zoom_level works opposite for `scale` in view matrix)
+        // If zoom_level > 1 means zoom OUT, then a positive wheel delta means zoom OUT (increase zoom_level).
+        // If zoom_level < 1 means zoom IN, then a negative wheel delta means zoom IN (decrease zoom_level).
+
+        // If you want to use a multiplier like your old `zoom_factor`:
+        float zoom_multiplier = (mouse_wheel_delta > 0) ? 1.1f : 0.9f; // Adjust these values for desired zoom speed
+        board_manager.camera.zoom(zoom_multiplier); // Use camera.zoom()
+
+        // Recalculate camera's matrices (implicit via getProjectionMatrix/getViewMatrix calls in screenToWorldPosition)
+        // Recalculate the world position under the mouse *after* zoom
+        glm::vec2 world_pos_after_zoom = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos); // Use FBO pos, as it's constant for the screen point
+
+        // Adjust camera position to keep the point under the mouse fixed during zoom
+        glm::vec2 zoom_drift = world_pos_after_zoom - world_pos_before_zoom;
+        board_manager.camera.pan(zoom_drift);
+    }
+}
+
 
 bool GameTableManager::isMouseInsideMapWindow() {
+    /*DEPRECATED*/
     // Get the pointer to the MapWindow by name
     ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
     if (!window) return false;  // If window doesn't exist, return false
@@ -282,7 +390,6 @@ std::vector<std::string> GameTableManager::listBoardFiles() {
     std::vector<std::string> boards;
     for (const auto& entry : std::filesystem::directory_iterator(game_table_boards_folder)) {
         if (entry.is_regular_file()) {
-            std::cout << entry.path().filename() << std::endl;  // Print file name
             boards.emplace_back(entry.path().filename().string());
         }
     }
@@ -339,7 +446,7 @@ void GameTableManager::createGameTablePopUp()
    //     ImGui::Text(network_info.c_str());
         ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
        // network_manager.setNetworkPassword(pass_buffer);
-
+       
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
         if (ImGui::Button("Save") && strlen(buffer) > 0 && strlen(port_buffer) > 0)
@@ -771,11 +878,20 @@ void GameTableManager::loadBoardPopUp() {
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer)
 {
+    if (board_manager.isEditWindowOpen()) {
+        board_manager.renderEditWindow();
+    }
+    else {
+        board_manager.setShowEditWindow(false);
+    }
+
+    chat.renderChat();
+
     if (board_manager.isBoardActive()) {
         //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
         board_manager.marker_directory->renderDirectory();
         //}
-	    board_manager.renderToolbar();
+	    //board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);
     }
 }

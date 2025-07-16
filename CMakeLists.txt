@@ -42,6 +42,7 @@ target_include_directories(RunicVTT PRIVATE
     vendor/glfw/include
     vendor/flecs/include
     vendor/json/single_include
+    vendor/libdatachannel/include
 )
 
 # --- OpenSSL config (antes de add_subdirectory(libdatachannel)) ---
@@ -74,10 +75,6 @@ target_link_libraries(RunicVTT PRIVATE
 # Global test disabling (kept as requested for general reassurance)
 set(BUILD_TESTING OFF CACHE BOOL "Disable all CMake tests globally" FORCE)
 
-# Precise disabling for miniupnpc, based on its options
-set(UPNPC_BUILD_TESTS OFF CACHE BOOL "Disable miniupnpc tests" FORCE)
-set(UPNPC_BUILD_SAMPLE OFF CACHE BOOL "Disable miniupnpc sample executables" FORCE)
-
 # Precise disabling for libdatachannel and its submodules, based on its options
 set(LIBSRTP_TEST_APPS OFF CACHE BOOL "Disable libsrtp tests" FORCE) # Specific for libsrtp
 set(TEST_APPS OFF CACHE BOOL "Disable usrsctp tests" FORCE)      # Specific for usrsctp
@@ -96,14 +93,6 @@ set(GLFW_INSTALL OFF CACHE BOOL "Disable GLFW installation target" FORCE) # To p
 # Precise disabling for Flecs, based on its options
 set(FLECS_TESTS OFF CACHE BOOL "Build flecs tests" FORCE)
 set(FLECS_SHARED OFF CACHE BOOL "Disable building shared Flecs library" FORCE) # To ensure static linking
-
-
-# ----------------------
-# miniupnpc
-# ----------------------
-add_subdirectory(vendor/miniupnpc)
-target_link_libraries(RunicVTT PRIVATE miniupnpc)
-target_link_directories(RunicVTT PRIVATE "${CMAKE_BINARY_DIR}/vendor/miniupnpc")
 
 # ----------------------
 # libdatachannel (Static)
@@ -140,6 +129,14 @@ add_custom_command(TARGET RunicVTT POST_BUILD
         "$<TARGET_FILE_DIR:RunicVTT>"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll"
+        "$<TARGET_FILE_DIR:RunicVTT>"
+)
+# ----------------------
+# Copy resource folder
+# ----------------------
+add_custom_command(TARGET RunicVTT POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${CMAKE_SOURCE_DIR}/dependencies/miniupnpc/upnpc-static.exe"
         "$<TARGET_FILE_DIR:RunicVTT>"
 )
 
