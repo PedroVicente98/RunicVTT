@@ -45,7 +45,7 @@ public:
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
 
 
-	void handleInputs(ImVec2 mouse_pos_in_image, ImVec2 displayed_image_size, int fbo_width, int fbo_height);
+	void handleInputs(glm::vec2 current_mouse_fbo_pos);
 	void handleCursorInputs();
 	void handleMouseButtonInputs();
 	void handleScrollInputs();
@@ -80,6 +80,8 @@ private:
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
 	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case 
+
+	glm::vec2 current_mouse_ndc_pos;  // Posição atual do mouse em snake_case 
 	glm::vec2 current_mouse_world_pos;  // Posição atual do mouse em world coordinates 
 	glm::vec2 current_mouse_fbo_pos;  // Posição atual do mouse em fbo pixels coordinates 
 

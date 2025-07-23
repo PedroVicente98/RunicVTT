@@ -66,7 +66,7 @@ private:
 	void ResizeMapFBO(int newWidth, int newHeight);
 	void DeleteMapFBO();
 
-	void GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size, ImVec2& item_screen_pos);
+	void GetMousePosInItem(ImVec2& out_item_size, ImVec2& item_screen_pos);
 
 	std::shared_ptr<MapFBO> map_fbo;
 	GLFWwindow* window;
@@ -76,16 +76,12 @@ private:
 	std::shared_ptr<DirectoryWindow> marker_directory;
 	bool g_dockspace_initialized = false;
 
+	glm::vec2 current_fbo_mouse_pos = glm::vec2(0,0);
+	ImVec2 current_map_relative_mouse_pos = ImVec2(0, 0);
+
 
 	//DEBUG STUFF --------------------------------------
-	 // Stores the global screen position where the last click occurred.
-	ImVec2 m_debugLastClickGlobalPos = ImVec2(-1.0f, -1.0f);
-
-	// Stores the calculated FBO pixel position corresponding to that click.
-	// This is the FBO's bottom-left origin (GL style) pixel.
-	ImVec2 m_debugLastClickFBO_PixelPos = ImVec2(-1.0f, -1.0f);
-
-
+	bool g_draw_debug_circle = true;
 	void DrawDebugCircle(ImVec2 coords, bool is_relative_to_window, ImU32 color, float radius = 10.0f) {
 		ImDrawList* draw_list = ImGui::GetForegroundDrawList();
 		ImVec2 final_screen_pos = coords;

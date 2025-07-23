@@ -127,15 +127,8 @@ void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
     board_manager.camera.setFboDimensions(fbo_dimensions);
 };
 
-void GameTableManager::handleInputs(ImVec2 mouse_pos_in_image, ImVec2 displayed_image_size, int fbo_width, int fbo_height) {
-    // 1. Calculate current_mouse_fbo_pos from ImGui image coordinates
-    // This is done once at the beginning of handleInputs.
-    float fbo_x = (mouse_pos_in_image.x / displayed_image_size.x) * fbo_width;
-    float fbo_y = (mouse_pos_in_image.y / displayed_image_size.y) * fbo_height;
-    current_mouse_fbo_pos = glm::vec2(fbo_x, fbo_height - fbo_y); // Y-flip for OpenGL FBO origin
+void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos) {
 
-    // 2. Calculate current_mouse_world_pos from FBO pixel coordinates
-    // This is done once here, so all subsequent calls use the already converted world position.
     current_mouse_world_pos = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos);
 
     // Call individual handlers

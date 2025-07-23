@@ -28,18 +28,33 @@ public:
 
     glm::vec2 fboToNdcPos(glm::vec2 fbo_pixel_top_left_origin) const {
         glm::vec2 ndc;
-        // Convert X from [0, fbo_dimensions.x] to [-1, 1]
-        ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
-
-        // Convert Y from [0, fbo_dimensions.y] (top-left, Y-down) to [-1, 1] (center, Y-up)
-        // First, normalize Y to [0, 1]: (fbo_pixel_top_left_origin.y / fbo_dimensions.y)
-        // Then, invert Y for OpenGL's Y-up: (1.0f - normalized_y)
-        // Finally, scale to [-1, 1]: (inverted_normalized_y * 2.0f - 1.0f)
-        ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
+        //ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
+        ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
+        //ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
+        ndc.y = 1.0f - (2.0f * (fbo_dimensions.y-fbo_pixel_top_left_origin.y)) / fbo_dimensions.y;
 
         return ndc;
     }
 
+    //
+//glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
+//
+//    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
+//    glm::mat4 view_matrix = camera.getViewMatrix();
+//    glm::mat4 proj_matrix = camera.getProjectionMatrix();
+//    glm::vec2 window_size = camera.getWindowSize();
+//      fbo_pixel_top_left_origin
+// 
+//    float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
+//    float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
+//    glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
+//    glm::mat4 mvp = proj_matrix * view_matrix;
+//    glm::mat4 inverse_mvp = glm::inverse(mvp);
+//    glm::vec4 world_position = inverse_mvp * ndc_position;
+//    return glm::vec2(world_position.x, world_position.y);
+//}
+
+    
     void zoom(float factor, glm::vec2 mouse_pos_fbo_pixels) {
         glm::vec2 mouse_world_pos_before_zoom = screenToWorldPosition(mouse_pos_fbo_pixels);
         float old_zoom_level = zoom_level;
@@ -81,8 +96,12 @@ public:
 
     glm::vec2 worldToScreenPosition(glm::vec2 world_position) const {
         glm::vec4 world_homogeneous = glm::vec4(world_position.x, world_position.y, 0.0f, 1.0f);
-        glm::vec4 camera_coords = getViewMatrix() * world_homogeneous;
-        glm::vec4 clip_coords = getProjectionMatrix() * camera_coords;
+        /*glm::vec4 camera_coords = getViewMatrix() * world_homogeneous;
+        glm::vec4 clip_coords = getProjectionMatrix() * camera_coords;*/
+
+        glm::mat4 pv_matrix = getProjectionMatrix() * getViewMatrix(); // Combine PV matrix
+        glm::vec4 clip_coords = pv_matrix * world_homogeneous;
+
         glm::vec2 ndc;
         if (clip_coords.w != 0.0f) { // Avoid division by zero
             ndc.x = clip_coords.x / clip_coords.w;
@@ -99,9 +118,8 @@ public:
     }
 
     glm::vec2 screenToWorldPosition(glm::vec2 fbo_pixel_top_left_origin) const {
-        glm::vec2 ndc;
-        ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
-        ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
+
+        glm::vec2 ndc = fboToNdcPos(fbo_pixel_top_left_origin);
         glm::vec4 ndc_homogeneous = glm::vec4(ndc.x, ndc.y, 0.0f, 1.0f);
         glm::mat4 inverse_pv_matrix = glm::inverse(getProjectionMatrix() * getViewMatrix());
         glm::vec4 world_homogeneous = inverse_pv_matrix * ndc_homogeneous;
@@ -125,6 +143,7 @@ private:
     glm::vec2 position;  // 2D position of the camera (X, Y)
     float zoom_level;     // Zoom level, where 1.0f means no zoom, > 1.0f means zoom in, < 1.0f means zoom out
     glm::vec2 fbo_dimensions; // current_fbo_dimension
+
 };
 
 

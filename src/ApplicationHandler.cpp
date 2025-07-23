@@ -218,9 +218,9 @@ int ApplicationHandler::run()
             //game_table_manager.processSentMessages();
             //game_table_manager.processReceivedMessages();
 
-
-            renderMainMenuBar();
             renderDockSpace();
+            renderMainMenuBar();
+
             renderMapFBO(va, ib, shader, renderer);
             renderActiveGametable();
 
@@ -268,9 +268,11 @@ void ApplicationHandler::renderDockSpace()
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
-    ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+    ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollWithMouse 
+                                | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoFocusOnAppearing /*<<--TESTING BEHAVIOUR FLAGS--*/ 
+                                | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus;
     ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Always);
-    ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Once);
+    ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Always); //TESTING WITHOUT ImGuiCond_Once
     ImGui::Begin("RootWindow", nullptr, root_flags);
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
@@ -289,18 +291,6 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
     }
-}
-
-void ApplicationHandler::GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size, ImVec2& item_screen_pos)
-{
-        ImVec2 mouse_pos_global = ImGui::GetMousePos();
-        out_mouse_pos_in_item = ImVec2(mouse_pos_global.x - item_screen_pos.x, mouse_pos_global.y - item_screen_pos.y);
-
-        // Capture the raw global mouse position
-        m_debugLastClickGlobalPos = ImGui::GetMousePos();
-        DrawDebugCircle(m_debugLastClickGlobalPos, false, IM_COL32(255, 255, 0, 150), 10.0f); // Yellow for raw click
-        DrawDebugCircle(item_screen_pos, false, IM_COL32(255, 255, 0, 150), 10.0f); // Yellow for image pos
-        
 }
 
 void ApplicationHandler::renderActiveGametable() {
@@ -324,25 +314,26 @@ void ApplicationHandler::renderActiveGametable() {
                 // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui
                 ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 0), ImVec2(1, 1));
 
-                ImVec2 mouse_pos_in_image;
                 ImVec2 displayed_image_size = ImGui::GetItemRectSize();;
                 ImVec2 image_min_screen_pos = ImGui::GetItemRectMin();
 
                 if (ImGui::IsItemHovered()) {
-                    GetMousePosInItem(mouse_pos_in_image, displayed_image_size, image_min_screen_pos);
+                    ImVec2 mouse_pos_global = ImGui::GetMousePos();
+                    current_map_relative_mouse_pos = ImVec2(mouse_pos_global.x - image_min_screen_pos.x, mouse_pos_global.y - image_min_screen_pos.y);
+                    float fbo_x = (current_map_relative_mouse_pos.x / displayed_image_size.x) * map_fbo->width;
+                    float fbo_y = (current_map_relative_mouse_pos.y / displayed_image_size.y) * map_fbo->height;
+                    current_fbo_mouse_pos = glm::vec2(fbo_x, fbo_y);
+                    game_table_manager.handleInputs(current_fbo_mouse_pos);
 
-                    game_table_manager.handleInputs(
-                        mouse_pos_in_image,         // Mouse position relative to the ImGui::Image
-                        displayed_image_size, // Actual size of the displayed ImGui::Image
-                        map_fbo->width,             // Native FBO width
-                        map_fbo->height             // Native FBO height
-                    );
-
-                    float fbo_x = (mouse_pos_in_image.x / displayed_image_size.x) * map_fbo->width;
-                    float fbo_y = (mouse_pos_in_image.y / displayed_image_size.y) * map_fbo->height;
-                    auto current_mouse_fbo_pos = glm::vec2(fbo_x, fbo_y); // Y-flip for OpenGL FBO origin
-
-                    DrawDebugCircle(ImVec2(image_min_screen_pos.x+current_mouse_fbo_pos.x, image_min_screen_pos.y+current_mouse_fbo_pos.y), false, IM_COL32(255, 100, 100, 255), 15.0f); // Red for raw click
+                    //DEBUG purposes
+                    if (g_draw_debug_circle) {
+                        DrawDebugCircle(mouse_pos_global, false, IM_COL32(0, 255, 0, 150), 10.0f); // Yellow for raw click
+                        DrawDebugCircle(image_min_screen_pos, false, IM_COL32(0, 255, 0, 255), 10.0f); // Yellow for image pos
+                        DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y+ current_fbo_mouse_pos.y), false, IM_COL32(255, 0, 0, 255), 5.0f); // Red for raw click
+                    
+                        DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y + (map_fbo->height - current_fbo_mouse_pos.y)), false, IM_COL32(0, 0, 255, 255), 5.0f); // Red for raw click
+                    
+                    }
                 }
                 
                 ImGui::SetCursorScreenPos(image_min_screen_pos);
@@ -353,13 +344,7 @@ void ApplicationHandler::renderActiveGametable() {
                     
                         const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
 
-                        float fbo_pixel_x_for_drop = (mouse_pos_in_image.x / displayed_image_size.x) * map_fbo->width;
-                        float fbo_pixel_y_for_drop = (mouse_pos_in_image.y / displayed_image_size.y) * map_fbo->height;
-
-                        // Important: Flip Y for OpenGL's bottom-left origin in FBO
-                        fbo_pixel_y_for_drop = map_fbo->height - fbo_pixel_y_for_drop;
-
-                        glm::vec2 world_position = game_table_manager.board_manager.camera.screenToWorldPosition(glm::vec2(fbo_pixel_x_for_drop, fbo_pixel_y_for_drop));
+                        glm::vec2 world_position = game_table_manager.board_manager.camera.screenToWorldPosition(current_fbo_mouse_pos);
                         game_table_manager.board_manager.createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
 
                     }
