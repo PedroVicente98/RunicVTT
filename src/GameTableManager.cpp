@@ -127,14 +127,6 @@ void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
     board_manager.camera.setFboDimensions(fbo_dimensions);
 };
 
-//void GameTableManager::setInputCallbacks(GLFWwindow* window) {
-//    glfwSetMouseButtonCallback(window, mouseButtonCallback);
-//    glfwSetCursorPosCallback(window, cursorPositionCallback);
-//    glfwSetScrollCallback(window, scrollCallback);
-//}
-
-
-
 void GameTableManager::handleInputs(ImVec2 mouse_pos_in_image, ImVec2 displayed_image_size, int fbo_width, int fbo_height) {
     // 1. Calculate current_mouse_fbo_pos from ImGui image coordinates
     // This is done once at the beginning of handleInputs.
@@ -213,139 +205,126 @@ void GameTableManager::handleScrollInputs() {
     float mouse_wheel_delta = ImGui::GetIO().MouseWheel;
 
     if (mouse_wheel_delta != 0.0f) {
-        // current_mouse_world_pos already holds the world position under the mouse *before* zoom
-        glm::vec2 world_pos_before_zoom = current_mouse_world_pos;
-
-        // Determine zoom factor
-        float zoom_speed = 0.1f;
-        // Your existing zoom factor logic from GLFW callback:
-        // float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;
-        // Translates to:
-        // ImGui::GetIO().MouseWheel > 0 means scroll up (zoom in in most UIs, but your Camera::zoom_level works opposite for `scale` in view matrix)
-        // If zoom_level > 1 means zoom OUT, then a positive wheel delta means zoom OUT (increase zoom_level).
-        // If zoom_level < 1 means zoom IN, then a negative wheel delta means zoom IN (decrease zoom_level).
-
-        // If you want to use a multiplier like your old `zoom_factor`:
-        float zoom_multiplier = (mouse_wheel_delta > 0) ? 1.1f : 0.9f; // Adjust these values for desired zoom speed
-        board_manager.camera.zoom(zoom_multiplier); // Use camera.zoom()
-
-        // Recalculate camera's matrices (implicit via getProjectionMatrix/getViewMatrix calls in screenToWorldPosition)
-        // Recalculate the world position under the mouse *after* zoom
-        glm::vec2 world_pos_after_zoom = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos); // Use FBO pos, as it's constant for the screen point
-
-        // Adjust camera position to keep the point under the mouse fixed during zoom
-        glm::vec2 zoom_drift = world_pos_after_zoom - world_pos_before_zoom;
-        board_manager.camera.pan(zoom_drift);
-    }
-}
-
-
-bool GameTableManager::isMouseInsideMapWindow() {
-    /*DEPRECATED*/
-    // Get the pointer to the MapWindow by name
-    ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
-    if (!window) return false;  // If window doesn't exist, return false
-
-    // Get the mouse position
-    ImVec2 mousePos = ImGui::GetMousePos();
-
-    // Get the window position and size
-    ImVec2 windowPos = window->Pos;  // Top-left corner
-    ImVec2 windowSize = window->Size;  // Size of the window
-
-    // Check if the mouse is inside the window boundaries
-    bool isInsideX = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x);
-    bool isInsideY = (mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
-
-    // Return true if both X and Y coordinates are inside the window
-    return isInsideX && isInsideY;
-}
-
-
-// Callback estático de botão do mouse
-void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    // Recupera o ponteiro para a instância do GameTableManager
-    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
-    if (!game_table_manager) return;
-
-    glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        if (game_table_manager->isBoardActive()) {
-            if (game_table_manager->isMouseInsideMapWindow()) {
-                if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE ) {
-		            if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
-			            game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
-		            }else{
-                	    game_table_manager->board_manager.startMouseDrag(mouse_pos, true);
-		            }
-                }
-
-                if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
-                    game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
-                }
-            
-                if (game_table_manager->board_manager.getCurrentTool() == Tool::SELECT) {
-                    auto entity = game_table_manager->board_manager.getEntityAtMousePosition(mouse_pos);
-                    if (entity. is_valid()) {
-                        game_table_manager->board_manager.setShowEditWindow(true, entity);
-                    }
-                }
-            }
-
-
-            //else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
-            //    game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
-            //}
+        float zoom_factor;
+        if (mouse_wheel_delta > 0) {
+            zoom_factor = 1.1f; // Zoom in by 10%
         }
-    }
-
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) 
-    {
-        if (game_table_manager->isBoardActive()) {
-
-            if (game_table_manager->board_manager.isPanning() || game_table_manager->board_manager.isDragginMarker()) {
-                game_table_manager->board_manager.endMouseDrag();
-            }
-            if (game_table_manager->board_manager.isCreatingFog()) {
-                auto imgui_mouse_pos = ImGui::GetMousePos();
-                game_table_manager->board_manager.handleFogCreation(glm::vec2(imgui_mouse_pos.x , imgui_mouse_pos.y));
-                game_table_manager->board_manager.endMouseDrag();
-            }
+        else {
+            zoom_factor = 0.9f; // Zoom out by 10%
         }
+        glm::vec2 mouse_pos_for_zoom = current_mouse_fbo_pos;
 
-    }
-
-}
-
-// Callback estático de movimentação do cursor
-void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
-    // Recupera o ponteiro para a instância do GameTableManager
-    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
-    if (!game_table_manager) return;
-    game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
-
-    if (game_table_manager->isBoardActive()) {
-        if (game_table_manager->board_manager.isPanning()) {
-            game_table_manager->board_manager.panBoard(game_table_manager->current_mouse_pos);
-        }
-
-        if (game_table_manager->board_manager.isDragginMarker()) {
-            game_table_manager->board_manager.handleMarkerDragging(game_table_manager->current_mouse_pos);
-        }
+        board_manager.camera.zoom(zoom_factor, mouse_pos_for_zoom);
     }
 }
 
-// Callback estático de scroll (zoom)
-void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
-    // Recupera o ponteiro para a instância do GameTableManager
-    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
-    if (!game_table_manager) return;
-
-    float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
-    if (game_table_manager->isBoardActive()) {
-        game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager
-    }
-}
+//
+//bool GameTableManager::isMouseInsideMapWindow() {
+//    /*DEPRECATED*/
+//    // Get the pointer to the MapWindow by name
+//    ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
+//    if (!window) return false;  // If window doesn't exist, return false
+//
+//    // Get the mouse position
+//    ImVec2 mousePos = ImGui::GetMousePos();
+//
+//    // Get the window position and size
+//    ImVec2 windowPos = window->Pos;  // Top-left corner
+//    ImVec2 windowSize = window->Size;  // Size of the window
+//
+//    // Check if the mouse is inside the window boundaries
+//    bool isInsideX = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x);
+//    bool isInsideY = (mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+//
+//    // Return true if both X and Y coordinates are inside the window
+//    return isInsideX && isInsideY;
+//}
+//
+//
+//// Callback estático de botão do mouse
+//void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+//    // Recupera o ponteiro para a instância do GameTableManager
+//    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+//    if (!game_table_manager) return;
+//
+//    glm::vec2 mouse_pos = game_table_manager->current_mouse_pos;  // Pega a posição atual do mouse
+//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+//        if (game_table_manager->isBoardActive()) {
+//            if (game_table_manager->isMouseInsideMapWindow()) {
+//                if (game_table_manager->board_manager.getCurrentTool() == Tool::MOVE ) {
+//		            if(game_table_manager->board_manager.isMouseOverMarker(mouse_pos)){
+//			            game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
+//		            }else{
+//                	    game_table_manager->board_manager.startMouseDrag(mouse_pos, true);
+//		            }
+//                }
+//
+//                if (game_table_manager->board_manager.getCurrentTool() == Tool::FOG) {
+//                    game_table_manager->board_manager.startMouseDrag(mouse_pos, false);
+//                }
+//            
+//                if (game_table_manager->board_manager.getCurrentTool() == Tool::SELECT) {
+//                    auto entity = game_table_manager->board_manager.getEntityAtMousePosition(mouse_pos);
+//                    if (entity. is_valid()) {
+//                        game_table_manager->board_manager.setShowEditWindow(true, entity);
+//                    }
+//                }
+//            }
+//
+//
+//            //else if (game_table_manager->board_manager.getCurrentTool() == Tool::MARKER) {
+//            //    game_table_manager->board_manager.handleMarkerSelection(mouse_pos);
+//            //}
+//        }
+//    }
+//
+//    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) 
+//    {
+//        if (game_table_manager->isBoardActive()) {
+//
+//            if (game_table_manager->board_manager.isPanning() || game_table_manager->board_manager.isDragginMarker()) {
+//                game_table_manager->board_manager.endMouseDrag();
+//            }
+//            if (game_table_manager->board_manager.isCreatingFog()) {
+//                auto imgui_mouse_pos = ImGui::GetMousePos();
+//                game_table_manager->board_manager.handleFogCreation(glm::vec2(imgui_mouse_pos.x , imgui_mouse_pos.y));
+//                game_table_manager->board_manager.endMouseDrag();
+//            }
+//        }
+//
+//    }
+//
+//}
+//
+//// Callback estático de movimentação do cursor
+//void GameTableManager::cursorPositionCallback(GLFWwindow* window, double xpos, double ypos) {
+//    // Recupera o ponteiro para a instância do GameTableManager
+//    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+//    if (!game_table_manager) return;
+//    game_table_manager->current_mouse_pos = glm::vec2(xpos, ypos);  // Atualiza a posição do mouse
+//
+//    if (game_table_manager->isBoardActive()) {
+//        if (game_table_manager->board_manager.isPanning()) {
+//            game_table_manager->board_manager.panBoard(game_table_manager->current_mouse_pos);
+//        }
+//
+//        if (game_table_manager->board_manager.isDragginMarker()) {
+//            game_table_manager->board_manager.handleMarkerDragging(game_table_manager->current_mouse_pos);
+//        }
+//    }
+//}
+//
+//// Callback estático de scroll (zoom)
+//void GameTableManager::scrollCallback(GLFWwindow* window, double xoffset, double yoffset) {
+//    // Recupera o ponteiro para a instância do GameTableManager
+//    GameTableManager* game_table_manager = static_cast<GameTableManager*>(glfwGetWindowUserPointer(window));
+//    if (!game_table_manager) return;
+//
+//    float zoom_factor = (yoffset > 0) ? 1.1f : 0.9f;  // Aumenta o zoom se o scroll for para cima, diminui se for para baixo
+//    if (game_table_manager->isBoardActive()) {
+//        game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager
+//    }
+//}
 
 // Save and Load Operations ------------------------------------------------------------------------------
 

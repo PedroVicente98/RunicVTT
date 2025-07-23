@@ -480,10 +480,6 @@ void BoardManager::handleFogCreation(glm::vec2 mousePos) {
     createFogOfWar(corrected_start_position, size);
 }
 
-void BoardManager::zoomBoard(float zoomFactor) {
-    camera.zoom(zoomFactor);
-}
-
 Tool BoardManager::getCurrentTool() const {
     return currentTool;
 }

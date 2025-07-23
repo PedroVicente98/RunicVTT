@@ -51,10 +51,10 @@ public:
 	void handleScrollInputs();
 
 	//void setInputCallbacks(GLFWwindow* window);
-	bool isMouseInsideMapWindow();
+	/*bool isMouseInsideMapWindow();
 	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
 	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);*/
 
 	void createGameTableFile(flecs::entity game_table);
 

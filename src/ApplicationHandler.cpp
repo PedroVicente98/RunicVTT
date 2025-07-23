@@ -208,7 +208,8 @@ int ApplicationHandler::run()
             glfwPollEvents();
             /* Render here */
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
-            GLCall(glClear(GL_COLOR_BUFFER_BIT));
+            GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+
             // Start the Dear ImGui frame
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
@@ -217,18 +218,14 @@ int ApplicationHandler::run()
             //game_table_manager.processSentMessages();
             //game_table_manager.processReceivedMessages();
 
-            ImGui::ShowMetricsWindow();
 
             renderMainMenuBar();
             renderDockSpace();
             renderMapFBO(va, ib, shader, renderer);
-            ImGui::Begin("MAP TEST");
-            auto content_size = ImGui::GetContentRegionAvail();
-            ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
-            ImGui::End();
             renderActiveGametable();
 
             // Rendering
+            ImGui::ShowMetricsWindow();
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -272,7 +269,7 @@ void ApplicationHandler::renderDockSpace()
     }
 
     ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-    ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Once);
+    ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Always);
     ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Once);
     ImGui::Begin("RootWindow", nullptr, root_flags);
     ImGui::DockSpace(dockspace_id);
@@ -283,7 +280,7 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
     if (map_fbo->fboID != 0 && map_fbo->width > 0 && map_fbo->height > 0) {
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, map_fbo->fboID));
         GLCall(glViewport(0, 0, map_fbo->width, map_fbo->height)); // Crucial: Viewport matches FBO size
-        GLCall(glClearColor(0.2f, 0.2f, 0.2f, 1.0f)); // Clear FBO background
+        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 0.0f)); // Clear FBO background
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         // Inform the camera about the FBO's current dimensions for projection
@@ -294,21 +291,16 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
     }
 }
 
-bool ApplicationHandler::GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size)
+void ApplicationHandler::GetMousePosInItem(ImVec2& out_mouse_pos_in_item, ImVec2& out_item_size, ImVec2& item_screen_pos)
 {
-    if (ImGui::IsItemHovered())
-    {
-        // This is the absolute screen position of the top-left of the currently hovered item (your Image)
-        ImVec2 item_screen_pos = ImGui::GetItemRectMin();
-        out_item_size = ImGui::GetItemRectSize(); // The size of the displayed image
-
         ImVec2 mouse_pos_global = ImGui::GetMousePos();
         out_mouse_pos_in_item = ImVec2(mouse_pos_global.x - item_screen_pos.x, mouse_pos_global.y - item_screen_pos.y);
 
-        return true;
-    }
-
-    return false;
+        // Capture the raw global mouse position
+        m_debugLastClickGlobalPos = ImGui::GetMousePos();
+        DrawDebugCircle(m_debugLastClickGlobalPos, false, IM_COL32(255, 255, 0, 150), 10.0f); // Yellow for raw click
+        DrawDebugCircle(item_screen_pos, false, IM_COL32(255, 255, 0, 150), 10.0f); // Yellow for image pos
+        
 }
 
 void ApplicationHandler::renderActiveGametable() {
@@ -330,33 +322,31 @@ void ApplicationHandler::renderActiveGametable() {
         if (game_table_manager.isBoardActive()) {
             if (map_fbo->textureID != 0) {
                 // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui
+                ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 0), ImVec2(1, 1));
+
                 ImVec2 mouse_pos_in_image;
-                ImVec2 displayed_image_size;
-                bool is_mouse_over_map_image = false;
-                ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
-                if (ImGui::IsItemHovered()) {
-                    is_mouse_over_map_image = GetMousePosInItem(mouse_pos_in_image, displayed_image_size);
-                }
-
-                // --- Input Handling Overlay (see Part 2) ---
+                ImVec2 displayed_image_size = ImGui::GetItemRectSize();;
                 ImVec2 image_min_screen_pos = ImGui::GetItemRectMin();
-                ImVec2 image_actual_displayed_size = ImGui::GetItemRectSize();
-                //ImGui::SetCursorScreenPos(image_min_screen_pos);
-                //ImGui::InvisibleButton("##MapInteractionArea", image_actual_displayed_size);
 
-                if (is_mouse_over_map_image) {
-                    std::cout << "Inside Map Window" << std::endl;
+                if (ImGui::IsItemHovered()) {
+                    GetMousePosInItem(mouse_pos_in_image, displayed_image_size, image_min_screen_pos);
+
                     game_table_manager.handleInputs(
                         mouse_pos_in_image,         // Mouse position relative to the ImGui::Image
                         displayed_image_size, // Actual size of the displayed ImGui::Image
                         map_fbo->width,             // Native FBO width
                         map_fbo->height             // Native FBO height
                     );
+
+                    float fbo_x = (mouse_pos_in_image.x / displayed_image_size.x) * map_fbo->width;
+                    float fbo_y = (mouse_pos_in_image.y / displayed_image_size.y) * map_fbo->height;
+                    auto current_mouse_fbo_pos = glm::vec2(fbo_x, fbo_y); // Y-flip for OpenGL FBO origin
+
+                    DrawDebugCircle(ImVec2(image_min_screen_pos.x+current_mouse_fbo_pos.x, image_min_screen_pos.y+current_mouse_fbo_pos.y), false, IM_COL32(255, 100, 100, 255), 15.0f); // Red for raw click
                 }
                 
-
                 ImGui::SetCursorScreenPos(image_min_screen_pos);
-                ImGui::InvisibleButton("##MapDropArea", image_actual_displayed_size);
+                ImGui::InvisibleButton("##MapDropArea", displayed_image_size);
                 // Handle the drop payload
                 if (ImGui::BeginDragDropTarget()) {
                     if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
