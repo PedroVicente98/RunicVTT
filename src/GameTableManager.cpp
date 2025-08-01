@@ -177,13 +177,14 @@ void GameTableManager::handleMouseButtonInputs() {
 void GameTableManager::handleCursorInputs() {
     if (!isBoardActive()) return;
 
+    if (board_manager.isDraggingMarker()) {
+        board_manager.handleMarkerDragging(current_mouse_world_pos);  
+    }
+
     if (board_manager.isPanning()) {
         board_manager.panBoard(current_mouse_world_pos); 
     }
 
-    if (board_manager.isDraggingMarker()) {
-        board_manager.handleMarkerDragging(current_mouse_world_pos);  
-    }
 }
 
 void GameTableManager::handleScrollInputs() {

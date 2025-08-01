@@ -333,7 +333,7 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position) {
 
             bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
                 (world_position.y <= (markerPos.y + markerSize.height / 2));
-
+         
             if (withinXBounds && withinYBounds) {
                 moving.isDragging = true;
                 hovered = true;           // Mark as hovered
