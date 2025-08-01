@@ -79,6 +79,7 @@ private:
 	NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
+
 	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case 
 
 	glm::vec2 current_mouse_ndc_pos;  // Posição atual do mouse em snake_case 
@@ -92,4 +93,99 @@ private:
 	// Variável para armazenar o caminho do arquivo selecionado
 	std::string map_image_path = "";
 
+
+	bool mouse_left_clicked, mouse_right_clicked, mouse_middle_clicked;
+	bool mouse_left_released, mouse_right_released, mouse_middle_released;
+	float mouse_wheel_delta;
+	bool ignore_mouse_until_release = false;
+
+public:
+	//void processMouseInput(bool is_mouse_within_image_bounds) {
+
+	//	ImGuiIO& io = ImGui::GetIO();
+
+	//	mouse_wheel_delta = io.MouseWheel;
+
+	//	for (int i = 0; i < 3; ++i) {
+	//		was_mouse_button_down[i] = is_mouse_button_down[i]; // Store previous state
+	//		is_mouse_button_down[i] = io.MouseDown[i]; // Store new state
+	//	}
+	//	
+	//	//IS CLICK INSIDE WINDOW
+	//	if (io.MouseClicked[0] && !is_mouse_within_image_bounds) {
+	//		ignore_mouse_until_release = true;
+	//	}
+	//	
+	//	mouse_left_clicked = mouse_right_clicked = mouse_middle_clicked = false;
+	//	mouse_left_released = mouse_right_released = mouse_middle_released = false;
+
+	//	
+	//	if (!ignore_mouse_until_release) {
+	//		if (is_mouse_button_down[0] && !was_mouse_button_down[0]) { //LEFT
+	//			mouse_left_clicked = true;
+	//		}
+	//		if (is_mouse_button_down[1] && !was_mouse_button_down[1]) { //RIGHT
+	//			mouse_right_clicked = true;
+	//		}
+	//		if (is_mouse_button_down[2] && !was_mouse_button_down[2]) { //MIDDLE
+	//			mouse_middle_clicked = true;
+	//		}
+	//	}
+
+	//	if (!is_mouse_button_down[0] && was_mouse_button_down[0]) { //LEFT
+	//		mouse_left_released = true;
+	//		ignore_mouse_until_release = false;
+	//	}
+
+	//	if (!is_mouse_button_down[1] && was_mouse_button_down[1]) { //RIGHT
+	//		mouse_right_released = true;
+	//		ignore_mouse_until_release = false;
+	//	}
+
+	//	if (!is_mouse_button_down[2] && was_mouse_button_down[2]) { //MIDDLE
+	//		mouse_middle_released = true;
+	//		ignore_mouse_until_release = false;
+	//	}
+	//};
+
+	void processMouseInput(bool is_mouse_within_image_bounds) {
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		mouse_wheel_delta = io.MouseWheel;
+
+		if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds) {
+			ignore_mouse_until_release = true;
+		}
+		if (io.MouseReleased[0] || io.MouseReleased[1] || io.MouseReleased[2]) {
+			ignore_mouse_until_release = false;
+		}
+
+		mouse_left_clicked = mouse_right_clicked = mouse_middle_clicked = false;
+		mouse_left_released = mouse_right_released = mouse_middle_released = false;
+
+		if (!ignore_mouse_until_release) {
+			if (is_mouse_within_image_bounds) {
+				if (io.MouseClicked[0]) { // LEFT mouse button just clicked
+					mouse_left_clicked = true;
+				}
+				if (io.MouseClicked[1]) { // RIGHT mouse button just clicked
+					mouse_right_clicked = true;
+				}
+				if (io.MouseClicked[2]) { // MIDDLE mouse button just clicked
+					mouse_middle_clicked = true;
+				}
+			}
+		}
+
+		if (io.MouseReleased[0]) { // LEFT mouse button just released
+			mouse_left_released = true;
+		}
+		if (io.MouseReleased[1]) { // RIGHT mouse button just released
+			mouse_right_released = true;
+		}
+		if (io.MouseReleased[2]) { // MIDDLE mouse button just released
+			mouse_middle_released = true;
+		}
+	}
 };

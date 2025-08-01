@@ -25,6 +25,7 @@ Texture::Texture(const std::string& path)
 
 	if (m_LocalBuffer)
 		stbi_image_free(m_LocalBuffer);
+	stbi_set_flip_vertically_on_load(0);
 }
 
 Texture::~Texture()

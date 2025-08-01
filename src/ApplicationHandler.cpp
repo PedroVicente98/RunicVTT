@@ -23,7 +23,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<NoteComponent>();
     ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
-   
+    
 }
 
 ApplicationHandler::~ApplicationHandler()
@@ -137,9 +137,9 @@ int ApplicationHandler::run()
         //      -1.0f, 1.0f, 0.0f, 1.0f //3
         //};
         float positions[] = {
-            -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left corner
+             0.5f,  0.5f, 1.0f, 1.0f, // top-right corner 
              0.5f, -0.5f, 1.0f, 0.0f, // bottom-right corner
-             0.5f,  0.5f, 1.0f, 1.0f, // top-right corner
+            -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left corner
             -0.5f,  0.5f, 0.0f, 1.0f  // top-left corner
         };
 
@@ -217,7 +217,7 @@ int ApplicationHandler::run()
 
             //game_table_manager.processSentMessages();
             //game_table_manager.processReceivedMessages();
-
+            //system("cls");
             renderDockSpace();
             renderMainMenuBar();
 
@@ -311,28 +311,40 @@ void ApplicationHandler::renderActiveGametable() {
 
         if (game_table_manager.isBoardActive()) {
             if (map_fbo->textureID != 0) {
-                // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui
-                ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 0), ImVec2(1, 1));
+                // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui  ImVec2(0, 0), ImVec2(1, 1)
+                ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
 
                 ImVec2 displayed_image_size = ImGui::GetItemRectSize();;
                 ImVec2 image_min_screen_pos = ImGui::GetItemRectMin();
 
-                if (ImGui::IsItemHovered()) {
-                    ImVec2 mouse_pos_global = ImGui::GetMousePos();
+                ImVec2 toolbar_cursor_pos_in_parent = ImVec2(image_min_screen_pos.x - window_pos.x,
+                    image_min_screen_pos.y - window_pos.y);
+                game_table_manager.board_manager.renderToolbar(toolbar_cursor_pos_in_parent);
+
+                ImGuiIO& io = ImGui::GetIO();
+                ImVec2 mouse_pos_global = ImGui::GetMousePos();
+
+                bool is_mouse_within_image_bounds = (
+                    mouse_pos_global.x >= image_min_screen_pos.x &&
+                    mouse_pos_global.x < (image_min_screen_pos.x + displayed_image_size.x) &&
+                    mouse_pos_global.y >= image_min_screen_pos.y &&
+                    mouse_pos_global.y < (image_min_screen_pos.y + displayed_image_size.y)
+                    );
+                game_table_manager.processMouseInput(is_mouse_within_image_bounds);
+
+                if (is_mouse_within_image_bounds) {
                     current_map_relative_mouse_pos = ImVec2(mouse_pos_global.x - image_min_screen_pos.x, mouse_pos_global.y - image_min_screen_pos.y);
                     float fbo_x = (current_map_relative_mouse_pos.x / displayed_image_size.x) * map_fbo->width;
                     float fbo_y = (current_map_relative_mouse_pos.y / displayed_image_size.y) * map_fbo->height;
                     current_fbo_mouse_pos = glm::vec2(fbo_x, fbo_y);
+                    //std::cout << "current_fbo_mouse_pos: " << current_fbo_mouse_pos.x << " / " << current_fbo_mouse_pos.y << std::endl;
                     game_table_manager.handleInputs(current_fbo_mouse_pos);
 
                     //DEBUG purposes
                     if (g_draw_debug_circle) {
                         DrawDebugCircle(mouse_pos_global, false, IM_COL32(0, 255, 0, 150), 10.0f); // Yellow for raw click
                         DrawDebugCircle(image_min_screen_pos, false, IM_COL32(0, 255, 0, 255), 10.0f); // Yellow for image pos
-                        DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y+ current_fbo_mouse_pos.y), false, IM_COL32(255, 0, 0, 255), 5.0f); // Red for raw click
-                    
-                        DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y + (map_fbo->height - current_fbo_mouse_pos.y)), false, IM_COL32(0, 0, 255, 255), 5.0f); // Red for raw click
-                    
+                        DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y + current_fbo_mouse_pos.y), false, IM_COL32(255, 0, 0, 255), 5.0f); // Red for raw click
                     }
                 }
                 

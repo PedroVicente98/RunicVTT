@@ -128,8 +128,8 @@ void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
 };
 
 void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos) {
-
     current_mouse_world_pos = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos);
+    this->current_mouse_fbo_pos = current_mouse_fbo_pos;
 
     // Call individual handlers
     handleMouseButtonInputs();
@@ -142,16 +142,16 @@ void GameTableManager::handleMouseButtonInputs() {
     if (!isBoardActive()) return;
 
     // Left Mouse Button Press
-    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+    if (mouse_left_clicked) {
         if (board_manager.getCurrentTool() == Tool::MOVE) {
-            if (board_manager.isMouseOverMarker(current_mouse_world_pos)) { // Use world_pos
+            if (board_manager.isMouseOverMarker(current_mouse_world_pos) and !board_manager.isDraggingMarker()) { // Use world_pos
                 board_manager.startMouseDrag(current_mouse_world_pos, false); // Drag Marker
             }
-            else {
+            else if(!board_manager.isPanning()) {
                 board_manager.startMouseDrag(current_mouse_world_pos, true); // Pan Board
             }
         }
-        if (board_manager.getCurrentTool() == Tool::FOG) {
+        if (board_manager.getCurrentTool() == Tool::FOG and !board_manager.isCreatingFog()) {
             board_manager.startMouseDrag(current_mouse_world_pos, false); // Start fog drawing/erasing
         }
         if (board_manager.getCurrentTool() == Tool::SELECT) {
@@ -163,8 +163,8 @@ void GameTableManager::handleMouseButtonInputs() {
     }
 
     // Left Mouse Button Release
-    if (ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-        if (board_manager.isPanning() || board_manager.isDragginMarker()) {
+    if (mouse_left_released /*|| ImGui::IsMouseReleased(ImGuiMouseButton_Left)*/) {
+        if (board_manager.isPanning() || board_manager.isDraggingMarker()) {
             board_manager.endMouseDrag();
         }
         if (board_manager.isCreatingFog()) {
@@ -177,26 +177,17 @@ void GameTableManager::handleMouseButtonInputs() {
 void GameTableManager::handleCursorInputs() {
     if (!isBoardActive()) return;
 
-    // No need for global mouse position from GLFW anymore
-    // current_mouse_pos is already updated to current_mouse_world_pos by handleInputs()
-
     if (board_manager.isPanning()) {
-        board_manager.panBoard(current_mouse_world_pos); // Pan logic needs current world mouse position
+        board_manager.panBoard(current_mouse_world_pos); 
     }
 
-    if (board_manager.isDragginMarker()) {
-        board_manager.handleMarkerDragging(current_mouse_world_pos); // Marker dragging logic needs current world mouse position
+    if (board_manager.isDraggingMarker()) {
+        board_manager.handleMarkerDragging(current_mouse_world_pos);  
     }
-    // Note: If Tool::FOG drawing involves continuous updates while dragging,
-    // that logic would also go here, using current_mouse_world_pos.
-    // Example: if (board_manager.isCreatingFog() && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) { ... }
 }
 
 void GameTableManager::handleScrollInputs() {
     if (!isBoardActive()) return;
-
-    float mouse_wheel_delta = ImGui::GetIO().MouseWheel;
-
     if (mouse_wheel_delta != 0.0f) {
         float zoom_factor;
         if (mouse_wheel_delta > 0) {
@@ -205,34 +196,11 @@ void GameTableManager::handleScrollInputs() {
         else {
             zoom_factor = 0.9f; // Zoom out by 10%
         }
-        glm::vec2 mouse_pos_for_zoom = current_mouse_fbo_pos;
-
-        board_manager.camera.zoom(zoom_factor, mouse_pos_for_zoom);
+        board_manager.camera.zoom(zoom_factor, current_mouse_world_pos);
     }
 }
 
-//
-//bool GameTableManager::isMouseInsideMapWindow() {
-//    /*DEPRECATED*/
-//    // Get the pointer to the MapWindow by name
-//    ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
-//    if (!window) return false;  // If window doesn't exist, return false
-//
-//    // Get the mouse position
-//    ImVec2 mousePos = ImGui::GetMousePos();
-//
-//    // Get the window position and size
-//    ImVec2 windowPos = window->Pos;  // Top-left corner
-//    ImVec2 windowSize = window->Size;  // Size of the window
-//
-//    // Check if the mouse is inside the window boundaries
-//    bool isInsideX = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x);
-//    bool isInsideY = (mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
-//
-//    // Return true if both X and Y coordinates are inside the window
-//    return isInsideX && isInsideY;
-//}
-//
+
 //
 //// Callback estático de botão do mouse
 //void GameTableManager::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
@@ -318,7 +286,28 @@ void GameTableManager::handleScrollInputs() {
 //        game_table_manager->board_manager.zoomBoard(zoom_factor);  // Aplica o zoom no BoardManager
 //    }
 //}
-
+//
+//bool GameTableManager::isMouseInsideMapWindow() {
+//    /*DEPRECATED*/
+//    // Get the pointer to the MapWindow by name
+//    ImGuiWindow* window = ImGui::FindWindowByName("MapWindow");
+//    if (!window) return false;  // If window doesn't exist, return false
+//
+//    // Get the mouse position
+//    ImVec2 mousePos = ImGui::GetMousePos();
+//
+//    // Get the window position and size
+//    ImVec2 windowPos = window->Pos;  // Top-left corner
+//    ImVec2 windowSize = window->Size;  // Size of the window
+//
+//    // Check if the mouse is inside the window boundaries
+//    bool isInsideX = (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x);
+//    bool isInsideY = (mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
+//
+//    // Return true if both X and Y coordinates are inside the window
+//    return isInsideX && isInsideY;
+//}
+//
 // Save and Load Operations ------------------------------------------------------------------------------
 
 
@@ -850,20 +839,19 @@ void GameTableManager::loadBoardPopUp() {
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer)
 {
-    if (board_manager.isEditWindowOpen()) {
-        board_manager.renderEditWindow();
-    }
-    else {
-        board_manager.setShowEditWindow(false);
-    }
-
     chat.renderChat();
 
     if (board_manager.isBoardActive()) {
+        if (board_manager.isEditWindowOpen()) {
+            board_manager.renderEditWindow();
+        }
+        else {
+            board_manager.setShowEditWindow(false);
+        }
+
         //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
         board_manager.marker_directory->renderDirectory();
         //}
-	    //board_manager.renderToolbar();
         board_manager.renderBoard(va, ib, shader, renderer);
     }
 }

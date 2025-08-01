@@ -27,12 +27,16 @@ public:
     }
 
     glm::vec2 fboToNdcPos(glm::vec2 fbo_pixel_top_left_origin) const {
-        glm::vec2 ndc;
-        //ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
-        ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
-        //ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
-        ndc.y = 1.0f - (2.0f * (fbo_dimensions.y-fbo_pixel_top_left_origin.y)) / fbo_dimensions.y;
+        //glm::vec2 ndc;
+        ////ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
+        //ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
+        ////ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
+        //ndc.y = 1.0f - (2.0f * (fbo_dimensions.y-fbo_pixel_top_left_origin.y)) / fbo_dimensions.y;
 
+        //return ndc;
+        glm::vec2 ndc;
+        ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
+        ndc.y = 1.0f - (2.0f * fbo_pixel_top_left_origin.y) / fbo_dimensions.y; 
         return ndc;
     }
 
@@ -55,8 +59,8 @@ public:
 //}
 
     
-    void zoom(float factor, glm::vec2 mouse_pos_fbo_pixels) {
-        glm::vec2 mouse_world_pos_before_zoom = screenToWorldPosition(mouse_pos_fbo_pixels);
+    void zoom(float factor, glm::vec2 mouse_world_pos_before_zoom) {
+        std::cout << "mouse_world_pos_before_zoom " << mouse_world_pos_before_zoom.x<<" - " << mouse_world_pos_before_zoom.y << std::endl;
         float old_zoom_level = zoom_level;
         zoom_level *= factor;
         zoom_level = glm::clamp(zoom_level, 0.05f, 20.0f); // Example limits
@@ -91,7 +95,7 @@ public:
     glm::mat4 getProjectionMatrix() const {
         float half_width = (fbo_dimensions.x / 2.0f) / zoom_level;
         float half_height = (fbo_dimensions.y / 2.0f) / zoom_level;
-        return glm::ortho(-half_width, half_width, -half_height, half_height, -1.0f, 1.0f);
+        return glm::ortho(-half_width, half_width, half_height, -half_height, -1.0f, 1.0f);
     }
 
     glm::vec2 worldToScreenPosition(glm::vec2 world_position) const {
@@ -160,7 +164,7 @@ public:
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
-	void renderToolbar();  // Render toolbar
+    void renderToolbar(const ImVec2 &window_position);
 
     void resetCamera();
 	
@@ -173,7 +177,7 @@ public:
     // Fog of War interactions
     flecs::entity createFogOfWar(glm::vec2 startPos, glm::vec2 size);
     void deleteFogOfWar(flecs::entity fogEntity);
-    void handleFogCreation(glm::vec2 mousePos);
+    void handleFogCreation(glm::vec2 end_world_position);
 
     // Camera manipulation
     void panBoard(glm::vec2 currentMousePos);
@@ -194,9 +198,7 @@ public:
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
     bool isPanning();
-    bool isDragginMarker();
-    //glm::vec2 screenToWorldPosition(glm::vec2 screen_position);
-    //glm::vec2 worldToScreenPosition(glm::vec2 world_position);
+    bool isDraggingMarker();
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
     
     // Generates a unique 64-bit ID
@@ -232,9 +234,16 @@ private:
     bool showEditWindow = false;
 	flecs::entity edit_window_entity = flecs::entity();
 	//NetworkManager* network_manager;
-    glm::vec2 mouseStartPos;
+    //glm::vec2 mouseStartPos;
+
+    glm::vec2 mouse_start_world_pos;
+    glm::vec2 mouse_current_world_pos;
+
+
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
     bool is_creating_fog = false;
     Tool currentTool;  // Active tool for interaction
+
+
 };
