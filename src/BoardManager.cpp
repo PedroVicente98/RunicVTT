@@ -424,14 +424,21 @@ void BoardManager::handleFogCreation(glm::vec2 end_world_position) {
     glm::vec2 start_world_position = getMouseStartPosition();
 
     // Calculate size
-    glm::vec2 size = glm::abs(end_world_position - start_world_position);  // Make sure size is positive
-
-    // Determine the corrected top-left position for the fog
+    glm::vec2 size = end_world_position - start_world_position;//glm::abs(end_world_position - start_world_position);  // Make sure size is positive
     glm::vec2 corrected_start_position;
-    corrected_start_position.x = start_world_position.x + size.x/2;
-    corrected_start_position.y = start_world_position.y + size.y / 2;
-
-    createFogOfWar(corrected_start_position, size);
+    if (size.x < 0) {
+        corrected_start_position.x = end_world_position.x + glm::abs(size.x) / 2;
+    }
+    else {
+        corrected_start_position.x = start_world_position.x + size.x/2;
+    }
+    if (size.y < 0) {
+        corrected_start_position.y = end_world_position.y + glm::abs(size.y) / 2;
+    }
+    else {
+        corrected_start_position.y = start_world_position.y + size.y / 2;
+    }
+    createFogOfWar(corrected_start_position, glm::abs(size));
 }
 
 Tool BoardManager::getCurrentTool() const {
@@ -537,13 +544,14 @@ bool BoardManager::isEditWindowOpen() const {
 
 void BoardManager::renderEditWindow() {
     if (!showEditWindow) return;  // If the window is closed, skip rendering it
-
+    bool is_hovered = false;
     // Get the current mouse position to set the window position
     ImVec2 mousePos = ImGui::GetMousePos();
     ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
     // Retrieve the Size and Visibility components of the entity
+    is_hovered = ImGui::IsWindowHovered();
     if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>()) {
         auto size = edit_window_entity.get_mut<Size>();  // Mutable access to the size
         auto visibility = edit_window_entity.get_mut<Visibility>();  // Mutable access to the visibility
@@ -593,10 +601,15 @@ void BoardManager::renderEditWindow() {
 
     ImGui::End();
     ImGui::PopStyleColor(); // Restore the original background color
+   
+    if (!is_hovered and ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+        showEditWindow = false;
+    }
 
     if (!showEditWindow) {
         edit_window_entity = flecs::entity();
     }
+    //close edit window when clicking outside it
 }
 
 //glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
