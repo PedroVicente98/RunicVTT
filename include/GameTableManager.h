@@ -42,19 +42,13 @@ public:
 	void loadGameTablePopUp();
 	void loadBoardPopUp();
 
-	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
+	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
 
 	void handleInputs(glm::vec2 current_mouse_fbo_pos);
 	void handleCursorInputs();
 	void handleMouseButtonInputs();
 	void handleScrollInputs();
-
-	//void setInputCallbacks(GLFWwindow* window);
-	/*bool isMouseInsideMapWindow();
-	static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-	static void cursorPositionCallback(GLFWwindow* window, double xpos, double ypos);
-	static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);*/
 
 	void createGameTableFile(flecs::entity game_table);
 
@@ -69,9 +63,6 @@ public:
 	BoardManager board_manager;
 private:
 
-	glm::vec2 convertImGuiScreenToFboPixelsBL(ImVec2 mouse_screen_pos, ImVec2 map_image_min_screen_pos, ImVec2 map_image_actual_displayed_size, int fbo_width, int fbo_height) const;
-
-	// Helper functions for clearer separation of concerns within handleInput
 	void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin,int fbo_height);
 	void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
 	void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
@@ -90,9 +81,7 @@ private:
 	char pass_buffer[124] = "";
 	char port_buffer[6] = "7777";
 
-	// Variável para armazenar o caminho do arquivo selecionado
 	std::string map_image_path = "";
-
 
 	bool mouse_left_clicked, mouse_right_clicked, mouse_middle_clicked;
 	bool mouse_left_released, mouse_right_released, mouse_middle_released;
@@ -100,54 +89,7 @@ private:
 	bool ignore_mouse_until_release = false;
 
 public:
-	//void processMouseInput(bool is_mouse_within_image_bounds) {
-
-	//	ImGuiIO& io = ImGui::GetIO();
-
-	//	mouse_wheel_delta = io.MouseWheel;
-
-	//	for (int i = 0; i < 3; ++i) {
-	//		was_mouse_button_down[i] = is_mouse_button_down[i]; // Store previous state
-	//		is_mouse_button_down[i] = io.MouseDown[i]; // Store new state
-	//	}
-	//	
-	//	//IS CLICK INSIDE WINDOW
-	//	if (io.MouseClicked[0] && !is_mouse_within_image_bounds) {
-	//		ignore_mouse_until_release = true;
-	//	}
-	//	
-	//	mouse_left_clicked = mouse_right_clicked = mouse_middle_clicked = false;
-	//	mouse_left_released = mouse_right_released = mouse_middle_released = false;
-
-	//	
-	//	if (!ignore_mouse_until_release) {
-	//		if (is_mouse_button_down[0] && !was_mouse_button_down[0]) { //LEFT
-	//			mouse_left_clicked = true;
-	//		}
-	//		if (is_mouse_button_down[1] && !was_mouse_button_down[1]) { //RIGHT
-	//			mouse_right_clicked = true;
-	//		}
-	//		if (is_mouse_button_down[2] && !was_mouse_button_down[2]) { //MIDDLE
-	//			mouse_middle_clicked = true;
-	//		}
-	//	}
-
-	//	if (!is_mouse_button_down[0] && was_mouse_button_down[0]) { //LEFT
-	//		mouse_left_released = true;
-	//		ignore_mouse_until_release = false;
-	//	}
-
-	//	if (!is_mouse_button_down[1] && was_mouse_button_down[1]) { //RIGHT
-	//		mouse_right_released = true;
-	//		ignore_mouse_until_release = false;
-	//	}
-
-	//	if (!is_mouse_button_down[2] && was_mouse_button_down[2]) { //MIDDLE
-	//		mouse_middle_released = true;
-	//		ignore_mouse_until_release = false;
-	//	}
-	//};
-
+	
 	void processMouseInput(bool is_mouse_within_image_bounds) {
 
 		ImGuiIO& io = ImGui::GetIO();

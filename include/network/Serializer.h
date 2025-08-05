@@ -410,17 +410,17 @@ inline Panning Serializer::deserializePanning(const std::vector<unsigned char>& 
 // Serialize and Deserialize Grid
 inline void Serializer::serializeGrid(std::vector<unsigned char>& buffer, const Grid* grid) {
     serializeVec2(buffer, grid->offset);
-    serializeVec2(buffer, grid->scale);
+    serializeFloat(buffer, grid->cell_size);
     serializeBool(buffer, grid->is_hex);
     serializeBool(buffer, grid->snap_to_grid);
 }
 
 inline Grid Serializer::deserializeGrid(const std::vector<unsigned char>& buffer, size_t& offset) {
     glm::vec2 offset_val = deserializeVec2(buffer, offset);
-    glm::vec2 scale = deserializeVec2(buffer, offset);
+    float cell_size = deserializeFloat(buffer, offset);
     bool is_hex = deserializeBool(buffer, offset);
     bool snap_to_grid = deserializeBool(buffer, offset);
-    return Grid{ offset_val, scale, is_hex, snap_to_grid };
+    return Grid{ offset_val, cell_size, is_hex, snap_to_grid };
 }
 
 // Serialize and Deserialize Board

@@ -58,9 +58,10 @@ struct Panning {
 // Grid Component
 struct Grid {
     glm::vec2 offset;
-    glm::vec2 scale;
+    float cell_size;
     bool is_hex;
     bool snap_to_grid;
+    bool visible;
 };
 
 // Board Component

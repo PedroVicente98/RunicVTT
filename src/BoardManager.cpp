@@ -20,7 +20,7 @@
 #include "Serializer.h"
 
 BoardManager::BoardManager(flecs::world ecs,/* NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_world_pos({0,0}), mouse_current_world_pos({ 0,0 }), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
     
     
     std::filesystem::path map_path = std::filesystem::path(map_directory->directoryPath);
@@ -53,13 +53,11 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
         .set(Identifier{ generateUniqueId() })
         .set(Board{ board_name })
         .set(Panning{false})
-        .set(Position{0,0})
-        .set(Grid{ {0.0f,0.0f},{1.0f,1.0f} })
+        .set(Grid{ {0,0}, 50.0f, false, false, false })
         .set(TextureComponent{ texture_id, map_image_path, size})
         .set(Size{ size.x, size.y });
     active_board = board;
 
-    //Create FILE
 
     return board;
 }
@@ -132,49 +130,106 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     if (ImGui::Button("Reset Camera", ImVec2(90, 40))) {
         resetCamera();
     }
+    
+    ImGui::SameLine(); // Ensure buttons are on the same row
+    if (ImGui::Button("Configure Grid", ImVec2(90, 40))) {
+        showGridSettings = !showGridSettings;
+    }
 
     // Pop the toolbar's background color
     ImGui::PopStyleColor();
 
     // End the child window
     ImGui::EndChild();
+
+    renderGridWindow();
+
 }
 
-void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
+void BoardManager::renderGridWindow() {
+    // Check if the window should be shown
+    if (!showGridSettings) {
+        return;
+    }
+
+    // Begin the ImGui window
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
+    ImGui::Begin("Grid Settings", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::PopStyleColor();
+    // Get a mutable reference to the Grid component from the active board
+    auto grid = active_board.get_mut<Grid>();
+
+    if (grid) {
+        // --- BOOLEAN CHECKBOXES ---
+        ImGui::Checkbox("Visible", &grid->visible);
+        ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
+        ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
+
+        // --- FLOAT SLIDERS ---
+        ImGui::SliderFloat("Cell Size", &grid->cell_size, 1.0f, 200.0f);
+
+        // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
+        ImGui::Text("Grid Offset");
+        ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
+        ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
+        ImGui::SameLine();
+
+        // Button to reset the offset
+        if (ImGui::Button("Reset Offset")) {
+            grid->offset = glm::vec2(0.0f);
+        }
+
+    }
+    else {
+        ImGui::Text("Active board entity does not have a Grid component.");
+    }
+
+    ImGui::End();
+}
+void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader &grid_shader, Renderer& renderer) {
     
     const TextureComponent* texture = active_board.get<TextureComponent>();
     if (texture->textureID != 0) {
         const Board* board = active_board.get<Board>();
-        const Panning* panning = active_board.get<Panning>();
-        const Position* position = active_board.get<Position>();
         const Grid* grid = active_board.get<Grid>();
         const Size* size = active_board.get<Size>();
 
-        /*ImVec2 window_size = ImGui::GetWindowSize();
-        ImVec2 window_position = ImGui::GetWindowPos();
-        camera.setWindowSize(glm::vec2(window_size.x, window_size.y));
-        camera.setWindowPosition(glm::vec2(window_position.x, window_position.y));*/
-
         glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
         glm::mat4 projection = camera.getProjectionMatrix();
-
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position->x, position->y, 0.0f));
-        model = glm::scale(model, glm::vec3(size->width, size->height, 1.0f));
-
-        glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+        glm::mat4 board_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+        board_model = glm::scale(board_model, glm::vec3(size->width, size->height, 1.0f));
 
         shader.Bind();
-        shader.SetUniformMat4f("u_MVP", mvp);
+        shader.SetUniformMat4f("projection", projection);
+        shader.SetUniformMat4f("view", viewMatrix);
+        shader.SetUniformMat4f("model", board_model);
         shader.SetUniform1f("u_Alpha", 1.0f);
         shader.SetUniform1f("u_UseTexture", 1);
         shader.SetUniform1i("u_Texture", 0);
         shader.Unbind();
 
 
-        GLCall(glActiveTexture(GL_TEXTURE0)); //https://learnopengl.com/Getting-started/Coordinate-Systems REDO THE SHADER FOR THE COORDINATE SYSTEM, MAKE MORE READABLE AND KEEP THE MATRIXES SEPARATE IN THE UNIFORMS
+        GLCall(glActiveTexture(GL_TEXTURE0)); 
         GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
 
         renderer.Draw(va, ib, shader);
+
+
+        if (grid) {
+            if (grid->visible) {
+                grid_shader.Bind();
+                grid_shader.SetUniformMat4f("projection", projection);
+                grid_shader.SetUniformMat4f("view", viewMatrix);
+                grid_shader.SetUniformMat4f("model", board_model); // Grid model is the same as the board
+                grid_shader.SetUniform1i("grid_type", grid->is_hex ? 1 : 0);
+                grid_shader.SetUniform1f("cell_size", grid->cell_size);
+                grid_shader.SetUniform2f("grid_offset", grid->offset.x, grid->offset.y);
+                grid_shader.Unbind();
+
+                renderer.Draw(va, ib, grid_shader);
+            }
+        }
+
 
         ecs.defer_begin(); // Start deferring modifications
         active_board.children([&](flecs::entity child) {
@@ -186,10 +241,10 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     const Visibility* visibility_marker = child.get<Visibility>();
                     const Size* size_marker = child.get<Size>();
 
-                    glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-                    model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+                    glm::mat4 marker_model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+                    marker_model = glm::scale(marker_model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
-                    glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
+                    //glm::mat4 mvp = projection * viewMatrix * marker_model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
                     float alpha = 1.0f;
                     if (!visibility_marker->isVisible) {
                         //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
@@ -201,7 +256,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     }
 
                     shader.Bind();
-                    shader.SetUniformMat4f("u_MVP", mvp);
+                    shader.SetUniformMat4f("projection", projection);
+                    shader.SetUniformMat4f("view", viewMatrix);
+                    shader.SetUniformMat4f("model", marker_model);
                     shader.SetUniform1f("u_Alpha", alpha);
                     shader.SetUniform1i("u_Texture", 0);
                     shader.SetUniform1f("u_UseTexture", 1);
@@ -220,10 +277,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                 const TextureComponent* texture_marker = child.get<TextureComponent>();
                 const Size* size_marker = child.get<Size>();
 
-                glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
-                model = glm::scale(model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
+                glm::mat4 fog_model = glm::translate(glm::mat4(1.0f), glm::vec3(position_marker->x, position_marker->y, 0.0f));
+                fog_model = glm::scale(fog_model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
-                glm::mat4 mvp = projection * viewMatrix * model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
                 float alpha = 1.0f;
                 if (!visibility_marker->isVisible) {
                     //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
@@ -236,7 +292,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                 }
 
                 shader.Bind();
-                shader.SetUniformMat4f("u_MVP", mvp);
+                shader.SetUniformMat4f("projection", projection);
+                shader.SetUniformMat4f("view", viewMatrix);
+                shader.SetUniformMat4f("model", fog_model);
                 shader.SetUniform1f("u_Alpha", alpha);
                 shader.SetUniform1i("u_UseTexture", 0);
                 shader.Unbind();
@@ -348,6 +406,7 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position) {
 
 void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
     mouse_start_world_pos = mousePos;  // Captura a posição inicial do mouse
+    mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
     if (currentTool == Tool::MOVE) {
         if (draggingMap) {
             active_board.set<Panning>({ true });
@@ -392,10 +451,12 @@ glm::vec2 BoardManager::getMouseStartPosition() const {
     return mouse_start_world_pos;
 }
 
-void BoardManager::panBoard(glm::vec2 currentMousePos) {
-    glm::vec2 delta = mouse_start_world_pos - currentMousePos;
-    camera.pan(delta);
-    mouse_start_world_pos = currentMousePos;
+void BoardManager::panBoard(glm::vec2 current_mouse_fbo_pos) {
+    glm::vec2 delta_screen = mouse_start_screen_pos - current_mouse_fbo_pos;
+    float world_scale_factor = camera.getZoom();
+    glm::vec2 delta_world = delta_screen / world_scale_factor;
+    camera.pan(delta_world);
+    mouse_start_screen_pos = current_mouse_fbo_pos;
 }
 
 
@@ -452,7 +513,7 @@ void BoardManager::setCurrentTool(Tool newTool) {
 flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
 
     auto entity_at_mouse = flecs::entity();
-    ecs.defer_begin();
+    ecs.defer_begin();    
     ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size) {
         
         glm::vec2 world_position = mouse_position;
@@ -473,6 +534,63 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
     ecs.defer_end();
     return entity_at_mouse;
 }
+
+//GRID
+
+//// Add this helper function to your BoardManager class
+//glm::vec2 BoardManager::snapToGrid(glm::vec2 raw_world_pos) {
+//    // Get grid parameters from the grid entity
+//    auto grid_comp = grid_entity.get<GridComponent>();
+//    auto grid_pos = grid_entity.get<Position>();
+//
+//    if (!grid_comp || !grid_pos) return raw_world_pos; // Safety check
+//
+//    float cell_size = grid_comp->cellSize;
+//    glm::vec2 offset = glm::vec2(grid_pos->x, grid_pos->y);
+//
+//    if (grid_comp->type == GridComponent::Type::SQUARE) {
+//        // Apply offset, snap, and then re-apply offset
+//        glm::vec2 relative_pos = raw_world_pos - offset;
+//        glm::vec2 snapped_pos = glm::round(relative_pos / cell_size) * cell_size;
+//        return snapped_pos + offset;
+//    }
+//    else if (grid_comp->type == GridComponent::Type::HEXAGONAL) {
+//        // Hex snapping logic (pointy-top orientation)
+//        float S = cell_size;
+//
+//        // Remove the grid offset before snapping
+//        glm::vec2 p = raw_world_pos - offset;
+//
+//        // Convert world position to floating-point axial coordinates
+//        float q_float = (p.x * 0.57735f - p.y * 0.33333f) / S; // 0.577... = 1/sqrt(3), 0.333... = 1/3
+//        float r_float = (p.y * 0.66667f) / S; // 0.666... = 2/3
+//
+//        // Round to nearest integer hex coordinates
+//        int q = round(q_float);
+//        int r = round(r_float);
+//        int s = round(-q_float - r_float);
+//
+//        // Correct for rounding errors by re-adjusting the one with the smallest change
+//        float q_diff = abs(q - q_float);
+//        float r_diff = abs(r - r_float);
+//        float s_diff = abs(s - (-q_float - r_float));
+//
+//        if (q_diff > r_diff && q_diff > s_diff) {
+//            q = -r - s;
+//        }
+//        else if (r_diff > s_diff) {
+//            r = -q - s;
+//        }
+//
+//        // Convert integer axial coordinates back to world position and add the offset
+//        float snapped_x = S * (1.73205f * q + 0.86603f * r); // 1.73... = sqrt(3), 0.866... = sqrt(3)/2
+//        float snapped_y = S * (1.5f * r);
+//
+//        return glm::vec2(snapped_x, snapped_y) + offset;
+//    }
+//
+//    return raw_world_pos; // Return original if no grid type matches
+//}
 
 
 //Save and Load Board --------------------------------------------------------------------
@@ -611,6 +729,9 @@ void BoardManager::renderEditWindow() {
     }
     //close edit window when clicking outside it
 }
+
+
+
 
 //glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
 //    // Step 1: Get the combined MVP matrix

@@ -36,20 +36,20 @@ out vec4 color;
 in vec2 WorldPos;
 
 // Uniforms for grid properties
-uniform uint grid_type;
+uniform int grid_type;
 uniform float cell_size;
 uniform vec2 grid_offset;
 
 void main()
 {
     // Initialize color to fully transparent
-    vec4 line_color = vec4(0.8, 0.8, 0.8, 0.5);
+    vec4 line_color = vec4(0.0, 0.0, 0.0, 0.5);
     float line_thickness = 2.0;
 
     // Apply the user-defined offset to the world position for grid calculations
     vec2 pos = WorldPos.xy + grid_offset;
     
-    if (grid_type == 0u) // Square Grid
+    if (grid_type == 0) // Square Grid
     {
         // Calculate the position relative to a cell origin
         vec2 local_pos = mod(pos, cell_size);
@@ -66,7 +66,7 @@ void main()
             color = vec4(0.0, 0.0, 0.0, 0.0);
         }
     }
-    else if (grid_type == 1u) // Hexagonal Grid (Pointy-top)
+    else if (grid_type == 1) // Hexagonal Grid (Pointy-top)
     {
         // Hexagonal grid calculation based on axial coordinates
         float S = cell_size;

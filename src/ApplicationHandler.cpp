@@ -160,12 +160,30 @@ int ApplicationHandler::run()
         IndexBuffer ib(indices, 6);
 
         glm::mat4 proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+        glm::mat4 identity = glm::mat4(1.0f);
 
         std::filesystem::path shader_path = PathManager::getShaderPath() / "Basic.shader";
+        std::filesystem::path grid_shader_path = PathManager::getShaderPath() / "GridShader.shader";
         Shader shader(shader_path.string());
+        Shader grid_shader(grid_shader_path.string());
+
+        grid_shader.Bind();
+        grid_shader.SetUniformMat4f("projection", proj);
+        grid_shader.SetUniformMat4f("view", identity);
+        grid_shader.SetUniformMat4f("model", identity);
+        grid_shader.SetUniform1i("grid_type", 0);
+        grid_shader.SetUniform1f("cell_size", 1.0f);
+        grid_shader.SetUniform2f("grid_offset", 1.0f, 1.0f);
+
+        /*uniform uint grid_type;
+        uniform float cell_size;
+        uniform vec2 grid_offset;*/
+
         shader.Bind();
         shader.SetUniform1i("u_Texture", 0);
-        shader.SetUniformMat4f("u_MVP", proj);
+        shader.SetUniformMat4f("projection", proj);
+        shader.SetUniformMat4f("view", identity);
+        shader.SetUniformMat4f("model", identity);
         shader.SetUniform1i("u_UseTexture", 1);
         shader.SetUniform1f("u_Alpha", 0.5f);
 
@@ -221,11 +239,11 @@ int ApplicationHandler::run()
             renderDockSpace();
             renderMainMenuBar();
 
-            renderMapFBO(va, ib, shader, renderer);
+            renderMapFBO(va, ib, shader, grid_shader, renderer);
             renderActiveGametable();
 
             // Rendering
-            ImGui::ShowMetricsWindow();
+            //ImGui::ShowMetricsWindow();
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
@@ -278,7 +296,7 @@ void ApplicationHandler::renderDockSpace()
     ImGui::End();
 }
 
-void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer) {
+void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer) {
     if (map_fbo->fboID != 0 && map_fbo->width > 0 && map_fbo->height > 0) {
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, map_fbo->fboID));
         GLCall(glViewport(0, 0, map_fbo->width, map_fbo->height)); // Crucial: Viewport matches FBO size
@@ -287,7 +305,7 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
         // Inform the camera about the FBO's current dimensions for projection
         game_table_manager.setCameraFboDimensions(glm::vec2(map_fbo->width, map_fbo->height));
-        game_table_manager.render(va, ib, shader, renderer); // Your board_manager.render() call
+        game_table_manager.render(va, ib, shader, grid_shader, renderer); // Your board_manager.render() call
 
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
     }
@@ -320,6 +338,7 @@ void ApplicationHandler::renderActiveGametable() {
                 ImVec2 toolbar_cursor_pos_in_parent = ImVec2(image_min_screen_pos.x - window_pos.x,
                     image_min_screen_pos.y - window_pos.y);
                 game_table_manager.board_manager.renderToolbar(toolbar_cursor_pos_in_parent);
+
 
                 ImGuiIO& io = ImGui::GetIO();
                 ImVec2 mouse_pos_global = ImGui::GetMousePos();

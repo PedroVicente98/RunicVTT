@@ -26,41 +26,9 @@ public:
         position += delta;
     }
 
-    glm::vec2 fboToNdcPos(glm::vec2 fbo_pixel_top_left_origin) const {
-        //glm::vec2 ndc;
-        ////ndc.x = (fbo_pixel_top_left_origin.x / fbo_dimensions.x) * 2.0f - 1.0f;
-        //ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
-        ////ndc.y = 1.0f - (fbo_pixel_top_left_origin.y / fbo_dimensions.y) * 2.0f;
-        //ndc.y = 1.0f - (2.0f * (fbo_dimensions.y-fbo_pixel_top_left_origin.y)) / fbo_dimensions.y;
-
-        //return ndc;
-        glm::vec2 ndc;
-        ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
-        ndc.y = 1.0f - (2.0f * fbo_pixel_top_left_origin.y) / fbo_dimensions.y; 
-        return ndc;
-    }
-
-    //
-//glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
-//
-//    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
-//    glm::mat4 view_matrix = camera.getViewMatrix();
-//    glm::mat4 proj_matrix = camera.getProjectionMatrix();
-//    glm::vec2 window_size = camera.getWindowSize();
-//      fbo_pixel_top_left_origin
-// 
-//    float ndc_x = (2.0f * relative_screen_position.x) / window_size.x - 1.0f;
-//    float ndc_y = 1.0f - (2.0f * relative_screen_position.y) / window_size.y; // Inverting y-axis for OpenGL
-//    glm::vec4 ndc_position = glm::vec4(ndc_x, ndc_y, 0.0f, 1.0f);
-//    glm::mat4 mvp = proj_matrix * view_matrix;
-//    glm::mat4 inverse_mvp = glm::inverse(mvp);
-//    glm::vec4 world_position = inverse_mvp * ndc_position;
-//    return glm::vec2(world_position.x, world_position.y);
-//}
 
     
     void zoom(float factor, glm::vec2 mouse_world_pos_before_zoom) {
-        std::cout << "mouse_world_pos_before_zoom " << mouse_world_pos_before_zoom.x<<" - " << mouse_world_pos_before_zoom.y << std::endl;
         float old_zoom_level = zoom_level;
         zoom_level *= factor;
         zoom_level = glm::clamp(zoom_level, 0.05f, 20.0f); // Example limits
@@ -121,6 +89,13 @@ public:
         return fbo_pixel_top_left_origin;
     }
 
+    glm::vec2 fboToNdcPos(glm::vec2 fbo_pixel_top_left_origin) const {
+        glm::vec2 ndc;
+        ndc.x = (2.0f * fbo_pixel_top_left_origin.x) / fbo_dimensions.x - 1.0f;
+        ndc.y = 1.0f - (2.0f * fbo_pixel_top_left_origin.y) / fbo_dimensions.y;
+        return ndc;
+    }
+
     glm::vec2 screenToWorldPosition(glm::vec2 fbo_pixel_top_left_origin) const {
 
         glm::vec2 ndc = fboToNdcPos(fbo_pixel_top_left_origin);
@@ -163,7 +138,7 @@ public:
 	BoardManager(flecs::world ecs, /*NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~BoardManager();
 
-	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Renderer& renderer);  // Render board elements (map, markers, fog)
+	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);  // Render board elements (map, markers, fog)
     void renderToolbar(const ImVec2 &window_position);
 
     void resetCamera();
@@ -206,7 +181,9 @@ public:
     // Finds an entity by its Identifier component with the specified ID
     flecs::entity findEntityById(uint64_t target_id);
 
-
+    //Grid
+    glm::vec2 snapToGrid(glm::vec2 raw_world_pos);
+    void renderGridWindow();
     //Network 
     void sendGameState();
     void sendEntityUpdate(flecs::entity entity/*, MessageType message_type*/);
@@ -232,16 +209,20 @@ public:
 
 private:
     bool showEditWindow = false;
+    bool showGridSettings = false;
 	flecs::entity edit_window_entity = flecs::entity();
 	//NetworkManager* network_manager;
     //glm::vec2 mouseStartPos;
 
+    glm::vec2 mouse_start_screen_pos;
     glm::vec2 mouse_start_world_pos;
     glm::vec2 mouse_current_world_pos;
 
 
 	flecs::world ecs;
 	flecs::entity active_board = flecs::entity();
+	flecs::entity grid_entity = flecs::entity();
+
     bool is_creating_fog = false;
     Tool currentTool;  // Active tool for interaction
 

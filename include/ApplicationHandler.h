@@ -58,7 +58,7 @@ public:
 private:
 	void renderMainMenuBar();
 	void renderDockSpace();
-	void renderMapFBO(VertexArray &va, IndexBuffer& ib, Shader& shader, Renderer& renderer);
+	void renderMapFBO(VertexArray &va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 	void renderActiveGametable();
 
 

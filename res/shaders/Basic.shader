@@ -6,11 +6,15 @@ layout(location = 1) in vec2 textCoord;
 
 out vec2 v_TextCoord;
 
-uniform mat4 u_MVP;
+//uniform mat4 u_MVP;
+
+uniform mat4 projection;
+uniform mat4 view;
+uniform mat4 model;
 
 void main()
 {
-    gl_Position = u_MVP * position;
+    gl_Position = projection * view * model  * position;
     v_TextCoord = textCoord;
 };
 
