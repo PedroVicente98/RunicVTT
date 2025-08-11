@@ -39,11 +39,12 @@ in vec2 WorldPos;
 uniform int grid_type;
 uniform float cell_size;
 uniform vec2 grid_offset;
+uniform float opacity;
 
 void main()
 {
     // Initialize color to fully transparent
-    vec4 line_color = vec4(0.0, 0.0, 0.0, 0.5);
+    vec4 line_color = vec4(0.0, 0.0, 0.0, opacity);
     float line_thickness = 2.0;
 
     // Apply the user-defined offset to the world position for grid calculations

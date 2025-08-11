@@ -69,9 +69,9 @@ public:
     }
 
     void renderDirectory(bool is_map_directory = false) {
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse ;
         if (is_map_directory == true) {
-            window_flags |= ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
         }
         
         ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x*0.1, ImGui::GetIO().DisplaySize.y*0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));

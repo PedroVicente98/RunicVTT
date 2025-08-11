@@ -203,10 +203,8 @@ inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer,
             markerCount++;
         }
      });
-    ecs.defer_end();
     Serializer::serializeInt(buffer, markerCount);
     // Serialize each marker's data
-    ecs.defer_begin();
     entity.children([&](flecs::entity child) {
         if (child.has<MarkerComponent>()) {
             serializeMarkerEntity(buffer, child, ecs);
@@ -413,6 +411,8 @@ inline void Serializer::serializeGrid(std::vector<unsigned char>& buffer, const 
     serializeFloat(buffer, grid->cell_size);
     serializeBool(buffer, grid->is_hex);
     serializeBool(buffer, grid->snap_to_grid);
+    serializeBool(buffer, grid->visible);
+    serializeFloat(buffer, grid->opacity);
 }
 
 inline Grid Serializer::deserializeGrid(const std::vector<unsigned char>& buffer, size_t& offset) {
@@ -420,7 +420,10 @@ inline Grid Serializer::deserializeGrid(const std::vector<unsigned char>& buffer
     float cell_size = deserializeFloat(buffer, offset);
     bool is_hex = deserializeBool(buffer, offset);
     bool snap_to_grid = deserializeBool(buffer, offset);
-    return Grid{ offset_val, cell_size, is_hex, snap_to_grid };
+    bool visible = deserializeBool(buffer, offset);
+    float opacity = deserializeFloat(buffer, offset);
+
+    return Grid{ offset_val, cell_size, is_hex, snap_to_grid, visible, opacity };
 }
 
 // Serialize and Deserialize Board

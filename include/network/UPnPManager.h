@@ -17,46 +17,32 @@
 class UPnPManager {
 public:
 
+    static std::string getExternalIPv4Address() {
+        return std::string("NOT IMPLEMENTED YET!!");
+    }
     // Static public method to get the primary local IPv4 address using PowerShell
     static std::string getLocalIPv4Address() {
         std::string ipAddress = "";
-
-        // Constrói o caminho completo para o script PowerShell.
-        // Assumimos que 'GetCorrectIPv4.ps1' está no mesmo diretório do executável,
-        // o que o snippet CMake acima garante.
         std::filesystem::path scriptPath = PathManager::getResPath() / "GetCorrectIPv4.ps1";
-
-        // Comando para executar o script PowerShell a partir de um arquivo.
-        // -NoProfile: Impede o carregamento do perfil do PowerShell do usuário (mais rápido e limpo).
-        // -ExecutionPolicy Bypass: Define temporariamente a política de execução para permitir a execução deste script.
         std::string command = "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \"" + scriptPath.string() + "\"";
-
-        // Abre um pipe para o processo do PowerShell. O "r" indica que queremos ler a saída padrão.
+        
         FILE* pipe = _popen(command.c_str(), "r");
         if (!pipe) {
             std::cerr << "Erro: Falha ao executar o script PowerShell. Comando: " << command << std::endl;
-            // Opcional: imprimir errno para mais detalhes
-            // std::cerr << "Detalhes do erro: " << strerror(errno) << std::endl;
             return ipAddress; // Retorna string vazia em caso de falha ao iniciar o processo
         }
 
         std::array<char, 256> buffer; // Buffer para ler a linha
         std::string line;
 
-        // O script PowerShell é projetado para imprimir APENAS o IP na saída padrão e, em seguida, sair.
-        // Portanto, basta ler a primeira linha.
         if (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
             line = buffer.data();
-            // Remove espaços em branco e quebras de linha do início e do fim da string
             line.erase(0, line.find_first_not_of(" \t\r\n"));
             line.erase(line.find_last_not_of(" \t\r\n") + 1);
             ipAddress = line;
         }
 
-        // Fecha o pipe
         _pclose(pipe);
-
-        // Validação básica para garantir que a saída se parece com um endereço IPv4
         std::regex ipv4_format_regex("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$");
         if (!std::regex_match(ipAddress, ipv4_format_regex)) {
             std::cerr << "Aviso: O script PowerShell retornou algo que não parece um IPv4 válido ou nada: '" << ipAddress << "'" << std::endl;

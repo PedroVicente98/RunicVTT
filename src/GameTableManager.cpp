@@ -3,7 +3,7 @@
 #include "Serializer.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs), network_manager(ecs), map_directory(map_directory), board_manager(ecs, map_directory , marker_directory), chat()
+    : ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(ecs, network_manager, map_directory, marker_directory), chat()
 {
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
@@ -290,27 +290,29 @@ void GameTableManager::createGameTablePopUp()
 
         ImGui::Separator();
 
-     //   auto network_info = network_manager.getLocalIPAddress();
+        auto network_info = network_manager->getLocalIPAddress();
         ImGui::Text("Network Info");
-   //     ImGui::Text(network_info.c_str());
+        ImGui::Text(network_info.c_str());
         ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-       // network_manager.setNetworkPassword(pass_buffer);
-       
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
         if (ImGui::Button("Save") && strlen(buffer) > 0 && strlen(port_buffer) > 0)
         {
-
             board_manager.closeBoard();
             active_game_table = flecs::entity();
-           // network_manager.stopServer();
+            network_manager->closeServer();
 
             auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
             active_game_table = game_table;
             createGameTableFile(game_table);
 
+
+            network_manager->setNetworkPassword(pass_buffer);
+
             int port = atoi(port_buffer);
-           // network_manager.startServer(port);
+            network_manager->setPort(port);
+            auto local_ip = network_manager->getLocalIPAddress();
+            network_manager->startServer(local_ip, port);
 
             memset(buffer, '\0', sizeof(buffer));
             memset(pass_buffer, '\0', sizeof(pass_buffer));
@@ -337,10 +339,8 @@ void GameTableManager::createBoardPopUp() {
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("CreateBoard")) {
         ImGui::SetItemDefaultFocus();
-        // Create a dockspace within the popup for the MapDirectory
         ImGuiID dockspace_id = ImGui::GetID("CreateBoardDockspace");
 
-        // Create the dockspace
         if (ImGui::DockBuilderGetNode(dockspace_id) == 0) {
             ImGui::DockBuilderRemoveNode(dockspace_id);
             ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoUndocking);
@@ -349,19 +349,15 @@ void GameTableManager::createBoardPopUp() {
             ImGui::DockBuilderFinish(dockspace_id);
         }
 
-        // Dividindo a janela em duas colunas
         ImGui::Columns(2, nullptr, false);
 
-        // Coluna esquerda: formulário de criação do board
         ImGui::Text("Create a new board");
 
-        // Campo para o nome do board
         ImGui::InputText("Board Name", buffer, sizeof(buffer));
         std::string board_name(buffer);
 
         ImGui::NewLine();
 
-        // Pega a imagem selecionada do diretório de mapas
         DirectoryWindow::ImageData selectedImage = map_directory->getSelectedImage();
 
         if (!selectedImage.filename.empty()) {
@@ -443,7 +439,7 @@ void GameTableManager::closeGameTablePopUp()
         {
             board_manager.closeBoard();
             active_game_table = flecs::entity();
-           // network_manager.stopServer();
+           // network_manager->stopServer();
             chat.clearChat();
             ImGui::CloseCurrentPopup();
         }
@@ -457,7 +453,7 @@ void GameTableManager::closeGameTablePopUp()
         ImGui::EndPopup();
     }
 }
-//-----------------------------------------------------------------------------------------------
+//---------------------NETWORK--------------------------------------------------------------------------
 void GameTableManager::connectToGameTablePopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -470,7 +466,7 @@ void GameTableManager::connectToGameTablePopUp()
 
         if (ImGui::Button("Connect") && strlen(buffer) > 0)
         {
-            if (true)//network_manager.connectToPeer(buffer)) 
+            if (network_manager->connectToPeer(buffer)) 
             {  
                 memset(buffer, '\0', sizeof(buffer));
 
@@ -502,8 +498,11 @@ void GameTableManager::createNetworkPopUp() {
         ImGui::SetItemDefaultFocus();
 
         // Display local IP address (use NetworkManager to get IP)
-        //std::string localIp = network_manager.getLocalIPAddress();  // New method to get IP address
-        //ImGui::Text("Local IP Address: %s", localIp.c_str());
+        std::string local_ip = network_manager->getLocalIPAddress();  // New method to get IP address
+        ImGui::Text("Local IP Address: %s", local_ip.c_str());
+
+        std::string external_ip = network_manager->getExternalIPAddress();
+        ImGui::Text("External IP Address: %s", external_ip.c_str());
 
         // Input field for port
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer));
@@ -517,8 +516,8 @@ void GameTableManager::createNetworkPopUp() {
         if (ImGui::Button("Start Network")) {
             unsigned short port = static_cast<unsigned short>(std::stoi(port_buffer));
             // Start the network with the given port and save the password
-            //network_manager.setNetworkPassword(pass_buffer);
-            //network_manager.startServer(port);
+            network_manager->setNetworkPassword(pass_buffer);
+            network_manager->startServer(local_ip, port);
             ImGui::CloseCurrentPopup();
 
             // Clear buffers after saving
@@ -546,7 +545,9 @@ void GameTableManager::closeNetworkPopUp() {
         ImGui::Text("Close Current Conection?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close Connection"))
         {
-            //network_manager.stopServer();
+            network_manager->closeServer();
+            network_manager->disconectFromPeers();
+            
             ImGui::CloseCurrentPopup();
         }
 
@@ -567,24 +568,40 @@ void GameTableManager::openNetworkInfoPopUp()
     if (ImGui::BeginPopupModal("NetworkInfo", 0, ImGuiWindowFlags_AlwaysAutoResize))
     {
 
-        //auto connection_string = network_manager.getNetworkInfo();
-        //auto ip = network_manager.getLocalIPAddress();
-        //auto port = network_manager.getPort();
+        auto local_ip = network_manager->getLocalIPAddress();
+        auto external_ip = network_manager->getExternalIPAddress();
+        auto port = network_manager->getPort();
 
-        ImGui::Text("IP: ");
+        auto local_connection_string = network_manager->getNetworkInfo(false);
+        auto external_connection_string = network_manager->getNetworkInfo(true);
+
+        ImGui::Text("Local IP: ");
         ImGui::SameLine();
-        //ImGui::Text(ip.c_str());
+        ImGui::Text(local_ip.c_str());
+
+        ImGui::Text("External IP: ");
+        ImGui::SameLine();
+        ImGui::Text(external_ip.c_str());
         
         ImGui::Text("PORT: ");
         ImGui::SameLine();
-        //ImGui::Text(std::to_string(port).c_str());
+        ImGui::Text(std::to_string(port).c_str());
         
-        ImGui::Text("Connection String: ");
+        ImGui::Text("Local Connection String: ");
         ImGui::SameLine();
-        //ImGui::Text(connection_string.c_str());
+        ImGui::Text(local_connection_string.c_str());
         ImGui::SameLine();
         if (ImGui::Button("Copy")) {
-            //ImGui::SetClipboardText(connection_string.c_str());  // Copy the connection string to the clipboard
+            ImGui::SetClipboardText(local_connection_string.c_str());  // Copy the connection string to the clipboard
+            ImGui::Text("Copied to clipboard!");
+        }
+        
+        ImGui::Text("External Connection String: ");
+        ImGui::SameLine();
+        ImGui::Text(external_connection_string.c_str());
+        ImGui::SameLine();
+        if (ImGui::Button("Copy")) {
+            ImGui::SetClipboardText(external_connection_string.c_str());  // Copy the connection string to the clipboard
             ImGui::Text("Copied to clipboard!");
         }
 

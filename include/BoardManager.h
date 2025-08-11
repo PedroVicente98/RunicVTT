@@ -16,7 +16,7 @@
 
 #include "Components.h"
 #include "DirectoryWindow.h"
-//#include "NetworkManager.h"
+#include "NetworkManager.h"
 
 class Camera {
 public:
@@ -135,7 +135,7 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs, /*NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
+	BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);  // Render board elements (map, markers, fog)
@@ -207,7 +207,12 @@ public:
         edit_window_entity = edit_entity;
     };
 
+    bool getIsNonMapWindowHovered() const { return is_non_map_window_hovered; }
+    void setIsNonMapWindowHovered(bool is_non_map_window_hovered) {
+        this->is_non_map_window_hovered = is_non_map_window_hovered;
+    }
 private:
+    bool is_non_map_window_hovered = false;
     bool showEditWindow = false;
     bool showGridSettings = false;
 	flecs::entity edit_window_entity = flecs::entity();

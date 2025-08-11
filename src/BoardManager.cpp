@@ -19,7 +19,7 @@
 #include <cstdint>   // For uint64_t and UINT64_MAX
 #include "Serializer.h"
 
-BoardManager::BoardManager(flecs::world ecs,/* NetworkManager* network_manager,*/ std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
+BoardManager::BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
     : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
     
     
@@ -53,7 +53,7 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
         .set(Identifier{ generateUniqueId() })
         .set(Board{ board_name })
         .set(Panning{false})
-        .set(Grid{ {0,0}, 50.0f, false, false, false })
+        .set(Grid{ {0,0}, 50.0f, false, false, false, 0.5f })
         .set(TextureComponent{ texture_id, map_image_path, size})
         .set(Size{ size.x, size.y });
     active_board = board;
@@ -81,7 +81,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
         | ImGuiWindowFlags_NoScrollbar
         | ImGuiWindowFlags_NoTitleBar
         | ImGuiWindowFlags_AlwaysAutoResize
-        | ImGuiWindowFlags_NoBackground; // Often desired for embedded toolbars
+        /*| ImGuiWindowFlags_NoBackground*/; // Often desired for embedded toolbars
 
     // Position the cursor within the parent window (MapWindow in this case)
     // before starting the child window. This is how you control the child's position.
@@ -99,7 +99,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f));
 
     ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
-    ImVec4 activeColor = ImVec4(0.2f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
+    ImVec4 activeColor = ImVec4(0.7f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
 
     // Tool: Move
     ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? activeColor : defaultColor);
@@ -132,7 +132,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     }
     
     ImGui::SameLine(); // Ensure buttons are on the same row
-    if (ImGui::Button("Configure Grid", ImVec2(90, 40))) {
+    if (ImGui::Button("Config Grid", ImVec2(90, 40))) {
         showGridSettings = !showGridSettings;
     }
 
@@ -153,8 +153,13 @@ void BoardManager::renderGridWindow() {
     }
 
     // Begin the ImGui window
+    auto mouse_pos = ImGui::GetMousePos();
+    ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
-    ImGui::Begin("Grid Settings", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
+    auto grid_hovered = ImGui::IsWindowHovered();
+    setIsNonMapWindowHovered(grid_hovered);
+   
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
     auto grid = active_board.get_mut<Grid>();
@@ -166,14 +171,40 @@ void BoardManager::renderGridWindow() {
         ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
 
         // --- FLOAT SLIDERS ---
-        ImGui::SliderFloat("Cell Size", &grid->cell_size, 1.0f, 200.0f);
-
+        ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("-")) {
+            grid->cell_size = grid->cell_size - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+")) {
+            grid->cell_size = grid->cell_size + 0.01f;
+        }
         // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
         ImGui::Text("Grid Offset");
         ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("-")) {
+            grid->offset.x = grid->offset.x - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+")) {
+            grid->offset.x = grid->offset.x + 0.01f;
+        }
         ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
         ImGui::SameLine();
+        if (ImGui::Button("-")) {
+            grid->offset.y = grid->offset.y - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+")) {
+            grid->offset.y = grid->offset.y + 0.01f;
+        }
 
+        // Button to reset the offset
+        if (ImGui::Button("Reset Offset")) {
+            grid->offset = glm::vec2(0.0f);
+        }
         // Button to reset the offset
         if (ImGui::Button("Reset Offset")) {
             grid->offset = glm::vec2(0.0f);
@@ -224,6 +255,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                 grid_shader.SetUniform1i("grid_type", grid->is_hex ? 1 : 0);
                 grid_shader.SetUniform1f("cell_size", grid->cell_size);
                 grid_shader.SetUniform2f("grid_offset", grid->offset.x, grid->offset.y);
+                grid_shader.SetUniform1f("opacity", grid->opacity);
                 grid_shader.Unbind();
 
                 renderer.Draw(va, ib, grid_shader);
@@ -668,6 +700,11 @@ void BoardManager::renderEditWindow() {
     ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
+    auto edit_window_hover = ImGui::IsWindowHovered();
+    if (edit_window_hover) {
+        setIsNonMapWindowHovered(true);
+    }
+
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
     if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>()) {

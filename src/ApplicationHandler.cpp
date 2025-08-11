@@ -174,6 +174,7 @@ int ApplicationHandler::run()
         grid_shader.SetUniform1i("grid_type", 0);
         grid_shader.SetUniform1f("cell_size", 1.0f);
         grid_shader.SetUniform2f("grid_offset", 1.0f, 1.0f);
+        grid_shader.SetUniform1f("opacity", 1.0f);
 
         /*uniform uint grid_type;
         uniform float cell_size;

@@ -62,6 +62,7 @@ struct Grid {
     bool is_hex;
     bool snap_to_grid;
     bool visible;
+    float opacity;
 };
 
 // Board Component

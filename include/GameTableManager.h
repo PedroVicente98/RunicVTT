@@ -60,6 +60,7 @@ public:
 	std::string game_table_name; 
 	Chat chat;
 	std::shared_ptr<DirectoryWindow> map_directory;
+	std::shared_ptr<NetworkManager> network_manager;
 	BoardManager board_manager;
 private:
 
@@ -67,7 +68,6 @@ private:
 	void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
 	void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
 
-	NetworkManager network_manager;
 	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
 
@@ -87,6 +87,7 @@ private:
 	bool mouse_left_released, mouse_right_released, mouse_middle_released;
 	float mouse_wheel_delta;
 	bool ignore_mouse_until_release = false;
+	bool is_non_map_window_hovered = false;
 
 public:
 	
@@ -95,8 +96,9 @@ public:
 		ImGuiIO& io = ImGui::GetIO();
 
 		mouse_wheel_delta = io.MouseWheel;
+		auto is_non_map_window_hovered = board_manager.getIsNonMapWindowHovered();
 
-		if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds) {
+		if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds && !is_non_map_window_hovered) {
 			ignore_mouse_until_release = true;
 		}
 		if (io.MouseReleased[0] || io.MouseReleased[1] || io.MouseReleased[2]) {
@@ -107,7 +109,7 @@ public:
 		mouse_left_released = mouse_right_released = mouse_middle_released = false;
 
 		if (!ignore_mouse_until_release) {
-			if (is_mouse_within_image_bounds) {
+			if (is_mouse_within_image_bounds && !is_non_map_window_hovered) {
 				if (io.MouseClicked[0]) { // LEFT mouse button just clicked
 					mouse_left_clicked = true;
 				}

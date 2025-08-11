@@ -7,11 +7,12 @@
 #include <regex>
 #include <cstdlib>  // For std::rand()
 #include <ctime>    // For std::time>
+#include "NetworkManager.h"
 
 class Chat {
 public:
 
-    //Chat(NetworkManager* network_manager) : network_manager(network_manager){};
+    Chat(std::shared_ptr<NetworkManager> network_manager) : network_manager(network_manager){};
     Chat() {};
     ~Chat() {};
     // Message structure with different types of content
@@ -177,7 +178,7 @@ public:
     }
 
 private:
-    //NetworkManager* network_manager;
+    std::shared_ptr<NetworkManager> network_manager;
     char textInput[256] = "";
     bool shouldFocusInput = false;
 };
