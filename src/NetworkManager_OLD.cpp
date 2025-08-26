@@ -1,3 +1,293 @@
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
+#include <string>
+#include <vector>
+#include <memory>
+#include <iostream>
+
+// --- Placeholder NetworkManager ---
+// Replace this with your actual NetworkManager class.
+// This mock version simulates the states and data needed by the UI.
+class NetworkManagerDummy {
+public:
+    enum class State { Stopped, StartingServer, Hosting, Connecting, Connected };
+
+    struct Peer {
+        std::string id;
+        std::string name;
+        int ping;
+    };
+
+    // --- Public API for the UI ---
+
+    State getState() const { return currentState; }
+    bool isGM() const { return currentState == State::Hosting; }
+
+    std::string getExternalIP() const { return "203.0.113.42"; } // Dummy data
+    std::string getInternalIP() const { return "192.168.1.101"; } // Dummy data
+    int getPort() const { return serverPort; }
+    std::string getPassword() const { return serverPassword; }
+    std::string getConnectionString() const {
+        if (isGM()) {
+            return "webrtc://" + getExternalIP() + ":" + std::to_string(getPort()) + "/" + getPassword();
+        }
+        return "N/A";
+    }
+
+    const std::vector<Peer>& getPeers() const { return connectedPeers; }
+
+    void startServer(int port, const std::string& password) {
+        std::cout << "UI requested to start server on port " << port << " with password '" << password << "'\n";
+        serverPort = port;
+        serverPassword = password;
+        currentState = State::Hosting; // Simulate instant success
+        // Add dummy peers for demonstration
+        connectedPeers = { {"peer_123", "Alice", 45}, {"peer_456", "Bob", 62} };
+    }
+
+    void stopServer() {
+        std::cout << "UI requested to stop the server.\n";
+        currentState = State::Stopped;
+        connectedPeers.clear();
+    }
+
+    void connectToServer(const std::string& url) {
+        std::cout << "UI requested to connect to " << url << "\n";
+        currentState = State::Connected; // Simulate instant success
+    }
+
+    void disconnect() {
+        std::cout << "UI requested to disconnect.\n";
+        currentState = State::Stopped;
+    }
+
+    void kickPeer(const std::string& peerId) {
+        std::cout << "UI requested to kick peer: " << peerId << "\n";
+        // In a real implementation, you'd remove the peer from the vector
+    }
+
+    void changePassword(const std::string& newPassword) {
+        std::cout << "UI requested to change password to: " << newPassword << "\n";
+        serverPassword = newPassword;
+    }
+
+private:
+    State currentState = State::Stopped;
+    int serverPort = 7777;
+    std::string serverPassword = "default_password";
+    std::vector<Peer> connectedPeers;
+};
+
+// --- The ImGui Window Function ---
+
+void DrawNetworkManagerPopup(NetworkManager& netManager, bool* p_open) {
+    if (!*p_open) {
+        return;
+    }
+
+    // Center the popup on first appearance
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Network Manager", p_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+        NetworkManager::State state = netManager.getState();
+
+        // Buffers for text input fields
+        static char port_buf[6] = "7777";
+        static char pw_buf[64] = "password123";
+        static char url_buf[256] = "webrtc://127.0.0.1:7777/password123";
+        static char new_pw_buf[64] = "";
+
+        // ===================================================================
+        // ==                  STATE: STOPPED / INITIAL                     ==
+        // ===================================================================
+        if (state == NetworkManager::State::Stopped) {
+            if (ImGui::BeginTabBar("ModeSelection")) {
+                if (ImGui::BeginTabItem("Host (GM)")) {
+                    ImGui::InputText("Port", port_buf, sizeof(port_buf));
+                    ImGui::InputText("Password", pw_buf, sizeof(pw_buf), ImGuiInputTextFlags_Password);
+                    if (ImGui::Button("Start Server", ImVec2(-1, 0))) {
+                        netManager.startServer(std::atoi(port_buf), pw_buf);
+                    }
+                    ImGui::EndTabItem();
+                }
+
+                if (ImGui::BeginTabItem("Join (Player)")) {
+                    ImGui::InputText("Connection String", url_buf, sizeof(url_buf));
+                    if (ImGui::Button("Connect", ImVec2(-1, 0))) {
+                        netManager.connectToServer(url_buf);
+                    }
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
+        }
+
+        // ===================================================================
+        // ==                 STATE: HOSTING (GAMEMASTER)                   ==
+        // ===================================================================
+        else if (state == NetworkManager::State::Hosting) {
+            ImGui::Text("Server Status: Hosting");
+
+            ImGui::SeparatorText("Network Info");
+            ImGui::InputText("Internal IP", (char*)netManager.getInternalIP().c_str(), 64, ImGuiInputTextFlags_ReadOnly);
+            ImGui::InputText("External IP", (char*)netManager.getExternalIP().c_str(), 64, ImGuiInputTextFlags_ReadOnly);
+
+            std::string portStr = std::to_string(netManager.getPort());
+            ImGui::InputText("Port", (char*)portStr.c_str(), 6, ImGuiInputTextFlags_ReadOnly);
+
+            std::string connStr = netManager.getConnectionString();
+            ImGui::InputText("Invite String", (char*)connStr.c_str(), 256, ImGuiInputTextFlags_ReadOnly);
+            ImGui::SameLine();
+            if (ImGui::Button("Copy")) {
+                ImGui::SetClipboardText(connStr.c_str());
+            }
+
+            ImGui::SeparatorText("Management");
+            ImGui::InputText("##NewPassword", new_pw_buf, sizeof(new_pw_buf), ImGuiInputTextFlags_Password);
+            ImGui::SameLine();
+            if (ImGui::Button("Change Password")) {
+                netManager.changePassword(new_pw_buf);
+                strcpy(new_pw_buf, ""); // Clear buffer
+            }
+
+            ImGui::SeparatorText("Peer List");
+            if (ImGui::BeginTable("PeerList", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+                ImGui::TableSetupColumn("Peer Name");
+                ImGui::TableSetupColumn("Ping (ms)");
+                ImGui::TableSetupColumn("Actions");
+                ImGui::TableHeadersRow();
+
+                for (const auto& peer : netManager.getPeers()) {
+                    ImGui::TableNextRow();
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::Text("%s", peer.name.c_str());
+                    ImGui::TableSetColumnIndex(1);
+                    ImGui::Text("%d", peer.ping);
+                    ImGui::TableSetColumnIndex(2);
+                    ImGui::PushID(peer.id.c_str()); // Ensure unique IDs for buttons
+                    if (ImGui::Button("Disconnect")) {
+                        netManager.kickPeer(peer.id);
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::EndTable();
+            }
+
+            ImGui::Separator();
+            // GM disconnect logic: this button is for the GM to leave the game.
+            // You will implement the logic to disconnect all peers when this is clicked.
+            if (ImGui::Button("Disconnect", ImVec2(ImGui::GetContentRegionAvail().x * 0.49f, 0))) {
+                // YOUR LOGIC HERE: Disconnect all peers, then stop the server.
+                std::cout << "[GM DISCONNECT] Add logic here to disconnect all peers.\n";
+                netManager.stopServer();
+                *p_open = false; // Close the popup
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Stop Server", ImVec2(ImGui::GetContentRegionAvail().x, 0))) {
+                netManager.stopServer();
+            }
+        }
+
+        // ===================================================================
+        // ==                    STATE: CONNECTED (PLAYER)                  ==
+        // ===================================================================
+        else if (state == NetworkManager::State::Connected) {
+            ImGui::Text("Status: Connected to server.");
+            ImGui::Separator();
+            if (ImGui::Button("Disconnect", ImVec2(-1, 0))) {
+                netManager.disconnect();
+                *p_open = false; // Close the popup
+            }
+        }
+
+        // ===================================================================
+        // ==                      TRANSITIONAL STATES                      ==
+        // ===================================================================
+        else if (state == NetworkManager::State::StartingServer) {
+            ImGui::Text("Starting server...");
+            // You can add a spinner or loading animation here
+        }
+        else if (state == NetworkManager::State::Connecting) {
+            ImGui::Text("Connecting to server...");
+        }
+
+        ImGui::Separator();
+        if (state != NetworkManager::State::Stopped && ImGui::Button("Close", ImVec2(-1, 0))) {
+            *p_open = false;
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+
+// --- Main Application Loop ---
+int main() {
+    // --- Boilerplate for GLFW, GLEW, ImGui ---
+    glfwInit();
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "ImGui Network Manager", NULL, NULL);
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+    glewInit();
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 150");
+    ImGui::StyleColorsDark();
+
+    NetworkManager myNetworkManager;
+    bool show_network_popup = true;
+
+    // Main loop
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // A simple button in your main UI to open the network popup
+        ImGui::Begin("Main Application");
+        if (ImGui::Button("Open Network Manager")) {
+            show_network_popup = true;
+        }
+        ImGui::End();
+
+        // Call our popup function
+        if (show_network_popup) {
+            ImGui::OpenPopup("Network Manager");
+        }
+        DrawNetworkManagerPopup(myNetworkManager, &show_network_popup);
+
+        // Rendering
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glfwSwapBuffers(window);
+    }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+    glfwDestroyWindow(window);
+    glfwTerminate();
+
+    return 0;
+}
+
+
+
+
 ////#include "NetworkManager.h"
 //#include <iostream>
 //#include <sstream>

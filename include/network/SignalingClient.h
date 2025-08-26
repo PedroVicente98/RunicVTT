@@ -6,9 +6,12 @@
 
 class SignalingClient {
 public:
+
+    SignalingClient();
+
     bool connect(const std::string& ip, unsigned short port);
     void send(const std::string& message);
-    void onSignal(std::function<void(const std::string&)> cb);
+    void onSignal(const std::string& msg);
 
 private:
     std::shared_ptr<rtc::WebSocket> ws;

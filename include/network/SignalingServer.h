@@ -6,7 +6,6 @@
 
 class SignalingServer {
 public:
-    SignalingServer(std::function<void(const std::string&)> onConnectCb, std::function<void(const std::string&, const std::string&)> onMessageCb);
     SignalingServer();
     ~SignalingServer();
     void start(unsigned short port);
@@ -16,9 +15,11 @@ public:
     void onClientConnected(std::function<void(const std::string&)>);
     void onMessage(std::function<void(const std::string& peerId, const std::string& message)>);
 
+
 private:
     std::shared_ptr<rtc::WebSocketServer> server;
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> clients;
-    std::function<void(const std::string&)> onConnectCb;
-    std::function<void(const std::string&, const std::string&)> onMessageCb;
+
+    void onConnect(std::string peer_id, std::shared_ptr<rtc::WebSocket> client);
+    void onMessage(std::string peer_id, std::string msg);
 };

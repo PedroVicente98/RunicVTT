@@ -5,10 +5,7 @@
 
 class PeerLink {
 public:
-    PeerLink(const std::string& id,
-        const rtc::Configuration& config,
-        std::function<void(const std::string&)> onSignalOut,
-        std::function<void()> onReady);
+    PeerLink(const std::string& id, const rtc::Configuration& config);
 
     void receiveSignal(const std::string& json);
     void close();

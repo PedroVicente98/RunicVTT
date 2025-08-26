@@ -8,6 +8,13 @@
 #include "flecs.h"
 #include "rtc/configuration.hpp"
 #include "imgui.h"
+#include <regex>
+
+#include <vector>
+#include <rtc/peerconnection.hpp>
+#include <nlohmann/json.hpp>
+#include <future>
+#include <iostream>
 
 enum class Role {
     NONE,
@@ -45,23 +52,45 @@ private:
     void receiveSignal(const std::string& peerId, const std::string& message);
     void sendSignalToPeer(const std::string& peerId, const std::string& message);
 
-    Role peer_role;
-
-    std::unordered_map<std::string, std::shared_ptr<PeerLink>> peers;
-
     std::unique_ptr<SignalingServer> signalingServer;
     std::unique_ptr<SignalingClient> signalingClient;
-
+    Role peer_role;
+    std::unordered_map<std::string, std::shared_ptr<PeerLink>> peers;
     rtc::Configuration rtcConfig;
 
-
 public:
+
+    std::string createAndEncodeOffer(std::shared_ptr<rtc::PeerConnection> pc);
+    std::string decodeOfferAndCreateAnswer(const std::string& offerString, std::shared_ptr<rtc::PeerConnection> pc);
+    void decodeAnswerAndFinalize(const std::string& answerString, std::shared_ptr<rtc::PeerConnection> pc);
+    void createPeerConnection();
+
+    std::string base64_encode(const std::string& in);
+    std::string base64_decode(const std::string& in);
+
+    void renderNetworkOfferer();
+    void renderNetworkAnswerer();
+
+
+    void parseConnectionString(std::string connection_string, std::string &server_ip, unsigned short &port, std::string &password) {
+        std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+            std::smatch match;
+            // Parse the connection string using regex
+            if (std::regex_match(connection_string, match, rgx)) {
+                server_ip = match[1];             // Extract the server's Hamachi IP address
+                port = std::stoi(match[2]);    // Extract the port
+                password = match[3];              // Extract the optional password
+            }
+    }
+
     unsigned short getPort() const { return port; };
     std::string getNetworkPassword() const { return std::string(network_password); };
 
     void setNetworkPassword(const char* password) {
+        std::cout << "BEFORE NETWORK PASSWORD" << password << std::endl;
         strncpy(network_password, password, sizeof(network_password) - 1);
         network_password[sizeof(network_password) - 1] = '\0';
+        std::cout << "NETWORK PASSWORD" << network_password << std::endl;
     }
 
     Role getPeerRole() const { return peer_role; }

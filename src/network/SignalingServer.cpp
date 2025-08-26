@@ -2,15 +2,9 @@
 #include <rtc/rtc.hpp>
 #include <iostream>
 
-
-SignalingServer::SignalingServer(std::function<void(const std::string&)> onConnectCb, std::function<void(const std::string&, const std::string&)> onMessageCb)
-{
-    this->onConnectCb = onConnectCb;
-    this->onMessageCb = onMessageCb;
-}
-
 SignalingServer::SignalingServer()
 {
+    
 }
 
 SignalingServer::~SignalingServer()
@@ -18,7 +12,8 @@ SignalingServer::~SignalingServer()
     this->stop();
 }
 
-void SignalingServer::start(unsigned short port) {
+void SignalingServer::start(unsigned short port) 
+{
     auto serverConfiguration = rtc::WebSocketServerConfiguration{};
     serverConfiguration.bindAddress = "0.0.0.0";
     serverConfiguration.port = port;
@@ -26,16 +21,15 @@ void SignalingServer::start(unsigned short port) {
 
     server->onClient([=](std::shared_ptr<rtc::WebSocket> client) {
         auto addrOpt = client->remoteAddress();
+        std::cout << "[SignalingServer] Client Connected at " << addrOpt.value() << "\n";
         if (addrOpt) {
             std::string peerId = addrOpt.value();
 
-            clients[peerId] = client;
-
-            if (onConnectCb) onConnectCb(peerId);
+            onConnect(peerId, client);
 
             client->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {
-                if (onMessageCb && std::holds_alternative<rtc::string>(msg)) {
-                    onMessageCb(peerId, std::get<rtc::string>(msg));
+                if (std::holds_alternative<rtc::string>(msg)) {
+                    onMessage(peerId, std::get<rtc::string>(msg));
                 }
                 });
 
@@ -46,26 +40,33 @@ void SignalingServer::start(unsigned short port) {
         }
     });
 
+
     std::cout << "[SignalingServer] Listening at ws://0.0.0.0" << ":" << port << "\n";
 }
 
 void SignalingServer::stop() {
-    server->stop();
+    if (server.get() != nullptr) {
+        server->stop();
+    }
     clients.clear();
 }
 
-// 
-//
-//void SignalingServer::send(const std::string& peerId, const std::string& message) {
-//    if (clients.count(peerId)) {
-//        clients[peerId]->send(message);
-//    }
-//}
-//
-//void SignalingServer::onClientConnected(std::function<void(const std::string&)> cb) {
-//    onConnectCb = cb;
-//}
-//
-//void SignalingServer::onMessage(std::function<void(const std::string&, const std::string&)> cb) {
-//    onMessageCb = cb;
-//}
+void SignalingServer::onConnect(std::string peer_id, std::shared_ptr<rtc::WebSocket> client)
+{
+    clients[peer_id] = client;
+
+}
+
+void SignalingServer::onMessage(std::string peer_id, std::string msg) 
+{
+    for (auto client : clients) {
+        send(client.first, msg);
+    }
+}
+
+void SignalingServer::send(const std::string& peerId, const std::string& message) {
+    if (clients.count(peerId)) {
+        clients[peerId]->send(message);
+    }
+}
+

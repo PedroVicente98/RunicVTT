@@ -61,10 +61,24 @@ public:
     }
 
     // --- APP/INSTALLATION-LOCAL FOLDERS ---
+    //C:\Dev\RunicVTT\external\node\node.exe .\node_modules\localtunnel\bin\client -p 7778 -s runics
+    static fs::path getExternalPath() {
+        return getExecutableRoot() / "external";
+
+    }
+    static fs::path getNodeExePath() {
+        return getExternalPath() / "node"/ "node.exe";
+
+    }
+    static fs::path getLocalTunnelClientPath() {
+        return getExternalPath() / "localtunnel" / "node_modules" / "localtunnel" / "bin" / "client";
+
+    }
     static fs::path getUpnpcExePath() {
         return executableDir / "upnpc-static.exe";
 
-    }static fs::path getExecutableDirectory() {
+    }
+    static fs::path getExecutableDirectory() {
         return executableDir;
     }
 

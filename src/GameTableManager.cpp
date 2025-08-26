@@ -651,11 +651,16 @@ void GameTableManager::loadGameTablePopUp() {
     {
 
         ImGui::Text("Load GameTable: ");
-        //auto network_info = network_manager.getLocalIPAddress();
-        ImGui::Text("Network Info");
-        //ImGui::Text(network_info.c_str());
+        auto network_info_local = network_manager->getNetworkInfo(false);
+        ImGui::Text("Network Info Local");
+        ImGui::Text(network_info_local.c_str());
+        
+        auto network_info_external = network_manager->getNetworkInfo(true);
+        ImGui::Text("Network Info External");
+        ImGui::Text(network_info_external.c_str());
+
         ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-        //network_manager.setNetworkPassword(pass_buffer);
+        
 
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
@@ -666,10 +671,10 @@ void GameTableManager::loadGameTablePopUp() {
         for (auto& game_table : game_tables) {
             if (ImGui::Button(game_table.c_str()) && strlen(port_buffer) > 0)
             {
+                network_manager->setNetworkPassword(pass_buffer);
                 board_manager.closeBoard();
                 active_game_table = flecs::entity();
-                //network_manager.stopServer();
-
+                network_manager->closeServer();
                 std::string suffix = ".runic";
                 size_t pos = game_table.rfind(suffix);  // Find the position of ".runic"
                 if (pos != std::string::npos && pos == game_table.length() - suffix.length()) {
@@ -683,7 +688,8 @@ void GameTableManager::loadGameTablePopUp() {
                 loadGameTable(game_table_file_path);
 
                 int port = atoi(port_buffer);
-                //network_manager.startServer(port);
+                auto internal_ip_address = network_manager->getLocalIPAddress();
+                network_manager->startServer(internal_ip_address, port);
 
                 memset(buffer, '\0', sizeof(buffer));
                 memset(pass_buffer, '\0', sizeof(pass_buffer));

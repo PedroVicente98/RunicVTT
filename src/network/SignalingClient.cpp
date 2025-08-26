@@ -2,6 +2,11 @@
 #include <rtc/rtc.hpp>
 #include <iostream>
 
+
+SignalingClient::SignalingClient() {
+
+}
+
 bool SignalingClient::connect(const std::string& ip, unsigned short port) {
     std::string url = "ws://" + ip + ":" + std::to_string(port);
     ws = std::make_shared<rtc::WebSocket>();
@@ -15,17 +20,17 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port) {
         });
 
     ws->onMessage([this](std::variant<rtc::binary, rtc::string> msg) {
-        if (onSignalCb && std::holds_alternative<rtc::string>(msg)) {
-            onSignalCb(std::get<rtc::string>(msg));
+        if (std::holds_alternative<rtc::string>(msg)) {
+            onSignal(std::get<rtc::string>(msg));
         }
         });
     try{
         if (ws->isClosed()) {
-            ws->open(url);
+            ws->open(ip);
         }
         else {
             ws->close();
-            ws->open(url);
+            ws->open(ip);
         }
     }
     catch(std::exception e){
@@ -34,6 +39,10 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port) {
 
     return true;
 }
+void SignalingClient::onSignal(const std::string& msg) {
+
+}
+
 //
 //void SignalingClient::send(const std::string& message) {
 //    if (ws) {
@@ -41,6 +50,3 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port) {
 //    }
 //}
 //
-//void SignalingClient::onSignal(std::function<void(const std::string&)> cb) {
-//    onSignalCb = cb;
-//}

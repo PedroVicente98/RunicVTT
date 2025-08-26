@@ -58,7 +58,7 @@ target_link_libraries(RunicVTT PRIVATE
     "${OPENSSL_SSL_LIBRARY}"
     "${OPENSSL_CRYPTO_LIBRARY}"
 )
-
+target_link_libraries(RunicVTT PRIVATE winhttp ws2_32)
 # ----------------------
 # nlohhmann json
 # ----------------------
@@ -132,12 +132,21 @@ add_custom_command(TARGET RunicVTT POST_BUILD
         "$<TARGET_FILE_DIR:RunicVTT>"
 )
 # ----------------------
-# Copy resource folder
+# Copy miniupnpc folder
 # ----------------------
 add_custom_command(TARGET RunicVTT POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
         "${CMAKE_SOURCE_DIR}/dependencies/miniupnpc/upnpc-static.exe"
         "$<TARGET_FILE_DIR:RunicVTT>"
+)
+
+# ----------------------
+# Copy external folder
+# ----------------------
+add_custom_command(TARGET RunicVTT POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_SOURCE_DIR}/external"
+        "$<TARGET_FILE_DIR:RunicVTT>/external"
 )
 
 # ----------------------
@@ -152,32 +161,33 @@ add_custom_command(TARGET RunicVTT POST_BUILD
 ## ----------------------
 # CPACK Installer
 # ----------------------
-#include(InstallRequiredSystemLibraries)
+include(InstallRequiredSystemLibraries)
 
-#set(CPACK_PACKAGE_NAME "RunicVTT")
-#set(CPACK_PACKAGE_VERSION "1.0.0")
-#set(CPACK_PACKAGE_VENDOR "Runic")
-#set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Runic Virtual Tabletop Application")
-#set(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
+set(CPACK_PACKAGE_NAME "RunicVTT")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VENDOR "Runic")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Runic Virtual Tabletop Application")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
 
-#set(CPACK_GENERATOR "NSIS")
+set(CPACK_GENERATOR "NSIS")
 
 # Shortcut on desktop
-#set(CPACK_NSIS_CREATE_ICONS_EXTRA
-#  "CreateShortCut \\\"$DESKTOP\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
-#)
+set(CPACK_NSIS_CREATE_ICONS_EXTRA
+  "CreateShortCut \\\"$DESKTOP\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
+)
 
 # Install binary
-#install(TARGETS RunicVTT DESTINATION .)
+install(TARGETS RunicVTT DESTINATION .)
 
 # Install resources
-#install(DIRECTORY ${CMAKE_SOURCE_DIR}/res DESTINATION res)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/res DESTINATION res)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/external DESTINATION external)
 
 # Install OpenSSL DLLs
-#install(FILES
-#    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
-#    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
-#    DESTINATION .
-#)
+install(FILES
+    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
+    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
+    DESTINATION .
+)
 
-#include(CPack)
+include(CPack)
