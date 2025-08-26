@@ -158,36 +158,90 @@ add_custom_command(TARGET RunicVTT POST_BUILD
         "$<TARGET_FILE_DIR:RunicVTT>/res"
 )
 
-## ----------------------
-# CPACK Installer
+# ----------------------
+# Install Rules
+# ----------------------
+# Install the main executable (to Program Files/RunicVTT)
+install(TARGETS RunicVTT
+    RUNTIME DESTINATION .
+)
+
+# Install resources (if you have folders like res/ and external/)
+install(DIRECTORY res/ DESTINATION res)
+install(DIRECTORY external/ DESTINATION external)
+
+# ----------------------
+# CPack Configuration
 # ----------------------
 include(InstallRequiredSystemLibraries)
 
+# Package metadata
 set(CPACK_PACKAGE_NAME "RunicVTT")
+set(CPACK_PACKAGE_VENDOR "Pedro Vicente dos Santos")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "RunicVTT - Virtual Tabletop")
 set(CPACK_PACKAGE_VERSION "1.0.0")
-set(CPACK_PACKAGE_VENDOR "Runic")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Runic Virtual Tabletop Application")
+set(CPACK_PACKAGE_CONTACT "pedrovicente45@outlook.com")
+
+# Default install directory (Program Files on Windows)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
 
-set(CPACK_GENERATOR "NSIS")
+# Generators: create both ZIP and NSIS installer
+set(CPACK_GENERATOR "ZIP;NSIS")
+
+# NSIS-specific settings
+set(CPACK_NSIS_DISPLAY_NAME "RunicVTT")
+set(CPACK_NSIS_HELP_LINK "https://github.com/PedroVicente98/RunicVTT")
+set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/PedroVicente98")
+set(CPACK_NSIS_CONTACT "pedrovicente45@outlook.com")
+
+# Add uninstaller entry in Control Panel
+set(CPACK_NSIS_MODIFY_PATH ON)
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
+
+# Create Start Menu shortcut
+set(CPACK_NSIS_CREATE_ICONS_EXTRA
+    "CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
+)
+set(CPACK_NSIS_DELETE_ICONS_EXTRA
+    "Delete \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\""
+)
+
+# Include CPack (must be last!)
+include(CPack)
+
+
+
+
+## ----------------------
+# CPACK Installer
+# ----------------------
+# in clude(InstallRequiredSystemLibraries)
+
+#s et(CPACK_PACKAGE_NAME "RunicVTT")
+#se t(CPACK_PACKAGE_VERSION "1.0.0")
+#s et(CPACK_PACKAGE_VENDOR "Runic")
+#se t(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Runic Virtual Tabletop Application")
+#se t(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
+
+#s et(CPACK_GENERATOR "NSIS")
 
 # Shortcut on desktop
-set(CPACK_NSIS_CREATE_ICONS_EXTRA
-  "CreateShortCut \\\"$DESKTOP\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
-)
+#s et(CPACK_NSIS_CREATE_ICONS_EXTRA
+#  "CreateShortCut \\\"$DESKTOP\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
+#)
 
 # Install binary
-install(TARGETS RunicVTT DESTINATION .)
+#in stall(TARGETS RunicVTT DESTINATION .)
 
 # Install resources
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/res DESTINATION res)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/external DESTINATION external)
+# in stall(DIRECTORY ${CMAKE_SOURCE_DIR}/res DESTINATION res)
+#ins tall(DIRECTORY ${CMAKE_SOURCE_DIR}/external DESTINATION external)
 
 # Install OpenSSL DLLs
-install(FILES
-    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
-    ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
-    DESTINATION .
-)
+# i nstall(FILES
+ #   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
+ #   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
+ #   DESTINATION .
+#)
 
-include(CPack)
+# i nclude(CPack)
