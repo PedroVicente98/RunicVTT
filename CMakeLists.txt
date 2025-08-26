@@ -1,5 +1,20 @@
 ﻿cmake_minimum_required(VERSION 3.20)
-project(RunicVTT VERSION 1.0 LANGUAGES C CXX)
+
+find_package(Git REQUIRED)
+execute_process(
+    COMMAND ${GIT_EXECUTABLE} describe --tags --always
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    OUTPUT_VARIABLE GIT_TAG
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+if(GIT_TAG)
+    message(STATUS "Git tag version: ${GIT_TAG}")
+    set(PROJECT_VERSION ${GIT_TAG})
+else()
+    set(PROJECT_VERSION "0.1.0-dev")
+endif()
+
+project(RunicVTT VERSION ${PROJECT_VERSION } LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -179,7 +194,7 @@ include(InstallRequiredSystemLibraries)
 set(CPACK_PACKAGE_NAME "RunicVTT")
 set(CPACK_PACKAGE_VENDOR "Pedro Vicente dos Santos")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "RunicVTT - Virtual Tabletop")
-set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "pedrovicente45@outlook.com")
 
 # Default install directory (Program Files on Windows)
