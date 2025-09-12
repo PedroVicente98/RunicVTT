@@ -4,10 +4,11 @@
 #include <memory>
 #include "rtc/rtc.hpp"
 
+class NetworkManager;
 class SignalingClient {
 public:
 
-    SignalingClient();
+    SignalingClient(std::weak_ptr<NetworkManager> parent);
 
     bool connect(const std::string& ip, unsigned short port);
     void send(const std::string& message);
@@ -15,5 +16,5 @@ public:
 
 private:
     std::shared_ptr<rtc::WebSocket> ws;
-    std::function<void(const std::string&)> onSignalCb;
+    std::weak_ptr<NetworkManager> network_manager;
 };

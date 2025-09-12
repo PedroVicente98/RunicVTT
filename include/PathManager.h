@@ -89,6 +89,10 @@ public:
     static fs::path getResPath() {
         return getExecutableRoot() / "res";
     }
+    
+    static fs::path getCertsPath() {
+        return getResPath() / "certs";
+    }
 
     static fs::path getShaderPath() {
         return getResPath() / "shaders";

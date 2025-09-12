@@ -1,11 +1,20 @@
 #include "NetworkManager.h"
 //#include "UPnPManager.h"
 #include "NetworkUtilities.h"
+#include "SignalingServer.h"
+#include "SignalingClient.h"
 
-NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NONE){
+NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NONE)
+{
 	getLocalIPAddress();
 	getExternalIPAddress();
-	rtc::InitLogger(rtc::LogLevel::Debug);
+	rtc::InitLogger(rtc::LogLevel::Verbose);
+	NetworkUtilities::setupTLS();
+}
+
+void NetworkManager::setup() {
+	signalingClient = std::make_shared<SignalingClient>(weak_from_this());
+	signalingServer = std::make_shared<SignalingServer>(weak_from_this());
 }
 
 NetworkManager::~NetworkManager()
@@ -14,7 +23,6 @@ NetworkManager::~NetworkManager()
 
 void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
 {
-	signalingServer = std::make_unique<SignalingServer>();
 	peer_role = Role::GAMEMASTER;
 
 	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
@@ -24,10 +32,10 @@ void NetworkManager::startServer(std::string internal_ip_address, unsigned short
 		ShowPortForwardingHelpPopup(&open_port_foward_tip);
 	}*/
 	signalingServer->start(port);
-
-	signalingClient = std::make_unique<SignalingClient>();
-	signalingClient->connect(local_tunnel_url, port);
-
+	auto status = signalingClient->connect(local_tunnel_url, port);
+	std::cout << "STATUS " << status << "\n";
+	/*std::string message = "CONNECTOU DA FERRAMENTA PELO MENOS TA INDO";
+	signalingClient->send(message);*/
 }
 
 void NetworkManager::closeServer()
@@ -43,31 +51,18 @@ void NetworkManager::closeServer()
 
 bool NetworkManager::connectToPeer(const std::string& connectionString)
 {
-	signalingClient = std::make_unique<SignalingClient>();
 	std::string server_ip;
 	unsigned short port;
 	std::string password;
 	parseConnectionString(connectionString, server_ip, port, password);
 	auto response = signalingClient->connect(server_ip, port);
-
+	peer_role = Role::PLAYER;
 	return response;
 }
 
 bool NetworkManager::disconectFromPeers()
 {
 	return false;
-}
-
-void NetworkManager::connectToWebRTCPeer(const std::string& peerId)
-{
-}
-
-void NetworkManager::receiveSignal(const std::string& peerId, const std::string& message)
-{
-}
-
-void NetworkManager::sendSignalToPeer(const std::string& peerId, const std::string& message)
-{
 }
 
 std::string NetworkManager::getLocalIPAddress() {
@@ -104,138 +99,146 @@ std::string NetworkManager::getNetworkInfo(bool external) {
 		return network_info;
 	}
 }
+std::string NetworkManager::getLocalTunnelURL() {
+	return NetworkUtilities::getLocalTunnelUrl();
+}
 
-//-------------------------------------------------------------------------------
-// In a real project, use a proper library for this.
+
+void NetworkManager::parseConnectionString(std::string connection_string, std::string& server_ip, unsigned short& port, std::string& password) {
+	std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+	std::smatch match;
+	// Parse the connection string using regex
+	if (std::regex_match(connection_string, match, rgx)) {
+		server_ip = match[1];             // Extract the server's Hamachi IP address
+		port = std::stoi(match[2]);    // Extract the port
+		password = match[3];              // Extract the optional password
+	}
+}
+
+void NetworkManager::setNetworkPassword(const char* password) {
+	std::cout << "BEFORE NETWORK PASSWORD" << password << std::endl;
+	strncpy(network_password, password, sizeof(network_password) - 1);
+	network_password[sizeof(network_password) - 1] = '\0';
+	std::cout << "NETWORK PASSWORD" << network_password << std::endl;
+}
 
 
-std::string NetworkManager::base64_encode(const std::string& in) { /* ... implementation ... */ return in; }
-std::string NetworkManager::base64_decode(const std::string& in) { /* ... implementation ... */ return in; }
+void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open) {
+	if (*p_open) {
+		ImGui::OpenPopup("Port Forwarding Failed");
+	}
 
-std::string NetworkManager::createAndEncodeOffer(std::shared_ptr<rtc::PeerConnection> pc) {
-	std::promise<std::string> sdpPromise;
-	auto sdpFuture = sdpPromise.get_future();
-	std::vector<rtc::Candidate> candidates;
-	bool gatheringComplete = false;
+	if (ImGui::BeginPopupModal("Port Forwarding Failed", p_open, ImGuiWindowFlags_AlwaysAutoResize)) {
+		ImGui::Text("Automatic port forwarding failed. This is likely because your router does not\n"
+			"support UPnP or it is disabled. You can still host by choosing one of the\n"
+			"following three options:");
 
-	// Create a data channel before the offer
-	auto dc = pc->createDataChannel("game-data");
-	dc->onOpen([]() { std::cout << "GM: DataChannel is open!" << std::endl; });
+		ImGui::Separator();
 
-	pc->onLocalDescription([&](rtc::Description description) {
-		sdpPromise.set_value(std::string(description));
-		});
+		if (ImGui::BeginTabBar("MyTabBar")) {
 
-	pc->onLocalCandidate([&](rtc::Candidate candidate) {
-		candidates.push_back(candidate);
-		});
+			// Tab 1: Enable UPnP
+			if (ImGui::BeginTabItem("Enable UPnP")) {
+				ImGui::Text("This is the easiest solution and will allow automatic port forwarding to work.");
+				ImGui::Spacing();
+				ImGui::BulletText("Access your router's administration page. This is usually done by\n"
+					"typing its IP address (e.g., 192.168.1.1) in your browser.");
+				ImGui::BulletText("Log in with your router's credentials.");
+				ImGui::BulletText("Look for a setting named 'UPnP' or 'Universal Plug and Play' and enable it.");
+				ImGui::BulletText("Save the settings and restart your router if necessary.");
+				ImGui::BulletText("Try hosting again. The application should now automatically forward the port.");
+				ImGui::EndTabItem();
+			}
 
-	pc->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
-		if (state == rtc::PeerConnection::GatheringState::Complete) {
-			gatheringComplete = true;
+			// Tab 2: Manual Port Forwarding
+			if (ImGui::BeginTabItem("Manual Port Forwarding")) {
+				ImGui::Text("This method always works but requires you to configure your router manually.");
+				ImGui::Spacing();
+				ImGui::BulletText("Find your local IP address. Open Command Prompt and type 'ipconfig' to find it\n"
+					"(e.g., 192.168.1.100).");
+				ImGui::BulletText("Access your router's administration page.");
+				ImGui::BulletText("Look for a setting named 'Port Forwarding', 'Virtual Server', or 'NAT'.");
+				ImGui::BulletText("Create a new rule with the following details:");
+				ImGui::Indent();
+				ImGui::BulletText("Protocol: TCP");
+				ImGui::BulletText("Internal Port: [Your application's port, e.g., 8080]");
+				ImGui::BulletText("External Port: [The same port]");
+				ImGui::BulletText("Internal IP: [Your local IP from step 1]");
+				ImGui::Unindent();
+				ImGui::BulletText("Save the rule and try hosting again.");
+				ImGui::EndTabItem();
+			}
+
+			// Tab 3: Use a VPN (Hamachi)
+			if (ImGui::BeginTabItem("Use a VPN (Hamachi)")) {
+				ImGui::Text("A VPN creates a virtual local network, bypassing the need for port forwarding.");
+				ImGui::Spacing();
+				ImGui::BulletText("Download and install a VPN client like Hamachi.");
+				ImGui::BulletText("Create a new network within the VPN client.");
+				ImGui::BulletText("Share the network name and password with your friends.");
+				ImGui::BulletText("Instruct your friends to join your network.");
+				ImGui::BulletText("On the host screen, you should be able to see your VPN IP address.\n"
+					"Use this IP to host your session.");
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
 		}
-		});
 
-	// Start the process
-	pc->setLocalDescription();
-
-	// Wait for the offer SDP to be generated
-	std::string offerSdp = sdpFuture.get();
-
-	// Wait until all ICE candidates have been gathered
-	while (!gatheringComplete) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-	}
-
-	// Now, bundle everything into a JSON object
-	nlohmann::json offer_bundle;
-	offer_bundle["type"] = "offer";
-	offer_bundle["sdp"] = offerSdp;
-
-	nlohmann::json json_candidates = nlohmann::json::array();
-	for (const auto& candidate : candidates) {
-		json_candidates.push_back({
-			{"candidate", std::string(candidate)},
-			{"mid", candidate.mid()}
-			});
-	}
-	offer_bundle["candidates"] = json_candidates;
-
-	std::cout << "GM: Offer and all candidates generated. Ready to encode." << std::endl;
-	return base64_encode(offer_bundle.dump());
-}
-
-std::string NetworkManager::decodeOfferAndCreateAnswer(const std::string& offerString, std::shared_ptr<rtc::PeerConnection> pc) {
-	// Decode the string from the GM
-	nlohmann::json offer_bundle = nlohmann::json::parse(base64_decode(offerString));
-
-	std::string sdp = offer_bundle["sdp"];
-	pc->setRemoteDescription(rtc::Description(sdp, "offer"));
-
-	for (const auto& j_cand : offer_bundle["candidates"]) {
-		pc->addRemoteCandidate(rtc::Candidate(j_cand["candidate"], j_cand["mid"]));
-	}
-
-	std::cout << "Player: Decoded offer and added candidates." << std::endl;
-
-	pc->onDataChannel([](std::shared_ptr<rtc::DataChannel> dc) {
-		std::cout << "Player: DataChannel received!" << std::endl;
-		dc->onOpen([]() { std::cout << "Player: DataChannel is open!" << std::endl; });
-		});
-
-	// Now, do the same process as the GM to create an answer
-	std::promise<std::string> sdpPromise;
-	auto sdpFuture = sdpPromise.get_future();
-	std::vector<rtc::Candidate> candidates;
-	bool gatheringComplete = false;
-
-	pc->onLocalDescription([&](rtc::Description description) {
-		sdpPromise.set_value(std::string(description));
-		});
-	pc->onLocalCandidate([&](rtc::Candidate candidate) {
-		candidates.push_back(candidate);
-		});
-	pc->onGatheringStateChange([&](rtc::PeerConnection::GatheringState state) {
-		if (state == rtc::PeerConnection::GatheringState::Complete) {
-			gatheringComplete = true;
+		if (ImGui::Button("Close")) {
+			*p_open = false;
+			ImGui::CloseCurrentPopup();
 		}
-		});
 
-	pc->setLocalDescription(); // Generate the answer
-
-	std::string answerSdp = sdpFuture.get();
-	while (!gatheringComplete) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+		ImGui::EndPopup();
 	}
-
-	nlohmann::json answer_bundle;
-	answer_bundle["type"] = "answer";
-	answer_bundle["sdp"] = answerSdp;
-	nlohmann::json json_candidates = nlohmann::json::array();
-	for (const auto& candidate : candidates) {
-		json_candidates.push_back({
-			{"candidate", std::string(candidate)},
-			{"mid", candidate.mid()}
-			});
-	}
-	answer_bundle["candidates"] = json_candidates;
-
-	std::cout << "Player: Answer and all candidates generated. Returning encoded string." << std::endl;
-	return base64_encode(answer_bundle.dump());
 }
 
-void NetworkManager::decodeAnswerAndFinalize(const std::string& answerString, std::shared_ptr<rtc::PeerConnection> pc) {
-	nlohmann::json answer_bundle = nlohmann::json::parse(base64_decode(answerString));
+////OPERATIONS------------------------------------------------------------------
+//void NetworkManager::addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws) 
+//{
+//	//pending_clients[client_id] = ws;
+//	pending_clients[std::move(client_id)] = std::move(ws);
+//
+//}
+//void NetworkManager::removePendingClient(std::string client_id) 
+//{
+//	pending_clients.erase(client_id);
+//}
+//
+//std::shared_ptr<rtc::WebSocket> NetworkManager::getPendingClient(std::string client_id) {
+//	auto it = pending_clients.find(client_id);
+//	if (it != pending_clients.end() && it->second && !it->second->isClosed()) {
+//		return it->second;
+//	}
+//	else {
+//		return nullptr;
+//	}
+//}
+//
+//void NetworkManager::addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws) {
+//	//clients[client_id] = ws;s
+//	clients[std::move(client_id)] = std::move(ws);
+//}
+//
+//void NetworkManager::removeClient(std::string client_id) {
+//	clients.erase(client_id);
+//}
+//
+//std::shared_ptr<rtc::WebSocket> NetworkManager::getClient(std::string client_id) {
+//	auto it = clients.find(client_id);
+//	if (it != clients.end() && it->second && !it->second->isClosed()) {
+//		return it->second;
+//	}
+//	else {
+//		return nullptr;
+//	}
+//}
 
-	std::string sdp = answer_bundle["sdp"];
-	pc->setRemoteDescription(rtc::Description(sdp, "answer"));
+//CALLBACKS --------------------------------------------------------------------
 
-	for (const auto& j_cand : answer_bundle["candidates"]) {
-		pc->addRemoteCandidate(rtc::Candidate(j_cand["candidate"], j_cand["mid"]));
-	}
 
-	std::cout << "GM: Finalized connection with player. Should be connected now!" << std::endl;
-}
+
 
 //void onMessageFromPeer(const std::string& peerId, const std::string& message) {
 //	nlohmann::json msg = nlohmann::json::parse(message);
@@ -257,6 +260,42 @@ void NetworkManager::decodeAnswerAndFinalize(const std::string& answerString, st
 //		// Handle normal game-state messages from this peer
 //	}
 //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //static std::vector<PeerConnectionState> offererPeers;
 //static char answererOfferInput[2048] = "";

@@ -5,6 +5,8 @@
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
     : ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(ecs, network_manager, map_directory, marker_directory), chat()
 {
+    network_manager->setup();
+
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
     map_directory->directoryPath = map_directory_path.string();
@@ -651,6 +653,7 @@ void GameTableManager::loadGameTablePopUp() {
     {
 
         ImGui::Text("Load GameTable: ");
+
         auto network_info_local = network_manager->getNetworkInfo(false);
         ImGui::Text("Network Info Local");
         ImGui::Text(network_info_local.c_str());
@@ -658,9 +661,12 @@ void GameTableManager::loadGameTablePopUp() {
         auto network_info_external = network_manager->getNetworkInfo(true);
         ImGui::Text("Network Info External");
         ImGui::Text(network_info_external.c_str());
+        
+        auto local_tunnel_url = network_manager->getLocalTunnelURL();
+        ImGui::Text("Local Tunnel URL");
+        ImGui::Text(local_tunnel_url.c_str());
 
         ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-        
 
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 

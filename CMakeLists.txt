@@ -7,14 +7,15 @@ execute_process(
     OUTPUT_VARIABLE GIT_TAG
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-if(GIT_TAG)
-    message(STATUS "Git tag version: ${GIT_TAG}")
+string(REGEX REPLACE "^v" "" GIT_TAG "${GIT_TAG}")
+
+if(GIT_TAG MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$")
     set(PROJECT_VERSION ${GIT_TAG})
 else()
-    set(PROJECT_VERSION "0.1.0-dev")
+    set(PROJECT_VERSION "0.1.0")
 endif()
 
-project(RunicVTT VERSION ${PROJECT_VERSION } LANGUAGES C CXX)
+project(RunicVTT VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)

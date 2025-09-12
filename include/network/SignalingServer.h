@@ -2,24 +2,44 @@
 #include <string>
 #include <functional>
 #include "rtc/rtc.hpp"
+#include <nlohmann/json.hpp>
 
+// Forward declare to avoid circular include
+class NetworkManager;
 
 class SignalingServer {
 public:
-    SignalingServer();
+    SignalingServer(std::weak_ptr<NetworkManager> parent);
     ~SignalingServer();
     void start(unsigned short port);
     void stop();
 
-    void send(const std::string& peerId, const std::string& message);
-    void onClientConnected(std::function<void(const std::string&)>);
-    void onMessage(std::function<void(const std::string& peerId, const std::string& message)>);
+    // Router/API
+    void onConnect(std::string clientId, std::shared_ptr<rtc::WebSocket> client);
+    void onMessage(const std::string& clientId, const std::string& text);
+    void sendTo(const std::string& clientId, const std::string& message);
+    void broadcast(const std::string& message); 
+
+    // Config
+    void setPendingAuthTimeout(std::chrono::seconds s) { pendingTimeout_ = s; }
+
+
+    // housekeeping
+    void prunePending(); // drop pending clients older than timeout
+    void moveToAuthenticated(const std::string& clientId);
+    bool isAuthenticated(const std::string& clientId) const;
 
 
 private:
     std::shared_ptr<rtc::WebSocketServer> server;
-    std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> clients;
+    std::weak_ptr<NetworkManager> network_manager;
 
-    void onConnect(std::string peer_id, std::shared_ptr<rtc::WebSocket> client);
-    void onMessage(std::string peer_id, std::string msg);
+    // Pending: not authenticated yet
+    std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> pendingClients_;
+    std::unordered_map<std::string, std::chrono::steady_clock::time_point> pendingSince_;
+
+    // Authenticated clients (only these receive routed messages)
+    std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> authClients_;
+    std::chrono::seconds pendingTimeout_{ 60 }; // default: 60s to auth
+
 };
