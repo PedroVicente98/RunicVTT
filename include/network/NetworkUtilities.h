@@ -120,15 +120,6 @@ public:
         return std::string(ipStr);
     }
 
-    //static std::string startLocalTunnel(const std::string& subdomain, int port) {
-    //    std::string nodePath = PathManager::getNodeExePath().string();
-    //    std::string ltPath = PathManager::getLocalTunnelClientPath().string();
-
-    //    std::string cmd = nodePath + " " + ltPath + " --port " + std::to_string(port) + " --subdomain " + subdomain;
-
-    //    std::string output = runCommand(cmd);
-    //    return output; // contains tunnel info (URL)
-    //}
     // helper: normalize URL for libdatachannel
     static std::string normalizeWsUrl(const std::string& hostOrUrl, unsigned short port) {
         auto starts = [](const std::string& s, const char* p) { return s.rfind(p, 0) == 0; };
@@ -148,14 +139,14 @@ public:
     }
 
     static void setupTLS() {
-      /*  auto caPath = PathManager::getCertsPath() / "cacert.pem";
+        auto caPath = PathManager::getCertsPath() / "cacert.pem";
         auto caPathString = caPath.string();
         if (_putenv_s("SSL_CERT_FILE", caPathString.c_str()) != 0) {
             std::cerr << "[NetworkUtilities] Failed to set SSL_CERT_FILE\n";
         }
         else {
             std::cout << "[NetworkUtilities] SSL_CERT_FILE set to " << caPath << "\n";
-        }*/
+        }
     }
 
     // Start a local tunnel, returns the subdomain used
