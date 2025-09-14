@@ -53,7 +53,13 @@ namespace msg {
         inline constexpr std::string_view Ping = "ping";
         inline constexpr std::string_view Pong = "pong";     // if you choose to send explicit pongs
         inline constexpr std::string_view Auth = "auth";
+        inline constexpr std::string_view AuthResponse = "auth_response";
         inline constexpr std::string_view Text = "text";
+    }
+
+    namespace value {
+        inline constexpr std::string False = "false";
+        inline constexpr std::string True = "true";
     }
 
     // ---------- DataChannel message types (game logic) ----------
@@ -130,6 +136,14 @@ namespace msg {
             { std::string(key::AuthToken), token }
         };
     }
+
+    inline Json makeAuthResponse(const std::string ok, const std::string& msg) {
+        return Json{
+            { std::string(key::Type), std::string(signaling::AuthResponse) },
+            { std::string(key::AuthOk), ok },
+            { std::string(key::AuthMsg), msg }
+        };
+    }
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false) {
         return Json{
             { std::string(key::Type), std::string(signaling::Text) },
@@ -141,21 +155,21 @@ namespace msg {
     }
 
     // ---- predicates ----
-    inline bool isType(const Json& j, std::string_view t) {
+    inline bool isType(const Json& j, std::string t) {
         auto it = j.find(std::string(key::Type));
         return it != j.end() && it->is_string() && it->get_ref<const std::string&>() == t;
     }
 
     // ---- accessors (safe-ish) ----
-    inline std::string getString(const Json& j, std::string_view k, std::string def = {}) {
+    inline std::string getString(const Json& j, std::string k, std::string def = {}) {
         auto it = j.find(std::string(k));
         return (it != j.end() && it->is_string()) ? it->get<std::string>() : std::move(def);
     }
-    inline int getInt(const Json& j, std::string_view k, int def = 0) {
+    inline int getInt(const Json& j, std::string k, int def = 0) {
         auto it = j.find(std::string(k));
         return (it != j.end() && it->is_number_integer()) ? it->get<int>() : def;
     }
-    inline bool getBool(const Json& j, std::string_view k, bool def = false) {
+    inline bool getBool(const Json& j, std::string k, bool def = false) {
         auto it = j.find(std::string(k));
         return (it != j.end() && it->is_boolean()) ? it->get<bool>() : def;
     }

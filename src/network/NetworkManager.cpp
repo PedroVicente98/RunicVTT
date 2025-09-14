@@ -33,9 +33,6 @@ void NetworkManager::startServer(std::string internal_ip_address, unsigned short
 	}*/
 	signalingServer->start(port);
 	auto status = signalingClient->connect(local_tunnel_url, port);
-	std::cout << "STATUS " << status << "\n";
-	/*std::string message = "CONNECTOU DA FERRAMENTA PELO MENOS TA INDO";
-	signalingClient->send(message);*/
 }
 
 void NetworkManager::closeServer()

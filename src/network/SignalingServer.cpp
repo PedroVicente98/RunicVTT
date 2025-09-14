@@ -3,6 +3,7 @@
 #include <iostream>
 #include "NetworkManager.h" 
 #include <nlohmann/json.hpp>
+#include "Message.h"
 
 using json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
@@ -35,11 +36,13 @@ void SignalingServer::start(unsigned short port) {
         onConnect(clientId, ws);
 
         ws->onMessage([this, clientId](std::variant<rtc::binary, rtc::string> msg) {
+            std::cout << "[SignalingServer] MESSAGE RECEIVED" <<"\n";
             if (!std::holds_alternative<rtc::string>(msg)) return;
             const auto& s = std::get<rtc::string>(msg);
+            std::cout << "[SignalingServer] MESSAGE: " << s <<"\n";
             prunePending();
             onMessage(clientId, s);
-            });
+        });
 
         ws->onError([clientId](std::string err) {
             std::cout << "[SignalingServer] Client Error (" << clientId << "): " << err << "\n";
@@ -69,6 +72,7 @@ void SignalingServer::onConnect(std::string clientId, std::shared_ptr<rtc::WebSo
 }
 
 void SignalingServer::onMessage(const std::string& clientId, const std::string& text) {
+    
     json j;
     try { j = json::parse(text); }
     catch (...) { return; }
@@ -76,29 +80,36 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     const std::string type = j.value("type", "");
     if (type.empty()) return;
 
-    // Always allow ping; reply pong
-    if (type == "ping") {
-        sendTo(clientId, R"({"type":"pong"})");
-        return;
-    }
+    std::cout << "type: " << type << "\n";
 
     // AUTH
-    if (type == "auth") {
-        std::string provided = j.value("password", "");
+    if (type == msg::signaling::Auth) {
+        std::string provided = j.value("token", "");
         std::string expected;
+
+        std::cout << "provided: " << provided << "\n";
+
         if (auto nm = network_manager.lock()) {
             expected = nm->getNetworkPassword();
         }
         else {
             throw std::runtime_error("SignalingServer::onMessage: NetworkManager expired");
         }
+        std::cout << "expected: " << expected << "\n";
+
         const bool ok = (expected.empty() || provided == expected);
+        std::cout << "ok: " << ok << "\n";
+
         if (ok) {
+            std::cout << "OK TRUE" << "\n";
             moveToAuthenticated(clientId);
-            sendTo(clientId, R"({"type":"auth","ok":true,"msg":"welcome"})");
+            auto msg = msg::makeAuthResponse(msg::value::True, "welcome");
+            sendTo(clientId, msg.dump());
         }
         else {
-            sendTo(clientId, R"({"type":"auth","ok":false,"msg":"invalid password"})");
+            std::cout << "OK FALSE" << "\n";
+            auto msg = msg::makeAuthResponse(msg::value::False, "invalid password");
+            sendTo(clientId, msg.dump());
             // optional hard-close on bad auth
             if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second) {
                 it->second->close();
@@ -112,15 +123,16 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
 
     // All other types require authentication
     if (!isAuthenticated(clientId)) {
-        sendTo(clientId, R"({"type":"auth","ok":false,"msg":"unauthenticated"})");
+        auto msg = msg::makeAuthResponse(msg::value::False, "unauthenticated");
+        sendTo(clientId, msg);
         return;
     }
 
     // Router: overwrite from with server-trusted clientId
-    j["from"] = clientId;
-
+    j[msg::key::From] = clientId;
+  
     // Broadcast to authenticated only
-    if (j.value("broadcast", false)) {
+    if (j.value(msg::key::Broadcast, msg::value::False) == msg::value::True) {
         const std::string dump = j.dump();
         for (auto& [id, ws] : authClients_) {
             if (id == clientId) continue; // don't echo to sender
@@ -130,7 +142,7 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     }
 
     // Direct
-    const std::string to = j.value("to", "");
+    const std::string to = j.value(msg::key::To, "");
     if (to.empty()) return;
     auto it = authClients_.find(to);
     if (it != authClients_.end() && it->second && !it->second->isClosed()) {
@@ -139,12 +151,16 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
 }
 
 void SignalingServer::sendTo(const std::string& clientId, const std::string& message) {
-    // Prefer authenticated if present, else pending (for auth/pong before auth)
+    std::cout << "SEND TO: " << clientId << "\n";
+    std::cout << "SEND MESSAGE: " << message << "\n";
+
     if (auto it = authClients_.find(clientId); it != authClients_.end() && it->second && !it->second->isClosed()) {
+        std::cout << "SENT TO AUTHED" << "\n";
         it->second->send(message);
         return;
     }
     if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second && !it->second->isClosed()) {
+        std::cout << "SENT TO PENDING" << "\n";
         it->second->send(message);
     }
 }

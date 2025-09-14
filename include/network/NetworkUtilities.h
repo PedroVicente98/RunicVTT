@@ -148,14 +148,14 @@ public:
     }
 
     static void setupTLS() {
-        auto caPath = PathManager::getCertsPath() / "cacert.pem";
+      /*  auto caPath = PathManager::getCertsPath() / "cacert.pem";
         auto caPathString = caPath.string();
         if (_putenv_s("SSL_CERT_FILE", caPathString.c_str()) != 0) {
             std::cerr << "[NetworkUtilities] Failed to set SSL_CERT_FILE\n";
         }
         else {
             std::cout << "[NetworkUtilities] SSL_CERT_FILE set to " << caPath << "\n";
-        }
+        }*/
     }
 
     // Start a local tunnel, returns the subdomain used

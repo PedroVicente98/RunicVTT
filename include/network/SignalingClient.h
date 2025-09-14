@@ -12,7 +12,7 @@ public:
 
     bool connect(const std::string& ip, unsigned short port);
     void send(const std::string& message);
-    void onSignal(const std::string& msg);
+    void onMessage(const std::string& msg);
 
 private:
     std::shared_ptr<rtc::WebSocket> ws;
