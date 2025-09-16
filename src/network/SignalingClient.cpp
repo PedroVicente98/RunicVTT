@@ -70,37 +70,77 @@ void SignalingClient::send(const std::string& message) {
 }
 
 void SignalingClient::onMessage(const std::string& msg) {
-    json j;
-    try { j = json::parse(msg); }
+    using json = nlohmann::json;
+    json j; try { j = json::parse(msg); }
     catch (...) { return; }
+    const std::string type = j.value(msg::key::Type, ""); if (type.empty()) return;
 
-    const std::string type = j.value("type", "");
-    if (type.empty()) return;
+    auto nm = network_manager.lock();
+    if (!nm) throw std::runtime_error("NM expired");
 
-    bool authenticated = false;
     if (type == msg::signaling::AuthResponse) {
-        std::string ok = j.value("ok", msg::value::False);
-        if (ok == msg::value::True) {
-            std::cout << "CLIENT AUTHED " << "\n";
+        if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True) {
+            // for each existing authed client -> start offer
+            if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array()) {
+                for (auto& v : j[msg::key::Clients]) {
+                    std::string peerId = v.get<std::string>();
+                    auto link = nm->ensurePeerLink(peerId);
+                    link->createPeerConnection();
+                    link->createDataChannel(msg::dc::name::Game);
+                    // IMPORTANT: just calling createOffer() will trigger onLocalDescription,
+                    // which will call NM->onPeerLocalDescription and send the offer.
+                    link->createOffer();
+                }
+            }
         }
+        return;
     }
 
-    //Offer
-    if (type == msg::signaling::Offer)
-    {
-
+    if (type == msg::signaling::Presence) {
+        if (j.value(msg::key::Event, "") == msg::signaling::Join) {
+            std::string peerId = j.value(msg::key::ClientId, "");
+            if (!peerId.empty()) {
+                auto link = nm->ensurePeerLink(peerId);
+                link->createPeerConnection();
+                link->createDataChannel(msg::dc::name::Game);
+                link->createOffer(); // NM callback will send
+            }
+        }
+        return;
     }
 
-    //Answer
-    if (type == msg::signaling::Answer)
-    {
+    if (type == msg::signaling::Offer) {
+        const std::string from = j.value(msg::key::From, "");
+        const std::string sdp = j.value(msg::key::Sdp, "");
+        if (from.empty() || sdp.empty()) return;
 
+        auto link = nm->ensurePeerLink(from);
+        link->createPeerConnection(); // safe if already exists
+        // Apply remote offer
+        link->setRemoteAnswer(rtc::Description(sdp, std::string(msg::signaling::Offer)));
+        // Create local answer (this will trigger NM callback to send)
+        link->createAnswer();
+        return;
     }
 
+    if (type == msg::signaling::Answer) {
+        const std::string from = j.value(msg::key::From, "");
+        const std::string sdp = j.value(msg::key::Sdp, "");
+        if (from.empty() || sdp.empty()) return;
 
-    //Candidate
-    if (type == msg::signaling::Candidate)
-    {
+        auto link = nm->ensurePeerLink(from);
+        link->setRemoteAnswer(rtc::Description(sdp, std::string(msg::signaling::Answer)));
+        return;
+    }
 
+    if (type == msg::signaling::Candidate) {
+        const std::string from = j.value(msg::key::From, "");
+        const std::string cand = j.value(msg::key::Candidate, "");
+        const std::string mid = j.value(msg::key::SdpMid, "");
+        if (from.empty() || cand.empty()) return;
+
+        auto link = nm->ensurePeerLink(from);
+        link->addIceCandidate(rtc::Candidate(cand, mid));
+        return;
     }
 }

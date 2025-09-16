@@ -1,7 +1,7 @@
 #include "PeerLink.h"
 #include "NetworkManager.h" 
 
-PeerLink::PeerLink(const std::string& id, std::shared_ptr<NetworkManager> parent)
+PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent)
     : peerId(id), network_manager(parent)
 {
     if (auto nm = network_manager.lock()) {
@@ -76,20 +76,20 @@ void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
 }
 
 void PeerLink::setupCallbacks() {
-    pc->onStateChange([](rtc::PeerConnection::State state) {
-        std::cout << "[PeerLink] PeerConnection state: " << (int)state << "\n";
-        });
+    pc->onStateChange([this](rtc::PeerConnection::State state) {
+        std::cout << "[PeerLink] State(" << peerId << "): " << (int)state << "\n";
+    });
 
-    pc->onLocalDescription([this](rtc::Description desc) {
-        // Send this via signaling (to remote peer)
-        std::cout << "[PeerLink] Local SDP: " << std::string(desc) << "\n";
-        });
+    pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc) {
+        if (auto nm = wk.lock()) nm->onPeerLocalDescription(id, desc);
+    });
 
-    pc->onLocalCandidate([this](rtc::Candidate candidate) {
-        // Send candidate via signaling
-        std::cout << "[PeerLink] Local ICE: " << candidate.candidate() << "\n";
-        });
+    pc->onLocalCandidate([wk = network_manager, id = peerId](rtc::Candidate cand) {
+        if (auto nm = wk.lock()) nm->onPeerLocalCandidate(id, cand);
+    });
 }
+
+
 
 /////
 //

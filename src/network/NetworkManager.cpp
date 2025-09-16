@@ -3,6 +3,7 @@
 #include "NetworkUtilities.h"
 #include "SignalingServer.h"
 #include "SignalingClient.h"
+#include "Message.h"
 
 NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NONE)
 {
@@ -113,10 +114,8 @@ void NetworkManager::parseConnectionString(std::string connection_string, std::s
 }
 
 void NetworkManager::setNetworkPassword(const char* password) {
-	std::cout << "BEFORE NETWORK PASSWORD" << password << std::endl;
 	strncpy(network_password, password, sizeof(network_password) - 1);
 	network_password[sizeof(network_password) - 1] = '\0';
-	std::cout << "NETWORK PASSWORD" << network_password << std::endl;
 }
 
 
@@ -192,47 +191,37 @@ void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open) {
 }
 
 ////OPERATIONS------------------------------------------------------------------
-//void NetworkManager::addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws) 
-//{
-//	//pending_clients[client_id] = ws;
-//	pending_clients[std::move(client_id)] = std::move(ws);
-//
-//}
-//void NetworkManager::removePendingClient(std::string client_id) 
-//{
-//	pending_clients.erase(client_id);
-//}
-//
-//std::shared_ptr<rtc::WebSocket> NetworkManager::getPendingClient(std::string client_id) {
-//	auto it = pending_clients.find(client_id);
-//	if (it != pending_clients.end() && it->second && !it->second->isClosed()) {
-//		return it->second;
-//	}
-//	else {
-//		return nullptr;
-//	}
-//}
-//
-//void NetworkManager::addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws) {
-//	//clients[client_id] = ws;s
-//	clients[std::move(client_id)] = std::move(ws);
-//}
-//
-//void NetworkManager::removeClient(std::string client_id) {
-//	clients.erase(client_id);
-//}
-//
-//std::shared_ptr<rtc::WebSocket> NetworkManager::getClient(std::string client_id) {
-//	auto it = clients.find(client_id);
-//	if (it != clients.end() && it->second && !it->second->isClosed()) {
-//		return it->second;
-//	}
-//	else {
-//		return nullptr;
-//	}
-//}
 
 //CALLBACKS --------------------------------------------------------------------
+// NetworkManager.cpp
+std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peerId) {
+	if (auto it = peers.find(peerId); it != peers.end()) return it->second;
+	auto link = std::make_shared<PeerLink>(peerId, weak_from_this());
+	peers.emplace(peerId, link);
+	return link;
+}
+
+void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc) {
+	// Build signaling message and send via SignalingClient
+	nlohmann::json j;
+	const std::string sdp = std::string(desc);
+	if (desc.type() == rtc::Description::Type::Offer) {
+		j = msg::makeOffer("", peerId, sdp);
+		
+	}
+	else if (desc.type() == rtc::Description::Type::Answer) {
+		j = msg::makeAnswer("", peerId, sdp);
+	}
+	else {
+		return;
+	}
+	if (!signalingClient) signalingClient->send(j.dump());
+}
+
+void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand) {
+	auto j = msg::makeCandidate("", peerId, cand.candidate());
+	if (signalingClient) signalingClient->send(j.dump());
+}
 
 
 

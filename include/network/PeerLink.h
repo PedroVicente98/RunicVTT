@@ -7,7 +7,7 @@ class NetworkManager; // forward declare
 
 class PeerLink {
 public:
-    PeerLink(const std::string& id, std::shared_ptr<NetworkManager> parent);
+    PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent);
     PeerLink();
 
     void close();

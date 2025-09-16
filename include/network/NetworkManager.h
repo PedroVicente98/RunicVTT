@@ -72,6 +72,11 @@ public:
     void removePeer();
     bool clearPeers() const { return peers.empty(); }
 
+    // PeerLink -> NM (send via signaling)
+    void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
+    void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
+    std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
+
 private:
     flecs::world ecs;
     unsigned int port = 8080;
@@ -85,8 +90,6 @@ private:
     std::shared_ptr<SignalingClient> signalingClient;
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> peers;
 
-    //std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> clients; //MAYBE MOVE TO SERVER
-    //std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> pending_clients;  //MAYBE MOVE TO SERVER
 };
 
 

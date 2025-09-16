@@ -9,7 +9,7 @@
 // #include <nlohmann/json.hpp>
 
 namespace msg {
-
+    
     // ---------- Common JSON keys (shared) ----------
     namespace key {
         inline constexpr std::string_view Type = "type";
@@ -18,12 +18,15 @@ namespace msg {
         inline constexpr std::string_view Broadcast = "broadcast";
         inline constexpr std::string_view Timestamp = "ts";
         inline constexpr std::string_view Text = "text";
+        inline constexpr std::string_view Clients = "clients";
+        inline constexpr std::string_view Event = "event";
+        inline constexpr std::string_view ClientId = "clientId";
 
         // Signaling-specific
         inline constexpr std::string_view Sdp = "sdp";
         inline constexpr std::string_view Candidate = "candidate";
         inline constexpr std::string_view SdpMid = "sdpMid";
-        inline constexpr std::string_view SdpMLineIndex = "sdpMLineIndex";
+        //inline constexpr std::string_view SdpMLineIndex = "sdpMLineIndex";
 
         // Auth / control
         inline constexpr std::string_view AuthOk = "ok";
@@ -47,8 +50,10 @@ namespace msg {
 
     // ---------- Signaling message types (WebSocket) ----------
     namespace signaling {
+        inline constexpr std::string_view Join = "join";
         inline constexpr std::string_view Offer = "offer";
         inline constexpr std::string_view Answer = "answer";
+        inline constexpr std::string_view Presence = "presence";
         inline constexpr std::string_view Candidate = "candidate";
         inline constexpr std::string_view Ping = "ping";
         inline constexpr std::string_view Pong = "pong";     // if you choose to send explicit pongs
@@ -65,6 +70,12 @@ namespace msg {
     // ---------- DataChannel message types (game logic) ----------
     // Prefer binary with a tiny header for performance, but define string labels too
     namespace dc {
+        namespace name {
+            inline constexpr std::string Game = "game";
+            inline constexpr std::string Chat = "chat";
+            inline constexpr std::string Notes = "notes";
+        }
+
         inline constexpr std::string_view Chat = "CHAT";
         inline constexpr std::string_view Image = "IMAGE";              // metadata/chunk control
         inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
@@ -112,18 +123,27 @@ namespace msg {
         };
     }
     inline Json makeCandidate(const std::string& from, const std::string& to,
-        const std::string& cand, const std::string& mid, int mline,
-        bool broadcast = false) {
+        const std::string& cand, bool broadcast = false) {
         return Json{
             { std::string(key::Type), std::string(signaling::Candidate) },
             { std::string(key::From), from },
             { std::string(key::To), to },
             { std::string(key::Broadcast), broadcast },
-            { std::string(key::Candidate), cand },
+            { std::string(key::Candidate), cand }/*,
             { std::string(key::SdpMid), mid },
-            { std::string(key::SdpMLineIndex), mline }
+            { std::string(key::SdpMLineIndex), mline }*/
         };
     }
+
+    inline Json makePresence(const std::string& event, const std::string& clientId) {
+        return Json{
+            { std::string(key::Type), std::string(signaling::Presence) },
+            { std::string(key::Event), event },
+            { std::string(key::ClientId), clientId }
+        };
+    }
+
+
     inline Json makePing(const std::string& from) {
         return Json{
             { std::string(key::Type), std::string(signaling::Ping) },
