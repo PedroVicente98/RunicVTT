@@ -666,6 +666,7 @@ void GameTableManager::loadGameTablePopUp() {
         ImGui::Text("Local Tunnel URL");
         ImGui::Text(local_tunnel_url.c_str());
 
+        ImGui::InputText("Username", username_buffer, sizeof(username_buffer), ImGuiInputTextFlags_None);
         ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
 
         ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
@@ -677,6 +678,7 @@ void GameTableManager::loadGameTablePopUp() {
         for (auto& game_table : game_tables) {
             if (ImGui::Button(game_table.c_str()) && strlen(port_buffer) > 0)
             {
+                network_manager->setMyIdentity("", username_buffer);
                 network_manager->setNetworkPassword(pass_buffer);
                 board_manager.closeBoard();
                 active_game_table = flecs::entity();

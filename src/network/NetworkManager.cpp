@@ -224,6 +224,24 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 }
 
 
+// NetworkManager.cpp
+void NetworkManager::setMyIdentity(std::string myId, std::string username) {
+	myClientId_ = std::move(myId);
+	myUsername_ = std::move(username);
+}
+
+void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string& username) {
+	peerUsernames_[id] = username;
+	// If PeerLink already exists, update its display name for logs/UI:
+	if (auto it = peers.find(id); it != peers.end() && it->second) {
+		it->second->setDisplayName(username);
+	}
+}
+
+std::string NetworkManager::displayNameFor(const std::string& id) const {
+	if (auto it = peerUsernames_.find(id); it != peerUsernames_.end()) return it->second;
+	return id; // fallback to raw id
+}
 
 
 //void onMessageFromPeer(const std::string& peerId, const std::string& message) {

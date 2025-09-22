@@ -14,6 +14,17 @@ PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent)
     }
 }
 
+// PeerLink.cpp
+void PeerLink::setDisplayName(std::string n) 
+{ 
+    displayName_ = std::move(n);
+}
+
+const std::string& PeerLink::displayName() const 
+{ 
+    return displayName_; 
+}
+
 void PeerLink::send(const std::string& msg) {
     if (dc && dc->isOpen()) {
         dc->send(msg);

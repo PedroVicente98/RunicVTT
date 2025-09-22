@@ -16,7 +16,7 @@
 enum class Role {
     NONE,
     GAMEMASTER,
-    PLAYER
+    PLAYER 
 };
 
 
@@ -77,7 +77,20 @@ public:
     void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
 
+    // NetworkManager.h
+    std::string getMyUsername() const { return myUsername_; }; // you decide how to set it (UI input etc.)
+    void setMyIdentity(std::string myId, std::string username);
+    void upsertPeerIdentity(const std::string& id, const std::string& username);
+    std::string displayNameFor(const std::string& id) const;
+
+  
 private:
+
+    // fields
+    std::string myClientId_;
+    std::string myUsername_;
+    std::unordered_map<std::string, std::string> peerUsernames_;
+
     flecs::world ecs;
     unsigned int port = 8080;
     char network_password[124] = "\0";

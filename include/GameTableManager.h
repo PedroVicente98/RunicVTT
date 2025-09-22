@@ -80,6 +80,7 @@ private:
 	char buffer[124] = "";
 	char pass_buffer[124] = "";
 	char port_buffer[6] = "7777";
+	char username_buffer[124] = "";
 
 	std::string map_image_path = "";
 

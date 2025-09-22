@@ -27,7 +27,8 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port) {
         auto nm = network_manager.lock();
         if (!nm) throw std::exception("[SignalingClient] NetworkManager Inactive");
         auto password = nm->getNetworkPassword();
-        auto msg = msg::makeAuth(password);
+        auto username = nm->getMyUsername();
+        auto msg = msg::makeAuth(password, username);
         ws->send(msg.dump());
     });
 
@@ -81,14 +82,17 @@ void SignalingClient::onMessage(const std::string& msg) {
     if (type == msg::signaling::AuthResponse) {
         if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True) {
             // for each existing authed client -> start offer
+            const std::string myId = j.value(std::string(msg::key::ClientId), "");
+            const std::string myUser = j.value(std::string(msg::key::Username), "me");
+
+            nm->setMyIdentity(myId, myUser);
+
             if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array()) {
                 for (auto& v : j[msg::key::Clients]) {
                     std::string peerId = v.get<std::string>();
                     auto link = nm->ensurePeerLink(peerId);
                     link->createPeerConnection();
                     link->createDataChannel(msg::dc::name::Game);
-                    // IMPORTANT: just calling createOffer() will trigger onLocalDescription,
-                    // which will call NM->onPeerLocalDescription and send the offer.
                     link->createOffer();
                 }
             }
@@ -96,18 +100,19 @@ void SignalingClient::onMessage(const std::string& msg) {
         return;
     }
 
-    if (type == msg::signaling::Presence) {
-        if (j.value(msg::key::Event, "") == msg::signaling::Join) {
-            std::string peerId = j.value(msg::key::ClientId, "");
-            if (!peerId.empty()) {
-                auto link = nm->ensurePeerLink(peerId);
-                link->createPeerConnection();
-                link->createDataChannel(msg::dc::name::Game);
-                link->createOffer(); // NM callback will send
-            }
-        }
-        return;
-    }
+    ////NOT USED
+    //if (type == msg::signaling::Presence) {
+    //    if (j.value(msg::key::Event, "") == msg::signaling::Join) {
+    //        std::string peerId = j.value(msg::key::ClientId, "");
+    //        if (!peerId.empty()) {
+    //            auto link = nm->ensurePeerLink(peerId);
+    //            link->createPeerConnection();
+    //            link->createDataChannel(msg::dc::name::Game);
+    //            link->createOffer(); // NM callback will send
+    //        }
+    //    }
+    //    return;
+    //}
 
     if (type == msg::signaling::Offer) {
         const std::string from = j.value(msg::key::From, "");

@@ -20,6 +20,7 @@ namespace msg {
         inline constexpr std::string_view Text = "text";
         inline constexpr std::string_view Clients = "clients";
         inline constexpr std::string_view Event = "event";
+        inline constexpr std::string_view Username = "username";
         inline constexpr std::string_view ClientId = "clientId";
 
         // Signaling-specific
@@ -150,10 +151,11 @@ namespace msg {
             { std::string(key::From), from }
         };
     }
-    inline Json makeAuth(const std::string& token) {
+    inline Json makeAuth(const std::string& token, const std::string& username) {
         return Json{
             { std::string(key::Type), std::string(signaling::Auth) },
-            { std::string(key::AuthToken), token }
+            { std::string(key::AuthToken), token },
+            { std::string(key::Username), username },
         };
     }
 

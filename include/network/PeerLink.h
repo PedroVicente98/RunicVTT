@@ -20,9 +20,14 @@ public:
     void addIceCandidate(const rtc::Candidate& candidate); 
 
     void send(const std::string& msg);
+    void setDisplayName(std::string n);
+    const std::string& displayName() const;
+
+  
 
 private:
     std::string peerId;
+    std::string displayName_;
     std::shared_ptr<rtc::PeerConnection> pc;
     std::shared_ptr<rtc::DataChannel> dc;
     std::weak_ptr<NetworkManager> network_manager;

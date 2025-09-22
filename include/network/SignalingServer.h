@@ -37,8 +37,10 @@ private:
     // Pending: not authenticated yet
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> pendingClients_;
     std::unordered_map<std::string, std::chrono::steady_clock::time_point> pendingSince_;
+    std::unordered_map<std::string, std::string> pendingUsernames_;
 
     // Authenticated clients (only these receive routed messages)
+    std::unordered_map<std::string, std::string> authUsernames_;
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> authClients_;
     std::chrono::seconds pendingTimeout_{ 60 }; // default: 60s to auth
 
