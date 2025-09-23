@@ -105,7 +105,7 @@ namespace msg {
     // Enable by including <nlohmann/json.hpp> before using these.
     using Json = nlohmann::json;
     // ---- builders (signaling) ----
-    inline Json makeOffer(const std::string& from, const std::string& to, const std::string& sdp, bool broadcast = false) {
+    inline Json makeOffer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& broadcast = msg::value::False) {
         return Json{
             { std::string(key::Type), std::string(signaling::Offer) },
             { std::string(key::From), from },
@@ -114,7 +114,7 @@ namespace msg {
             { std::string(key::Sdp), sdp }
         };
     }
-    inline Json makeAnswer(const std::string& from, const std::string& to, const std::string& sdp, bool broadcast = false) {
+    inline Json makeAnswer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& broadcast = msg::value::False) {
         return Json{
             { std::string(key::Type), std::string(signaling::Answer) },
             { std::string(key::From), from },
@@ -123,8 +123,7 @@ namespace msg {
             { std::string(key::Sdp), sdp }
         };
     }
-    inline Json makeCandidate(const std::string& from, const std::string& to,
-        const std::string& cand, bool broadcast = false) {
+    inline Json makeCandidate(const std::string& from, const std::string& to, const std::string& cand, const std::string& broadcast = msg::value::False) {
         return Json{
             { std::string(key::Type), std::string(signaling::Candidate) },
             { std::string(key::From), from },
