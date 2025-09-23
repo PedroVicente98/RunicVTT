@@ -19,6 +19,11 @@ enum class Role {
     PLAYER 
 };
 
+enum class ConnectionType {
+    EXTERNAL,
+    LOCAL,
+    LOCALTUNNEL
+};
 
 // Forward declare
 class SignalingServer;
@@ -32,6 +37,7 @@ public:
 
     ~NetworkManager();
 
+    void startServer(ConnectionType mode, unsigned short port, bool tryUpnp);
     void startServer(std::string internal_ip_address, unsigned short port);
     void closeServer();
     bool connectToPeer(const std::string& connectionString);
@@ -42,12 +48,12 @@ public:
     void disallowPort(unsigned short port);
 
     // Utility methods
-    std::string getNetworkInfo(bool external);     // Get network info (IP and port) (server utility)
+    std::string getNetworkInfo(ConnectionType type);     // Get network info (IP and port) (server utility)
     std::string getLocalIPAddress();  // Get local IP address (server utility)
     std::string getExternalIPAddress();  // Get external IP address (server utility)
     std::string getLocalTunnelURL();  // Get Local Tunnel URL
 
-    void parseConnectionString(std::string connection_string, std::string& server_ip, unsigned short& port, std::string& password);
+    void parseConnectionString(std::string connection_string,std::string& server, unsigned short& port,std::string& password);
     unsigned short getPort() const { return port; };
     std::string getNetworkPassword() const { return std::string(network_password); };
     void setPort(unsigned int port) { this->port = port; }
@@ -68,9 +74,10 @@ public:
     //std::shared_ptr<rtc::WebSocket> getPendingClient(std::string client_id);
 
 
-    void addPeer();
-    void removePeer();
+    bool removePeer(std::string peerId);
     bool clearPeers() const { return peers.empty(); }
+    void disconnectAllPeers();
+    std::size_t removeDisconnectedPeers();
 
     // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
@@ -83,7 +90,11 @@ public:
     void upsertPeerIdentity(const std::string& id, const std::string& username);
     std::string displayNameFor(const std::string& id) const;
 
-  
+    // expose read-only view to peers for UI
+    const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const { return peers; }
+    // expose server pointer for UI
+    std::shared_ptr<SignalingServer> getSignalingServer() const { return signalingServer; }
+
 private:
 
     // fields
@@ -102,6 +113,13 @@ private:
     std::shared_ptr<SignalingServer> signalingServer;
     std::shared_ptr<SignalingClient> signalingClient;
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> peers;
+
+
+    static bool hasUrlScheme(const std::string& s) {
+        auto starts = [&](const char* p) { return s.rfind(p, 0) == 0; };
+        return starts("https://") || starts("http://") || starts("wss://") || starts("ws://");
+    }
+
 
 };
 

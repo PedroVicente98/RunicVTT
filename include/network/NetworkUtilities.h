@@ -149,6 +149,14 @@ public:
         }
     }
 
+    static std::string normalizeWsUrl(const std::string& raw) {
+        auto starts = [&](const char* p) { return raw.rfind(p, 0) == 0; };
+        if (starts("https://")) return "wss://" + raw.substr(8);
+        if (starts("http://"))  return "ws://" + raw.substr(7);
+        // if already ws:// or wss:// or a bare host (leave as caller wishes)
+        return raw;
+    }
+
     // Start a local tunnel, returns the subdomain used
     static std::string startLocalTunnel(const std::string& subdomainBase, int port) {
         stopLocalTunnel(); // Stop any previous tunnel

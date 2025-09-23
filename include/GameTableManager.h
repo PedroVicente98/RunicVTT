@@ -29,18 +29,26 @@ public:
 	//void processSentMessages();
 	//void processReceivedMessages();
 
-	void createGameTablePopUp();
-	void closeGameTablePopUp();
-	void connectToGameTablePopUp();
-	void createBoardPopUp();
+	//void createGameTablePopUp();
+	//void loadGameTablePopUp();
 
+	void hostGameTablePopUp();
+	void networkCenterPopUp();
+
+	void connectToGameTablePopUp();
+	void closeGameTablePopUp();
+	
+	void createBoardPopUp();
 	void closeBoardPopUp();
-	void createNetworkPopUp();
-	void closeNetworkPopUp();
-	void openNetworkInfoPopUp();
 	void saveBoardPopUp();
-	void loadGameTablePopUp();
 	void loadBoardPopUp();
+
+	void guidePopUp();
+	void aboutPopUp();
+
+	//void createNetworkPopUp();
+	//void closeNetworkPopUp();
+	//void openNetworkInfoPopUp();
 
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
@@ -132,5 +140,57 @@ public:
 		if (io.MouseReleased[2]) { // MIDDLE mouse button just released
 			mouse_middle_released = true;
 		}
+	}
+
+	// Label + value on one line
+	void UI_LabelValue(const char* label, const std::string& value) {
+		ImGui::TextUnformatted(label);
+		ImGui::SameLine();
+		ImGui::TextUnformatted(value.c_str());
+	}
+
+	// Copy button with timed "Copied!" toast (per-id)
+	bool UI_CopyButtonWithToast(const char* btnId, const std::string& toCopy,
+		const char* toastId, float seconds = 1.5f) {
+		static std::unordered_map<std::string, double> s_toasts; // toastId -> expire time
+		bool clicked = ImGui::Button(btnId);
+		if (clicked) {
+			ImGui::SetClipboardText(toCopy.c_str());
+			s_toasts[toastId] = ImGui::GetTime() + seconds;
+		}
+		if (auto it = s_toasts.find(toastId); it != s_toasts.end()) {
+			if (ImGui::GetTime() < it->second) {
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.4f, 1.f, 0.4f, 1.f), "Copied!");
+			}
+			else {
+				s_toasts.erase(it);
+			}
+		}
+		return clicked;
+	}
+
+	// Transient colored line (e.g., "Failed to connect!") that auto hides
+	void UI_TransientLine(const char* key, bool trigger, const ImVec4& color,
+		const char* text, float seconds = 2.0f) {
+		static std::unordered_map<std::string, double> s_until; // key -> expire time
+		if (trigger) s_until[key] = ImGui::GetTime() + seconds;
+		if (auto it = s_until.find(key); it != s_until.end()) {
+			if (ImGui::GetTime() < it->second) {
+				ImGui::TextColored(color, "%s", text);
+			}
+			else {
+				s_until.erase(it);
+			}
+		}
+	}
+
+	// Shared chunk for entering password + port (returns true if drew fields)
+	bool UI_RenderPortAndPassword(char* portBuf, size_t portBufSize,
+		char* passBuf, size_t passBufSize) {
+		ImGui::InputText("Password", passBuf, passBufSize, ImGuiInputTextFlags_Password);
+		ImGui::InputText("Port", portBuf, portBufSize,
+			ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+		return true;
 	}
 };

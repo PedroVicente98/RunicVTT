@@ -15,38 +15,122 @@ SignalingClient::SignalingClient(std::weak_ptr<NetworkManager> parent)
 
 }
 
-bool SignalingClient::connect(const std::string& ip, unsigned short port) {
-    auto client_configuration = rtc::WebSocketConfiguration();
-    client_configuration.pingInterval = std::chrono::milliseconds(1000);
-    client_configuration.connectionTimeout = std::chrono::milliseconds(0);
-
-    ws = std::make_shared<rtc::WebSocket>(client_configuration);
+// SignalingClient.cpp
+bool SignalingClient::connectUrl(const std::string& url) {
+    rtc::WebSocketConfiguration cfg;
+    cfg.pingInterval = std::chrono::milliseconds(1000);
+    cfg.connectionTimeout = std::chrono::milliseconds(0);
+    ws = std::make_shared<rtc::WebSocket>(cfg);
 
     ws->onOpen([=]() {
-        std::cout << "[SignalingClient] Connected to GM. " <<"\n";
+        if (auto nm = network_manager.lock()) {
+            ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername()).dump());
+        }
+        });
+    ws->onClosed([=]() { std::cout << "[SignalingClient] Disconnected from GM.\n"; });
+    ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {
+        if (!std::holds_alternative<rtc::string>(msg)) return;
+        this->onMessage(std::get<rtc::string>(msg));
+        });
+
+    // normalize https→wss, http→ws; leave ws/wss as-is
+    const std::string norm = NetworkUtilities::normalizeWsUrl(url);
+    std::cout << "[SignalingClient] Opening URL: " << norm << "\n";
+    try {
+        if (ws->isClosed()) ws->open(norm);
+        else { ws->close(); ws->open(norm); }
+    }
+    catch (const std::exception& e) {
+        std::cout << "Exception on ws->open: " << e.what() << "\n";
+        return false;
+    }
+    return true;
+}
+
+//
+//bool SignalingClient::connect(const std::string& ip, unsigned short port) {
+//    auto client_configuration = rtc::WebSocketConfiguration();
+//    client_configuration.pingInterval = std::chrono::milliseconds(1000);
+//    client_configuration.connectionTimeout = std::chrono::milliseconds(0);
+//
+//    ws = std::make_shared<rtc::WebSocket>(client_configuration);
+//
+//    ws->onOpen([=]() {
+//        std::cout << "[SignalingClient] Connected to GM. " <<"\n";
+//        auto nm = network_manager.lock();
+//        if (!nm) throw std::exception("[SignalingClient] NetworkManager Inactive");
+//        auto password = nm->getNetworkPassword();
+//        auto username = nm->getMyUsername();
+//        auto msg = msg::makeAuth(password, username);
+//        ws->send(msg.dump());
+//    });
+//
+//    ws->onClosed([=]() {
+//        std::cout << "[SignalingClient] Disconnected from GM." << "\n";
+//    });
+//
+//    ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {
+//        std::cout << "[SignalingClient] MESSAGE RECEIVED" << "\n";
+//        if (!std::holds_alternative<rtc::string>(msg)) return;
+//        const auto& s = std::get<rtc::string>(msg);
+//        std::cout << "[SignalingClient] MESSAGE: " << s << "\n";
+//        this->onMessage(s);
+//    });
+//
+//    const std::string url = NetworkUtilities::normalizeWsUrl(ip, port);
+//    std::cout << "[SignalingClient] Opening URL: " << url << "\n";
+//    try{
+//        if (ws->isClosed()) {
+//            ws->open(url);
+//        }
+//        else {
+//            ws->close();
+//            ws->open(url);
+//        }
+//    }
+//    catch(std::exception e){
+//        std::cout << "Expection on ws->open: " << e.what() << "\n";
+//        return false;
+//    }
+//
+//    return true;
+//}
+bool SignalingClient::connect(const std::string& ip, unsigned short port) {
+    // If caller accidentally passed a full URL, just route to connectUrl.
+    auto starts = [&](const char* p) { return ip.rfind(p, 0) == 0; };
+    if (starts("https://") || starts("http://") || starts("wss://") || starts("ws://")) {
+        return connectUrl(ip);
+    }
+
+    rtc::WebSocketConfiguration cfg;
+    cfg.pingInterval = std::chrono::milliseconds(1000);
+    cfg.connectionTimeout = std::chrono::milliseconds(0);
+    ws = std::make_shared<rtc::WebSocket>(cfg);
+
+    ws->onOpen([=]() {
+        std::cout << "[SignalingClient] Connected to GM.\n";
         auto nm = network_manager.lock();
-        if (!nm) throw std::exception("[SignalingClient] NetworkManager Inactive");
-        auto password = nm->getNetworkPassword();
-        auto username = nm->getMyUsername();
-        auto msg = msg::makeAuth(password, username);
-        ws->send(msg.dump());
-    });
+        if (!nm) throw std::runtime_error("[SignalingClient] NetworkManager Inactive");
+        ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername()).dump());
+        });
 
     ws->onClosed([=]() {
-        std::cout << "[SignalingClient] Disconnected from GM." << "\n";
-    });
+        std::cout << "[SignalingClient] Disconnected from GM.\n";
+        });
+
+    ws->onError([=](std::string err) {
+        std::cout << "[SignalingClient] WebSocket error: " << err << "\n";
+        });
 
     ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {
-        std::cout << "[SignalingClient] MESSAGE RECEIVED" << "\n";
         if (!std::holds_alternative<rtc::string>(msg)) return;
-        const auto& s = std::get<rtc::string>(msg);
-        std::cout << "[SignalingClient] MESSAGE: " << s << "\n";
-        this->onMessage(s);
-    });
+        this->onMessage(std::get<rtc::string>(msg));
+        });
 
-    const std::string url = NetworkUtilities::normalizeWsUrl(ip, port);
+    // Build a proper ws URL from host:port using your existing helper
+    const std::string url = NetworkUtilities::normalizeWsUrl(ip, port); // e.g. "ws://<ip>:<port>"
     std::cout << "[SignalingClient] Opening URL: " << url << "\n";
-    try{
+    try {
         if (ws->isClosed()) {
             ws->open(url);
         }
@@ -55,11 +139,10 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port) {
             ws->open(url);
         }
     }
-    catch(std::exception e){
-        std::cout << "Expection on ws->open: " << e.what() << "\n";
+    catch (const std::exception& e) {  // catch by reference
+        std::cout << "Exception on ws->open: " << e.what() << "\n";
         return false;
     }
-
     return true;
 }
 

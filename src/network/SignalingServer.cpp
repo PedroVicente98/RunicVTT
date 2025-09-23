@@ -202,6 +202,12 @@ bool SignalingServer::isAuthenticated(const std::string& clientId) const {
     return authClients_.find(clientId) != authClients_.end();
 }
 
+void SignalingServer::disconnectClient(const std::string& clientId) {
+    auto it = authClients_.find(clientId);
+    if (it != authClients_.end() && it->second) {
+        it->second->close();
+    }
+}
 
 //
 //void SignalingServer::start(unsigned short port) {

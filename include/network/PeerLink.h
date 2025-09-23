@@ -24,6 +24,9 @@ public:
     const std::string& displayName() const;
 
   
+    bool isDataChannelOpen() const;
+    rtc::PeerConnection::State pcState() const; // optional
+    bool isClosedOrFailed() const;
 
 private:
     std::string peerId;

@@ -28,7 +28,11 @@ public:
     void prunePending(); // drop pending clients older than timeout
     void moveToAuthenticated(const std::string& clientId);
     bool isAuthenticated(const std::string& clientId) const;
+    void disconnectClient(const std::string& clientId);
 
+    const std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& authClients() const {
+        return authClients_;
+    }
 
 private:
     std::shared_ptr<rtc::WebSocketServer> server;

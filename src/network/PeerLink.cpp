@@ -30,11 +30,11 @@ void PeerLink::send(const std::string& msg) {
         dc->send(msg);
     }
 }
-
-void PeerLink::close() {
-    if (dc) dc->close();
-    if (pc) pc->close();
-}
+//
+//void PeerLink::close() {
+//    if (dc) dc->close();
+//    if (pc) pc->close();
+//}
 
 void PeerLink::createPeerConnection() {
     rtc::Configuration config;
@@ -101,6 +101,38 @@ void PeerLink::setupCallbacks() {
 }
 
 
+bool PeerLink::isDataChannelOpen() const {
+    return dc && dc->isOpen();
+}
+
+void PeerLink::close() {
+    // Close datachannel first
+    if (dc) {
+        try { dc->close(); }
+        catch (...) {}
+    }
+    // Close peer connection
+    if (pc) {
+        try { pc->close(); }
+        catch (...) {}
+    }
+    // Release references
+    dc.reset();
+    pc.reset();
+    if (auto nm = network_manager.lock()) nm->removePeer(peerId);
+}
+
+rtc::PeerConnection::State PeerLink::pcState() const {
+    if (!pc) return rtc::PeerConnection::State::Closed;
+    return pc->state();
+}
+
+bool PeerLink::isClosedOrFailed() const {
+    if (!pc) return true;
+    auto s = pc->state();
+    return s == rtc::PeerConnection::State::Closed ||
+        s == rtc::PeerConnection::State::Failed;
+}
 
 /////
 //

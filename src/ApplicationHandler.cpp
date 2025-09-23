@@ -390,81 +390,230 @@ void ApplicationHandler::renderActiveGametable() {
     }
 
 }
-
+//
+//void ApplicationHandler::renderMainMenuBar() {
+//    bool open_create_gametable = false;
+//    bool close_current_gametable = false;
+//    bool connect_to_gametable = false;
+//    bool load_active_gametable = false;
+//    
+//    bool open_create_board = false;
+//    bool close_current_board = false;
+//
+//    bool save_active_board = false;
+//    bool load_active_board = false;
+//
+//
+//    bool open_network_connection = false;
+//    bool open_network_info = false;
+//    bool close_network_connection = false;
+//
+//    ImGui::BeginMainMenuBar();
+//    if (ImGui::BeginMenu("Game Table")) {
+//        if (ImGui::MenuItem("Create")) {
+//            open_create_gametable = true;
+//        }
+//        if (ImGui::MenuItem("Connect")) {
+//            connect_to_gametable = true;
+//        }
+//        if (game_table_manager.isGameTableActive()) {
+//            if (ImGui::MenuItem("Save"))
+//            {
+//                game_table_manager.saveGameTable();
+//            }
+//        }
+//        
+//        if (ImGui::MenuItem("Open")) 
+//        {
+//            load_active_gametable = true;
+//        }
+//        if (ImGui::MenuItem("Close")) {
+//            close_current_gametable = true;
+//        }
+//        ImGui::EndMenu();
+//    }
+//
+//    if(game_table_manager.isGameTableActive()){
+//
+//        if (ImGui::BeginMenu("Network")) {
+//            bool is_connection_active = false/*game_table_manager.isConnectionActive()*/;
+//            //if(!game_table_manager.isConnectionActive()){
+//            //    if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
+//            //        open_network_connection = true;
+//            //    } 
+//            //}
+//            
+//            if (ImGui::MenuItem("Connection Info")) {
+//                open_network_info = true;
+//            }
+//
+//            if (ImGui::MenuItem("Close Connection", 0, false, is_connection_active)) {
+//                close_network_connection = true;
+//            }
+//            ImGui::EndMenu();
+//        }
+//        
+//
+//        if (ImGui::BeginMenu("Board")) {
+//            if (ImGui::MenuItem("Create")) {
+//                open_create_board = true;
+//            }
+//            if (game_table_manager.board_manager.isBoardActive()) {
+//                if (ImGui::MenuItem("Save")) {
+//                    //save_active_board = true;
+//                    auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
+//                    game_table_manager.board_manager.saveActiveBoard(board_folder_path);
+//                }
+//
+//                if (ImGui::MenuItem("Close")) {
+//                    close_current_board = true;
+//                }
+//            }
+//            if (ImGui::MenuItem("Open")) {
+//                load_active_board = true;
+//            }
+//         
+//            ImGui::EndMenu();
+//        }
+//    }
+//
+// /*   if (ImGui::BeginMenu("Notes")) {
+//        if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+//        }
+//        if (ImGui::MenuItem("Redo", "Ctrl+Y")) {
+//        }
+//        ImGui::EndMenu();
+//    }*/
+//
+//    ImGui::EndMainMenuBar();
+//
+//
+//    if (load_active_gametable)
+//        ImGui::OpenPopup("LoadGameTable");
+//
+//    if (ImGui::IsPopupOpen("LoadGameTable"))
+//        game_table_manager.loadGameTablePopUp();
+//
+//    //if (save_active_board)
+//    //    ImGui::OpenPopup("SaveBoard");
+//
+//    //if (ImGui::IsPopupOpen("SaveBoard"))
+//    //    game_table_manager.saveBoardPopUp();
+//
+//    if (load_active_board)
+//        ImGui::OpenPopup("LoadBoard");
+//
+//    if (ImGui::IsPopupOpen("LoadBoard"))
+//        game_table_manager.loadBoardPopUp();
+//
+//    if (close_network_connection)
+//        ImGui::OpenPopup("CloseNetwork");
+//
+//    if(ImGui::IsPopupOpen("CloseNetwork"))
+//        game_table_manager.closeNetworkPopUp();
+//
+//    if (open_network_info)
+//        ImGui::OpenPopup("NetworkInfo");
+//
+//    if(ImGui::IsPopupOpen("NetworkInfo"))
+//        game_table_manager.openNetworkInfoPopUp();
+//     
+//     if (open_network_connection)
+//        ImGui::OpenPopup("CreateNetwork");
+//
+//    if(ImGui::IsPopupOpen("CreateNetwork"))
+//        game_table_manager.createNetworkPopUp();
+//
+//    if (connect_to_gametable)
+//        ImGui::OpenPopup("ConnectToGameTable");
+//
+//    if(ImGui::IsPopupOpen("ConnectToGameTable"))
+//        game_table_manager.connectToGameTablePopUp();
+//
+//    if (open_create_gametable)
+//        ImGui::OpenPopup("CreateGameTable");
+//
+//    if(ImGui::IsPopupOpen("CreateGameTable"))
+//        game_table_manager.createGameTablePopUp();
+//    
+//    if (close_current_gametable)
+//        ImGui::OpenPopup("CloseGameTable");
+//
+//    if (ImGui::IsPopupOpen("CloseGameTable"))
+//        game_table_manager.closeGameTablePopUp();
+//    
+//    if (open_create_board)
+//        ImGui::OpenPopup("CreateBoard");
+//
+//    if (ImGui::IsPopupOpen("CreateBoard"))
+//        game_table_manager.createBoardPopUp();
+//    
+//    if (close_current_board)
+//        ImGui::OpenPopup("CloseBoard");
+//
+//    if (ImGui::IsPopupOpen("CloseBoard"))
+//        game_table_manager.closeBoardPopUp();
+//
+//
+//}
 void ApplicationHandler::renderMainMenuBar() {
-    bool open_create_gametable = false;
-    bool close_current_gametable = false;
+    // one-shot flags to open popups
+    bool open_host_gametable = false; // NEW unified host modal (Create/Load + network + username)
     bool connect_to_gametable = false;
-    bool load_active_gametable = false;
-    
+    bool close_current_gametable = false;
+
+    bool open_network_center = false; // NEW unified network management popup
+
     bool open_create_board = false;
     bool close_current_board = false;
-
-    bool save_active_board = false;
     bool load_active_board = false;
 
-
-    bool open_network_connection = false;
-    bool open_network_info = false;
-    bool close_network_connection = false;
+    bool about = false;
+    bool guide = false;
 
     ImGui::BeginMainMenuBar();
+
+    // ---------------- Game Table ----------------
     if (ImGui::BeginMenu("Game Table")) {
-        if (ImGui::MenuItem("Create")) {
-            open_create_gametable = true;
+        if (ImGui::MenuItem("Host...")) {                   // NEW: replaces Create/Open/Network
+            open_host_gametable = true;
         }
-        if (ImGui::MenuItem("Connect")) {
+        if (ImGui::MenuItem("Connect...")) {                // players joining
             connect_to_gametable = true;
         }
+
         if (game_table_manager.isGameTableActive()) {
-            if (ImGui::MenuItem("Save"))
-            {
+            if (ImGui::MenuItem("Save")) {                  // existing logic
                 game_table_manager.saveGameTable();
             }
-        }
-        
-        if (ImGui::MenuItem("Open")) 
-        {
-            load_active_gametable = true;
-        }
-        if (ImGui::MenuItem("Close")) {
-            close_current_gametable = true;
+            if (ImGui::MenuItem("Close")) {
+                close_current_gametable = true;
+            }
         }
         ImGui::EndMenu();
     }
 
-    if(game_table_manager.isGameTableActive()){
-
+    // ---------------- Network ----------------
+    if (game_table_manager.isGameTableActive()) {
         if (ImGui::BeginMenu("Network")) {
-            bool is_connection_active = false/*game_table_manager.isConnectionActive()*/;
-            //if(!game_table_manager.isConnectionActive()){
-            //    if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
-            //        open_network_connection = true;
-            //    } 
-            //}
-            
-            if (ImGui::MenuItem("Connection Info")) {
-                open_network_info = true;
-            }
-
-            if (ImGui::MenuItem("Close Connection", 0, false, is_connection_active)) {
-                close_network_connection = true;
+            if (ImGui::MenuItem("Network Center...")) {     // NEW: replaces Connection Info + Open/Close network
+                open_network_center = true;
             }
             ImGui::EndMenu();
         }
-        
+    }
 
+    // ---------------- Board ----------------
+    if (game_table_manager.isGameTableActive()) {
         if (ImGui::BeginMenu("Board")) {
             if (ImGui::MenuItem("Create")) {
                 open_create_board = true;
             }
             if (game_table_manager.board_manager.isBoardActive()) {
                 if (ImGui::MenuItem("Save")) {
-                    //save_active_board = true;
                     auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
                     game_table_manager.board_manager.saveActiveBoard(board_folder_path);
                 }
-
                 if (ImGui::MenuItem("Close")) {
                     close_current_board = true;
                 }
@@ -472,87 +621,66 @@ void ApplicationHandler::renderMainMenuBar() {
             if (ImGui::MenuItem("Open")) {
                 load_active_board = true;
             }
-         
             ImGui::EndMenu();
         }
     }
-
- /*   if (ImGui::BeginMenu("Notes")) {
-        if (ImGui::MenuItem("Undo", "Ctrl+Z")) {
+    if (ImGui::BeginMenu("Help")) {
+        if (ImGui::MenuItem("Guide")) {
+            guide = true;
         }
-        if (ImGui::MenuItem("Redo", "Ctrl+Y")) {
+        
+        if (ImGui::MenuItem("About")) {
+            about = true;
         }
         ImGui::EndMenu();
-    }*/
+    }
 
     ImGui::EndMainMenuBar();
 
+    // ---------------- Popups (open + render) ----------------
 
-    if (load_active_gametable)
-        ImGui::OpenPopup("LoadGameTable");
-
-    if (ImGui::IsPopupOpen("LoadGameTable"))
-        game_table_manager.loadGameTablePopUp();
-
-    //if (save_active_board)
-    //    ImGui::OpenPopup("SaveBoard");
-
-    //if (ImGui::IsPopupOpen("SaveBoard"))
-    //    game_table_manager.saveBoardPopUp();
-
-    if (load_active_board)
-        ImGui::OpenPopup("LoadBoard");
-
-    if (ImGui::IsPopupOpen("LoadBoard"))
-        game_table_manager.loadBoardPopUp();
-
-    if (close_network_connection)
-        ImGui::OpenPopup("CloseNetwork");
-
-    if(ImGui::IsPopupOpen("CloseNetwork"))
-        game_table_manager.closeNetworkPopUp();
-
-    if (open_network_info)
-        ImGui::OpenPopup("NetworkInfo");
-
-    if(ImGui::IsPopupOpen("NetworkInfo"))
-        game_table_manager.openNetworkInfoPopUp();
-     
-     if (open_network_connection)
-        ImGui::OpenPopup("CreateNetwork");
-
-    if(ImGui::IsPopupOpen("CreateNetwork"))
-        game_table_manager.createNetworkPopUp();
+    if (open_host_gametable)
+        ImGui::OpenPopup("Host GameTable");
+    if (ImGui::IsPopupOpen("Host GameTable"))
+        game_table_manager.hostGameTablePopUp();         // NEW (Create/Load tabs + network + username)
 
     if (connect_to_gametable)
         ImGui::OpenPopup("ConnectToGameTable");
+    if (ImGui::IsPopupOpen("ConnectToGameTable"))
+        game_table_manager.connectToGameTablePopUp();     // you already have this popup
 
-    if(ImGui::IsPopupOpen("ConnectToGameTable"))
-        game_table_manager.connectToGameTablePopUp();
-
-    if (open_create_gametable)
-        ImGui::OpenPopup("CreateGameTable");
-
-    if(ImGui::IsPopupOpen("CreateGameTable"))
-        game_table_manager.createGameTablePopUp();
-    
     if (close_current_gametable)
         ImGui::OpenPopup("CloseGameTable");
-
     if (ImGui::IsPopupOpen("CloseGameTable"))
-        game_table_manager.closeGameTablePopUp();
-    
+        game_table_manager.closeGameTablePopUp();         // existing
+
+    if (open_network_center)
+        ImGui::OpenPopup("Network Center");
+    if (ImGui::IsPopupOpen("Network Center"))
+        game_table_manager.networkCenterPopUp();          // NEW unified network panel
+
     if (open_create_board)
         ImGui::OpenPopup("CreateBoard");
-
     if (ImGui::IsPopupOpen("CreateBoard"))
-        game_table_manager.createBoardPopUp();
-    
+        game_table_manager.createBoardPopUp();            // existing (good as-is)
+
+    if (load_active_board)
+        ImGui::OpenPopup("LoadBoard");
+    if (ImGui::IsPopupOpen("LoadBoard"))
+        game_table_manager.loadBoardPopUp();              // existing
+
     if (close_current_board)
         ImGui::OpenPopup("CloseBoard");
-
     if (ImGui::IsPopupOpen("CloseBoard"))
-        game_table_manager.closeBoardPopUp();
+        game_table_manager.closeBoardPopUp();    
 
-
+    if (guide)
+        ImGui::OpenPopup("Guide");
+    if (ImGui::IsPopupOpen("Guide"))
+        game_table_manager.guidePopUp();      
+    
+    if (about)
+        ImGui::OpenPopup("About");
+    if (ImGui::IsPopupOpen("About"))
+        game_table_manager.aboutPopUp();         
 }

@@ -1,9 +1,9 @@
 #include "NetworkManager.h"
-//#include "UPnPManager.h"
 #include "NetworkUtilities.h"
 #include "SignalingServer.h"
 #include "SignalingClient.h"
 #include "Message.h"
+#include "UPnPManager.h"
 
 NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NONE)
 {
@@ -22,19 +22,89 @@ NetworkManager::~NetworkManager()
 {
 }
 
-void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
-{
+void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool tryUpnp) {
 	peer_role = Role::GAMEMASTER;
 
-	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
-	//auto internalIP = UPnPManager::getLocalIPv4Address();
-	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
-		bool open_port_foward_tip = true;
-		ShowPortForwardingHelpPopup(&open_port_foward_tip);
-	}*/
+	// Ensure server exists (your setup() likely already does this)
+	if (!signalingServer) {
+		signalingServer = std::make_shared<SignalingServer>(shared_from_this());
+	}
+	if (!signalingClient) {
+		signalingClient = std::make_shared<SignalingClient>(shared_from_this());
+	}
+
+	// Start WS server
 	signalingServer->start(port);
-	auto status = signalingClient->connect(local_tunnel_url, port);
+	setPort(port);
+
+	const std::string localIp = getLocalIPAddress();
+	const std::string externalIp = getExternalIPAddress();
+
+	switch (mode) {
+	case ConnectionType::LOCALTUNNEL: {
+		// Start LocalTunnel (non-blocking thread)
+		// Note: URL will be available shortly after start; user can grab it from Network Center.
+		NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
+
+		// (Optional) GM auto-connect to own server via LocalTunnel when ready:
+		// Simple poll (short window) so we don’t overcomplicate.
+		for (int i = 0; i < 50; ++i) { // ~5s
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			const auto ltUrl = getLocalTunnelURL();
+			if (!ltUrl.empty()) {
+				signalingClient->connectUrl(ltUrl);
+				break;
+			}
+		}
+		break;
+	}
+	case ConnectionType::LOCAL: {
+		// LAN hosting: no localtunnel, no UPnP.
+		// GM can connect to itself using loopback to unify code paths
+		signalingClient->connect("127.0.0.1", port);
+		break;
+	}
+	case ConnectionType::EXTERNAL: {
+		// Optional UPnP mapping for inbound connections
+		if (tryUpnp) {
+			try {
+				// If you have UPnPManager available, call it here
+				 if (!UPnPManager::addPortMapping(localIp, port, port, "TCP", "RunicVTT")) {
+				     // optionally show your help popup:
+				      bool open = true; ShowPortForwardingHelpPopup(&open);
+				 }
+			}
+			catch (...) {
+				// swallow errors; user was warned that it might not work
+			}
+		}
+		// GM connects to itself locally
+		signalingClient->connect("127.0.0.1", port);
+		break;
+	}
+	}
 }
+
+// Keep your old method (back-compat). Default it to LocalTunnel behavior.
+void NetworkManager::startServer(std::string internal_ip_address, unsigned short port) {
+	// Old default used LocalTunnel; keep that behavior
+	startServer(ConnectionType::LOCALTUNNEL, port, /*tryUpnp=*/false);
+}
+
+//
+//void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
+//{
+//	peer_role = Role::GAMEMASTER;
+//
+//	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
+//	//auto internalIP = UPnPManager::getLocalIPv4Address();
+//	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
+//		bool open_port_foward_tip = true;
+//		ShowPortForwardingHelpPopup(&open_port_foward_tip);
+//	}*/
+//	signalingServer->start(port);
+//	auto status = signalingClient->connect(local_tunnel_url, port);
+//}
 
 void NetworkManager::closeServer()
 {
@@ -47,16 +117,32 @@ void NetworkManager::closeServer()
 
 
 
+//bool NetworkManager::connectToPeer(const std::string& connectionString)
+//{
+//	std::string server_ip;
+//	unsigned short port;
+//	std::string password;
+//	parseConnectionString(connectionString, server_ip, port, password);
+//	auto response = signalingClient->connect(server_ip, port);
+//	peer_role = Role::PLAYER;
+//	return response;
+//}
+
+
 bool NetworkManager::connectToPeer(const std::string& connectionString)
 {
-	std::string server_ip;
-	unsigned short port;
-	std::string password;
-	parseConnectionString(connectionString, server_ip, port, password);
-	auto response = signalingClient->connect(server_ip, port);
+	std::string server; unsigned short port = 0; std::string password;
+	parseConnectionString(connectionString, server, port, password);
+
+	if (!password.empty()) setNetworkPassword(password.c_str());
 	peer_role = Role::PLAYER;
-	return response;
+
+	if (hasUrlScheme(server)) {
+		return signalingClient->connectUrl(server); // NEW method (see below)
+	}
+	return signalingClient->connect(server, port); // your old method
 }
+
 
 bool NetworkManager::disconectFromPeers()
 {
@@ -82,34 +168,72 @@ std::string NetworkManager::getExternalIPAddress() {
 	return external_ip_address;
 }
 
-std::string NetworkManager::getNetworkInfo(bool external) {
+std::string NetworkManager::getNetworkInfo(ConnectionType type) {
+	const auto port = getPort();
+	const auto pwd = getNetworkPassword();
 
-	if (!external) {
-		auto ip_address = getLocalIPAddress();
-		auto port = getPort();
-		std::string network_info = "runic:" + ip_address + ":" + std::to_string(port) + "?" + getNetworkPassword();
-		return network_info;
+	if (type == ConnectionType::LOCAL) { // LAN (192.168.x.y)
+		const auto ip = getLocalIPAddress();
+		return "runic:" + ip + ":" + std::to_string(port) + "?" + pwd;
 	}
-	else {
-		auto ip_address = getExternalIPAddress();
-		auto port = getPort();
-		std::string network_info = "runic:" + ip_address + ":" + std::to_string(port) + "?" + getNetworkPassword();
-		return network_info;
+	else if (type == ConnectionType::EXTERNAL) { // public IP
+		const auto ip = getExternalIPAddress();
+		return "runic:" + ip + ":" + std::to_string(port) + "?" + pwd;
 	}
+	else if (type == ConnectionType::LOCALTUNNEL) {
+		const auto url = getLocalTunnelURL(); // e.g., https://sub.loca.lt
+		return url + "?" + pwd;    // no port needed (LT handles it)
+	}
+	return {};
 }
+
 std::string NetworkManager::getLocalTunnelURL() {
 	return NetworkUtilities::getLocalTunnelUrl();
 }
 
 
-void NetworkManager::parseConnectionString(std::string connection_string, std::string& server_ip, unsigned short& port, std::string& password) {
-	std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
-	std::smatch match;
-	// Parse the connection string using regex
-	if (std::regex_match(connection_string, match, rgx)) {
-		server_ip = match[1];             // Extract the server's Hamachi IP address
-		port = std::stoi(match[2]);    // Extract the port
-		password = match[3];              // Extract the optional password
+//void NetworkManager::parseConnectionString(std::string connection_string, std::string& server_ip, unsigned short& port, std::string& password) {
+//	std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
+//	std::smatch match;
+//	// Parse the connection string using regex
+//	if (std::regex_match(connection_string, match, rgx)) {
+//		server_ip = match[1];             // Extract the server's Hamachi IP address
+//		port = std::stoi(match[2]);    // Extract the port
+//		password = match[3];              // Extract the optional password
+//	}
+//}
+
+
+void NetworkManager::parseConnectionString(std::string connection_string,
+	std::string& server, unsigned short& port,
+	std::string& password)
+{
+	server.clear(); password.clear(); port = 0;
+
+	const std::string prefix = "runic:";
+	if (connection_string.rfind(prefix, 0) == 0)
+		connection_string.erase(0, prefix.size());
+
+	// split pass
+	std::string left = connection_string;
+	if (auto q = connection_string.find('?'); q != std::string::npos) {
+		left = connection_string.substr(0, q);
+		password = connection_string.substr(q + 1);
+	}
+
+	if (hasUrlScheme(left)) {      // URL path
+		server = left;
+		return;
+	}
+
+	// host[:port]
+	if (auto colon = left.find(':'); colon != std::string::npos) {
+		server = left.substr(0, colon);
+		try { port = static_cast<unsigned short>(std::stoi(left.substr(colon + 1))); }
+		catch (...) { port = 0; }
+	}
+	else {
+		server = left; // no port
 	}
 }
 
@@ -131,7 +255,7 @@ void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open) {
 
 		ImGui::Separator();
 
-		if (ImGui::BeginTabBar("MyTabBar")) {
+		if (ImGui::BeginTabBar("PortOptions")) {
 
 			// Tab 1: Enable UPnP
 			if (ImGui::BeginTabItem("Enable UPnP")) {
@@ -191,6 +315,50 @@ void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open) {
 }
 
 ////OPERATIONS------------------------------------------------------------------
+bool NetworkManager::removePeer(std::string peerId) {
+	auto it = peers.find(peerId);
+	if (it == peers.end()) return false;
+	if (auto& link = it->second) {
+		try {
+			link->close(); // ensure pc/dc closed
+		}
+		catch (...) {
+			// swallow — safe cleanup path
+		}
+	}
+	peers.erase(it);
+	return true;
+}
+
+void NetworkManager::disconnectAllPeers() {
+	for (auto& [id, link] : peers) {
+		if (link) {
+			try { link->close(); }
+			catch (...) {}
+		}
+	}
+	peers.clear();
+}
+
+// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
+std::size_t NetworkManager::removeDisconnectedPeers() {
+	std::size_t removed = 0;
+	for (auto it = peers.begin(); it != peers.end(); ) {
+		const bool shouldRemove =
+			!it->second ||
+			it->second->isClosedOrFailed(); // helper on PeerLink below
+
+		if (shouldRemove) {
+			if (it->second) { try { it->second->close(); } catch (...) {} }
+			it = peers.erase(it);
+			++removed;
+		}
+		else {
+			++it;
+		}
+	}
+	return removed;
+}
 
 //CALLBACKS --------------------------------------------------------------------
 // NetworkManager.cpp
