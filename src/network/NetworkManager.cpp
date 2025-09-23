@@ -44,18 +44,12 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
 	case ConnectionType::LOCALTUNNEL: {
 		// Start LocalTunnel (non-blocking thread)
 		// Note: URL will be available shortly after start; user can grab it from Network Center.
-		NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
-
-		// (Optional) GM auto-connect to own server via LocalTunnel when ready:
-		// Simple poll (short window) so we don’t overcomplicate.
-		for (int i = 0; i < 50; ++i) { // ~5s
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			const auto ltUrl = getLocalTunnelURL();
-			if (!ltUrl.empty()) {
-				signalingClient->connectUrl(ltUrl);
-				break;
-			}
+		const auto ltUrl = NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
+		if (!ltUrl.empty()) {
+			break;
 		}
+		signalingClient->connectUrl(ltUrl);
+
 		break;
 	}
 	case ConnectionType::LOCAL: {
@@ -323,7 +317,7 @@ bool NetworkManager::removePeer(std::string peerId) {
 			link->close(); // ensure pc/dc closed
 		}
 		catch (...) {
-			// swallow — safe cleanup path
+			// swallow â€” safe cleanup path
 		}
 	}
 	peers.erase(it);
