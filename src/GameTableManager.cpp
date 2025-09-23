@@ -527,7 +527,7 @@ void GameTableManager::connectToGameTablePopUp()
         //   runic:https://sub.loca.lt?PASSWORD
         //   runic:wss://host[:port/path]?PASSWORD
         //   runic:<host>:<port>?PASSWORD
-        ImGui::InputText("Connection String", buffer, sizeof(buffer));
+        ImGui::InputText("Connection String", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll);
 
         // Small helper row
         ImGui::BeginDisabled(true);
@@ -614,23 +614,42 @@ void GameTableManager::networkCenterPopUp() {
         const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
 
         // quick inline labels (use your UI_LabelValue helpers if you have them)
-        ImGui::TextUnformatted("Local IP:");    ImGui::SameLine(); ImGui::TextUnformatted(local_ip.c_str());
-        ImGui::TextUnformatted("External IP:"); ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
+        ImGui::TextUnformatted("Local IP:");    
+        ImGui::SameLine(); 
+        ImGui::TextUnformatted(local_ip.c_str());
+        ImGui::TextUnformatted("External IP:"); 
+        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
         ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
 
         ImGui::Separator();
 
-        auto copyRow = [](const char* label, const std::string& value, const char* btnId) {
+        auto copyRow = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
             ImGui::TextUnformatted(label);
             ImGui::SameLine();
             ImGui::TextUnformatted(value.c_str());
             ImGui::SameLine();
-            if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
+            UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+            //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
             };
 
-        copyRow("LocalTunnel URL:", lt_url, "Copy##lt");
-        copyRow("Local Connection String:", cs_local, "Copy##loc");
-        copyRow("External Connection String:", cs_external, "Copy##ext");
+        copyRow("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
+        copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+        copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+
+
+       /* if (ImGui::BeginTable("CopyRows", 3, ImGuiTableFlags_None)) {
+            auto row = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(label);
+                ImGui::TableSetColumnIndex(1); ImGui::TextWrapped("%s", value.c_str());
+                ImGui::TableSetColumnIndex(2); UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+                };
+            row("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
+            row("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+            row("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+            ImGui::EndTable();
+        }*/
+
 
         // ---------- PLAYERS (P2P) ----------
         ImGui::Separator();
