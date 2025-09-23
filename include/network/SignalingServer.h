@@ -25,7 +25,7 @@ public:
 
 
     // housekeeping
-    void prunePending(); // drop pending clients older than timeout
+    //void prunePending(); // drop pending clients older than timeout
     void moveToAuthenticated(const std::string& clientId);
     bool isAuthenticated(const std::string& clientId) const;
     void disconnectClient(const std::string& clientId);
@@ -40,7 +40,7 @@ private:
 
     // Pending: not authenticated yet
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> pendingClients_;
-    std::unordered_map<std::string, std::chrono::steady_clock::time_point> pendingSince_;
+    //std::unordered_map<std::string, std::chrono::steady_clock::time_point> pendingSince_;
     std::unordered_map<std::string, std::string> pendingUsernames_;
 
     // Authenticated clients (only these receive routed messages)

@@ -632,7 +632,7 @@ void GameTableManager::networkCenterPopUp() {
             //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
             };
 
-        copyRow("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
+        copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
         copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
         copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
 

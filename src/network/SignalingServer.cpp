@@ -40,7 +40,7 @@ void SignalingServer::start(unsigned short port) {
             if (!std::holds_alternative<rtc::string>(msg)) return;
             const auto& s = std::get<rtc::string>(msg);
             std::cout << "[SignalingServer] MESSAGE: " << s <<"\n";
-            prunePending();
+            //prunePending();
             onMessage(clientId, s);
         });
 
@@ -51,7 +51,7 @@ void SignalingServer::start(unsigned short port) {
         ws->onClosed([this, clientId]() {
             std::cout << "[SignalingServer] Client disconnected: " << clientId << "\n";
             pendingClients_.erase(clientId);
-            pendingSince_.erase(clientId);
+            //pendingSince_.erase(clientId);
             authClients_.erase(clientId);
             });
         });
@@ -62,13 +62,13 @@ void SignalingServer::start(unsigned short port) {
 void SignalingServer::stop() {
     if (server) { server->stop(); server.reset(); }
     pendingClients_.clear();
-    pendingSince_.clear();
+    //pendingSince_.clear();
     authClients_.clear();
 }
 
 void SignalingServer::onConnect(std::string clientId, std::shared_ptr<rtc::WebSocket> ws) {
     pendingClients_[clientId] = std::move(ws);
-    pendingSince_[clientId] = Clock::now();
+    //pendingSince_[clientId] = Clock::now();
 }
 
 void SignalingServer::onMessage(const std::string& clientId, const std::string& text) {
@@ -77,38 +77,42 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     try { j = json::parse(text); }
     catch (...) { return; }
 
-    const std::string type = j.value("type", "");
+    const std::string type = j.value(msg::key::Type, "");
     if (type.empty()) return;
 
     std::cout << "type: " << type << "\n";
 
     // AUTH
     if (type == msg::signaling::Auth) {
-        std::string provided = j.value("token", "");
+        std::string provided = j.value(msg::key::AuthToken, "");
         std::string expected;
 
-        std::cout << "provided: " << provided << "\n";
-
-        if (auto nm = network_manager.lock()) {
-            expected = nm->getNetworkPassword();
-        }
-        else {
+        auto nm = network_manager.lock();
+        if (!nm) {
             throw std::runtime_error("SignalingServer::onMessage: NetworkManager expired");
         }
-        std::cout << "expected: " << expected << "\n";
+        expected = nm->getNetworkPassword();
 
         const bool ok = (expected.empty() || provided == expected);
-        std::cout << "ok: " << ok << "\n";
 
         if (ok) {
             std::cout << "OK TRUE" << "\n";
             moveToAuthenticated(clientId);
-            auto msg = msg::makeAuthResponse(msg::value::True, "welcome");
+            //get clients to send to authresponse
+            std::vector<std::string> others;
+            others.reserve(authClients_.size());
+            for (auto& [id, ws] : authClients_) {
+                if (id == clientId) continue;
+                others.emplace_back(id);
+            }
+
+            auto username = j.value(msg::key::Username, "guest"+clientId);
+            auto msg = msg::makeAuthResponse(msg::value::True, "welcome", clientId, username, others);
             sendTo(clientId, msg.dump());
         }
         else {
-            std::cout << "OK FALSE" << "\n";
-            auto msg = msg::makeAuthResponse(msg::value::False, "invalid password");
+            auto username = j.value(msg::key::Username, "guest" + clientId);
+            auto msg = msg::makeAuthResponse(msg::value::False, "invalid password", clientId, username);
             sendTo(clientId, msg.dump());
             // optional hard-close on bad auth
             if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second) {
@@ -123,7 +127,8 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
 
     // All other types require authentication
     if (!isAuthenticated(clientId)) {
-        auto msg = msg::makeAuthResponse(msg::value::False, "unauthenticated");
+        auto username = j.value(msg::key::Username, "guest" + clientId);
+        auto msg = msg::makeAuthResponse(msg::value::False, "unauthenticated", clientId, username);
         sendTo(clientId, msg);
         return;
     }
@@ -171,30 +176,30 @@ void SignalingServer::broadcast(const std::string& message) {
     }
 }
 
-void SignalingServer::prunePending() {
-    if (pendingTimeout_.count() <= 0) return;
-    const auto now = Clock::now();
-    std::vector<std::string> toDrop;
-    toDrop.reserve(pendingClients_.size());
-    for (auto& [id, since] : pendingSince_) {
-        if (now - since > pendingTimeout_) toDrop.push_back(id);
-    }
-    for (auto& id : toDrop) {
-        if (auto it = pendingClients_.find(id); it != pendingClients_.end() && it->second) {
-            it->second->close(); // optional
-        }
-        pendingClients_.erase(id);
-        pendingSince_.erase(id);
-        std::cout << "[SignalingServer] Dropped pending (timeout): " << id << "\n";
-    }
-}
+//void SignalingServer::prunePending() {
+//    if (pendingTimeout_.count() <= 0) return;
+//    const auto now = Clock::now();
+//    std::vector<std::string> toDrop;
+//    toDrop.reserve(pendingClients_.size());
+//    for (auto& [id, since] : pendingSince_) {
+//        if (now - since > pendingTimeout_) toDrop.push_back(id);
+//    }
+//    for (auto& id : toDrop) {
+//        if (auto it = pendingClients_.find(id); it != pendingClients_.end() && it->second) {
+//            it->second->close(); // optional
+//        }
+//        pendingClients_.erase(id);
+//        //pendingSince_.erase(id);
+//        std::cout << "[SignalingServer] Dropped pending (timeout): " << id << "\n";
+//    }
+//}
 
 void SignalingServer::moveToAuthenticated(const std::string& clientId) {
     auto it = pendingClients_.find(clientId);
     if (it == pendingClients_.end()) return;
     authClients_[clientId] = it->second;
     pendingClients_.erase(it);
-    pendingSince_.erase(clientId);
+    //pendingSince_.erase(clientId);
     std::cout << "[SignalingServer] Authenticated: " << clientId << "\n";
 }
 

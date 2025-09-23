@@ -45,7 +45,7 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
 		// Start LocalTunnel (non-blocking thread)
 		// Note: URL will be available shortly after start; user can grab it from Network Center.
 		const auto ltUrl = NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
-		if (!ltUrl.empty()) {
+		if (ltUrl.empty()) {
 			break;
 		}
 		signalingClient->connectUrl(ltUrl);
@@ -388,8 +388,14 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 
 // NetworkManager.cpp
 void NetworkManager::setMyIdentity(std::string myId, std::string username) {
-	myClientId_ = std::move(myId);
-	myUsername_ = std::move(username);
+	if (myId.empty()) {
+		myUsername_ = std::move(username);
+	}
+	else {
+		clientUsernames_[myId] = username;
+		myUsername_ = std::move(username);
+		myClientId_ = std::move(myId);
+	}
 }
 
 void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string& username) {
@@ -402,6 +408,7 @@ void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string
 
 std::string NetworkManager::displayNameFor(const std::string& id) const {
 	if (auto it = peerUsernames_.find(id); it != peerUsernames_.end()) return it->second;
+	if (auto it = clientUsernames_.find(id); it != clientUsernames_.end()) return it->second;
 	return id; // fallback to raw id
 }
 

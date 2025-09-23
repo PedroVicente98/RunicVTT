@@ -101,6 +101,7 @@ private:
     std::string myClientId_;
     std::string myUsername_;
     std::unordered_map<std::string, std::string> peerUsernames_;
+    std::unordered_map<std::string, std::string> clientUsernames_;
 
     flecs::world ecs;
     unsigned int port = 8080;

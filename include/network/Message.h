@@ -159,12 +159,21 @@ namespace msg {
         };
     }
 
-    inline Json makeAuthResponse(const std::string ok, const std::string& msg) {
-        return Json{
+    inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}) {
+        
+         auto j = Json{
             { std::string(key::Type), std::string(signaling::AuthResponse) },
             { std::string(key::AuthOk), ok },
-            { std::string(key::AuthMsg), msg }
-        };
+            { std::string(key::AuthMsg), msg },
+            { std::string(key::ClientId), clientId },
+            { std::string(key::Username), username }
+         };
+
+         if (!clients.empty()) {
+             j[std::string(msg::key::Clients)] = clients; // array of peerId strings
+         };
+
+        return j;
     }
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false) {
         return Json{
