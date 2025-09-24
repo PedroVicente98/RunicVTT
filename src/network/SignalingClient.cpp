@@ -24,14 +24,20 @@ bool SignalingClient::connectUrl(const std::string& url) {
 
     ws->onOpen([=]() {
         if (auto nm = network_manager.lock()) {
+            nm->pushStatusToast("Signaling connected", NetworkToast::Level::Good);
             ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername()).dump());
         }
-        });
-    ws->onClosed([=]() { std::cout << "[SignalingClient] Disconnected from GM.\n"; });
+    });
+    
+    ws->onClosed([=]() { 
+        if (auto nm = network_manager.lock())
+            nm->pushStatusToast("Signaling disconnected", NetworkToast::Level::Error);
+    });
+    
     ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {
         if (!std::holds_alternative<rtc::string>(msg)) return;
         this->onMessage(std::get<rtc::string>(msg));
-        });
+    });
 
     // normalize https→wss, http→ws; leave ws/wss as-is
     const std::string norm = NetworkUtilities::normalizeWsUrl(url);
