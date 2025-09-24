@@ -12,11 +12,11 @@ public:
 
     void close();
 
-    void createPeerConnection();        
+    //void createPeerConnection();        
     void createDataChannel(const std::string& label);  
     rtc::Description createOffer();          
     rtc::Description createAnswer();         
-    void setRemoteAnswer(const rtc::Description& desc); 
+    void setRemoteDescription(const rtc::Description& desc);
     void addIceCandidate(const rtc::Candidate& candidate); 
 
     void send(const std::string& msg);
@@ -40,6 +40,10 @@ private:
 
     std::atomic<rtc::PeerConnection::State> lastState_{ rtc::PeerConnection::State::New };
     std::atomic<double> lastStateAt_{ 0.0 }; // seconds since app start
+
+    std::atomic<bool> remoteDescSet_{ false };
+    std::vector<rtc::Candidate> pendingRemoteCandidates_;
+    std::mutex candMx_;
 
     void setupCallbacks();   // internal
 };

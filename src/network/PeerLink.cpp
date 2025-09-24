@@ -6,6 +6,7 @@ PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent)
 {
     if (auto nm = network_manager.lock()) {
         auto config = nm->getRTCConfig();
+        config.iceServers.push_back({ "stun:stun.l.google.com:19302" });
         pc = std::make_shared<rtc::PeerConnection>(config);
         setupCallbacks();
     }
@@ -36,14 +37,18 @@ void PeerLink::send(const std::string& msg) {
 //    if (pc) pc->close();
 //}
 
-void PeerLink::createPeerConnection() {
-    rtc::Configuration config;
-    config.iceServers.push_back({ "stun:stun.l.google.com:19302" }); 
-
-    pc = std::make_shared<rtc::PeerConnection>(config);
-
-    setupCallbacks(); // bind onStateChange, onLocalDescription, onLocalCandidate...
-}
+//void PeerLink::createPeerConnection() {
+//    if (pc) return; // already created
+//    if (auto nm = network_manager.lock()) {
+//        auto config = nm->getRTCConfig();
+//        config.iceServers.push_back({ "stun:stun.l.google.com:19302" }); 
+//        pc = std::make_shared<rtc::PeerConnection>(config);
+//        setupCallbacks(); // bind onStateChange, onLocalDescription, onLocalCandidate...
+//    }
+//    else {
+//        throw std::runtime_error("NetworkManager expired");
+//    }
+//}
 
 void PeerLink::createDataChannel(const std::string& label) {
     dc = pc->createDataChannel(label);
@@ -78,12 +83,34 @@ rtc::Description PeerLink::createAnswer() {
     return answer; // Send this via signaling
 }
 
-void PeerLink::setRemoteAnswer(const rtc::Description& desc) {
+//void PeerLink::setRemoteDescription(const rtc::Description& desc) {
+//    pc->setRemoteDescription(desc);
+//}
+//
+//void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
+//    pc->addRemoteCandidate(candidate);
+//}
+
+
+void PeerLink::setRemoteDescription(const rtc::Description& desc) {
     pc->setRemoteDescription(desc);
+    {
+        std::lock_guard<std::mutex> lk(candMx_);
+        remoteDescSet_.store(true, std::memory_order_release);
+        for (auto& c : pendingRemoteCandidates_) {
+            pc->addRemoteCandidate(c);
+        }
+        pendingRemoteCandidates_.clear();
+    }
 }
 
 void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
-    pc->addRemoteCandidate(candidate);
+    std::lock_guard<std::mutex> lk(candMx_);
+    if (!remoteDescSet_.load(std::memory_order_acquire)) {
+        pendingRemoteCandidates_.push_back(candidate);
+    } else {
+        pc->addRemoteCandidate(candidate);
+    }
 }
 
 void PeerLink::setupCallbacks() {

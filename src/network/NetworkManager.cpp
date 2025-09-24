@@ -377,7 +377,7 @@ void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc
 	else {
 		return;
 	}
-	if (!signalingClient) signalingClient->send(j.dump());
+	if (signalingClient) signalingClient->send(j.dump());
 }
 
 void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand) {

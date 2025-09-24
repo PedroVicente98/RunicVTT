@@ -174,7 +174,6 @@ void SignalingClient::onMessage(const std::string& msg) {
                 for (auto& v : j[msg::key::Clients]) {
                     std::string peerId = v.get<std::string>();
                     auto link = nm->ensurePeerLink(peerId);
-                    link->createPeerConnection();
                     link->createDataChannel(msg::dc::name::Game);
                     link->createOffer();
                 }
@@ -191,9 +190,9 @@ void SignalingClient::onMessage(const std::string& msg) {
 
         auto link = nm->ensurePeerLink(from);
         nm->upsertPeerIdentity(from, username);
-        link->createPeerConnection(); // safe if already exists
+        //link->createPeerConnection(); // safe if already exists
         // Apply remote offer
-        link->setRemoteAnswer(rtc::Description(sdp, std::string(msg::signaling::Offer)));
+        link->setRemoteDescription(rtc::Description(sdp, std::string(msg::signaling::Offer)));
         // Create local answer (this will trigger NM callback to send)
         link->createAnswer();
         return;
@@ -205,7 +204,7 @@ void SignalingClient::onMessage(const std::string& msg) {
         if (from.empty() || sdp.empty()) return;
 
         auto link = nm->ensurePeerLink(from);
-        link->setRemoteAnswer(rtc::Description(sdp, std::string(msg::signaling::Answer)));
+        link->setRemoteDescription(rtc::Description(sdp, std::string(msg::signaling::Answer)));
         return;
     }
 
