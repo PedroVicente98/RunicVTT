@@ -25,6 +25,13 @@ enum class ConnectionType {
     LOCALTUNNEL
 };
 
+struct NetworkToast {
+    enum class Level { Info, Good, Warning, Error };
+    std::string message;
+    double      expiresAt; // ImGui::GetTime() + duration
+    Level       level;
+};
+
 // Forward declare
 class SignalingServer;
 class SignalingClient;
@@ -81,7 +88,18 @@ public:
     const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const { return peers; }
     std::shared_ptr<SignalingServer> getSignalingServer() const { return signalingServer; }
 
+
+    // push a toast (thread-safe enough for your callbacks if they hit main via your queues;
+    // if not, call this from main thread; otherwise add a mutex)
+    void pushStatusToast(const std::string& msg, NetworkToast::Level lvl, double durationSec = 3.0);
+    // expose read-only for renderer
+    const std::deque<NetworkToast>& toasts() const { return toasts_; }
+    // prune expired (call every frame before rendering)
+    void pruneToasts(double now);
+
 private:
+    std::deque<NetworkToast> toasts_;
+
     std::string myClientId_;
     std::string myUsername_;
     std::unordered_map<std::string, std::string> peerUsernames_;
