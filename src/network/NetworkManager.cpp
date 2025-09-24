@@ -488,7 +488,11 @@ bool NetworkManager::disconnectAllPeers() {
 }
 
 
-
+void NetworkManager::broadcastPeerDisconnect(const std::string& targetId) {
+    if (!signalingClient) return; // GM might be loopbacked as a client; else send via server
+    auto j = msg::makePeerDisconnect(targetId, /*broadcast*/true);
+    signalingClient->send(j.dump());
+}
 
 
 
