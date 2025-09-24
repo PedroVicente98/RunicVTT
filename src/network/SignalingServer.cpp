@@ -130,7 +130,30 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
 
     // Router: overwrite from with server-trusted clientId
     j[msg::key::From] = clientId;
-  
+
+    // In SignalingServer::onMessage (after auth checks)
+    if (type == msg::signaling::PeerDisconnect) {
+        // Optional: verify this clientId is GM
+        // if (!isFromGM(clientId)) return;
+    
+        // Overwrite from for trust (already done in your router)
+        const std::string target = j.value(std::string(msg::key::Target), "");
+        if (target.empty()) return;
+    
+        // Broadcast to all authed clients (including target)
+        const std::string dump = j.dump();
+        for (auto& [id, ws] : authClients_) {
+            if (ws && !ws->isClosed()) ws->send(dump);
+        }
+    
+        // Optionally kick the target at signaling level
+        if (auto it = authClients_.find(target); it != authClients_.end()) {
+            if (it->second) it->second->close();
+        }
+        return;
+    }
+
+    
     // Broadcast to authenticated only
     if (j.value(msg::key::Broadcast, msg::value::False) == msg::value::True) {
         const std::string dump = j.dump();
