@@ -51,7 +51,7 @@ public:
 	//void createNetworkPopUp();
 	//void closeNetworkPopUp();
 	//void openNetworkInfoPopUp();
-
+	void renderNetworkToasts(NetworkManager& nm);
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
 
