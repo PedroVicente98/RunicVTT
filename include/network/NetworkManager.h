@@ -66,6 +66,7 @@ public:
     bool clearPeers() const { return peers.empty(); }
     bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
+    void broadcastPeerDisconnect(const std::string& targetId);
 
     // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
