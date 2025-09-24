@@ -412,29 +412,80 @@ std::string NetworkManager::displayNameFor(const std::string& id) const {
 	return id; // fallback to raw id
 }
 
+bool NetworkManager::disconectFromPeers() {
+	// Close all peer links (don’t let PeerLink::close() call back into NM to erase)
+	for (auto& [pid, link] : peers) {
+		if (link) {
+			try { link->close(); }
+			catch (...) {}
+		}
+	}
+	peers.clear();
 
-//void onMessageFromPeer(const std::string& peerId, const std::string& message) {
-//	nlohmann::json msg = nlohmann::json::parse(message);
-//	std::string type = msg["type"];
-//
-//	if (type == "relay") {
-//		std::string destinationId = msg["to"];
-//		auto payload = msg["payload"];
-//
-//		// Find the data channel for the destination peer
-//		auto it = peerDataChannels.find(destinationId);
-//		if (it != peerDataChannels.end()) {
-//			std::cout << "Relaying message from " << peerId << " to " << destinationId << std::endl;
-//			// Forward the payload
-//			it->second->sendMessage(payload.dump());
-//		}
-//	}
-//	else {
-//		// Handle normal game-state messages from this peer
-//	}
-//}
+	// Close signaling client (player’s WS)
+	if (signalingClient) {
+		signalingClient->close();
+		signalingClient.reset();
+	}
 
+	// We’re no longer connected
+	peer_role = Role::NONE;
+	return true;
+}
 
+bool NetworkManager::disconectFromPeers() {
+	// Close all peer links (don’t let PeerLink::close() call back into NM to erase)
+	for (auto& [pid, link] : peers) {
+		if (link) {
+			try { link->close(); }
+			catch (...) {}
+		}
+	}
+	peers.clear();
+
+	// Close signaling client (player’s WS)
+	if (signalingClient) {
+		signalingClient->close();
+		signalingClient.reset();
+	}
+
+	// We’re no longer connected
+	peer_role = Role::NONE;
+	return true;
+}
+
+bool NetworkManager::disconnectAllPeers() {
+	// 1) Broadcast a shutdown message (optional, but nice UX)
+	if (signalingServer) {
+		signalingServer->broadcastShutdown();     // 1) tell everyone
+	}
+
+	// 2) Close all peer links locally
+	for (auto& [pid, link] : peers) {
+		if (link) {
+			try { link->close(); }
+			catch (...) {}
+		}
+	}
+	peers.clear();
+
+	// 3) Disconnect all WS clients and stop the server
+	if (signalingServer) {
+		signalingServer->disconnectAllClients();
+		try { signalingServer->stop(); }
+		catch (...) {}
+		signalingServer.reset();
+	}
+
+	// 4) If GM also had a self client (loopback to its own server), close it too
+	if (signalingClient) {
+		signalingClient->close();
+		signalingClient.reset();
+	}
+
+	peer_role = Role::NONE;
+	return true;
+}
 
 
 

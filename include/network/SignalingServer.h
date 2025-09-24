@@ -18,7 +18,10 @@ public:
     void onConnect(std::string clientId, std::shared_ptr<rtc::WebSocket> client);
     void onMessage(const std::string& clientId, const std::string& text);
     void sendTo(const std::string& clientId, const std::string& message);
+
     void broadcast(const std::string& message); 
+    void broadcastShutdown();                
+    void disconnectAllClients();                
 
     // Config
     void setPendingAuthTimeout(std::chrono::seconds s) { pendingTimeout_ = s; }

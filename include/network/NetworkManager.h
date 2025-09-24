@@ -40,9 +40,7 @@ public:
     void startServer(ConnectionType mode, unsigned short port, bool tryUpnp);
     void startServer(std::string internal_ip_address, unsigned short port);
     void closeServer();
-    bool connectToPeer(const std::string& connectionString);
-
-    bool disconectFromPeers();
+    
 
     void allowPort(unsigned int port);
     void disallowPort(unsigned short port);
@@ -62,21 +60,11 @@ public:
     void ShowPortForwardingHelpPopup(bool* p_open);
     rtc::Configuration getRTCConfig() const { return rtcConfig; }
 
-    ////Operations
-    //void addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-    //void removeClient(std::string client_id);
-    //void clearClients() const { clients.empty(); }
-    //std::shared_ptr<rtc::WebSocket> getClient(std::string client_id);
-    //std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& getClients() { return clients; }
-    //void addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-    //void removePendingClient(std::string client_id);
-    //void clearPendingClients() const { pending_clients.empty(); }
-    //std::shared_ptr<rtc::WebSocket> getPendingClient(std::string client_id);
-
-
+    bool connectToPeer(const std::string& connectionString);
+    bool disconectFromPeers();
     bool removePeer(std::string peerId);
     bool clearPeers() const { return peers.empty(); }
-    void disconnectAllPeers();
+    bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
 
     // PeerLink -> NM (send via signaling)
@@ -84,20 +72,15 @@ public:
     void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
 
-    // NetworkManager.h
-    std::string getMyUsername() const { return myUsername_; }; // you decide how to set it (UI input etc.)
+    std::string getMyUsername() const { return myUsername_; };
     void setMyIdentity(std::string myId, std::string username);
     void upsertPeerIdentity(const std::string& id, const std::string& username);
     std::string displayNameFor(const std::string& id) const;
 
-    // expose read-only view to peers for UI
     const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const { return peers; }
-    // expose server pointer for UI
     std::shared_ptr<SignalingServer> getSignalingServer() const { return signalingServer; }
 
 private:
-
-    // fields
     std::string myClientId_;
     std::string myUsername_;
     std::unordered_map<std::string, std::string> peerUsernames_;
@@ -121,11 +104,19 @@ private:
         return starts("https://") || starts("http://") || starts("wss://") || starts("ws://");
     }
 
-
 };
 
 
-
+////Operations
+  //void addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
+  //void removeClient(std::string client_id);
+  //void clearClients() const { clients.empty(); }
+  //std::shared_ptr<rtc::WebSocket> getClient(std::string client_id);
+  //std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& getClients() { return clients; }
+  //void addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
+  //void removePendingClient(std::string client_id);
+  //void clearPendingClients() const { pending_clients.empty(); }
+  //std::shared_ptr<rtc::WebSocket> getPendingClient(std::string client_id);
     ////Callback Methods
     ////WebSocker Client
     //void onOpenClient();                               // WebSocket connected to master

@@ -23,7 +23,8 @@ public:
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 
-  
+    void attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch);
+
     bool isDataChannelOpen() const;
     rtc::PeerConnection::State pcState() const; // optional
     const char* pcStateString() const;

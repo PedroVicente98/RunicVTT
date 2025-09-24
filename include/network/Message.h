@@ -61,6 +61,7 @@ namespace msg {
         inline constexpr std::string_view Auth = "auth";
         inline constexpr std::string_view AuthResponse = "auth_response";
         inline constexpr std::string_view Text = "text";
+        inline constexpr std::string_view ServerDisconnect = "server_disconnect";
     }
 
     namespace value {
@@ -145,6 +146,12 @@ namespace msg {
         };
     }
 
+   inline Json makeBroadcastShutdown() {
+       return Json{
+           { std::string(msg::key::Type),      msg::signaling::ServerDisconnect },
+           { std::string(msg::key::Broadcast), std::string(msg::value::True) }
+       };
+   }
 
     inline Json makePing(const std::string& from) {
         return Json{

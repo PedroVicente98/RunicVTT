@@ -6,7 +6,9 @@ PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent)
 {
     if (auto nm = network_manager.lock()) {
         auto config = nm->getRTCConfig();
-        config.iceServers.push_back({ "stun:stun.l.google.com:19302" });
+        config.iceServers.push_back({ "stun:stun.l.google.com:19302" });    // Google
+        config.iceServers.push_back({ "stun:stun1.l.google.com:19302" });   // Google alt
+        config.iceServers.push_back({ "stun:stun.stunprotocol.org:3478" }); // Community server
         pc = std::make_shared<rtc::PeerConnection>(config);
         setupCallbacks();
     }
@@ -31,39 +33,16 @@ void PeerLink::send(const std::string& msg) {
         dc->send(msg);
     }
 }
-//
-//void PeerLink::close() {
-//    if (dc) dc->close();
-//    if (pc) pc->close();
-//}
 
-//void PeerLink::createPeerConnection() {
-//    if (pc) return; // already created
-//    if (auto nm = network_manager.lock()) {
-//        auto config = nm->getRTCConfig();
-//        config.iceServers.push_back({ "stun:stun.l.google.com:19302" }); 
-//        pc = std::make_shared<rtc::PeerConnection>(config);
-//        setupCallbacks(); // bind onStateChange, onLocalDescription, onLocalCandidate...
-//    }
-//    else {
-//        throw std::runtime_error("NetworkManager expired");
-//    }
-//}
 
 void PeerLink::createDataChannel(const std::string& label) {
-    dc = pc->createDataChannel(label);
+    if (!pc) return;                       // ensure pc exists
+    if (dc && dc->isOpen()) return;        // idempotent-ish: keep existing dc
 
-    dc->onOpen([this]() {
-        std::cout << "[PeerLink] DataChannel open\n";
-        });
-
-    dc->onMessage([this](rtc::message_variant msg) {
-        if (std::holds_alternative<std::string>(msg)) {
-            std::cout << "[PeerLink] Received: "
-                << std::get<std::string>(msg) << "\n";
-        } //GAME LOGIC 
-    });
+    dc = pc->createDataChannel(label);     // negotiated=false by default
+    attachChannelHandlers(dc);
 }
+
 
 rtc::Description PeerLink::createOffer() {
     auto offer = pc->createOffer();
@@ -82,15 +61,6 @@ rtc::Description PeerLink::createAnswer() {
     pc->setLocalDescription(answer.type(), init);
     return answer; // Send this via signaling
 }
-
-//void PeerLink::setRemoteDescription(const rtc::Description& desc) {
-//    pc->setRemoteDescription(desc);
-//}
-//
-//void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
-//    pc->addRemoteCandidate(candidate);
-//}
-
 
 void PeerLink::setRemoteDescription(const rtc::Description& desc) {
     pc->setRemoteDescription(desc);
@@ -130,14 +100,28 @@ void PeerLink::setupCallbacks() {
 
     pc->onDataChannel([this](std::shared_ptr<rtc::DataChannel> ch) {
         dc = std::move(ch);
-        dc->onOpen([this] { std::cout << "[PeerLink] DC open\n"; });
-        dc->onClosed([this] { std::cout << "[PeerLink] DC closed\n"; });
-        dc->onMessage([this](rtc::message_variant m) {
-            if (std::holds_alternative<std::string>(m))
-                std::cout << "[PeerLink] msg: " << std::get<std::string>(m) << "\n";
-            });
-        });
+        attachChannelHandlers(dc);
+    });
 }
+
+
+void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch) {
+    ch->onOpen([this] {
+        std::cout << "[PeerLink] DataChannel open (" << peerId << ")\n";
+    });
+    ch->onClosed([this] {
+        std::cout << "[PeerLink] DataChannel closed (" << peerId << ")\n";
+    });
+    ch->onMessage([this](rtc::message_variant msg) {
+        if (std::holds_alternative<std::string>(msg)) {
+            std::cout << "[PeerLink] Received: " << std::get<std::string>(msg) << "\n";
+            // TODO: route to your game message router
+        }
+        // handle binary if you need:
+        // else if (std::holds_alternative<rtc::binary>(msg)) { ... }
+    });
+}
+
 
 
 bool PeerLink::isDataChannelOpen() const {
@@ -188,7 +172,24 @@ const char* PeerLink::pcStateString() const {
 }
 
 
+//
+//void PeerLink::close() {
+//    if (dc) dc->close();
+//    if (pc) pc->close();
+//}
 
+//void PeerLink::createPeerConnection() {
+//    if (pc) return; // already created
+//    if (auto nm = network_manager.lock()) {
+//        auto config = nm->getRTCConfig();
+//        config.iceServers.push_back({ "stun:stun.l.google.com:19302" }); 
+//        pc = std::make_shared<rtc::PeerConnection>(config);
+//        setupCallbacks(); // bind onStateChange, onLocalDescription, onLocalCandidate...
+//    }
+//    else {
+//        throw std::runtime_error("NetworkManager expired");
+//    }
+//}
 /////
 //
 //#include "PeerLink.h"

@@ -162,6 +162,13 @@ void SignalingClient::onMessage(const std::string& msg) {
     auto nm = network_manager.lock();
     if (!nm) throw std::runtime_error("NM expired");
 
+    if (type == msg::signaling::ServerDisconnect) {
+        if (auto nm = network_manager.lock()) {
+            nm->disconectFromPeers();
+        }
+        return;
+    }
+
     if (type == msg::signaling::AuthResponse) {
         if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True) {
             // for each existing authed client -> start offer
@@ -221,20 +228,13 @@ void SignalingClient::onMessage(const std::string& msg) {
         link->addIceCandidate(rtc::Candidate(cand, mid));
         return;
     }
+}
 
 
-    ////NOT USED
-    //if (type == msg::signaling::Presence) {
-    //    if (j.value(msg::key::Event, "") == msg::signaling::Join) {
-    //        std::string peerId = j.value(msg::key::ClientId, "");
-    //        if (!peerId.empty()) {
-    //            auto link = nm->ensurePeerLink(peerId);
-    //            link->createPeerConnection();
-    //            link->createDataChannel(msg::dc::name::Game);
-    //            link->createOffer(); // NM callback will send
-    //        }
-    //    }
-    //    return;
-    //}
-
+void SignalingClient::close() {
+    if (ws) {
+        try { ws->close(); }
+        catch (...) {}
+        ws.reset();
+    }
 }

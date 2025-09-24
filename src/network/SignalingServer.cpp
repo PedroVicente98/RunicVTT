@@ -80,8 +80,6 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     const std::string type = j.value(msg::key::Type, "");
     if (type.empty()) return;
 
-    std::cout << "type: " << type << "\n";
-
     // AUTH
     if (type == msg::signaling::Auth) {
         std::string provided = j.value(msg::key::AuthToken, "");
@@ -96,9 +94,7 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
         const bool ok = (expected.empty() || provided == expected);
 
         if (ok) {
-            std::cout << "OK TRUE" << "\n";
             moveToAuthenticated(clientId);
-            //get clients to send to authresponse
             std::vector<std::string> others;
             others.reserve(authClients_.size());
             for (auto& [id, ws] : authClients_) {
@@ -114,7 +110,6 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
             auto username = j.value(msg::key::Username, "guest" + clientId);
             auto msg = msg::makeAuthResponse(msg::value::False, "invalid password", clientId, username);
             sendTo(clientId, msg.dump());
-            // optional hard-close on bad auth
             if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second) {
                 it->second->close();
             }
@@ -156,16 +151,11 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
 }
 
 void SignalingServer::sendTo(const std::string& clientId, const std::string& message) {
-    std::cout << "SEND TO: " << clientId << "\n";
-    std::cout << "SEND MESSAGE: " << message << "\n";
-
     if (auto it = authClients_.find(clientId); it != authClients_.end() && it->second && !it->second->isClosed()) {
-        std::cout << "SENT TO AUTHED" << "\n";
         it->second->send(message);
         return;
     }
     if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second && !it->second->isClosed()) {
-        std::cout << "SENT TO PENDING" << "\n";
         it->second->send(message);
     }
 }
@@ -175,6 +165,24 @@ void SignalingServer::broadcast(const std::string& message) {
         if (ws && !ws->isClosed()) ws->send(message);
     }
 }
+
+void SignalingServer::broadcastShutdown() {
+    nlohmann::json j = msg::makeBroadcastShutdown();
+    broadcast(j.dump());
+}
+
+void SignalingServer::disconnectAllClients() {
+    for (auto& [id, ws] : authClients_) {
+        if (ws) { try { ws->close(); } catch (...) {} }
+    }
+    authClients_.clear();
+    // You may also want to clear pendingClients_
+    for (auto& [id, ws] : pendingClients_) {
+        if (ws) { try { ws->close(); } catch (...) {} }
+    }
+    pendingClients_.clear();
+}
+
 
 //void SignalingServer::prunePending() {
 //    if (pendingTimeout_.count() <= 0) return;
