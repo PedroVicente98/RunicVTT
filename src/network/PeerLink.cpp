@@ -84,10 +84,27 @@ void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
 }
 
 void PeerLink::setupCallbacks() {
-    pc->onStateChange([this](rtc::PeerConnection::State state) {
-        lastState_ = state;
+    pc->onStateChange([this](rtc::PeerConnection::State s) {
+        lastState_ = s;
         lastStateAt_ = std::chrono::seconds().count();
-        std::cout << "[PeerLink] State(" << peerId << "): " << (int)state << "at " << lastStateAt_ << "\n";
+        std::cout << "[PeerLink] State(" << peerId << "): " << (int)s << "at " << lastStateAt_ << "\n";
+       
+        if (auto nm = network_manager.lock()) {
+            using L = NetworkToast::Level;
+            const char* stateStr =
+                s == rtc::PeerConnection::State::Connected    ? "Connected" :
+                s == rtc::PeerConnection::State::Connecting   ? "Connecting" :
+                s == rtc::PeerConnection::State::Disconnected ? "Disconnected" :
+                s == rtc::PeerConnection::State::Failed       ? "Failed" :
+                s == rtc::PeerConnection::State::Closed       ? "Closed" : "New";
+            L lvl =
+                s == rtc::PeerConnection::State::Connected    ? L::Good :
+                s == rtc::PeerConnection::State::Connecting   ? L::Warning :
+                s == rtc::PeerConnection::State::Disconnected ? L::Error :
+                s == rtc::PeerConnection::State::Failed       ? L::Error :
+                s == rtc::PeerConnection::State::Closed       ? L::Warning : L::Info;
+            nm->pushStatusToast(std::string("[Peer] ") + peerId + " " + stateStr, lvl);
+        }
     });
 
     pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc) {
@@ -106,11 +123,13 @@ void PeerLink::setupCallbacks() {
 
 
 void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch) {
-    ch->onOpen([this] {
-        std::cout << "[PeerLink] DataChannel open (" << peerId << ")\n";
+     ch->onOpen([this]{
+        if (auto nm = network_manager.lock())
+            nm->pushStatusToast(std::string("[DC] open: ") + peerId, NetworkToast::Level::Good);
     });
-    ch->onClosed([this] {
-        std::cout << "[PeerLink] DataChannel closed (" << peerId << ")\n";
+    ch->onClosed([this]{
+        if (auto nm = network_manager.lock())
+            nm->pushStatusToast(std::string("[DC] closed: ") + peerId, NetworkToast::Level::Error);
     });
     ch->onMessage([this](rtc::message_variant msg) {
         if (std::holds_alternative<std::string>(msg)) {
