@@ -868,7 +868,7 @@ void GameTableManager::renderNetworkCenterGM() {
 
             // Actions
             ImGui::TableSetColumnIndex(4);
-            ImGui::PushID(peerId.c_str());
+            /*ImGui::PushID(peerId.c_str());
             if (ImGui::SmallButton("Disconnect")) {
                 link->close(); // your existing teardown (pc/dc + optional unregister)
             }
@@ -881,7 +881,24 @@ void GameTableManager::renderNetworkCenterGM() {
                 l2->createDataChannel("game");
                 l2->createOffer();
             }
-            ImGui::PopID();
+            ImGui::PopID();*/
+
+			ImGui::PushID(peerId.c_str());
+			if (ImGui::SmallButton("Disconnect")) {
+			    ImGui::OpenPopup("ConfirmKickPeer");
+			}
+			if (UI_ConfirmModal("ConfirmKickPeer", "Disconnect this peer?",
+			                    "This will disconnect the selected peer and notify others to drop it.")) {
+			    // 1) Broadcast PeerDisconnect (so other peers drop links to this id)
+			    network_manager->broadcastPeerDisconnect(peerId);
+			    // 2) Optionally kick WS client too (server-side)
+			    if (auto srv = network_manager->getSignalingServer()) {
+			        srv->disconnectClient(peerId); // add this helper to server if not present
+			    }
+			    // 3) Locally close our peer link
+			    network_manager->removePeerLink(peerId);
+			}
+			ImGui::PopID();
         }
         ImGui::EndTable();
     }
@@ -920,7 +937,21 @@ void GameTableManager::renderNetworkCenterGM() {
     }
 
     // ---------- Controls ----------
-    ImGui::Separator();
+	ImGui::Separator();
+	if (ImGui::Button("Disconnect All")) {
+	    ImGui::OpenPopup("ConfirmGMDisconnectAll");
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Close Network Center")) {
+	    ImGui::CloseCurrentPopup();
+	}
+	if (UI_ConfirmModal("ConfirmGMDisconnectAll", "Disconnect ALL clients?",
+	                    "This will broadcast a shutdown and disconnect all clients, "
+	                    "close all peer links, and stop the signaling server.")) {
+	    network_manager->disconnectAllPeers(); // your GM teardown
+	    ImGui::CloseCurrentPopup();
+	}
+    
     if (ImGui::Button("Close Network")) {
         network_manager->closeServer();
     }
@@ -969,6 +1000,15 @@ void GameTableManager::renderNetworkCenterPlayer() {
 
         ImGui::EndTable();
     }
+	// At end of renderNetworkCenterPlayer()
+	if (ImGui::Button("Disconnect")) {
+	    ImGui::OpenPopup("ConfirmPlayerDisconnect");
+	}
+	if (UI_ConfirmModal("ConfirmPlayerDisconnect", "Disconnect?",
+	                    "This will close your WebSocket and all peer connections.")) {
+	    network_manager->disconectFromPeers(); // your player teardown
+	    ImGui::CloseCurrentPopup();            // close Network Center
+	}
 }
 
 
