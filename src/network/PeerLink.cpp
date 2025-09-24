@@ -127,6 +127,16 @@ void PeerLink::setupCallbacks() {
     pc->onLocalCandidate([wk = network_manager, id = peerId](rtc::Candidate cand) {
         if (auto nm = wk.lock()) nm->onPeerLocalCandidate(id, cand);
     });
+
+    pc->onDataChannel([this](std::shared_ptr<rtc::DataChannel> ch) {
+        dc = std::move(ch);
+        dc->onOpen([this] { std::cout << "[PeerLink] DC open\n"; });
+        dc->onClosed([this] { std::cout << "[PeerLink] DC closed\n"; });
+        dc->onMessage([this](rtc::message_variant m) {
+            if (std::holds_alternative<std::string>(m))
+                std::cout << "[PeerLink] msg: " << std::get<std::string>(m) << "\n";
+            });
+        });
 }
 
 

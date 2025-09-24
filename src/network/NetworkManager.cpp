@@ -372,7 +372,7 @@ void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc
 		
 	}
 	else if (desc.type() == rtc::Description::Type::Answer) {
-		j = msg::makeAnswer("", peerId, sdp);
+		j = msg::makeAnswer("", peerId, sdp, myUsername_);
 	}
 	else {
 		return;

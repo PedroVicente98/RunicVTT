@@ -877,7 +877,7 @@ void GameTableManager::renderNetworkCenterGM() {
                 // Optional renegotiation (your logic)
                 network_manager->removePeer(peerId);
                 auto l2 = network_manager->ensurePeerLink(peerId);
-                l2->createPeerConnection();
+                //l2->createPeerConnection();
                 l2->createDataChannel("game");
                 l2->createOffer();
             }

@@ -201,9 +201,12 @@ void SignalingClient::onMessage(const std::string& msg) {
     if (type == msg::signaling::Answer) {
         const std::string from = j.value(msg::key::From, "");
         const std::string sdp = j.value(msg::key::Sdp, "");
+        const std::string username = j.value(msg::key::Username, "guest_" + from);
+
         if (from.empty() || sdp.empty()) return;
 
         auto link = nm->ensurePeerLink(from);
+        nm->upsertPeerIdentity(from, username);
         link->setRemoteDescription(rtc::Description(sdp, std::string(msg::signaling::Answer)));
         return;
     }
