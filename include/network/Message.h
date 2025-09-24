@@ -22,6 +22,7 @@ namespace msg {
         inline constexpr std::string_view Event = "event";
         inline constexpr std::string_view Username = "username";
         inline constexpr std::string_view ClientId = "clientId";
+        inline constexpr std::string_view Target = "target";
 
         // Signaling-specific
         inline constexpr std::string_view Sdp = "sdp";
@@ -62,6 +63,7 @@ namespace msg {
         inline constexpr std::string_view AuthResponse = "auth_response";
         inline constexpr std::string_view Text = "text";
         inline constexpr std::string_view ServerDisconnect = "server_disconnect";
+        inline constexpr std::string_view PeerDisconnect  = "peer_disconnect";
     }
 
     namespace value {
@@ -143,6 +145,14 @@ namespace msg {
             { std::string(key::Type), std::string(signaling::Presence) },
             { std::string(key::Event), event },
             { std::string(key::ClientId), clientId }
+        };
+    }
+
+    inline nlohmann::json makePeerDisconnect(const std::string& targetPeerId, bool broadcast=true) {
+        return nlohmann::json{
+            { std::string(key::Type),      std::string(signaling::PeerDisconnect) },
+            { std::string(key::Broadcast), broadcast ? std::string(msg::value::True) : std::string(msg::value::False) },
+            { std::string(key::Target),    targetPeerId }
         };
     }
 
