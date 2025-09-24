@@ -2238,7 +2238,7 @@ void GameTableManager::aboutPopUp() {
 //RENDER ========================================================================================================================================================= 
 
 // Call this each frame (after BeginFrame, before EndFrame)
-void GameTableManager::RenderNetworkToasts(NetworkManager& nm) {
+void GameTableManager::renderNetworkToasts(NetworkManager& nm) {
     const double now = ImGui::GetTime();
     nm.pruneToasts(now);
     const auto& toasts = nm.toasts();
