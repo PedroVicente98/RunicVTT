@@ -169,6 +169,16 @@ void SignalingClient::onMessage(const std::string& msg) {
         return;
     }
 
+    // SignalingClient::onMessage
+    if (type == msg::signaling::PeerDisconnect) {
+        const std::string target = j.value(std::string(msg::key::Target), "");
+        if (target.empty()) return;
+        if (auto nm = network_manager.lock()) {
+            nm->removePeerLink(target); // close PC/DC and erase from map
+        }
+        return;
+    }
+
     if (type == msg::signaling::AuthResponse) {
         if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True) {
             // for each existing authed client -> start offer
