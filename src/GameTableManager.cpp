@@ -579,15 +579,14 @@ void GameTableManager::connectToGameTablePopUp()
 }
 
 
-
-// ======================= Network Center (Info + Peers + Clients) =======================
+// ================== 1) Router popup (keeps your STATUS header) ==================
 void GameTableManager::networkCenterPopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
     if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
 
-        // ---------- STATUS ----------
+        // ---------- STATUS (keep this block) ----------
         Role role = network_manager->getPeerRole();
         const char* roleStr =
             role == Role::GAMEMASTER ? "Hosting (GM)" :
@@ -603,145 +602,375 @@ void GameTableManager::networkCenterPopUp() {
 
         ImGui::Separator();
 
-        // ---------- INFO ----------
-        const auto local_ip = network_manager->getLocalIPAddress();
-        const auto external_ip = network_manager->getExternalIPAddress();
-        const auto port = network_manager->getPort();
-        const auto lt_url = network_manager->getLocalTunnelURL();
-
-        const auto cs_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
-        const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
-        const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
-
-        // quick inline labels (use your UI_LabelValue helpers if you have them)
-        ImGui::TextUnformatted("Local IP:");    
-        ImGui::SameLine(); 
-        ImGui::TextUnformatted(local_ip.c_str());
-        ImGui::TextUnformatted("External IP:"); 
-        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
-        ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
+        // ---------- BODY ----------
+        if (role == Role::GAMEMASTER) {
+            renderNetworkCenterGM();       // full GM center
+        }
+        else if (role == Role::PLAYER) {
+            renderNetworkCenterPlayer();   // player center (read-only)
+        }
+        else {
+            ImGui::TextDisabled("No network connection established.");
+        }
 
         ImGui::Separator();
+        if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
 
-        auto copyRow = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+        ImGui::EndPopup();
+    }
+}
+
+// ======================= Network Center (Info + Peers + Clients) =======================
+//void GameTableManager::networkCenterPopUp() {
+//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+//
+//    if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+//
+//        // ---------- STATUS ----------
+//        Role role = network_manager->getPeerRole();
+//        const char* roleStr =
+//            role == Role::GAMEMASTER ? "Hosting (GM)" :
+//            role == Role::PLAYER ? "Connected (Player)" :
+//            "Idle";
+//        ImVec4 roleClr =
+//            role == Role::GAMEMASTER ? ImVec4(0.2f, 0.9f, 0.2f, 1) :
+//            role == Role::PLAYER ? ImVec4(0.2f, 0.6f, 1.0f, 1) :
+//            ImVec4(1.0f, 0.6f, 0.2f, 1);
+//        ImGui::Text("Status: ");
+//        ImGui::SameLine();
+//        ImGui::TextColored(roleClr, "%s", roleStr);
+//
+//        ImGui::Separator();
+//
+//        // ---------- INFO ----------
+//        const auto local_ip = network_manager->getLocalIPAddress();
+//        const auto external_ip = network_manager->getExternalIPAddress();
+//        const auto port = network_manager->getPort();
+//        const auto lt_url = network_manager->getLocalTunnelURL();
+//
+//        const auto cs_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
+//        const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
+//        const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
+//
+//        // quick inline labels (use your UI_LabelValue helpers if you have them)
+//        ImGui::TextUnformatted("Local IP:");    
+//        ImGui::SameLine(); 
+//        ImGui::TextUnformatted(local_ip.c_str());
+//        ImGui::TextUnformatted("External IP:"); 
+//        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
+//        ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
+//
+//        ImGui::Separator();
+//
+//        auto copyRow = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+//            ImGui::TextUnformatted(label);
+//            ImGui::SameLine();
+//            ImGui::TextUnformatted(value.c_str());
+//            ImGui::SameLine();
+//            UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+//            //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
+//            };
+//
+//        copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
+//        copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+//        copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+//
+//
+//       /* if (ImGui::BeginTable("CopyRows", 3, ImGuiTableFlags_None)) {
+//            auto row = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(label);
+//                ImGui::TableSetColumnIndex(1); ImGui::TextWrapped("%s", value.c_str());
+//                ImGui::TableSetColumnIndex(2); UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+//                };
+//            row("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
+//            row("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+//            row("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+//            ImGui::EndTable();
+//        }*/
+//
+//
+//        // ---------- PLAYERS (P2P) ----------
+//        ImGui::Separator();
+//        ImGui::Text("Players (P2P)");
+//        if (ImGui::BeginTable("PeersTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+//            /*ImGui::TableSetupColumn("Name");
+//            ImGui::TableSetupColumn("PeerId");
+//            ImGui::TableSetupColumn("DataChannel");
+//            ImGui::TableSetupColumn("DataChannel");
+//            ImGui::TableSetupColumn("Actions");*/
+//            ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
+//            ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+//            ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
+//            ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
+//            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 120.f);
+//            ImGui::TableHeadersRow();
+//
+//            // requires accessor (see "New accessors" below)
+//            for (auto& [peerId, link] : network_manager->getPeers()) {
+//                if (!link) continue;
+//
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0);
+//                ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+//
+//                ImGui::TableSetColumnIndex(1);
+//                const char* pcStr = link ? link->pcStateString() : "Closed";
+//                ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
+//                if (strcmp(pcStr, "Connected") == 0)      pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+//                else if (strcmp(pcStr, "Connecting") == 0)pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+//                else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
+//                    pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
+//                ImGui::TextColored(pcCol, "%s", pcStr);
+//                
+//                ImGui::TableSetColumnIndex(2);
+//                ImGui::TextUnformatted(peerId.c_str());
+//
+//                ImGui::TableSetColumnIndex(3);
+//                // very basic state (extend with your own getters)
+//                bool dcOpen = link->isDataChannelOpen(); // add this trivial helper in PeerLink if needed
+//                ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
+//
+//                ImGui::TableSetColumnIndex(4);
+//                if (ImGui::SmallButton((std::string("Disconnect##") + peerId).c_str())) {
+//                    link->close(); // implement close() to tear down pc/dc and unregister in NM if desired
+//                }
+//            }
+//            ImGui::EndTable();
+//        }
+//
+//        // ---------- CLIENTS (WS) ----------
+//        ImGui::Separator();
+//        ImGui::Text("Clients (WebSocket)");
+//        if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+//            ImGui::TableSetupColumn("ClientId");
+//            ImGui::TableSetupColumn("Username");
+//            ImGui::TableSetupColumn("Actions");
+//            ImGui::TableHeadersRow();
+//
+//            // requires server accessor (see "New accessors" below)
+//            if (auto srv = network_manager->getSignalingServer()) {
+//                for (auto& [cid, ws] : srv->authClients()) {
+//                    ImGui::TableNextRow();
+//
+//                    ImGui::TableSetColumnIndex(0);
+//                    ImGui::TextUnformatted(cid.c_str());
+//
+//                    ImGui::TableSetColumnIndex(1);
+//                    ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
+//
+//                    ImGui::TableSetColumnIndex(2);
+//                    if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
+//                        srv->disconnectClient(cid);
+//                    }
+//                }
+//            }
+//            else {
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0);
+//                ImGui::TextDisabled("No signaling server");
+//            }
+//            ImGui::EndTable();
+//        }
+//
+//        ImGui::Separator();
+//
+//        if (ImGui::Button("Restart Network")) {
+//            // simple restart with same config
+//            const auto ip = network_manager->getLocalTunnelURL();
+//            const auto port = network_manager->getPort();
+//            network_manager->closeServer();
+//            network_manager->startServer(ip, port);
+//        }
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Close Network")) {
+//            network_manager->closeServer();
+//        }
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Close")) {
+//            ImGui::CloseCurrentPopup();
+//        }
+//
+//        ImGui::EndPopup();
+//    }
+//}
+
+
+void GameTableManager::renderNetworkCenterGM() {
+    // ---------- INFO ----------
+    const auto local_ip = network_manager->getLocalIPAddress();
+    const auto external_ip = network_manager->getExternalIPAddress();
+    const auto port = network_manager->getPort();
+    const auto cs_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
+    const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
+    const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
+
+    ImGui::TextUnformatted("Local IP:");     ImGui::SameLine(); ImGui::TextUnformatted(local_ip.c_str());
+    ImGui::TextUnformatted("External IP:");  ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
+    ImGui::TextUnformatted("Port:");         ImGui::SameLine(); ImGui::Text("%u", port);
+
+    ImGui::Separator();
+
+    auto copyRow = [this](const char* label, const std::string& value,
+        const char* btnId, const char* toastId) {
             ImGui::TextUnformatted(label);
             ImGui::SameLine();
             ImGui::TextUnformatted(value.c_str());
             ImGui::SameLine();
             UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
-            //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
-            };
+        };
 
-        copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
-        copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
-        copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+    copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
+    copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+    copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
 
+    // ---------- PLAYERS (P2P) ----------
+    ImGui::Separator();
+    ImGui::Text("Players (P2P)");
+    if (ImGui::BeginTable("PeersTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+        ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
+        ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+        ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 120.f);
+        ImGui::TableHeadersRow();
 
-       /* if (ImGui::BeginTable("CopyRows", 3, ImGuiTableFlags_None)) {
-            auto row = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+        for (auto& [peerId, link] : network_manager->getPeers()) {
+            if (!link) continue;
+
+            ImGui::TableNextRow();
+
+            // Username
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+
+            // Peer ID
+            ImGui::TableSetColumnIndex(1);
+            ImGui::TextUnformatted(peerId.c_str());
+
+            // PC State (with color)
+            ImGui::TableSetColumnIndex(2);
+            const char* pcStr = link->pcStateString();
+            ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
+            if (strcmp(pcStr, "Connected") == 0) pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+            else if (strcmp(pcStr, "Connecting") == 0) pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+            else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
+                pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
+            ImGui::TextColored(pcCol, "%s", pcStr);
+
+            // DC state
+            ImGui::TableSetColumnIndex(3);
+            const bool dcOpen = link->isDataChannelOpen();
+            ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
+
+            // Actions
+            ImGui::TableSetColumnIndex(4);
+            ImGui::PushID(peerId.c_str());
+            if (ImGui::SmallButton("Disconnect")) {
+                link->close(); // your existing teardown (pc/dc + optional unregister)
+            }
+            ImGui::SameLine();
+            if (ImGui::SmallButton("Refresh")) {
+                // Optional renegotiation (your logic)
+                network_manager->removePeer(peerId);
+                auto l2 = network_manager->ensurePeerLink(peerId);
+                l2->createPeerConnection();
+                l2->createDataChannel("game");
+                l2->createOffer();
+            }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+
+    // ---------- CLIENTS (WS) ----------
+    ImGui::Separator();
+    ImGui::Text("Clients (WebSocket)");
+    if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+        ImGui::TableSetupColumn("ClientId");
+        ImGui::TableSetupColumn("Username");
+        ImGui::TableSetupColumn("Actions");
+        ImGui::TableHeadersRow();
+
+        if (auto srv = network_manager->getSignalingServer()) {
+            for (auto& [cid, ws] : srv->authClients()) {
                 ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(label);
-                ImGui::TableSetColumnIndex(1); ImGui::TextWrapped("%s", value.c_str());
-                ImGui::TableSetColumnIndex(2); UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
-                };
-            row("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
-            row("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
-            row("External Connection String:", cs_external, "Copy##ext", "toast-ext");
-            ImGui::EndTable();
-        }*/
 
-
-        // ---------- PLAYERS (P2P) ----------
-        ImGui::Separator();
-        ImGui::Text("Players (P2P)");
-        if (ImGui::BeginTable("PeersTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-            ImGui::TableSetupColumn("Name");
-            ImGui::TableSetupColumn("PeerId");
-            ImGui::TableSetupColumn("DataChannel");
-            ImGui::TableSetupColumn("Actions");
-            ImGui::TableHeadersRow();
-
-            // requires accessor (see "New accessors" below)
-            for (auto& [peerId, link] : network_manager->getPeers()) {
-                if (!link) continue;
-
-                ImGui::TableNextRow();
                 ImGui::TableSetColumnIndex(0);
-                ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+                ImGui::TextUnformatted(cid.c_str());
 
                 ImGui::TableSetColumnIndex(1);
-                ImGui::TextUnformatted(peerId.c_str());
+                ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
 
                 ImGui::TableSetColumnIndex(2);
-                // very basic state (extend with your own getters)
-                bool dcOpen = link->isDataChannelOpen(); // add this trivial helper in PeerLink if needed
-                ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
-
-                ImGui::TableSetColumnIndex(3);
-                if (ImGui::SmallButton((std::string("Disconnect##") + peerId).c_str())) {
-                    link->close(); // implement close() to tear down pc/dc and unregister in NM if desired
+                if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
+                    srv->disconnectClient(cid);
                 }
             }
-            ImGui::EndTable();
         }
-
-        // ---------- CLIENTS (WS) ----------
-        ImGui::Separator();
-        ImGui::Text("Clients (WebSocket)");
-        if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-            ImGui::TableSetupColumn("ClientId");
-            ImGui::TableSetupColumn("Username");
-            ImGui::TableSetupColumn("Actions");
-            ImGui::TableHeadersRow();
-
-            // requires server accessor (see "New accessors" below)
-            if (auto srv = network_manager->getSignalingServer()) {
-                for (auto& [cid, ws] : srv->authClients()) {
-                    ImGui::TableNextRow();
-
-                    ImGui::TableSetColumnIndex(0);
-                    ImGui::TextUnformatted(cid.c_str());
-
-                    ImGui::TableSetColumnIndex(1);
-                    ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
-
-                    ImGui::TableSetColumnIndex(2);
-                    if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
-                        srv->disconnectClient(cid);
-                    }
-                }
-            }
-            else {
-                ImGui::TableNextRow();
-                ImGui::TableSetColumnIndex(0);
-                ImGui::TextDisabled("No signaling server");
-            }
-            ImGui::EndTable();
+        else {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextDisabled("No signaling server");
         }
+        ImGui::EndTable();
+    }
 
-        ImGui::Separator();
-
-        if (ImGui::Button("Restart Network")) {
-            // simple restart with same config
-            const auto ip = network_manager->getLocalTunnelURL();
-            const auto port = network_manager->getPort();
-            network_manager->closeServer();
-            network_manager->startServer(ip, port);
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Close Network")) {
-            network_manager->closeServer();
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Close")) {
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
+    // ---------- Controls ----------
+    ImGui::Separator();
+    if (ImGui::Button("Close Network")) {
+        network_manager->closeServer();
     }
 }
+
+void GameTableManager::renderNetworkCenterPlayer() {
+    // Username
+    ImGui::Text("Username: %s", network_manager->getMyUsername().c_str());
+    ImGui::NewLine();
+
+    // Peers (read-only)
+    if (ImGui::BeginTable("PeersPlayer", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+        ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
+        ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+        ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
+        ImGui::TableHeadersRow();
+
+        for (auto& [peerId, link] : network_manager->getPeers()) {
+            if (!link) continue;
+
+            ImGui::TableNextRow();
+
+            // Username
+            ImGui::TableSetColumnIndex(0);
+            ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+
+            // Peer ID
+            ImGui::TableSetColumnIndex(1);
+            ImGui::TextUnformatted(peerId.c_str());
+
+            // PC state
+            ImGui::TableSetColumnIndex(2);
+            const char* pcStr = link->pcStateString();
+            ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
+            if (strcmp(pcStr, "Connected") == 0) pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+            else if (strcmp(pcStr, "Connecting") == 0) pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+            else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
+                pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
+            ImGui::TextColored(pcCol, "%s", pcStr);
+
+            // DC state
+            ImGui::TableSetColumnIndex(3);
+            ImGui::TextUnformatted(link->isDataChannelOpen() ? "Open" : "Closed");
+        }
+
+        ImGui::EndTable();
+    }
+}
+
 
 // ======================= Host GameTable (Create / Load + Network) =======================
 void GameTableManager::hostGameTablePopUp() {

@@ -183,26 +183,14 @@ void SignalingClient::onMessage(const std::string& msg) {
         return;
     }
 
-    ////NOT USED
-    //if (type == msg::signaling::Presence) {
-    //    if (j.value(msg::key::Event, "") == msg::signaling::Join) {
-    //        std::string peerId = j.value(msg::key::ClientId, "");
-    //        if (!peerId.empty()) {
-    //            auto link = nm->ensurePeerLink(peerId);
-    //            link->createPeerConnection();
-    //            link->createDataChannel(msg::dc::name::Game);
-    //            link->createOffer(); // NM callback will send
-    //        }
-    //    }
-    //    return;
-    //}
-
     if (type == msg::signaling::Offer) {
         const std::string from = j.value(msg::key::From, "");
         const std::string sdp = j.value(msg::key::Sdp, "");
+        const std::string username = j.value(msg::key::Username, "guest_"+from);
         if (from.empty() || sdp.empty()) return;
 
         auto link = nm->ensurePeerLink(from);
+        nm->upsertPeerIdentity(from, username);
         link->createPeerConnection(); // safe if already exists
         // Apply remote offer
         link->setRemoteAnswer(rtc::Description(sdp, std::string(msg::signaling::Offer)));
@@ -231,4 +219,20 @@ void SignalingClient::onMessage(const std::string& msg) {
         link->addIceCandidate(rtc::Candidate(cand, mid));
         return;
     }
+
+
+    ////NOT USED
+    //if (type == msg::signaling::Presence) {
+    //    if (j.value(msg::key::Event, "") == msg::signaling::Join) {
+    //        std::string peerId = j.value(msg::key::ClientId, "");
+    //        if (!peerId.empty()) {
+    //            auto link = nm->ensurePeerLink(peerId);
+    //            link->createPeerConnection();
+    //            link->createDataChannel(msg::dc::name::Game);
+    //            link->createOffer(); // NM callback will send
+    //        }
+    //    }
+    //    return;
+    //}
+
 }

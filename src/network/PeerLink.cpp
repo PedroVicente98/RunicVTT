@@ -88,7 +88,9 @@ void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
 
 void PeerLink::setupCallbacks() {
     pc->onStateChange([this](rtc::PeerConnection::State state) {
-        std::cout << "[PeerLink] State(" << peerId << "): " << (int)state << "\n";
+        lastState_ = state;
+        lastStateAt_ = std::chrono::seconds().count();
+        std::cout << "[PeerLink] State(" << peerId << "): " << (int)state << "at " << lastStateAt_ << "\n";
     });
 
     pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc) {
@@ -133,6 +135,22 @@ bool PeerLink::isClosedOrFailed() const {
     return s == rtc::PeerConnection::State::Closed ||
         s == rtc::PeerConnection::State::Failed;
 }
+
+const char* PeerLink::pcStateString() const {
+    auto s = pcState();
+    using S = rtc::PeerConnection::State;
+    switch (s) {
+    case S::New:         return "New";
+    case S::Connecting:  return "Connecting";
+    case S::Connected:   return "Connected";
+    case S::Disconnected:return "Disconnected";
+    case S::Failed:      return "Failed";
+    case S::Closed:      return "Closed";
+    }
+    return "Unknown";
+}
+
+
 
 /////
 //

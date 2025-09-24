@@ -26,7 +26,10 @@ public:
   
     bool isDataChannelOpen() const;
     rtc::PeerConnection::State pcState() const; // optional
+    const char* pcStateString() const;
     bool isClosedOrFailed() const;
+
+    const char* pcStateToStr(rtc::PeerConnection::State s);
 
 private:
     std::string peerId;
@@ -34,6 +37,9 @@ private:
     std::shared_ptr<rtc::PeerConnection> pc;
     std::shared_ptr<rtc::DataChannel> dc;
     std::weak_ptr<NetworkManager> network_manager;
+
+    std::atomic<rtc::PeerConnection::State> lastState_{ rtc::PeerConnection::State::New };
+    std::atomic<double> lastStateAt_{ 0.0 }; // seconds since app start
 
     void setupCallbacks();   // internal
 };

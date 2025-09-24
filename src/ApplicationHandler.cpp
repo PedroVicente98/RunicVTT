@@ -592,11 +592,12 @@ void ApplicationHandler::renderMainMenuBar() {
         }
         ImGui::EndMenu();
     }
-
+    bool showNetwork = (game_table_manager.network_manager && game_table_manager.network_manager->getPeerRole() != Role::NONE);
     // ---------------- Network ----------------
-    if (game_table_manager.isGameTableActive()) {
+    //if (game_table_manager.isGameTableActive()) {
+    if (showNetwork) {
         if (ImGui::BeginMenu("Network")) {
-            if (ImGui::MenuItem("Network Center...")) {     // NEW: replaces Connection Info + Open/Close network
+            if (ImGui::MenuItem("Network Center")) {     // NEW: replaces Connection Info + Open/Close network
                 open_network_center = true;
             }
             ImGui::EndMenu();

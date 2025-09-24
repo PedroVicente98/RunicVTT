@@ -34,6 +34,8 @@ public:
 
 	void hostGameTablePopUp();
 	void networkCenterPopUp();
+	void renderNetworkCenterPlayer();
+	void renderNetworkCenterGM();
 
 	void connectToGameTablePopUp();
 	void closeGameTablePopUp();

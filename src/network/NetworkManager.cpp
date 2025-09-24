@@ -368,7 +368,7 @@ void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc
 	nlohmann::json j;
 	const std::string sdp = std::string(desc);
 	if (desc.type() == rtc::Description::Type::Offer) {
-		j = msg::makeOffer("", peerId, sdp);
+		j = msg::makeOffer("", peerId, sdp, myUsername_);
 		
 	}
 	else if (desc.type() == rtc::Description::Type::Answer) {
