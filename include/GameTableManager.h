@@ -195,4 +195,23 @@ public:
 			ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 		return true;
 	}
+
+	// Reusable confirm modal
+	inline bool UI_ConfirmModal(const char* popupId, const char* title, const char* text) {
+	    bool confirmed = false;
+	    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+	    if (ImGui::BeginPopupModal(popupId, nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+	        ImGui::TextUnformatted(title);
+	        ImGui::Separator();
+	        ImGui::TextWrapped("%s", text);
+	        ImGui::Separator();
+	        if (ImGui::Button("Yes")) { confirmed = true; ImGui::CloseCurrentPopup(); }
+	        ImGui::SameLine();
+	        if (ImGui::Button("No")) { ImGui::CloseCurrentPopup(); }
+	        ImGui::EndPopup();
+	    }
+	    return confirmed;
+	}
+
 };
