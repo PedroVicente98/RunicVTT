@@ -494,8 +494,17 @@ void NetworkManager::broadcastPeerDisconnect(const std::string& targetId) {
     signalingClient->send(j.dump());
 }
 
+void NetworkManager::pushStatusToast(const std::string& msg, NetworkToast::Level lvl, double durationSec) {
+    const double now = ImGui::GetTime();
+    toasts_.push_back(NetworkToast{ msg, now + durationSec, lvl });
+    if (toasts_.size() > 8) toasts_.pop_front(); // keep a small backlog
+}
 
-
+void NetworkManager::pruneToasts(double now) {
+    while (!toasts_.empty() && toasts_.front().expiresAt <= now) {
+        toasts_.pop_front();
+    }
+}
 
 
 
