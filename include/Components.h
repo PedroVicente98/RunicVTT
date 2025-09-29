@@ -88,22 +88,7 @@ struct ActiveBoard
 };
 
 
-// Network Component
-struct Network {
-    std::string external_ip;
-    std::string internal_ip;
-    unsigned short port;
-    std::string password;
-    std::vector<std::shared_ptr<std::string>> active_peers;
-    bool is_gamemaster;
-};
 
-struct PeerInfo {
-    std::string id;
-    std::string username;
-    bool isAuthenticated = false;
-    bool isGameMaster = false;
-};
 
 // Notes Component
 struct Notes {
@@ -129,3 +114,19 @@ struct NoteComponent {
 
 
 
+// Network Component
+//struct Network {
+//    std::string external_ip;
+//    std::string internal_ip;
+//    unsigned short port;
+//    std::string password;
+//    std::vector<std::shared_ptr<std::string>> active_peers;
+//    bool is_gamemaster;
+//};
+//
+//struct PeerInfo {
+//    std::string id;
+//    std::string username;
+//    bool isAuthenticated = false;
+//    bool isGameMaster = false;
+//};

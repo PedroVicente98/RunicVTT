@@ -84,9 +84,10 @@ bool GameTableManager::isGameTableActive()
 //    return network_manager.isConnectionOpen();
 //}
 //
-//bool GameTableManager::isConnected() const {
-//    return network_manager.isConnected();
-//}
+bool GameTableManager::isConnected() const {
+    return network_manager->isConnected();
+}
+
 //
 //void GameTableManager::openConnection(unsigned short port) {
 //    network_manager.startServer(port);
@@ -462,51 +463,7 @@ void GameTableManager::closeGameTablePopUp()
         ImGui::EndPopup();
     }
 }
-//
-//void GameTableManager::connectToGameTablePopUp()
-//{
-//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-//    if (ImGui::BeginPopupModal("ConnectToGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
-//    {
-//        ImGui::SetItemDefaultFocus();
-//
-//        ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
-//        ImGui::Separator();
-//
-//        ImGui::InputText("Connection String", buffer, sizeof(buffer));
-//        ImGui::Separator();
-//
-//        bool connectFailed = false;
-//
-//        if (ImGui::Button("Connect") && buffer[0] != '\0')
-//        {
-//            network_manager->setMyIdentity("", username_buffer); // you have this API
-//            if (network_manager->connectToPeer(buffer))
-//            {
-//                memset(buffer, 0, sizeof(buffer));
-//                memset(username_buffer, 0, sizeof(username_buffer));
-//                ImGui::CloseCurrentPopup();
-//            }
-//            else
-//            {
-//                connectFailed = true;
-//            }
-//        }
-//
-//        ImGui::SameLine();
-//
-//        if (ImGui::Button("Close"))
-//        {
-//            ImGui::CloseCurrentPopup();
-//            memset(buffer, 0, sizeof(buffer));
-//        }
-//
-//        UI_TransientLine("conn-fail", connectFailed, ImVec4(1.f, 0.f, 0.f, 1.f), "Failed to Connect!", 2.5f);
-//
-//        ImGui::EndPopup();
-//    }
-//}
+
 void GameTableManager::connectToGameTablePopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -620,184 +577,6 @@ void GameTableManager::networkCenterPopUp() {
     }
 }
 
-// ======================= Network Center (Info + Peers + Clients) =======================
-//void GameTableManager::networkCenterPopUp() {
-//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-//
-//    if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
-//
-//        // ---------- STATUS ----------
-//        Role role = network_manager->getPeerRole();
-//        const char* roleStr =
-//            role == Role::GAMEMASTER ? "Hosting (GM)" :
-//            role == Role::PLAYER ? "Connected (Player)" :
-//            "Idle";
-//        ImVec4 roleClr =
-//            role == Role::GAMEMASTER ? ImVec4(0.2f, 0.9f, 0.2f, 1) :
-//            role == Role::PLAYER ? ImVec4(0.2f, 0.6f, 1.0f, 1) :
-//            ImVec4(1.0f, 0.6f, 0.2f, 1);
-//        ImGui::Text("Status: ");
-//        ImGui::SameLine();
-//        ImGui::TextColored(roleClr, "%s", roleStr);
-//
-//        ImGui::Separator();
-//
-//        // ---------- INFO ----------
-//        const auto local_ip = network_manager->getLocalIPAddress();
-//        const auto external_ip = network_manager->getExternalIPAddress();
-//        const auto port = network_manager->getPort();
-//        const auto lt_url = network_manager->getLocalTunnelURL();
-//
-//        const auto cs_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
-//        const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
-//        const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
-//
-//        // quick inline labels (use your UI_LabelValue helpers if you have them)
-//        ImGui::TextUnformatted("Local IP:");    
-//        ImGui::SameLine(); 
-//        ImGui::TextUnformatted(local_ip.c_str());
-//        ImGui::TextUnformatted("External IP:"); 
-//        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
-//        ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
-//
-//        ImGui::Separator();
-//
-//        auto copyRow = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
-//            ImGui::TextUnformatted(label);
-//            ImGui::SameLine();
-//            ImGui::TextUnformatted(value.c_str());
-//            ImGui::SameLine();
-//            UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
-//            //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
-//            };
-//
-//        copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
-//        copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
-//        copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
-//
-//
-//       /* if (ImGui::BeginTable("CopyRows", 3, ImGuiTableFlags_None)) {
-//            auto row = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
-//                ImGui::TableNextRow();
-//                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(label);
-//                ImGui::TableSetColumnIndex(1); ImGui::TextWrapped("%s", value.c_str());
-//                ImGui::TableSetColumnIndex(2); UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
-//                };
-//            row("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
-//            row("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
-//            row("External Connection String:", cs_external, "Copy##ext", "toast-ext");
-//            ImGui::EndTable();
-//        }*/
-//
-//
-//        // ---------- PLAYERS (P2P) ----------
-//        ImGui::Separator();
-//        ImGui::Text("Players (P2P)");
-//        if (ImGui::BeginTable("PeersTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-//            /*ImGui::TableSetupColumn("Name");
-//            ImGui::TableSetupColumn("PeerId");
-//            ImGui::TableSetupColumn("DataChannel");
-//            ImGui::TableSetupColumn("DataChannel");
-//            ImGui::TableSetupColumn("Actions");*/
-//            ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
-//            ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
-//            ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
-//            ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
-//            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 120.f);
-//            ImGui::TableHeadersRow();
-//
-//            // requires accessor (see "New accessors" below)
-//            for (auto& [peerId, link] : network_manager->getPeers()) {
-//                if (!link) continue;
-//
-//                ImGui::TableNextRow();
-//                ImGui::TableSetColumnIndex(0);
-//                ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
-//
-//                ImGui::TableSetColumnIndex(1);
-//                const char* pcStr = link ? link->pcStateString() : "Closed";
-//                ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
-//                if (strcmp(pcStr, "Connected") == 0)      pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
-//                else if (strcmp(pcStr, "Connecting") == 0)pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
-//                else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
-//                    pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
-//                ImGui::TextColored(pcCol, "%s", pcStr);
-//                
-//                ImGui::TableSetColumnIndex(2);
-//                ImGui::TextUnformatted(peerId.c_str());
-//
-//                ImGui::TableSetColumnIndex(3);
-//                // very basic state (extend with your own getters)
-//                bool dcOpen = link->isDataChannelOpen(); // add this trivial helper in PeerLink if needed
-//                ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
-//
-//                ImGui::TableSetColumnIndex(4);
-//                if (ImGui::SmallButton((std::string("Disconnect##") + peerId).c_str())) {
-//                    link->close(); // implement close() to tear down pc/dc and unregister in NM if desired
-//                }
-//            }
-//            ImGui::EndTable();
-//        }
-//
-//        // ---------- CLIENTS (WS) ----------
-//        ImGui::Separator();
-//        ImGui::Text("Clients (WebSocket)");
-//        if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
-//            ImGui::TableSetupColumn("ClientId");
-//            ImGui::TableSetupColumn("Username");
-//            ImGui::TableSetupColumn("Actions");
-//            ImGui::TableHeadersRow();
-//
-//            // requires server accessor (see "New accessors" below)
-//            if (auto srv = network_manager->getSignalingServer()) {
-//                for (auto& [cid, ws] : srv->authClients()) {
-//                    ImGui::TableNextRow();
-//
-//                    ImGui::TableSetColumnIndex(0);
-//                    ImGui::TextUnformatted(cid.c_str());
-//
-//                    ImGui::TableSetColumnIndex(1);
-//                    ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
-//
-//                    ImGui::TableSetColumnIndex(2);
-//                    if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
-//                        srv->disconnectClient(cid);
-//                    }
-//                }
-//            }
-//            else {
-//                ImGui::TableNextRow();
-//                ImGui::TableSetColumnIndex(0);
-//                ImGui::TextDisabled("No signaling server");
-//            }
-//            ImGui::EndTable();
-//        }
-//
-//        ImGui::Separator();
-//
-//        if (ImGui::Button("Restart Network")) {
-//            // simple restart with same config
-//            const auto ip = network_manager->getLocalTunnelURL();
-//            const auto port = network_manager->getPort();
-//            network_manager->closeServer();
-//            network_manager->startServer(ip, port);
-//        }
-//
-//        ImGui::SameLine();
-//        if (ImGui::Button("Close Network")) {
-//            network_manager->closeServer();
-//        }
-//
-//        ImGui::SameLine();
-//        if (ImGui::Button("Close")) {
-//            ImGui::CloseCurrentPopup();
-//        }
-//
-//        ImGui::EndPopup();
-//    }
-//}
-
 
 void GameTableManager::renderNetworkCenterGM() {
     // ---------- INFO ----------
@@ -896,7 +675,7 @@ void GameTableManager::renderNetworkCenterGM() {
 			        srv->disconnectClient(peerId); // add this helper to server if not present
 			    }
 			    // 3) Locally close our peer link
-			    network_manager->removePeerLink(peerId);
+			    network_manager->removePeer(peerId);
 			}
 			ImGui::PopID();
         }
@@ -942,9 +721,6 @@ void GameTableManager::renderNetworkCenterGM() {
 	    ImGui::OpenPopup("ConfirmGMDisconnectAll");
 	}
 	ImGui::SameLine();
-	if (ImGui::Button("Close Network Center")) {
-	    ImGui::CloseCurrentPopup();
-	}
 	if (UI_ConfirmModal("ConfirmGMDisconnectAll", "Disconnect ALL clients?",
 	                    "This will broadcast a shutdown and disconnect all clients, "
 	                    "close all peer links, and stop the signaling server.")) {
@@ -953,7 +729,15 @@ void GameTableManager::renderNetworkCenterGM() {
 	}
     
     if (ImGui::Button("Close Network")) {
+        ImGui::OpenPopup("ConfirmCloseNetwork");
+        
+    }
+
+    if (UI_ConfirmModal("ConfirmCloseNetwork", "Close Network?",
+        "This close will close the server"
+        "and stop the signaling server.")) {
         network_manager->closeServer();
+        ImGui::CloseCurrentPopup();
     }
 }
 
@@ -1169,7 +953,7 @@ void GameTableManager::hostGameTablePopUp() {
 
                     // close current + load
                     board_manager.closeBoard();
-                    active_game_table = flecs::entity();
+                    active_game_table = flecs::entity(); //Clean before load from file
                     network_manager->closeServer();
 
                     std::filesystem::path game_table_file_path =
@@ -1210,7 +994,6 @@ void GameTableManager::hostGameTablePopUp() {
 }
 
 // INFORMATIONAL POPUPS
-
 // ======================= Guide (Mini Wiki) =======================
 void GameTableManager::guidePopUp() {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -1343,6 +1126,297 @@ void GameTableManager::aboutPopUp() {
         ImGui::EndPopup();
     }
 }
+
+
+
+//RENDER ========================================================================================================================================================= 
+
+// Call this each frame (after BeginFrame, before EndFrame)
+void GameTableManager::renderNetworkToasts(std::shared_ptr<NetworkManager> nm) {
+    const double now = ImGui::GetTime();
+    nm->pruneToasts(now);
+    const auto& toasts = nm->toasts();
+    if (toasts.empty()) return;
+
+    const float PAD = 10.f;
+    ImGuiViewport* vp = ImGui::GetMainViewport();
+    ImVec2 pos = ImVec2(vp->WorkPos.x + vp->WorkSize.x - PAD, vp->WorkPos.y + PAD); // top-right
+
+    // Stack to draw newest last (top-down)
+    int idx = 0;
+    for (const auto& t : toasts) {
+        ImGui::SetNextWindowBgAlpha(0.9f);
+        ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(1, 0)); // anchor top-right
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+                                 ImGuiWindowFlags_AlwaysAutoResize |
+                                 ImGuiWindowFlags_NoSavedSettings |
+                                 ImGuiWindowFlags_NoFocusOnAppearing |
+                                 ImGuiWindowFlags_NoNav |
+                                 ImGuiWindowFlags_NoInputs; // let clicks pass through
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.f);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 8));
+
+        ImGui::Begin((std::string("##toast-") + std::to_string(idx++)).c_str(), nullptr, flags);
+
+        ImVec4 col;
+        switch (t.level) {
+            case NetworkToast::Level::Good:    col = ImVec4(0.2f, 1.f, 0.2f, 1); break; // green
+            case NetworkToast::Level::Error:   col = ImVec4(1.f, 0.2f, 0.2f, 1); break; // red
+            case NetworkToast::Level::Warning: col = ImVec4(1.f, 0.9f, 0.2f, 1); break; // yellow
+            default:                           col = ImVec4(0.6f, 0.8f, 1.f, 1); break; // blue/info
+        }
+        ImGui::TextColored(col, "%s", t.message.c_str());
+        ImGui::End();
+
+        ImGui::PopStyleVar(2);
+        // Move down for next toast
+        pos.y += 36.f; // spacing between toasts
+    }
+}
+
+void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
+{
+    chat.renderChat();
+    renderNetworkToasts(network_manager);
+    if (board_manager.isBoardActive()) {
+        if (board_manager.isEditWindowOpen()) {
+            board_manager.renderEditWindow();
+        }
+        else {
+            board_manager.setShowEditWindow(false);
+        }
+
+        //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
+        board_manager.marker_directory->renderDirectory();
+        //}
+        board_manager.renderBoard(va, ib, shader, grid_shader, renderer);
+    }
+}
+
+
+//
+//void GameTableManager::connectToGameTablePopUp()
+//{
+//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+//    if (ImGui::BeginPopupModal("ConnectToGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
+//    {
+//        ImGui::SetItemDefaultFocus();
+//
+//        ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
+//        ImGui::Separator();
+//
+//        ImGui::InputText("Connection String", buffer, sizeof(buffer));
+//        ImGui::Separator();
+//
+//        bool connectFailed = false;
+//
+//        if (ImGui::Button("Connect") && buffer[0] != '\0')
+//        {
+//            network_manager->setMyIdentity("", username_buffer); // you have this API
+//            if (network_manager->connectToPeer(buffer))
+//            {
+//                memset(buffer, 0, sizeof(buffer));
+//                memset(username_buffer, 0, sizeof(username_buffer));
+//                ImGui::CloseCurrentPopup();
+//            }
+//            else
+//            {
+//                connectFailed = true;
+//            }
+//        }
+//
+//        ImGui::SameLine();
+//
+//        if (ImGui::Button("Close"))
+//        {
+//            ImGui::CloseCurrentPopup();
+//            memset(buffer, 0, sizeof(buffer));
+//        }
+//
+//        UI_TransientLine("conn-fail", connectFailed, ImVec4(1.f, 0.f, 0.f, 1.f), "Failed to Connect!", 2.5f);
+//
+//        ImGui::EndPopup();
+//    }
+//}
+
+// ======================= Network Center (Info + Peers + Clients) =======================
+//void GameTableManager::networkCenterPopUp() {
+//    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+//    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+//
+//    if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+//
+//        // ---------- STATUS ----------
+//        Role role = network_manager->getPeerRole();
+//        const char* roleStr =
+//            role == Role::GAMEMASTER ? "Hosting (GM)" :
+//            role == Role::PLAYER ? "Connected (Player)" :
+//            "Idle";
+//        ImVec4 roleClr =
+//            role == Role::GAMEMASTER ? ImVec4(0.2f, 0.9f, 0.2f, 1) :
+//            role == Role::PLAYER ? ImVec4(0.2f, 0.6f, 1.0f, 1) :
+//            ImVec4(1.0f, 0.6f, 0.2f, 1);
+//        ImGui::Text("Status: ");
+//        ImGui::SameLine();
+//        ImGui::TextColored(roleClr, "%s", roleStr);
+//
+//        ImGui::Separator();
+//
+//        // ---------- INFO ----------
+//        const auto local_ip = network_manager->getLocalIPAddress();
+//        const auto external_ip = network_manager->getExternalIPAddress();
+//        const auto port = network_manager->getPort();
+//        const auto lt_url = network_manager->getLocalTunnelURL();
+//
+//        const auto cs_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
+//        const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
+//        const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
+//
+//        // quick inline labels (use your UI_LabelValue helpers if you have them)
+//        ImGui::TextUnformatted("Local IP:");    
+//        ImGui::SameLine(); 
+//        ImGui::TextUnformatted(local_ip.c_str());
+//        ImGui::TextUnformatted("External IP:"); 
+//        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
+//        ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
+//
+//        ImGui::Separator();
+//
+//        auto copyRow = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+//            ImGui::TextUnformatted(label);
+//            ImGui::SameLine();
+//            ImGui::TextUnformatted(value.c_str());
+//            ImGui::SameLine();
+//            UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+//            //if (ImGui::SmallButton(btnId)) ImGui::SetClipboardText(value.c_str());
+//            };
+//
+//        copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
+//        copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+//        copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+//
+//
+//       /* if (ImGui::BeginTable("CopyRows", 3, ImGuiTableFlags_None)) {
+//            auto row = [this](const char* label, const std::string& value, const char* btnId, const char* toastId) {
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0); ImGui::TextUnformatted(label);
+//                ImGui::TableSetColumnIndex(1); ImGui::TextWrapped("%s", value.c_str());
+//                ImGui::TableSetColumnIndex(2); UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+//                };
+//            row("LocalTunnel URL:", lt_url, "Copy##lt", "toast-lt");
+//            row("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
+//            row("External Connection String:", cs_external, "Copy##ext", "toast-ext");
+//            ImGui::EndTable();
+//        }*/
+//
+//
+//        // ---------- PLAYERS (P2P) ----------
+//        ImGui::Separator();
+//        ImGui::Text("Players (P2P)");
+//        if (ImGui::BeginTable("PeersTable", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+//            /*ImGui::TableSetupColumn("Name");
+//            ImGui::TableSetupColumn("PeerId");
+//            ImGui::TableSetupColumn("DataChannel");
+//            ImGui::TableSetupColumn("DataChannel");
+//            ImGui::TableSetupColumn("Actions");*/
+//            ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
+//            ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
+//            ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
+//            ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
+//            ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 120.f);
+//            ImGui::TableHeadersRow();
+//
+//            // requires accessor (see "New accessors" below)
+//            for (auto& [peerId, link] : network_manager->getPeers()) {
+//                if (!link) continue;
+//
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0);
+//                ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+//
+//                ImGui::TableSetColumnIndex(1);
+//                const char* pcStr = link ? link->pcStateString() : "Closed";
+//                ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
+//                if (strcmp(pcStr, "Connected") == 0)      pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+//                else if (strcmp(pcStr, "Connecting") == 0)pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+//                else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
+//                    pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
+//                ImGui::TextColored(pcCol, "%s", pcStr);
+//                
+//                ImGui::TableSetColumnIndex(2);
+//                ImGui::TextUnformatted(peerId.c_str());
+//
+//                ImGui::TableSetColumnIndex(3);
+//                // very basic state (extend with your own getters)
+//                bool dcOpen = link->isDataChannelOpen(); // add this trivial helper in PeerLink if needed
+//                ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
+//
+//                ImGui::TableSetColumnIndex(4);
+//                if (ImGui::SmallButton((std::string("Disconnect##") + peerId).c_str())) {
+//                    link->close(); // implement close() to tear down pc/dc and unregister in NM if desired
+//                }
+//            }
+//            ImGui::EndTable();
+//        }
+//
+//        // ---------- CLIENTS (WS) ----------
+//        ImGui::Separator();
+//        ImGui::Text("Clients (WebSocket)");
+//        if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg)) {
+//            ImGui::TableSetupColumn("ClientId");
+//            ImGui::TableSetupColumn("Username");
+//            ImGui::TableSetupColumn("Actions");
+//            ImGui::TableHeadersRow();
+//
+//            // requires server accessor (see "New accessors" below)
+//            if (auto srv = network_manager->getSignalingServer()) {
+//                for (auto& [cid, ws] : srv->authClients()) {
+//                    ImGui::TableNextRow();
+//
+//                    ImGui::TableSetColumnIndex(0);
+//                    ImGui::TextUnformatted(cid.c_str());
+//
+//                    ImGui::TableSetColumnIndex(1);
+//                    ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
+//
+//                    ImGui::TableSetColumnIndex(2);
+//                    if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
+//                        srv->disconnectClient(cid);
+//                    }
+//                }
+//            }
+//            else {
+//                ImGui::TableNextRow();
+//                ImGui::TableSetColumnIndex(0);
+//                ImGui::TextDisabled("No signaling server");
+//            }
+//            ImGui::EndTable();
+//        }
+//
+//        ImGui::Separator();
+//
+//        if (ImGui::Button("Restart Network")) {
+//            // simple restart with same config
+//            const auto ip = network_manager->getLocalTunnelURL();
+//            const auto port = network_manager->getPort();
+//            network_manager->closeServer();
+//            network_manager->startServer(ip, port);
+//        }
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Close Network")) {
+//            network_manager->closeServer();
+//        }
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Close")) {
+//            ImGui::CloseCurrentPopup();
+//        }
+//
+//        ImGui::EndPopup();
+//    }
+//}
 
 
 //void GameTableManager::hostGameTablePopUp() {
@@ -2232,69 +2306,3 @@ void GameTableManager::aboutPopUp() {
 //    }
 //}
 
-
-
-
-//RENDER ========================================================================================================================================================= 
-
-// Call this each frame (after BeginFrame, before EndFrame)
-void GameTableManager::renderNetworkToasts(NetworkManager& nm) {
-    const double now = ImGui::GetTime();
-    nm.pruneToasts(now);
-    const auto& toasts = nm.toasts();
-    if (toasts.empty()) return;
-
-    const float PAD = 10.f;
-    ImGuiViewport* vp = ImGui::GetMainViewport();
-    ImVec2 pos = ImVec2(vp->WorkPos.x + vp->WorkSize.x - PAD, vp->WorkPos.y + PAD); // top-right
-
-    // Stack to draw newest last (top-down)
-    int idx = 0;
-    for (const auto& t : toasts) {
-        ImGui::SetNextWindowBgAlpha(0.9f);
-        ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(1, 0)); // anchor top-right
-        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
-                                 ImGuiWindowFlags_AlwaysAutoResize |
-                                 ImGuiWindowFlags_NoSavedSettings |
-                                 ImGuiWindowFlags_NoFocusOnAppearing |
-                                 ImGuiWindowFlags_NoNav |
-                                 ImGuiWindowFlags_NoInputs; // let clicks pass through
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 8));
-
-        ImGui::Begin((std::string("##toast-") + std::to_string(idx++)).c_str(), nullptr, flags);
-
-        ImVec4 col;
-        switch (t.level) {
-            case NetworkToast::Level::Good:    col = ImVec4(0.2f, 1.f, 0.2f, 1); break; // green
-            case NetworkToast::Level::Error:   col = ImVec4(1.f, 0.2f, 0.2f, 1); break; // red
-            case NetworkToast::Level::Warning: col = ImVec4(1.f, 0.9f, 0.2f, 1); break; // yellow
-            default:                           col = ImVec4(0.6f, 0.8f, 1.f, 1); break; // blue/info
-        }
-        ImGui::TextColored(col, "%s", t.message.c_str());
-        ImGui::End();
-
-        ImGui::PopStyleVar(2);
-        // Move down for next toast
-        pos.y += 36.f; // spacing between toasts
-    }
-}
-
-void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
-{
-    chat.renderChat();
-	RenderNetworkToasts(network_manager);
-    if (board_manager.isBoardActive()) {
-        if (board_manager.isEditWindowOpen()) {
-            board_manager.renderEditWindow();
-        }
-        else {
-            board_manager.setShowEditWindow(false);
-        }
-
-        //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
-        board_manager.marker_directory->renderDirectory();
-        //}
-        board_manager.renderBoard(va, ib, shader, grid_shader, renderer);
-    }
-}

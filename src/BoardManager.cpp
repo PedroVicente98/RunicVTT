@@ -20,7 +20,7 @@
 #include "Serializer.h"
 
 BoardManager::BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
+    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager) {
     
     
     std::filesystem::path map_path = std::filesystem::path(map_directory->directoryPath);
@@ -109,31 +109,34 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     ImGui::PopStyleColor();
     ImGui::SameLine(); // Ensure buttons are on the same row
 
-    //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+    if (network_manager->getPeerRole() == Role::GAMEMASTER) {
         // Tool: Fog
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
-    if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
-        currentTool = Tool::FOG;
-    }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
+        if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
+            currentTool = Tool::FOG;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
 
-    // Tool: Select
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
-    if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
-        currentTool = Tool::SELECT;
+        // Tool: Select
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
+        if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
+            currentTool = Tool::SELECT;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
     }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    //}
 
     if (ImGui::Button("Reset Camera", ImVec2(90, 40))) {
         resetCamera();
     }
-    
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    if (ImGui::Button("Config Grid", ImVec2(90, 40))) {
-        showGridSettings = !showGridSettings;
+
+    if (network_manager->getPeerRole() == Role::GAMEMASTER)
+    {
+        ImGui::SameLine(); // Ensure buttons are on the same row
+        if (ImGui::Button("Config Grid", ImVec2(90, 40))) {
+            showGridSettings = !showGridSettings;
+        }
     }
 
     // Pop the toolbar's background color
@@ -766,6 +769,39 @@ void BoardManager::renderEditWindow() {
     }
     //close edit window when clicking outside it
 }
+
+BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, size_t sizeBytes) {
+    if (!bytes || sizeBytes == 0) {
+        std::cerr << "LoadTextureFromMemory: empty buffer\n";
+        return BoardImageData{};
+    }
+
+    // stb_image: ensure vertical flip matches your expectations
+    stbi_set_flip_vertically_on_load(0);
+
+    int width = 0, height = 0, nrChannels = 0;
+    unsigned char* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
+    if (!data) {
+        std::cerr << "LoadTextureFromMemory: decode failed\n";
+        return BoardImageData{};
+    }
+
+    GLuint tex = 0;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
+        0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    stbi_image_free(data);
+    return BoardImageData(tex, glm::vec2(width, height), /*path*/"");
+}
+
 
 
 

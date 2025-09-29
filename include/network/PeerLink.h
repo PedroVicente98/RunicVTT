@@ -12,6 +12,8 @@ public:
 
     void close();
 
+    void createChannels(); // creates Intent, State, Snapshot, Chat (as offerer)
+
     //void createPeerConnection();        
     void createDataChannel(const std::string& label);  
     rtc::Description createOffer();          
@@ -20,23 +22,36 @@ public:
     void addIceCandidate(const rtc::Candidate& candidate); 
 
     void send(const std::string& msg);
+    void sendOn(const std::string& label, const std::vector<std::byte>& bytes);
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 
-    void attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch);
+    void attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch, const std::string& label);
 
     bool isDataChannelOpen() const;
     rtc::PeerConnection::State pcState() const; // optional
     const char* pcStateString() const;
     bool isClosedOrFailed() const;
-
     const char* pcStateToStr(rtc::PeerConnection::State s);
+
+
+    // send helpers
+  /*  void sendIntent(const std::vector<unsigned char>& bytes);
+    void sendState(const std::vector<unsigned char>& bytes);
+    void sendSnapshot(const std::vector<unsigned char>& bytes);
+    void sendChat(const std::vector<unsigned char>& bytes);*/
+
+    // accessors
+    bool isConnected() const;       // PC connected + *at least* Intent channel open
+    bool isPcConnectedOnly() const;
 
 private:
     std::string peerId;
     std::string displayName_;
     std::shared_ptr<rtc::PeerConnection> pc;
-    std::shared_ptr<rtc::DataChannel> dc;
+    //std::shared_ptr<rtc::DataChannel> dc;
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> dcs_;
+
     std::weak_ptr<NetworkManager> network_manager;
 
     std::atomic<rtc::PeerConnection::State> lastState_{ rtc::PeerConnection::State::New };
@@ -45,6 +60,12 @@ private:
     std::atomic<bool> remoteDescSet_{ false };
     std::vector<rtc::Candidate> pendingRemoteCandidates_;
     std::mutex candMx_;
+
+    // internal handler dispatch (called from each dc->onMessage)
+    void onIntentMessage(const std::vector<unsigned char>& bytes);
+    void onStateMessage(const std::vector<unsigned char>& bytes);
+    void onSnapshotMessage(const std::vector<unsigned char>& bytes);
+    void onChatMessage(const std::vector<unsigned char>& bytes);
 
     void setupCallbacks();   // internal
 };

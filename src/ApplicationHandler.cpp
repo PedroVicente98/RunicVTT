@@ -17,11 +17,11 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<MarkerComponent>();
     ecs.component<FogOfWar>();
     ecs.component<GameTable>();
-    ecs.component<Network>();
+    //ecs.component<Network>();
     ecs.component<Notes>();
     ecs.component<Identifier>();
     ecs.component<NoteComponent>();
-    ecs.component<PeerInfo>();
+    //ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
     
 }
@@ -314,7 +314,7 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
 void ApplicationHandler::renderActiveGametable() {
 
-    if (game_table_manager.isGameTableActive() /*|| game_table_manager.isConnected()*/) {
+    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected()) {
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar;
 

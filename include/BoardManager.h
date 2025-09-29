@@ -18,6 +18,15 @@
 #include "DirectoryWindow.h"
 #include "NetworkManager.h"
 
+
+struct BoardImageData {
+    GLuint textureID = 0;
+    glm::vec2 size{};
+    std::string path; // can be empty for memory loads
+    BoardImageData() = default;
+    BoardImageData(GLuint id, glm::vec2 s, std::string p) : textureID(id), size(s), path(std::move(p)) {}
+};
+
 class Camera {
 public:
     Camera() : position(0.0f, 0.0f), zoom_level(1.0f), fbo_dimensions(0,0) {}  // Set initial zoom to 1.0f for no scaling by default
@@ -211,12 +220,14 @@ public:
     void setIsNonMapWindowHovered(bool is_non_map_window_hovered) {
         this->is_non_map_window_hovered = is_non_map_window_hovered;
     }
+
+    BoardImageData LoadTextureFromMemory(const unsigned char* bytes, size_t sizeBytes);
 private:
     bool is_non_map_window_hovered = false;
     bool showEditWindow = false;
     bool showGridSettings = false;
 	flecs::entity edit_window_entity = flecs::entity();
-	//NetworkManager* network_manager;
+    std::shared_ptr<NetworkManager> network_manager;
     //glm::vec2 mouseStartPos;
 
     glm::vec2 mouse_start_screen_pos;

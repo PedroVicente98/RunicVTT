@@ -1,5 +1,6 @@
 #include "PeerLink.h"
 #include "NetworkManager.h" 
+#include "Message.h"
 
 PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent)
     : peerId(id), network_manager(parent)
@@ -28,19 +29,37 @@ const std::string& PeerLink::displayName() const
     return displayName_; 
 }
 
-void PeerLink::send(const std::string& msg) {
-    if (dc && dc->isOpen()) {
-        dc->send(msg);
-    }
-}
+//void PeerLink::send(const std::string& msg) {
+//    if (dc && dc->isOpen()) {
+//        dc->send(msg);
+//    }
+//}
 
 
-void PeerLink::createDataChannel(const std::string& label) {
-    if (!pc) return;                       // ensure pc exists
-    if (dc && dc->isOpen()) return;        // idempotent-ish: keep existing dc
+//void PeerLink::createDataChannel(const std::string& label) {
+//    if (!pc) return;                       // ensure pc exists
+//    if (dc && dc->isOpen()) return;        // idempotent-ish: keep existing dc
+//
+//    dc = pc->createDataChannel(label);     // negotiated=false by default
+//    attachChannelHandlers(dc);
+//}
 
-    dc = pc->createDataChannel(label);     // negotiated=false by default
-    attachChannelHandlers(dc);
+void PeerLink::createChannels() {
+    if (!pc) return;
+
+    rtc::DataChannelInit init; // default reliable/ordered
+    // Offerer creates channels; answerer gets them in pc->onDataChannel
+    auto dcGame = pc->createDataChannel(std::string(msg::dc::name::Game), init);
+    dcs_[std::string(msg::dc::name::Game)] = dcGame;
+    attachChannelHandlers(dcGame, std::string(msg::dc::name::Game));
+
+    auto dcChat = pc->createDataChannel(std::string(msg::dc::name::Chat), init);
+    dcs_[std::string(msg::dc::name::Chat)] = dcChat;
+    attachChannelHandlers(dcChat, std::string(msg::dc::name::Chat));
+
+    auto dcNotes = pc->createDataChannel(std::string(msg::dc::name::Notes), init);
+    dcs_[std::string(msg::dc::name::Notes)] = dcNotes;
+    attachChannelHandlers(dcNotes, std::string(msg::dc::name::Notes));
 }
 
 
@@ -116,50 +135,100 @@ void PeerLink::setupCallbacks() {
     });
 
     pc->onDataChannel([this](std::shared_ptr<rtc::DataChannel> ch) {
-        dc = std::move(ch);
-        attachChannelHandlers(dc);
+        const std::string label = ch->label();
+        dcs_[label] = ch;
+        attachChannelHandlers(ch, label);
+        std::cout << "[PeerLink] Received DC \"" << label << "\" from " << peerId << "\n";
     });
 }
 
+void PeerLink::sendOn(const std::string& label, const std::vector<std::byte>& bytes) {
+    auto it = dcs_.find(label);
+    if (it == dcs_.end() || !it->second || !it->second->isOpen()) return;
+    it->second->send(&bytes.front(), bytes.size());
+}
 
-void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch) {
-     ch->onOpen([this]{
-        if (auto nm = network_manager.lock())
-            nm->pushStatusToast(std::string("[DC] open: ") + peerId, NetworkToast::Level::Good);
-    });
-    ch->onClosed([this]{
-        if (auto nm = network_manager.lock())
-            nm->pushStatusToast(std::string("[DC] closed: ") + peerId, NetworkToast::Level::Error);
-    });
-    ch->onMessage([this](rtc::message_variant msg) {
-        if (std::holds_alternative<std::string>(msg)) {
-            std::cout << "[PeerLink] Received: " << std::get<std::string>(msg) << "\n";
-            // TODO: route to your game message router
+void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc, const std::string& label) {
+    if (!dc) return;
+
+    dc->onOpen([id = peerId, label]() {
+        std::cout << "[PeerLink] DC open \"" << label << "\" to " << id << "\n";
+        });
+
+    dc->onClosed([id = peerId, label]() {
+        std::cout << "[PeerLink] DC closed \"" << label << "\" to " << id << "\n";
+        });
+
+    dc->onMessage([this, label](rtc::message_variant m) {
+        if (std::holds_alternative<std::string>(m)) {
+            const auto& s = std::get<std::string>(m);
+            // Route text by label if you wish; for now, just log & (optionally) notify NM later
+            if (label == msg::dc::name::Chat) {
+                // TODO: add NM hook: nm->onPeerChatText(peerId, s);
+                std::cout << "[PeerLink] CHAT(" << peerId << "): " << s << "\n";
+            }
+            else {
+                std::cout << "[PeerLink] TEXT(" << label << " from " << peerId << "): " << s << "\n";
+            }
+            return;
         }
-        // handle binary if you need:
-        // else if (std::holds_alternative<rtc::binary>(msg)) { ... }
+
+        // binary
+        const auto& bin = std::get<rtc::binary>(m);
+        std::vector<std::byte> bytes(bin.begin(), bin.end());
+
+        if (auto nm = network_manager.lock()) {
+            if (label == msg::dc::name::Game) {
+                // Your existing binary entrypoint:
+                //nm->onPeerBinaryMessage(peerId, bytes);
+            }
+            else if (label == msg::dc::name::Chat) {
+                // Optional: add nm->onPeerChatBinary(peerId, bytes) later
+                std::cout << "[PeerLink] CHAT/BIN " << bytes.size() << "B from " << peerId << "\n";
+            }
+            else if (label == msg::dc::name::Notes) {
+                // Optional: nm->onPeerNotesBinary(peerId, bytes)
+                std::cout << "[PeerLink] NOTES/BIN " << bytes.size() << "B from " << peerId << "\n";
+            }
+            else {
+                // Unknown label, forward to generic handler if you add one later
+                std::cout << "[PeerLink] DC(" << label << ") BIN " << bytes.size() << "B from " << peerId << "\n";
+            }
+        }
     });
 }
 
-
+bool PeerLink::isConnected() const {
+    // “usable” = PC connected AND at least Game channel open
+    auto it = dcs_.find(std::string(msg::dc::name::Game));
+    return isPcConnectedOnly() && it != dcs_.end() && it->second && it->second->isOpen();
+}
 
 bool PeerLink::isDataChannelOpen() const {
-    return dc && dc->isOpen();
+    for (auto& [label, ch] : dcs_) {
+        if (ch && ch->isOpen()) return true;
+    }
+    return false;
+}
+
+bool PeerLink::isPcConnectedOnly() const {
+    return pc && pc->state() == rtc::PeerConnection::State::Connected;
 }
 
 void PeerLink::close() {
     // Close datachannel first
-    if (dc) {
-        try { dc->close(); }
-        catch (...) {}
+    for (auto& [label, ch] : dcs_) {
+        if (ch) {
+            try { ch->close(); }
+            catch (...) {}
+        }
     }
-    // Close peer connection
+    dcs_.clear();
+
     if (pc) {
         try { pc->close(); }
         catch (...) {}
     }
-    // Release references
-    dc.reset();
     pc.reset();
     if (auto nm = network_manager.lock()) nm->removePeer(peerId);
 }
@@ -190,167 +259,3 @@ const char* PeerLink::pcStateString() const {
     return "Unknown";
 }
 
-
-//
-//void PeerLink::close() {
-//    if (dc) dc->close();
-//    if (pc) pc->close();
-//}
-
-//void PeerLink::createPeerConnection() {
-//    if (pc) return; // already created
-//    if (auto nm = network_manager.lock()) {
-//        auto config = nm->getRTCConfig();
-//        config.iceServers.push_back({ "stun:stun.l.google.com:19302" }); 
-//        pc = std::make_shared<rtc::PeerConnection>(config);
-//        setupCallbacks(); // bind onStateChange, onLocalDescription, onLocalCandidate...
-//    }
-//    else {
-//        throw std::runtime_error("NetworkManager expired");
-//    }
-//}
-/////
-//
-//#include "PeerLink.h"
-//#include "NetworkManager.h"
-//#include <stdexcept>
-//#include <iostream>
-//
-//PeerLink::PeerLink(const std::string& id, std::shared_ptr<NetworkManager> parent)
-//    : peerId(id), network_manager(parent)
-//{
-//    if (auto nm = network_manager.lock()) {
-//        auto config = nm->getRTCConfig();
-//        pc = std::make_shared<rtc::PeerConnection>(config);
-//        setupCallbacks();
-//    } else {
-//        throw std::runtime_error("PeerLink ctor: NetworkManager expired");
-//    }
-//}
-//
-//void PeerLink::send(const std::string& msg) {
-//    if (dc && dc->isOpen()) dc->send(msg);
-//}
-//
-
-//
-//void PeerLink::createPeerConnection() {
-//    // Prefer taking config from NetworkManager (keeps a single source of truth)
-//    if (auto nm = network_manager.lock()) {
-//        auto config = nm->getRTCConfig();
-//        pc = std::make_shared<rtc::PeerConnection>(config);
-//        setupCallbacks();
-//    } else {
-//        throw std::runtime_error("PeerLink::createPeerConnection: NetworkManager expired");
-//    }
-//}
-//
-//void PeerLink::createDataChannel(const std::string& label) {
-//    if (!pc) throw std::runtime_error("PeerLink::createDataChannel: PC not created");
-//    dc = pc->createDataChannel(label);
-//
-//    // optional per-channel callbacks (messages routed via NM in setupCallbacks for onDataChannel)
-//    dc->onOpen([this]() {
-//        std::cout << "[PeerLink] DataChannel open: " << dc->label() << "\n";
-//    });
-//    dc->onMessage([this](rtc::message_variant msg) {
-//        if (std::holds_alternative<std::string>(msg)) {
-//            std::cout << "[PeerLink] Received: " << std::get<std::string>(msg) << "\n";
-//        }
-//    });
-//}
-//
-//rtc::Description PeerLink::createOffer() {
-//    if (!pc) throw std::runtime_error("PeerLink::createOffer: PC not created");
-//    auto offer = pc->createOffer();
-//    rtc::LocalDescriptionInit init;
-//    init.icePwd   = offer.icePwd();
-//    init.iceUfrag = offer.iceUfrag();
-//    pc->setLocalDescription(offer.type(), init);
-//    return offer;
-//}
-//
-//rtc::Description PeerLink::createAnswer() {
-//    if (!pc) throw std::runtime_error("PeerLink::createAnswer: PC not created");
-//    auto answer = pc->createAnswer();
-//    rtc::LocalDescriptionInit init;
-//    init.icePwd   = answer.icePwd();
-//    init.iceUfrag = answer.iceUfrag();
-//    pc->setLocalDescription(answer.type(), init);
-//    return answer;
-//}
-//
-//void PeerLink::setRemoteAnswer(const rtc::Description& desc) {
-//    if (!pc) throw std::runtime_error("PeerLink::setRemoteAnswer: PC not created");
-//    pc->setRemoteDescription(desc);
-//}
-//
-//void PeerLink::addIceCandidate(const rtc::Candidate& candidate) {
-//    if (!pc) throw std::runtime_error("PeerLink::addIceCandidate: PC not created");
-//    pc->addRemoteCandidate(candidate);
-//}
-//
-//void PeerLink::setupCallbacks() {
-//    if (!pc) throw std::runtime_error("PeerLink::setupCallbacks: PC not created");
-//
-//    pc->onStateChange([wptr = network_manager, pid = peerId](rtc::PeerConnection::State state) {
-//        if (auto nm = wptr.lock()) {
-//            std::cout << "[PeerLink] PC state(" << pid << "): " << (int)state << "\n";
-//            // You can add nm->handlePeerState(pid, state) later if you want.
-//            if (state == rtc::PeerConnection::State::Failed) {
-//                // Let NetworkManager handle removal if desired
-//                // nm->removePeerLink(pid);
-//            }
-//        } else {
-//            throw std::runtime_error("PeerLink::onStateChange: NetworkManager expired");
-//        }
-//    });
-//
-//    pc->onLocalDescription([wptr = network_manager, pid = peerId](rtc::Description desc) {
-//        if (auto nm = wptr.lock()) {
-//            nm->sendSdpToPeer(pid, desc);
-//        } else {
-//            throw std::runtime_error("PeerLink::onLocalDescription: NetworkManager expired");
-//        }
-//    });
-//
-//    pc->onLocalCandidate([wptr = network_manager, pid = peerId](rtc::Candidate cand) {
-//        if (auto nm = wptr.lock()) {
-//            nm->sendIceToPeer(pid, cand);
-//        } else {
-//            throw std::runtime_error("PeerLink::onLocalCandidate: NetworkManager expired");
-//        }
-//    });
-//
-//    // Remote-created datachannels
-//    pc->onDataChannel([this](std::shared_ptr<rtc::DataChannel> remoteDc) {
-//        dc = remoteDc; // if you only keep one; otherwise map by label
-//        // If you want to inform NM about DC open/close/messages, bind here:
-//        remoteDc->onOpen([wptr = network_manager, pid = peerId, label = remoteDc->label()]() {
-//            if (auto nm = wptr.lock()) {
-//                // you can add nm->onChannelOpen(pid, label);
-//                std::cout << "[PeerLink] Remote DC open: " << label << "\n";
-//            } else {
-//                throw std::runtime_error("PeerLink::onDataChannel::onOpen: NetworkManager expired");
-//            }
-//        });
-//        remoteDc->onMessage([wptr = network_manager, pid = peerId, label = remoteDc->label()](rtc::message_variant msg) {
-//            if (auto nm = wptr.lock()) {
-//                // you can forward bytes to NM here later if desired
-//                if (auto* s = std::get_if<std::string>(&msg)) {
-//                    std::cout << "[PeerLink] DC msg (" << pid << ":" << label << "): " << *s << "\n";
-//                }
-//            } else {
-//                throw std::runtime_error("PeerLink::onDataChannel::onMessage: NetworkManager expired");
-//            }
-//        });
-//        remoteDc->onClosed([wptr = network_manager, pid = peerId, label = remoteDc->label()]() {
-//            if (auto nm = wptr.lock()) {
-//                // nm->onChannelClosed(pid, label);
-//                std::cout << "[PeerLink] Remote DC closed: " << label << "\n";
-//            } else {
-//                throw std::runtime_error("PeerLink::onDataChannel::onClosed: NetworkManager expired");
-//            }
-//        });
-//    });
-//}

@@ -94,6 +94,21 @@ namespace msg {
 
     // ---------- Optional: numeric IDs for DC binary mux ----------
     enum class DCType : uint8_t {
+        // Intents (Player -> GM)
+        Intent_MarkerCreate = 12,
+        Intent_MarkerMove = 13,
+        Intent_MarkerDelete = 14,
+
+        // State (GM -> All)
+        State_MarkerCreated = 50,
+        State_MarkerMoved = 51,
+        State_MarkerDeleted = 52,
+
+        // Snapshots (GM -> Player)
+        Snapshot_GameTable = 100,
+        Snapshot_Board = 101,
+
+        // You already have these; keep them if you still use JSON side paths
         Chat = 1,
         Image = 2,
         ToggleVisibility = 3,
@@ -102,6 +117,9 @@ namespace msg {
         MarkerMove = 6,
         FogCreate = 7,
         FogUpdate = 8,
+        GridUpdate = 9,
+        CommitMarker = 10,
+        CommitBoard = 11
     };
 
     // ========== Optional JSON helpers (nlohmann::json) ==========
@@ -134,9 +152,7 @@ namespace msg {
             { std::string(key::From), from },
             { std::string(key::To), to },
             { std::string(key::Broadcast), broadcast },
-            { std::string(key::Candidate), cand }/*,
-            { std::string(key::SdpMid), mid },
-            { std::string(key::SdpMLineIndex), mline }*/
+            { std::string(key::Candidate), cand }
         };
     }
 

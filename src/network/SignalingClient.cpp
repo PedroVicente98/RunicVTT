@@ -180,7 +180,7 @@ void SignalingClient::onMessage(const std::string& msg) {
         const std::string target = j.value(std::string(msg::key::Target), "");
         if (target.empty()) return;
         if (auto nm = network_manager.lock()) {
-            nm->removePeerLink(target); // close PC/DC and erase from map
+            nm->removePeer(target); // close PC/DC and erase from map
         }
         return;
     }
@@ -197,7 +197,8 @@ void SignalingClient::onMessage(const std::string& msg) {
                 for (auto& v : j[msg::key::Clients]) {
                     std::string peerId = v.get<std::string>();
                     auto link = nm->ensurePeerLink(peerId);
-                    link->createDataChannel(msg::dc::name::Game);
+                    //link->createDataChannel(msg::dc::name::Game);
+                    link->createChannels();
                     link->createOffer();
                 }
             }

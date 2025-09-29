@@ -12,6 +12,7 @@
 #include <nlohmann/json.hpp>
 #include <future>
 #include <iostream>
+#include "MessageQueue.h"
 
 enum class Role {
     NONE,
@@ -32,6 +33,33 @@ struct NetworkToast {
     Level       level;
 };
 
+struct InboundMsg {
+    std::string fromPeer;                // who sent
+    std::string label;                   // DC label (e.g., msg::dc::name::Game)
+    std::vector<unsigned char> bytes;    // payload
+};
+
+struct OutboundMsg {
+    std::string toPeer;                  // empty = broadcast
+    std::string label;                   // DC label
+    std::vector<unsigned char> bytes;    // payload
+};
+
+struct PendingMarker {
+    std::string name;           // filename hint
+    uint64_t total = 0;
+    uint64_t received = 0;
+    std::vector<unsigned char> buf;
+};
+
+struct PendingBoard {
+    std::string name;
+    uint64_t total = 0;
+    uint64_t received = 0;
+    std::vector<unsigned char> buf;
+};
+
+
 // Forward declare
 class SignalingServer;
 class SignalingClient;
@@ -48,6 +76,8 @@ public:
     void startServer(std::string internal_ip_address, unsigned short port);
     void closeServer();
     
+    // if not, call this from main thread; otherwise add a mutex)
+    bool isConnected();
 
     void allowPort(unsigned int port);
     void disallowPort(unsigned short port);
@@ -89,16 +119,28 @@ public:
     std::shared_ptr<SignalingServer> getSignalingServer() const { return signalingServer; }
 
 
-    // push a toast (thread-safe enough for your callbacks if they hit main via your queues;
-    // if not, call this from main thread; otherwise add a mutex)
+    // Toaster Notification;
     void pushStatusToast(const std::string& msg, NetworkToast::Level lvl, double durationSec = 3.0);
-    // expose read-only for renderer
     const std::deque<NetworkToast>& toasts() const { return toasts_; }
-    // prune expired (call every frame before rendering)
     void pruneToasts(double now);
 
+    void onDcGameBinary(const std::string& fromPeer, const unsigned char* data, size_t len);
+    void queueMessage(OutboundMsg msg);
+    bool tryDequeueOutbound(OutboundMsg& msg);
+
+
+    bool sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<unsigned char>& img, const std::string& name);
+    bool sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<unsigned char>& img, const std::string& name);
+
+    static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
 private:
     std::deque<NetworkToast> toasts_;
+
+    std::unordered_map<uint64_t, PendingMarker> markersRx_;
+    std::unordered_map<uint64_t, PendingBoard> boardsRx_;
+
+    MessageQueue<InboundMsg>  inbound_;
+    MessageQueue<OutboundMsg> outbound_; 
 
     std::string myClientId_;
     std::string myUsername_;

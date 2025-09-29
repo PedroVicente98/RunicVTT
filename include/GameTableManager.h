@@ -21,7 +21,7 @@ public:
 	bool isGameTableActive();
 	//bool isConnectionActive();
 
-	//bool isConnected() const;
+	bool isConnected() const;
 	
 	//void openConnection(unsigned short port);
 	//void closeConnection();
@@ -36,7 +36,6 @@ public:
 	void networkCenterPopUp();
 	void renderNetworkCenterPlayer();
 	void renderNetworkCenterGM();
-
 	void connectToGameTablePopUp();
 	void closeGameTablePopUp();
 	
@@ -51,7 +50,7 @@ public:
 	//void createNetworkPopUp();
 	//void closeNetworkPopUp();
 	//void openNetworkInfoPopUp();
-	void renderNetworkToasts(NetworkManager& nm);
+	void renderNetworkToasts(std::shared_ptr<NetworkManager> nm);
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
 

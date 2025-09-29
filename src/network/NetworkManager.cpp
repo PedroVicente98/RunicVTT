@@ -4,6 +4,7 @@
 #include "SignalingClient.h"
 #include "Message.h"
 #include "UPnPManager.h"
+#include "Serializer.h"
 
 NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NONE)
 {
@@ -42,8 +43,6 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
 
 	switch (mode) {
 	case ConnectionType::LOCALTUNNEL: {
-		// Start LocalTunnel (non-blocking thread)
-		// Note: URL will be available shortly after start; user can grab it from Network Center.
 		const auto ltUrl = NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
 		if (ltUrl.empty()) {
 			break;
@@ -53,30 +52,24 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
 		break;
 	}
 	case ConnectionType::LOCAL: {
-		// LAN hosting: no localtunnel, no UPnP.
-		// GM can connect to itself using loopback to unify code paths
 		signalingClient->connect("127.0.0.1", port);
 		break;
 	}
-	case ConnectionType::EXTERNAL: {
-		// Optional UPnP mapping for inbound connections
+	case ConnectionType::EXTERNAL:{
 		if (tryUpnp) {
 			try {
-				// If you have UPnPManager available, call it here
 				 if (!UPnPManager::addPortMapping(localIp, port, port, "TCP", "RunicVTT")) {
-				     // optionally show your help popup:
 				      bool open = true; ShowPortForwardingHelpPopup(&open);
 				 }
 			}
 			catch (...) {
-				// swallow errors; user was warned that it might not work
 			}
 		}
-		// GM connects to itself locally
 		signalingClient->connect("127.0.0.1", port);
 		break;
 	}
 	}
+	pushStatusToast("Signalling Server Started!!", NetworkToast::Level::Good, 4);
 }
 
 // Keep your old method (back-compat). Default it to LocalTunnel behavior.
@@ -109,19 +102,10 @@ void NetworkManager::closeServer()
 	NetworkUtilities::stopLocalTunnel();
 }
 
+bool NetworkManager::isConnected(){
 
-
-//bool NetworkManager::connectToPeer(const std::string& connectionString)
-//{
-//	std::string server_ip;
-//	unsigned short port;
-//	std::string password;
-//	parseConnectionString(connectionString, server_ip, port, password);
-//	auto response = signalingClient->connect(server_ip, port);
-//	peer_role = Role::PLAYER;
-//	return response;
-//}
-
+	return false;
+}
 
 bool NetworkManager::connectToPeer(const std::string& connectionString)
 {
@@ -135,12 +119,6 @@ bool NetworkManager::connectToPeer(const std::string& connectionString)
 		return signalingClient->connectUrl(server); // NEW method (see below)
 	}
 	return signalingClient->connect(server, port); // your old method
-}
-
-
-bool NetworkManager::disconectFromPeers()
-{
-	return false;
 }
 
 std::string NetworkManager::getLocalIPAddress() {
@@ -184,19 +162,6 @@ std::string NetworkManager::getNetworkInfo(ConnectionType type) {
 std::string NetworkManager::getLocalTunnelURL() {
 	return NetworkUtilities::getLocalTunnelUrl();
 }
-
-
-//void NetworkManager::parseConnectionString(std::string connection_string, std::string& server_ip, unsigned short& port, std::string& password) {
-//	std::regex rgx(R"(runic:([\d.]+):(\d+)\??(.*))");
-//	std::smatch match;
-//	// Parse the connection string using regex
-//	if (std::regex_match(connection_string, match, rgx)) {
-//		server_ip = match[1];             // Extract the server's Hamachi IP address
-//		port = std::stoi(match[2]);    // Extract the port
-//		password = match[3];              // Extract the optional password
-//	}
-//}
-
 
 void NetworkManager::parseConnectionString(std::string connection_string,
 	std::string& server, unsigned short& port,
@@ -324,16 +289,6 @@ bool NetworkManager::removePeer(std::string peerId) {
 	return true;
 }
 
-void NetworkManager::disconnectAllPeers() {
-	for (auto& [id, link] : peers) {
-		if (link) {
-			try { link->close(); }
-			catch (...) {}
-		}
-	}
-	peers.clear();
-}
-
 // Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
 std::size_t NetworkManager::removeDisconnectedPeers() {
 	std::size_t removed = 0;
@@ -433,27 +388,6 @@ bool NetworkManager::disconectFromPeers() {
 	return true;
 }
 
-bool NetworkManager::disconectFromPeers() {
-	// Close all peer links (don’t let PeerLink::close() call back into NM to erase)
-	for (auto& [pid, link] : peers) {
-		if (link) {
-			try { link->close(); }
-			catch (...) {}
-		}
-	}
-	peers.clear();
-
-	// Close signaling client (player’s WS)
-	if (signalingClient) {
-		signalingClient->close();
-		signalingClient.reset();
-	}
-
-	// We’re no longer connected
-	peer_role = Role::NONE;
-	return true;
-}
-
 bool NetworkManager::disconnectAllPeers() {
 	// 1) Broadcast a shutdown message (optional, but nice UX)
 	if (signalingServer) {
@@ -508,18 +442,213 @@ void NetworkManager::pruneToasts(double now) {
 
 
 
+void NetworkManager::queueMessage(OutboundMsg msg) {
+	outbound_.push(std::move(msg));
+}
+
+bool NetworkManager::tryDequeueOutbound(OutboundMsg& msg) {
+	return outbound_.try_pop(msg);
+}
+
+
+bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	const std::vector<unsigned char>& img, const std::string& name)
+{
+	if (img.empty()) return false;
+
+	// BEGIN: DCType::Intent_MarkerCreate
+	{
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::Intent_MarkerCreate));
+		Serializer::serializeUInt64(b, markerId);
+		Serializer::serializeString(b, name);
+		Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+	}
+
+	// CHUNKS: DCType::Image
+	uint64_t offset = 0;
+	while (offset < img.size()) {
+		const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::Image));
+		Serializer::serializeUInt64(b, markerId);
+		Serializer::serializeUInt64(b, offset);
+		Serializer::serializeInt(b, n);
+		b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+		offset += n;
+	}
+
+	// COMMIT: DCType::CommitMarker
+	{
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
+		Serializer::serializeUInt64(b, markerId);
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+	}
+
+	return true;
+}
+
+bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, const std::vector<unsigned char>& img, const std::string& name)
+{
+	if (img.empty()) return false;
+
+	// BEGIN: we use DCType::Snapshot_Board as “BoardCreateBegin”
+	{
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
+		Serializer::serializeUInt64(b, boardId);
+		Serializer::serializeString(b, name);
+		Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+	}
+
+	// CHUNKS: DCType::Image (same as marker)
+	uint64_t offset = 0;
+	while (offset < img.size()) {
+		const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::Image));
+		Serializer::serializeUInt64(b, boardId);
+		Serializer::serializeUInt64(b, offset);
+		Serializer::serializeInt(b, n);
+		b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+		offset += n;
+	}
+
+	// COMMIT: DCType::CommitBoard
+	{
+		std::vector<unsigned char> b;
+		b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
+		Serializer::serializeUInt64(b, boardId);
+		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+	}
+
+	return true;
+}
 
 
 
 
+// NetworkManager.cpp
+void NetworkManager::onDcGameBinary(const std::string& from, const unsigned char* data, size_t len) {
+	if (!data || len < 1) return;
 
+	const auto type = static_cast<msg::DCType>(data[0]);
 
+	// We use Serializer by operating on a temp view (excluding first byte)
+	std::vector<unsigned char> v;
+	v.reserve(len - 1);
+	v.insert(v.end(), data + 1, data + len);
+	size_t off = 0;
 
+	switch (type) {
+	case msg::DCType::Intent_MarkerCreate: {
+		// [id u64][string name][total u64]
+		const uint64_t id = Serializer::deserializeUInt64(v, off);
+		const std::string name = Serializer::deserializeString(v, off);
+		const uint64_t total = Serializer::deserializeUInt64(v, off);
 
+		PendingMarker pm;
+		pm.name = name;
+		pm.total = total;
+		pm.received = 0;
+		pm.buf.resize(static_cast<size_t>(total));
+		markersRx_[id] = std::move(pm);
+		break;
+	}
 
+	case msg::DCType::Snapshot_Board: {
+		// Used as "BoardCreateBegin"
+		// [id u64][string name][total u64]
+		const uint64_t id = Serializer::deserializeUInt64(v, off);
+		const std::string name = Serializer::deserializeString(v, off);
+		const uint64_t total = Serializer::deserializeUInt64(v, off);
 
+		PendingBoard pb;
+		pb.name = name;
+		pb.total = total;
+		pb.received = 0;
+		pb.buf.resize(static_cast<size_t>(total));
+		boardsRx_[id] = std::move(pb);
+		break;
+	}
 
+	case msg::DCType::Image: {
+		// Shared chunk format for both marker/board payloads
+		// [id u64][offset u64][len int][data ...]
+		const uint64_t id = Serializer::deserializeUInt64(v, off);
+		const uint64_t offset = Serializer::deserializeUInt64(v, off);
+		const int      n = Serializer::deserializeInt(v, off);
+		if (n <= 0 || off + static_cast<size_t>(n) > v.size()) return;
 
+		const unsigned char* src = v.data() + off;
+
+		// Try marker first
+		if (auto it = markersRx_.find(id); it != markersRx_.end()) {
+			auto& pm = it->second;
+			if (offset + static_cast<uint64_t>(n) <= pm.total) {
+				std::memcpy(pm.buf.data() + offset, src, n);
+				pm.received += static_cast<uint64_t>(n);
+			}
+			break;
+		}
+
+		// Then board
+		if (auto it = boardsRx_.find(id); it != boardsRx_.end()) {
+			auto& pb = it->second;
+			if (offset + static_cast<uint64_t>(n) <= pb.total) {
+				std::memcpy(pb.buf.data() + offset, src, n);
+				pb.received += static_cast<uint64_t>(n);
+			}
+			break;
+		}
+
+		// Unknown id → ignore
+		break;
+	}
+
+	case msg::DCType::CommitMarker: {
+		// [id u64]
+		const uint64_t id = Serializer::deserializeUInt64(v, off);
+		auto it = markersRx_.find(id);
+		if (it == markersRx_.end()) break;
+
+		PendingMarker pm = std::move(it->second);
+		markersRx_.erase(it);
+		if (pm.received == pm.total) {
+			//inboundMarkers_.push({ from, id, std::move(pm.name), std::move(pm.buf) });
+		}
+		else {
+			std::cerr << "[Net] CommitMarker incomplete (" << pm.received << "/" << pm.total << ")\n";
+		}
+		break;
+	}
+
+	case msg::DCType::CommitBoard: {
+		// [id u64]
+		const uint64_t id = Serializer::deserializeUInt64(v, off);
+		auto it = boardsRx_.find(id);
+		if (it == boardsRx_.end()) break;
+
+		PendingBoard pb = std::move(it->second);
+		boardsRx_.erase(it);
+		if (pb.received == pb.total) {
+			//inboundBoards_.push({ from, id, std::move(pb.name), std::move(pb.buf) });
+		}
+		else {
+			std::cerr << "[Net] CommitBoard incomplete (" << pb.received << "/" << pb.total << ")\n";
+		}
+		break;
+	}
+
+	default:
+		// ignore others here
+		break;
+	}
+}
 
 
 
