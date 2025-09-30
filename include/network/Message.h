@@ -81,7 +81,7 @@ namespace msg {
         }
 
         inline constexpr std::string_view Chat = "CHAT";
-        inline constexpr std::string_view Image = "IMAGE";              // metadata/chunk control
+        inline constexpr std::string_view Image = "IMAGE";            
         inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
         inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
         inline constexpr std::string_view Move = "MOVE";
@@ -94,11 +94,6 @@ namespace msg {
 
     // ---------- Optional: numeric IDs for DC binary mux ----------
     enum class DCType : uint8_t {
-        // Intents (Player -> GM)
-        Intent_MarkerCreate = 12,
-        Intent_MarkerMove = 13,
-        Intent_MarkerDelete = 14,
-
         // State (GM -> All)
         State_MarkerCreated = 50,
         State_MarkerMoved = 51,

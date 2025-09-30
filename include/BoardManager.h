@@ -16,8 +16,8 @@
 
 #include "Components.h"
 #include "DirectoryWindow.h"
-#include "NetworkManager.h"
 
+class NetworkManager;
 
 struct BoardImageData {
     GLuint textureID = 0;
@@ -144,7 +144,7 @@ enum class Tool{ MOVE, FOG, MARKER, SELECT};
 
 class BoardManager {
 public:
-	BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
+	BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~BoardManager();
 
 	void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);  // Render board elements (map, markers, fog)
@@ -227,7 +227,7 @@ private:
     bool showEditWindow = false;
     bool showGridSettings = false;
 	flecs::entity edit_window_entity = flecs::entity();
-    std::shared_ptr<NetworkManager> network_manager;
+    std::weak_ptr<NetworkManager> network_manager;
     //glm::vec2 mouseStartPos;
 
     glm::vec2 mouse_start_screen_pos;

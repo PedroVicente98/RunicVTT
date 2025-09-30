@@ -16,6 +16,7 @@ public:
     static void serializeString(std::vector<unsigned char>& buffer, const std::string& str);
     static void serializeVec2(std::vector<unsigned char>& buffer, const glm::vec2& vec);
     static void serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value);
+    static void serializeUInt8(std::vector<unsigned char>& buffer, uint8_t value);
 
     // Deserialize methods for basic types
     static int deserializeInt(const std::vector<unsigned char>& buffer, size_t& offset);
@@ -24,6 +25,7 @@ public:
     static std::string deserializeString(const std::vector<unsigned char>& buffer, size_t& offset);
     static glm::vec2 deserializeVec2(const std::vector<unsigned char>& buffer, size_t& offset);
     static uint64_t deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset);
+    static uint8_t deserializeUInt8(const std::vector<unsigned char>& buffer, size_t& offset);
 
     // Serialize methods for components
     static void serializePosition(std::vector<unsigned char>& buffer, const Position* position);
@@ -139,10 +141,11 @@ inline flecs::entity Serializer::deserializeFogEntity(const std::vector<unsigned
 
 inline void Serializer::serializeGameTableEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
+    auto identifier = entity.get<Identifier>();
     auto game_table = entity.get<GameTable>();
     //auto game_table_id = entity.id();
 
-    //serializeInt(buffer, game_table_id);
+    serializeUInt64(buffer, identifier->id);
     serializeGameTable(buffer, game_table);
 
     int boardCount = 0;
@@ -165,8 +168,10 @@ inline void Serializer::serializeGameTableEntity(std::vector<unsigned char>& buf
 inline flecs::entity Serializer::deserializeGameTableEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
 {
     //auto game_table_id = deserializeInt(buffer, offset);
+    auto identifier = deserializeUInt64(buffer, offset);
     auto game_table = deserializeGameTable(buffer, offset);
-    auto game_table_entity = ecs.entity().set<GameTable>(game_table);
+    auto game_table_entity = ecs.entity().set(GameTable{game_table});
+    game_table_entity.set(Identifier{identifier});
 
     int board_count = Serializer::deserializeInt(buffer, offset);
     for (int i = 1; i <= board_count; i++) {
@@ -299,6 +304,16 @@ inline void Serializer::serializeVec2(std::vector<unsigned char>& buffer, const 
 
 inline void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value) {
     buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint64_t));
+}
+
+inline void Serializer::serializeUInt8(std::vector<unsigned char>& buffer, uint8_t value) {
+    buffer.push_back(static_cast<unsigned char>(value));
+}
+
+inline uint8_t Serializer::deserializeUInt8(const std::vector<unsigned char>& buffer, size_t& offset) {
+    uint8_t v = static_cast<uint8_t>(buffer[offset]);
+    offset += sizeof(uint8_t);
+    return v;
 }
 
 inline uint64_t Serializer::deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset) {

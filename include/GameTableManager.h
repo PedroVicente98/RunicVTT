@@ -70,7 +70,7 @@ public:
 	Chat chat;
 	std::shared_ptr<DirectoryWindow> map_directory;
 	std::shared_ptr<NetworkManager> network_manager;
-	BoardManager board_manager;
+	std::shared_ptr<BoardManager> board_manager;
 private:
 
 	void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin,int fbo_height);
@@ -106,7 +106,7 @@ public:
 		ImGuiIO& io = ImGui::GetIO();
 
 		mouse_wheel_delta = io.MouseWheel;
-		auto is_non_map_window_hovered = board_manager.getIsNonMapWindowHovered();
+		auto is_non_map_window_hovered = board_manager->getIsNonMapWindowHovered();
 
 		if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds && !is_non_map_window_hovered) {
 			ignore_mouse_until_release = true;

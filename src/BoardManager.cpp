@@ -18,8 +18,9 @@
 #include <atomic>    // For atomic counter
 #include <cstdint>   // For uint64_t and UINT64_MAX
 #include "Serializer.h"
+#include "NetworkManager.h"
 
-BoardManager::BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
+BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
     : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager) {
     
     
@@ -108,8 +109,10 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     }
     ImGui::PopStyleColor();
     ImGui::SameLine(); // Ensure buttons are on the same row
+    auto nm = network_manager.lock();
+    if (!nm) throw std::exception("[BoardManager] NetworkManager Expired");
 
-    if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+    if (nm->getPeerRole() == Role::GAMEMASTER) {
         // Tool: Fog
         ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
         if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
@@ -131,7 +134,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
         resetCamera();
     }
 
-    if (network_manager->getPeerRole() == Role::GAMEMASTER)
+    if (nm->getPeerRole() == Role::GAMEMASTER)
     {
         ImGui::SameLine(); // Ensure buttons are on the same row
         if (ImGui::Button("Config Grid", ImVec2(90, 40))) {
@@ -642,7 +645,7 @@ void BoardManager::saveActiveBoard(std::filesystem::path& filePath) {
 
     auto board_file_path = filePath / (board->board_name + ".runic");
 
-    std::vector<unsigned char> buffer;
+    std::vector<uint8_t> buffer;
     Serializer::serializeBoardEntity(buffer, active_board, ecs);
 
     std::ofstream outFile(board_file_path, std::ios::binary);
@@ -659,7 +662,7 @@ void BoardManager::saveActiveBoard(std::filesystem::path& filePath) {
 void BoardManager::loadActiveBoard(const std::string& filePath) {
     std::ifstream inFile(filePath, std::ios::binary);
     if (inFile) {
-        std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+        std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
         inFile.close();
 
         size_t offset = 0;
@@ -770,7 +773,7 @@ void BoardManager::renderEditWindow() {
     //close edit window when clicking outside it
 }
 
-BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, size_t sizeBytes) {
+BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t sizeBytes) {
     if (!bytes || sizeBytes == 0) {
         std::cerr << "LoadTextureFromMemory: empty buffer\n";
         return BoardImageData{};
@@ -780,7 +783,7 @@ BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, s
     stbi_set_flip_vertically_on_load(0);
 
     int width = 0, height = 0, nrChannels = 0;
-    unsigned char* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
+    uint8_t* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
     if (!data) {
         std::cerr << "LoadTextureFromMemory: decode failed\n";
         return BoardImageData{};
@@ -830,7 +833,7 @@ BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, s
 //    if (message_type == MessageType::MarkerUpdate) {
 //        Message markerMessage;
 //        markerMessage.type = MessageType::MarkerUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //        auto pos =  entity.get<Position>();
 //        auto size =  entity.get<Size>();
 //        auto texture =  entity.get<TextureComponent>();
@@ -851,7 +854,7 @@ BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, s
 //    {
 //        Message fogMessage;
 //        fogMessage.type = MessageType::FogUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();
@@ -870,7 +873,7 @@ BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, s
 //    {
 //        Message markerMessage;
 //        markerMessage.type = MessageType::MarkerUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();
 //        auto texture = entity.get<TextureComponent>();
@@ -892,7 +895,7 @@ BoardImageData BoardManager::LoadTextureFromMemory(const unsigned char* bytes, s
 //    {
 //        Message fogMessage;
 //        fogMessage.type = MessageType::FogUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();

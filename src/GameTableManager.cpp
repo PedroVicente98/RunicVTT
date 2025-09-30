@@ -5,9 +5,9 @@
 #include "UPnPManager.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(ecs, network_manager, map_directory, marker_directory), chat()
+    : ecs(ecs),network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory)), chat()
 {
-    network_manager->setup();
+    network_manager->setup(board_manager);
 
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
@@ -41,7 +41,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
         {   
             active_game_table.children([&](flecs::entity child) {
                 if (child.has<Board>()) {
-                    board_manager.setActiveBoard(child);
+                    board_manager->setActiveBoard(child);
                     auto texture = child.get_mut<TextureComponent>();
                     auto board_image = map_directory->getImageByPath(texture->image_path);
                     texture->textureID = board_image.textureID;
@@ -50,7 +50,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
                     child.children([&](flecs::entity grand_child) {
                         if (grand_child.has<MarkerComponent>()) {
                             auto grand_child_texture = grand_child.get_mut<TextureComponent>();
-                            auto marker_image = board_manager.marker_directory->getImageByPath(grand_child_texture->image_path);
+                            auto marker_image = board_manager->marker_directory->getImageByPath(grand_child_texture->image_path);
                             grand_child_texture->textureID = marker_image.textureID;
                             grand_child_texture->size = marker_image.size;
                         }
@@ -72,7 +72,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
 
 bool GameTableManager::isBoardActive()
 {
-    return board_manager.isBoardActive();
+    return board_manager->isBoardActive();
 }
 
 bool GameTableManager::isGameTableActive()
@@ -128,11 +128,11 @@ bool GameTableManager::isConnected() const {
 
 
 void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
-    board_manager.camera.setFboDimensions(fbo_dimensions);
+    board_manager->camera.setFboDimensions(fbo_dimensions);
 };
 
 void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos) {
-    current_mouse_world_pos = board_manager.camera.screenToWorldPosition(current_mouse_fbo_pos);
+    current_mouse_world_pos = board_manager->camera.screenToWorldPosition(current_mouse_fbo_pos);
     this->current_mouse_fbo_pos = current_mouse_fbo_pos;
 
     // Call individual handlers
@@ -147,33 +147,33 @@ void GameTableManager::handleMouseButtonInputs() {
 
     // Left Mouse Button Press
     if (mouse_left_clicked) {
-        if (board_manager.getCurrentTool() == Tool::MOVE) {
-            if (board_manager.isMouseOverMarker(current_mouse_world_pos) /*and !board_manager.isDraggingMarker()*/) { 
-                board_manager.startMouseDrag(current_mouse_world_pos, false); // Drag Marker
+        if (board_manager->getCurrentTool() == Tool::MOVE) {
+            if (board_manager->isMouseOverMarker(current_mouse_world_pos) /*and !board_manager->isDraggingMarker()*/) {
+                board_manager->startMouseDrag(current_mouse_world_pos, false); // Drag Marker
             }
-            else /*if(!board_manager.isPanning())*/ {
-                board_manager.startMouseDrag(current_mouse_world_pos, true); // Pan Board
+            else /*if(!board_manager->isPanning())*/ {
+                board_manager->startMouseDrag(current_mouse_world_pos, true); // Pan Board
             }
         }
-        if (board_manager.getCurrentTool() == Tool::FOG and !board_manager.isCreatingFog()) {
-            board_manager.startMouseDrag(current_mouse_world_pos, false); // Start fog drawing/erasing
+        if (board_manager->getCurrentTool() == Tool::FOG and !board_manager->isCreatingFog()) {
+            board_manager->startMouseDrag(current_mouse_world_pos, false); // Start fog drawing/erasing
         }
-        if (board_manager.getCurrentTool() == Tool::SELECT) {
-            auto entity = board_manager.getEntityAtMousePosition(current_mouse_world_pos); 
+        if (board_manager->getCurrentTool() == Tool::SELECT) {
+            auto entity = board_manager->getEntityAtMousePosition(current_mouse_world_pos);
             if (entity.is_valid()) {
-                board_manager.setShowEditWindow(true, entity);
+                board_manager->setShowEditWindow(true, entity);
             }
         }
     }
 
     // Left Mouse Button Release
     if (mouse_left_released || ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-        if (board_manager.isPanning() || board_manager.isDraggingMarker()) {
-            board_manager.endMouseDrag();
+        if (board_manager->isPanning() || board_manager->isDraggingMarker()) {
+            board_manager->endMouseDrag();
         }
-        if (board_manager.isCreatingFog()) {
-            board_manager.handleFogCreation(current_mouse_world_pos); // Use world_pos
-            board_manager.endMouseDrag();
+        if (board_manager->isCreatingFog()) {
+            board_manager->handleFogCreation(current_mouse_world_pos); // Use world_pos
+            board_manager->endMouseDrag();
         }
     }
 }
@@ -181,12 +181,12 @@ void GameTableManager::handleMouseButtonInputs() {
 void GameTableManager::handleCursorInputs() {
     if (!isBoardActive()) return;
 
-    if (board_manager.isDraggingMarker()) {
-        board_manager.handleMarkerDragging(current_mouse_world_pos);  
+    if (board_manager->isDraggingMarker()) {
+        board_manager->handleMarkerDragging(current_mouse_world_pos);
     }
 
-    if (board_manager.isPanning()) {
-        board_manager.panBoard(current_mouse_fbo_pos); 
+    if (board_manager->isPanning()) {
+        board_manager->panBoard(current_mouse_fbo_pos);
     }
 
 }
@@ -201,7 +201,7 @@ void GameTableManager::handleScrollInputs() {
         else {
             zoom_factor = 0.9f; // Zoom out by 10%
         }
-        board_manager.camera.zoom(zoom_factor, current_mouse_world_pos);
+        board_manager->camera.zoom(zoom_factor, current_mouse_world_pos);
     }
 }
 
@@ -322,7 +322,7 @@ void GameTableManager::createBoardPopUp() {
 
         bool saved = false;
         if (ImGui::Button("Save") && !selectedImage.filename.empty() && buffer[0] != '\0') {
-            auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
+            auto board = board_manager->createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
             board.add(flecs::ChildOf, active_game_table);
 
             map_directory->clearSelectedImage();
@@ -360,7 +360,7 @@ void GameTableManager::closeBoardPopUp()
         ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
         {
-            board_manager.closeBoard();
+            board_manager->closeBoard();
             ImGui::CloseCurrentPopup();
         }
 
@@ -419,7 +419,7 @@ void GameTableManager::loadBoardPopUp() {
             if (ImGui::Button(board.c_str()))
             {
                 std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
-                board_manager.loadActiveBoard(board_file_path.string());
+                board_manager->loadActiveBoard(board_file_path.string());
                 loaded = true;
                 ImGui::CloseCurrentPopup();
             }
@@ -447,7 +447,7 @@ void GameTableManager::closeGameTablePopUp()
         ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
         if (ImGui::Button("Close"))
         {
-            board_manager.closeBoard();
+            board_manager->closeBoard();
             active_game_table = flecs::entity();
              network_manager->closeServer();
             chat.clearChat();
@@ -855,13 +855,13 @@ void GameTableManager::hostGameTablePopUp() {
 
                 if (ImGui::Button("Create & Host") && valid) {
                     // Close whatever is running
-                    board_manager.closeBoard();
+                    board_manager->closeBoard();
                     active_game_table = flecs::entity();
                     network_manager->closeServer();
 
                     // Create GT entity + file
                     game_table_name = buffer;
-                    auto game_table = ecs.entity("GameTable").set(GameTable{ game_table_name });
+                    auto game_table = ecs.entity("GameTable").set(Identifier{board_manager->generateUniqueId()}).set(GameTable{game_table_name});
                     active_game_table = game_table;
                     createGameTableFile(game_table);
 
@@ -952,7 +952,7 @@ void GameTableManager::hostGameTablePopUp() {
                     game_table_name = name;
 
                     // close current + load
-                    board_manager.closeBoard();
+                    board_manager->closeBoard();
                     active_game_table = flecs::entity(); //Clean before load from file
                     network_manager->closeServer();
 
@@ -1178,18 +1178,18 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 {
     chat.renderChat();
     renderNetworkToasts(network_manager);
-    if (board_manager.isBoardActive()) {
-        if (board_manager.isEditWindowOpen()) {
-            board_manager.renderEditWindow();
+    if (board_manager->isBoardActive()) {
+        if (board_manager->isEditWindowOpen()) {
+            board_manager->renderEditWindow();
         }
         else {
-            board_manager.setShowEditWindow(false);
+            board_manager->setShowEditWindow(false);
         }
 
         //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
-        board_manager.marker_directory->renderDirectory();
+        board_manager->marker_directory->renderDirectory();
         //}
-        board_manager.renderBoard(va, ib, shader, grid_shader, renderer);
+        board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
     }
 }
 
@@ -1445,7 +1445,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //                if (ImGui::Button("Create & Host") && valid) {
 //                    // close whatever is running
-//                    board_manager.closeBoard();
+//                    board_manager->closeBoard();
 //                    active_game_table = flecs::entity();
 //                    network_manager->closeServer();
 //
@@ -1524,7 +1524,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //                    game_table_name = name;
 //
 //                    // close current + load
-//                    board_manager.closeBoard();
+//                    board_manager->closeBoard();
 //                    active_game_table = flecs::entity();
 //                    network_manager->closeServer();
 //
@@ -1588,7 +1588,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //        if (ImGui::Button("Save") && buffer[0] != '\0' && port_buffer[0] != '\0')
 //        {
-//            board_manager.closeBoard();
+//            board_manager->closeBoard();
 //            active_game_table = flecs::entity();
 //            network_manager->closeServer();
 //
@@ -1659,7 +1659,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //                network_manager->setMyIdentity("", username_buffer);
 //                network_manager->setNetworkPassword(pass_buffer);
 //
-//                board_manager.closeBoard();
+//                board_manager->closeBoard();
 //                active_game_table = flecs::entity();
 //                network_manager->closeServer();
 //
@@ -1837,7 +1837,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //        if (ImGui::Button("Save") && strlen(buffer) > 0 && strlen(port_buffer) > 0)
 //        {
-//            board_manager.closeBoard();
+//            board_manager->closeBoard();
 //            active_game_table = flecs::entity();
 //            network_manager->closeServer();
 //
@@ -1912,7 +1912,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        // Botão para salvar o board, habilitado apenas se houver nome e mapa selecionado
 //        if (ImGui::Button("Save") && !selectedImage.filename.empty() && strlen(buffer) > 0) {
 //            // Cria o board com o mapa e o nome inseridos
-//            auto board = board_manager.createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
+//            auto board = board_manager->createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
 //            board.add(flecs::ChildOf, active_game_table);
 //
 //            // Limpa a seleção após salvar
@@ -1953,7 +1953,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
 //        if (ImGui::Button("Close"))
 //        {
-//            board_manager.closeBoard();
+//            board_manager->closeBoard();
 //            ImGui::CloseCurrentPopup();
 //        }
 //
@@ -1976,7 +1976,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::Text("Close Current GameTable?? Any unsaved changes will be lost!!");
 //        if (ImGui::Button("Close"))
 //        {
-//            board_manager.closeBoard();
+//            board_manager->closeBoard();
 //            active_game_table = flecs::entity();
 //           // network_manager->stopServer();
 //            chat.clearChat();
@@ -2232,7 +2232,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //            {
 //                network_manager->setMyIdentity("", username_buffer);
 //                network_manager->setNetworkPassword(pass_buffer);
-//                board_manager.closeBoard();
+//                board_manager->closeBoard();
 //                active_game_table = flecs::entity();
 //                network_manager->closeServer();
 //                std::string suffix = ".runic";
@@ -2290,7 +2290,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //            if (ImGui::Button(board.c_str())) 
 //            {
 //                std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
-//                board_manager.loadActiveBoard(board_file_path.string());
+//                board_manager->loadActiveBoard(board_file_path.string());
 //                ImGui::CloseCurrentPopup();
 //            }
 //        }

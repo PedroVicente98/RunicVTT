@@ -2,6 +2,7 @@
 #include "NetworkUtilities.h"
 #include "SignalingServer.h"
 #include "SignalingClient.h"
+#include "BoardManager.h"
 #include "Message.h"
 #include "UPnPManager.h"
 #include "Serializer.h"
@@ -14,7 +15,7 @@ NetworkManager::NetworkManager(flecs::world ecs) : ecs(ecs), peer_role(Role::NON
 	NetworkUtilities::setupTLS();
 }
 
-void NetworkManager::setup() {
+void NetworkManager::setup(std::weak_ptr<BoardManager> board_manager) {
 	signalingClient = std::make_shared<SignalingClient>(weak_from_this());
 	signalingServer = std::make_shared<SignalingServer>(weak_from_this());
 }
@@ -451,13 +452,13 @@ bool NetworkManager::tryDequeueOutbound(OutboundMsg& msg) {
 }
 
 
-bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	const std::vector<unsigned char>& img, const std::string& name)
+bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	const std::vector<uint8_t>& img, const std::string& name)
 {
 	if (img.empty()) return false;
 
 	// BEGIN: DCType::Intent_MarkerCreate
 	{
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::Intent_MarkerCreate));
 		Serializer::serializeUInt64(b, markerId);
 		Serializer::serializeString(b, name);
@@ -469,7 +470,7 @@ bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	
 	uint64_t offset = 0;
 	while (offset < img.size()) {
 		const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::Image));
 		Serializer::serializeUInt64(b, markerId);
 		Serializer::serializeUInt64(b, offset);
@@ -481,7 +482,7 @@ bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	
 
 	// COMMIT: DCType::CommitMarker
 	{
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
 		Serializer::serializeUInt64(b, markerId);
 		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
@@ -490,13 +491,13 @@ bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	
 	return true;
 }
 
-bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, const std::vector<unsigned char>& img, const std::string& name)
+bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
 {
 	if (img.empty()) return false;
 
 	// BEGIN: we use DCType::Snapshot_Board as “BoardCreateBegin”
 	{
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
 		Serializer::serializeUInt64(b, boardId);
 		Serializer::serializeString(b, name);
@@ -508,7 +509,7 @@ bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, co
 	uint64_t offset = 0;
 	while (offset < img.size()) {
 		const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::Image));
 		Serializer::serializeUInt64(b, boardId);
 		Serializer::serializeUInt64(b, offset);
@@ -520,7 +521,7 @@ bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, co
 
 	// COMMIT: DCType::CommitBoard
 	{
-		std::vector<unsigned char> b;
+		std::vector<uint8_t> b;
 		b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
 		Serializer::serializeUInt64(b, boardId);
 		queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
@@ -530,229 +531,479 @@ bool NetworkManager::sendBoardCreate(const std::string& to,	uint64_t boardId, co
 }
 
 
+// ---------- send primitives ----------
+void NetworkManager::sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes) {
+	auto it = peers.find(peerId);
+	if (it == peers.end() || !it->second) return;
+	it->second->sendGame(bytes);
+}
+
+void NetworkManager::broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds) {
+	for (auto& pid : toPeerIds) {
+		sendGameTo(pid, frame);
+	}
+}
+
+std::vector<std::string> NetworkManager::getConnectedPeerIds() const {
+	std::vector<std::string> ids;
+	ids.reserve(peers.size());
+	for (auto& [pid, link] : peers) {
+		if (link && link->isConnected()) {
+			ids.push_back(pid);
+		}
+	}
+	return ids;
+}
+
+// ----------- Broadcast wrappers -----------
+
+void NetworkManager::broadcastGameTable(const flecs::entity& gameTable) {
+	auto ids = getConnectedPeerIds();
+	if (!ids.empty()) {
+		sendGameTable(gameTable, ids);
+	}
+}
+
+void NetworkManager::broadcastBoard(const flecs::entity& board) {
+	auto ids = getConnectedPeerIds();
+	if (!ids.empty()) {
+		sendBoard(board, ids);
+	}
+}
+
+void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& marker) {
+	auto ids = getConnectedPeerIds();
+	if (!ids.empty()) {
+		sendMarker(boardId, marker, ids);
+	}
+}
+
+void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog) {
+	auto ids = getConnectedPeerIds();
+	if (!ids.empty()) {
+		sendFog(boardId, fog, ids);
+	}
+}
+
+// ---------- public API ----------
+
+void NetworkManager::sendGameTable(const flecs::entity& gameTable, const std::vector<std::string>& toPeerIds) {
+	auto gtId = gameTable.get<Identifier>()->id;
+	auto gt = *gameTable.get<GameTable>();
+	auto frame = buildSnapshotGameTableFrame(gtId, gt.gameTableName);
+	broadcastFrame(frame, toPeerIds);
+}
 
 
-// NetworkManager.cpp
-void NetworkManager::onDcGameBinary(const std::string& from, const unsigned char* data, size_t len) {
-	if (!data || len < 1) return;
+void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std::string>& toPeerIds) {
+	// read board image (from TextureComponent.image_path)
+	auto tex = board.get<TextureComponent>();
+	std::vector<unsigned char> img = tex ? readFileBytes(tex->image_path) : std::vector<unsigned char>{};
 
-	const auto type = static_cast<msg::DCType>(data[0]);
+	// 1) meta
+	auto meta = buildSnapshotBoardFrame(board, static_cast<uint64_t>(img.size()));
+	broadcastFrame(meta, toPeerIds);
 
-	// We use Serializer by operating on a temp view (excluding first byte)
-	std::vector<unsigned char> v;
-	v.reserve(len - 1);
-	v.insert(v.end(), data + 1, data + len);
+	// 2) image chunks (ownerKind=0 for board)
+	uint64_t bid = board.get<Identifier>()->id;
+	uint64_t off = 0;
+	while (off < img.size()) {
+		size_t chunk = std::min<size_t>(kChunk, img.size() - off);
+		auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
+		for (auto& pid : toPeerIds) sendGameTo(pid, frame);
+		off += chunk;
+	}
+
+	// 3) commit
+	auto commit = buildCommitBoardFrame(bid);
+	broadcastFrame(commit, toPeerIds);
+}
+
+void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds) {
+	// read marker image (from TextureComponent.image_path)
+	auto tex = marker.get<TextureComponent>();
+	std::vector<unsigned char> img = tex ? readFileBytes(tex->image_path) : std::vector<unsigned char>{};
+
+	// 1) meta
+	auto meta = buildCreateMarkerFrame(boardId, marker, static_cast<uint64_t>(img.size()));
+	broadcastFrame(meta, toPeerIds);
+
+	// 2) image chunks (ownerKind=1 for marker)
+	uint64_t mid = marker.get<Identifier>()->id;
+	uint64_t off = 0;
+	while (off < img.size()) {
+		size_t chunk = std::min<size_t>(kChunk, img.size() - off);
+		auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
+		for (auto& pid : toPeerIds) sendGameTo(pid, frame);
+		off += chunk;
+	}
+
+	// 3) commit
+	auto commit = buildCommitMarkerFrame(boardId, mid);
+	broadcastFrame(commit, toPeerIds);
+}
+
+void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds) {
+	auto frame = buildFogCreateFrame(boardId, fog);
+	broadcastFrame(frame, toPeerIds);
+}
+
+
+void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
 	size_t off = 0;
-
-	switch (type) {
-	case msg::DCType::Intent_MarkerCreate: {
-		// [id u64][string name][total u64]
-		const uint64_t id = Serializer::deserializeUInt64(v, off);
-		const std::string name = Serializer::deserializeString(v, off);
-		const uint64_t total = Serializer::deserializeUInt64(v, off);
-
-		PendingMarker pm;
-		pm.name = name;
-		pm.total = total;
-		pm.received = 0;
-		pm.buf.resize(static_cast<size_t>(total));
-		markersRx_[id] = std::move(pm);
-		break;
-	}
-
-	case msg::DCType::Snapshot_Board: {
-		// Used as "BoardCreateBegin"
-		// [id u64][string name][total u64]
-		const uint64_t id = Serializer::deserializeUInt64(v, off);
-		const std::string name = Serializer::deserializeString(v, off);
-		const uint64_t total = Serializer::deserializeUInt64(v, off);
-
-		PendingBoard pb;
-		pb.name = name;
-		pb.total = total;
-		pb.received = 0;
-		pb.buf.resize(static_cast<size_t>(total));
-		boardsRx_[id] = std::move(pb);
-		break;
-	}
-
-	case msg::DCType::Image: {
-		// Shared chunk format for both marker/board payloads
-		// [id u64][offset u64][len int][data ...]
-		const uint64_t id = Serializer::deserializeUInt64(v, off);
-		const uint64_t offset = Serializer::deserializeUInt64(v, off);
-		const int      n = Serializer::deserializeInt(v, off);
-		if (n <= 0 || off + static_cast<size_t>(n) > v.size()) return;
-
-		const unsigned char* src = v.data() + off;
-
-		// Try marker first
-		if (auto it = markersRx_.find(id); it != markersRx_.end()) {
-			auto& pm = it->second;
-			if (offset + static_cast<uint64_t>(n) <= pm.total) {
-				std::memcpy(pm.buf.data() + offset, src, n);
-				pm.received += static_cast<uint64_t>(n);
-			}
+	while (off < b.size()) {
+		// Need at least one byte for the type
+		if (!ensureRemaining(b, off, 1)) {
 			break;
 		}
 
-		// Then board
-		if (auto it = boardsRx_.find(id); it != boardsRx_.end()) {
-			auto& pb = it->second;
-			if (offset + static_cast<uint64_t>(n) <= pb.total) {
-				std::memcpy(pb.buf.data() + offset, src, n);
-				pb.received += static_cast<uint64_t>(n);
-			}
+		auto type = static_cast<msg::DCType>(b[off]);
+		off += 1;
+
+		switch (type) {
+			// -------- SNAPSHOT / BOARD ----------
+		case msg::DCType::Snapshot_Board:
+			handleBoardMeta(b, off);
 			break;
+
+			// -------- CREATE MARKER (META) ----------
+		case msg::DCType::CreateEntity:
+			handleMarkerMeta(b, off);
+			break;
+
+			// -------- FOG CREATE (NO IMAGE) ----------
+		case msg::DCType::FogCreate:
+			handleFogCreate(b, off);
+			break;
+
+			// -------- IMAGE CHUNK (BOARD or MARKER) ----------
+		case msg::DCType::Image:
+			handleImageChunk(b, off);
+			break;
+
+			// -------- COMMIT BOARD ----------
+		case msg::DCType::CommitBoard:
+			handleCommitBoard(b, off);
+			break;
+
+			// -------- COMMIT MARKER ----------
+		case msg::DCType::CommitMarker:
+			handleCommitMarker(b, off);
+			break;
+
+			// -------- BOARD OPERATONS - AFTER ENTITIY CREATION ----------
+		case msg::DCType::MarkerMove:
+		    //handlemarkermove(b, off);
+		    break;
+
+		case msg::DCType::GridUpdate:
+		    //handlegridupdate(b, off);
+		    break;
+
+		case msg::DCType::Chat:
+			//handleChat(b, off);
+			break;
+		case msg::DCType::ToggleVisibility:
+			//handleToggleVisibility(b, off);
+			break;
+		case msg::DCType::FogUpdate:
+			//handleFogUpdate(b, off);
+			break;
+		default:
+			return;
 		}
-
-		// Unknown id → ignore
-		break;
-	}
-
-	case msg::DCType::CommitMarker: {
-		// [id u64]
-		const uint64_t id = Serializer::deserializeUInt64(v, off);
-		auto it = markersRx_.find(id);
-		if (it == markersRx_.end()) break;
-
-		PendingMarker pm = std::move(it->second);
-		markersRx_.erase(it);
-		if (pm.received == pm.total) {
-			//inboundMarkers_.push({ from, id, std::move(pm.name), std::move(pm.buf) });
-		}
-		else {
-			std::cerr << "[Net] CommitMarker incomplete (" << pm.received << "/" << pm.total << ")\n";
-		}
-		break;
-	}
-
-	case msg::DCType::CommitBoard: {
-		// [id u64]
-		const uint64_t id = Serializer::deserializeUInt64(v, off);
-		auto it = boardsRx_.find(id);
-		if (it == boardsRx_.end()) break;
-
-		PendingBoard pb = std::move(it->second);
-		boardsRx_.erase(it);
-		if (pb.received == pb.total) {
-			//inboundBoards_.push({ from, id, std::move(pb.name), std::move(pb.buf) });
-		}
-		else {
-			std::cerr << "[Net] CommitBoard incomplete (" << pb.received << "/" << pb.total << ")\n";
-		}
-		break;
-	}
-
-	default:
-		// ignore others here
-		break;
 	}
 }
 
 
+// DCType::Snapshot_Board (101) -- NewBoard - Check for Existing Board in entities
+void NetworkManager::handleBoardMeta(const std::vector<uint8_t>& b, size_t& off) {
+	BoardMeta bm;
+	bm.boardId = Serializer::deserializeUInt64(b, off);
+	bm.boardName = Serializer::deserializeString(b, off);
+	bm.pan = Serializer::deserializePanning(b, off);
+	bm.grid = Serializer::deserializeGrid(b, off);
+	bm.size = Serializer::deserializeSize(b, off);
+	uint64_t total = Serializer::deserializeUInt64(b, off); // 0 if no image
+
+	auto& p = imagesRx_[bm.boardId];
+	p.kind = ImageOwnerKind::Board;
+	p.id = bm.boardId;
+	p.boardId = bm.boardId;
+	p.boardMeta = bm;
+	p.total = total;
+	p.received = 0;
+	p.buf.clear();
+	if (total) p.buf.resize(static_cast<size_t>(total));
+}
+
+// DCType::CreateEntity (4) 
+void NetworkManager::handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off) {
+	MarkerMeta mm;
+	mm.boardId = Serializer::deserializeUInt64(b, off);
+	mm.markerId = Serializer::deserializeUInt64(b, off);
+	mm.name = Serializer::deserializeString(b, off);
+	mm.pos = Serializer::deserializePosition(b, off);
+	mm.size = Serializer::deserializeSize(b, off);
+	mm.vis = Serializer::deserializeVisibility(b, off);
+	mm.mov = Serializer::deserializeMoving(b, off);
+	uint64_t total = Serializer::deserializeUInt64(b, off); // 0 if no image
+
+	auto& p = imagesRx_[mm.markerId];
+	p.kind = ImageOwnerKind::Marker;
+	p.id = mm.markerId;
+	p.boardId = mm.boardId;
+	p.markerMeta = mm;
+	p.total = total;
+	p.received = 0;
+	p.buf.clear();
+	if (total) p.buf.resize(static_cast<size_t>(total));
+}
+
+// DCType::FogCreate (7)
+void NetworkManager::handleFogCreate(const std::vector<uint8_t>& b, size_t& off) {
+	uint64_t boardId = Serializer::deserializeUInt64(b, off);
+	uint64_t fogId = Serializer::deserializeUInt64(b, off);
+	Position pos = Serializer::deserializePosition(b, off);
+	Size size = Serializer::deserializeSize(b, off);
+	Visibility vis = Serializer::deserializeVisibility(b, off);
+
+	if (auto boardEnt = findBoardById(boardId)) {
+		createFogFromMeta(fogId, pos, size, vis, boardEnt);
+	}
+	else {
+		// If board not found (shouldn't happen if GM sends in order), you can queue this request.
+		// For now, no-op or log.
+	}
+}
+
+// DCType::Image 
+void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off) {
+	auto kind = static_cast<ImageOwnerKind>(b[off]); off += 1;
+	uint64_t id = Serializer::deserializeUInt64(b, off);
+	uint64_t off64 = Serializer::deserializeUInt64(b, off);
+	int      len = Serializer::deserializeInt(b, off);
+
+	auto it = imagesRx_.find(id);
+	if (it == imagesRx_.end()) return; // unknown; drop
+
+	auto& p = it->second;
+	if (p.kind != kind || p.total == 0) return;
+
+	// bounds check
+	if (off64 + static_cast<uint64_t>(len) > p.total) return;
+
+	std::memcpy(p.buf.data() + off64, b.data() + off, static_cast<size_t>(len));
+	off += static_cast<size_t>(len);
+	p.received += static_cast<uint64_t>(len);
+}
+
+void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off) {
+	uint64_t boardId = Serializer::deserializeUInt64(b, off);
+	auto it = imagesRx_.find(boardId);
+	if (it == imagesRx_.end()) return;
+
+	auto& p = it->second;
+	if (p.kind != ImageOwnerKind::Board) return;
+
+	// board image may be optional (total==0)
+	if (p.total == 0 || p.isComplete()) {
+		if (p.boardMeta) {
+			createBoardFromBytesAndMeta(*p.boardMeta, p.buf); // sets active board
+		}
+		imagesRx_.erase(it);
+	}
+}
+
+void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off) {
+	uint64_t boardId = Serializer::deserializeUInt64(b, off);
+	uint64_t markerId = Serializer::deserializeUInt64(b, off);
+
+	auto it = imagesRx_.find(markerId);
+	if (it == imagesRx_.end()) return;
+
+	auto& p = it->second;
+	if (p.kind != ImageOwnerKind::Marker || p.boardId != boardId) return;
+
+	// marker image may be optional (total==0)
+	if (p.total == 0 || p.isComplete()) {
+		if (auto boardEnt = findBoardById(boardId)) {
+			if (p.markerMeta) {
+				createMarkerFromBytesAndMeta(*p.markerMeta, p.buf, boardEnt);
+			}
+		}
+		imagesRx_.erase(it);
+	}
+}
+
+void NetworkManager::createBoardFromBytesAndMeta(const BoardMeta& bmeta, const std::vector<uint8_t>& bytes) 
+{
+	auto bm = board_manager.lock();
+	if (!bm) throw std::exception("[NetworkManager] BoardManager Expired!!!");
+
+	GLuint tex = 0;
+	glm::vec2 texSize{ 0,0 };
+	if (!bytes.empty()) {
+		auto image_data = bm->LoadTextureFromMemory(bytes.data(), bytes.size());
+		tex = image_data.textureID;
+		texSize = image_data.size;
+	}
+	auto board = bm->createBoard(bmeta.boardName, "", tex, texSize);
+	board.set(Identifier{ bmeta.boardId });
+	board.set(bmeta.pan);
+	board.set(bmeta.grid);
+}
+
+void NetworkManager::createFogFromMeta(uint64_t fogId, const Position& pos, const Size& size, const Visibility& vis, flecs::entity parentBoard) {
+	auto bm = board_manager.lock();
+	if (!bm) throw std::exception("[NetworkManager] BoardManager Expired!!!");
+
+	auto fog = bm->createFogOfWar({ (float)pos.x,(float)pos.y }, { size.width,size.height });
+	fog.set(Identifier{ fogId });
+	fog.set(vis);
+	fog.add(flecs::ChildOf, parentBoard);
+}
+
+void NetworkManager::createMarkerFromBytesAndMeta(const MarkerMeta& mm,	const std::vector<uint8_t>& bytes, flecs::entity parentBoard) {
+	auto bm = board_manager.lock();
+	if (!bm) throw std::exception("[NetworkManager] BoardManager Expired!!!");
+
+	GLuint tex = 0; glm::vec2 texSize{ mm.size.width, mm.size.height };
+	if (!bytes.empty()) {
+		auto image_data = bm->LoadTextureFromMemory(bytes.data(), bytes.size());
+		tex = image_data.textureID;
+		texSize = image_data.size;
+	}
+	auto m = bm->createMarker(/*map path*/"", tex,{ (float)mm.pos.x,(float)mm.pos.y }, texSize);
+	m.set(Identifier{ mm.markerId });
+	m.set(mm.vis);
+	m.set(mm.mov);
+	m.add(flecs::ChildOf, parentBoard);
+}
 
 
+flecs::entity NetworkManager::findBoardById(uint64_t boardId) {
+	flecs::entity result;
+	ecs.each([&](flecs::entity e, const Board&, const Identifier& id) {
+		if (e.is_valid() && id.id == boardId) {
+			result = e;
+		}
+		});
+	return result; // will be invalid if not found
+}
 
 
+// ---------- frame builders ----------
+std::vector<unsigned char> NetworkManager::buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::Snapshot_GameTable));
+	Serializer::serializeUInt64(b, gameTableId);
+	Serializer::serializeString(b, name);
+	return b;
+}
 
+std::vector<unsigned char> NetworkManager::buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::Snapshot_Board));
 
+	// Required components
+	auto id = board.get<Identifier>()->id;
+	auto bd = *board.get<Board>();
+	auto pan = *board.get<Panning>();
+	auto grid = *board.get<Grid>();
+	auto size = *board.get<Size>();
 
+	// [boardId][boardName][Panning][Grid][Size][imageTotal]
+	Serializer::serializeUInt64(b, id);
+	Serializer::serializeString(b, bd.board_name);
 
+	// Panning
+	Serializer::serializeBool(b, pan.isPanning);
 
+	// Grid
+	Serializer::serializeVec2(b, grid.offset);
+	Serializer::serializeFloat(b, grid.cell_size);
+	Serializer::serializeBool(b, grid.is_hex);
+	Serializer::serializeBool(b, grid.snap_to_grid);
+	Serializer::serializeBool(b, grid.visible);
+	Serializer::serializeFloat(b, grid.opacity);
 
+	// Size
+	Serializer::serializeFloat(b, size.width);
+	Serializer::serializeFloat(b, size.height);
 
+	// Image total size in bytes (u64)
+	Serializer::serializeUInt64(b, imageBytesTotal);
+	return b;
+}
 
-//static std::vector<PeerConnectionState> offererPeers;
-//static char answererOfferInput[2048] = "";
-//static PeerConnectionState answererConnection;
-//static std::vector<std::string> answererConnectedPeers;
-//
-//void renderNetworkOfferer() {
-//	ImGui::Begin("Offerer / Gamemaster Control");
-//
-//	if (ImGui::Button("Add Peer Connection")) {
-//		PeerConnectionState newState;
-//		newState.id = offererPeers.empty() ? 0 : offererPeers.back().id + 1;
-//		newState.pc = nullptr; // In real code: std::make_shared<rtc::PeerConnection>(config);
-//
-//		// Call createAndEncodeOffer asynchronously to avoid freezing the UI
-//		newState.offerFuture = std::async(std::launch::async, createAndEncodeOffer, newState.pc);
-//
-//		offererPeers.push_back(std::move(newState));
-//	}
-//
-//	ImGui::Separator();
-//
-//	for (auto& peer : offererPeers) {
-//		ImGui::PushID(peer.id); // Use a unique ID for each peer's widgets
-//
-//		// Check if the async offer creation is complete
-//		if (peer.offerFuture.valid() && peer.offerFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-//			peer.offerString = peer.offerFuture.get();
-//		}
-//
-//		// Display the generated offer string
-//		ImGui::InputText("Offer to Copy", &peer.offerString[0], peer.offerString.size() + 1, ImGuiInputTextFlags_ReadOnly);
-//		ImGui::SameLine();
-//		if (ImGui::Button("Copy##Offer")) {
-//			ImGui::SetClipboardText(peer.offerString.c_str());
-//		}
-//
-//		// Input for the peer's answer
-//		ImGui::InputText("Paste Answer Peer", peer.answerInputBuffer, sizeof(peer.answerInputBuffer));
-//		ImGui::SameLine();
-//
-//		// Disable the connect button if already connected
-//		if (peer.isConnected) ImGui::BeginDisabled();
-//		if (ImGui::Button("Connect")) {
-//			decodeAnswerAndFinalize(peer.answerInputBuffer, peer.pc);
-//			peer.isConnected = true; // In real code, this would be set by a callback
-//		}
-//		if (peer.isConnected) ImGui::EndDisabled();
-//
-//		ImGui::Separator();
-//		ImGui::PopID();
-//	}
-//
-//	ImGui::End();
-//}
-//
-//
-//void renderNetworkAnswerer() {
-//	ImGui::Begin("Answerer / Player Control");
-//
-//	ImGui::InputTextMultiline("Paste Offer", answererOfferInput, sizeof(answererOfferInput), ImVec2(-1, 80));
-//
-//	if (ImGui::Button("Create Answer")) {
-//		answererConnection.pc = nullptr; // In real code: std::make_shared<rtc::PeerConnection>(config);
-//		// Call asynchronously to avoid freezing
-//		answererConnection.answerFuture = std::async(std::launch::async, decodeOfferAndCreateAnswer, std::string(answererOfferInput), answererConnection.pc);
-//	}
-//
-//	// Check if the async answer creation is complete
-//	if (answererConnection.answerFuture.valid() && answererConnection.answerFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready) {
-//		answererConnection.answerString = answererConnection.answerFuture.get();
-//		// Simulate connection success and add the GM to our list of peers
-//		if (!answererConnection.isConnected) {
-//			answererConnectedPeers.push_back("GM_Peer");
-//			answererConnection.isConnected = true;
-//		}
-//	}
-//
-//	ImGui::InputTextMultiline("Answer to be Copied", &answererConnection.answerString[0], answererConnection.answerString.size() + 1, ImVec2(-1, 80), ImGuiInputTextFlags_ReadOnly);
-//	ImGui::SameLine();
-//	if (ImGui::Button("Copy##Answer")) {
-//		ImGui::SetClipboardText(answererConnection.answerString.c_str());
-//	}
-//
-//	ImGui::SeparatorText("Connected Peers");
-//	if (ImGui::BeginListBox("##ConnectedPeers", ImVec2(-1, 0))) {
-//		for (const auto& peerName : answererConnectedPeers) {
-//			ImGui::Selectable(peerName.c_str());
-//		}
-//		ImGui::EndListBox();
-//	}
-//
-//	ImGui::End();
-//}
+std::vector<unsigned char> NetworkManager::buildCreateMarkerFrame(uint64_t boardId, const flecs::entity& marker, uint64_t imageBytesTotal) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::CreateEntity));
+
+	auto mid = marker.get<Identifier>()->id;
+	auto pos = *marker.get<Position>();
+	auto sz = *marker.get<Size>();
+	auto vis = *marker.get<Visibility>();
+	auto mov = *marker.get<Moving>();
+
+	std::string name = "marker_" + std::to_string(mid);
+
+	Serializer::serializeUInt64(b, boardId);
+	Serializer::serializeUInt64(b, mid);
+	Serializer::serializeString(b, name);
+
+	Serializer::serializePosition(b, &pos);
+	Serializer::serializeSize(b, &sz);
+	Serializer::serializeVisibility(b, &vis);
+	Serializer::serializeMoving(b, &mov);
+
+	Serializer::serializeUInt64(b, imageBytesTotal);
+	return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildFogCreateFrame(uint64_t boardId, const flecs::entity& fog) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::FogCreate));
+
+	auto fid = fog.get<Identifier>()->id;
+	auto pos = *fog.get<Position>();
+	auto sz = *fog.get<Size>();
+	auto vis = *fog.get<Visibility>();
+
+	// [boardId][fogId][Position][Size][Visibility]
+	Serializer::serializeUInt64(b, boardId);
+	Serializer::serializeUInt64(b, fid);
+	Serializer::serializePosition(b, &pos);
+	Serializer::serializeSize(b, &sz);
+	Serializer::serializeVisibility(b, &vis);
+	return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildImageChunkFrame(uint8_t ownerKind, uint64_t id, uint64_t offset, const unsigned char* data, size_t len) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::Image));
+	Serializer::serializeUInt8(b, ownerKind);
+	Serializer::serializeUInt64(b, id);
+	Serializer::serializeUInt64(b, offset);
+	// len as int32
+	Serializer::serializeInt(b, static_cast<int>(len));
+	b.insert(b.end(), data, data + len);
+	return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildCommitBoardFrame(uint64_t boardId) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::CommitBoard));
+	Serializer::serializeUInt64(b, boardId);
+	return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId) {
+	std::vector<unsigned char> b;
+	Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::CommitMarker));
+	Serializer::serializeUInt64(b, boardId);
+	Serializer::serializeUInt64(b, markerId);
+	return b;
+}

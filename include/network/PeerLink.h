@@ -22,7 +22,9 @@ public:
     void addIceCandidate(const rtc::Candidate& candidate); 
 
     void send(const std::string& msg);
-    void sendOn(const std::string& label, const std::vector<std::byte>& bytes);
+    bool sendOn(const std::string& label, const std::vector<uint8_t>& bytes);
+    bool sendGame(const std::vector<uint8_t>& bytes);
+
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 
@@ -36,14 +38,15 @@ public:
 
 
     // send helpers
-  /*  void sendIntent(const std::vector<unsigned char>& bytes);
-    void sendState(const std::vector<unsigned char>& bytes);
-    void sendSnapshot(const std::vector<unsigned char>& bytes);
-    void sendChat(const std::vector<unsigned char>& bytes);*/
+  /*  void sendIntent(const std::vector<uint8_t>& bytes);
+    void sendState(const std::vector<uint8_t>& bytes);
+    void sendSnapshot(const std::vector<uint8_t>& bytes);
+    void sendChat(const std::vector<uint8_t>& bytes);*/
 
     // accessors
     bool isConnected() const;       // PC connected + *at least* Intent channel open
     bool isPcConnectedOnly() const;
+    static constexpr size_t kMaxBufferedBytes = 5 /*MB*/*1024*1024; //(tune as you like)
 
 private:
     std::string peerId;
@@ -62,10 +65,10 @@ private:
     std::mutex candMx_;
 
     // internal handler dispatch (called from each dc->onMessage)
-    void onIntentMessage(const std::vector<unsigned char>& bytes);
-    void onStateMessage(const std::vector<unsigned char>& bytes);
-    void onSnapshotMessage(const std::vector<unsigned char>& bytes);
-    void onChatMessage(const std::vector<unsigned char>& bytes);
+    void onIntentMessage(const std::vector<uint8_t>& bytes);
+    void onStateMessage(const std::vector<uint8_t>& bytes);
+    void onSnapshotMessage(const std::vector<uint8_t>& bytes);
+    void onChatMessage(const std::vector<uint8_t>& bytes);
 
     void setupCallbacks();   // internal
 };

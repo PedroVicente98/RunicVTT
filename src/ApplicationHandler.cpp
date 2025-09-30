@@ -306,7 +306,7 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
         // Inform the camera about the FBO's current dimensions for projection
         game_table_manager.setCameraFboDimensions(glm::vec2(map_fbo->width, map_fbo->height));
-        game_table_manager.render(va, ib, shader, grid_shader, renderer); // Your board_manager.render() call
+        game_table_manager.render(va, ib, shader, grid_shader, renderer); // Your board_manager->render() call
 
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
     }
@@ -338,7 +338,7 @@ void ApplicationHandler::renderActiveGametable() {
 
                 ImVec2 toolbar_cursor_pos_in_parent = ImVec2(image_min_screen_pos.x - window_pos.x,
                     image_min_screen_pos.y - window_pos.y);
-                game_table_manager.board_manager.renderToolbar(toolbar_cursor_pos_in_parent);
+                game_table_manager.board_manager->renderToolbar(toolbar_cursor_pos_in_parent);
 
 
                 ImGuiIO& io = ImGui::GetIO();
@@ -376,8 +376,8 @@ void ApplicationHandler::renderActiveGametable() {
                     
                         const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
 
-                        glm::vec2 world_position = game_table_manager.board_manager.camera.screenToWorldPosition(current_fbo_mouse_pos);
-                        game_table_manager.board_manager.createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
+                        glm::vec2 world_position = game_table_manager.board_manager->camera.screenToWorldPosition(current_fbo_mouse_pos);
+                        game_table_manager.board_manager->createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
 
                     }
                     ImGui::EndDragDropTarget();
@@ -458,11 +458,11 @@ void ApplicationHandler::renderActiveGametable() {
 //            if (ImGui::MenuItem("Create")) {
 //                open_create_board = true;
 //            }
-//            if (game_table_manager.board_manager.isBoardActive()) {
+//            if (game_table_manager.board_manager->isBoardActive()) {
 //                if (ImGui::MenuItem("Save")) {
 //                    //save_active_board = true;
 //                    auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
-//                    game_table_manager.board_manager.saveActiveBoard(board_folder_path);
+//                    game_table_manager.board_manager->saveActiveBoard(board_folder_path);
 //                }
 //
 //                if (ImGui::MenuItem("Close")) {
@@ -610,10 +610,10 @@ void ApplicationHandler::renderMainMenuBar() {
             if (ImGui::MenuItem("Create")) {
                 open_create_board = true;
             }
-            if (game_table_manager.board_manager.isBoardActive()) {
+            if (game_table_manager.board_manager->isBoardActive()) {
                 if (ImGui::MenuItem("Save")) {
                     auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
-                    game_table_manager.board_manager.saveActiveBoard(board_folder_path);
+                    game_table_manager.board_manager->saveActiveBoard(board_folder_path);
                 }
                 if (ImGui::MenuItem("Close")) {
                     close_current_board = true;

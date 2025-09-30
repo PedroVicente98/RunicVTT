@@ -141,11 +141,30 @@ void PeerLink::setupCallbacks() {
         std::cout << "[PeerLink] Received DC \"" << label << "\" from " << peerId << "\n";
     });
 }
+//
+//void PeerLink::sendOn(const std::string& label, const std::vector<std::byte>& bytes) {
+//    auto it = dcs_.find(label);
+//    if (it == dcs_.end() || !it->second || !it->second->isOpen()) return;
+//    it->second->send(&bytes.front(), bytes.size());
+//}
 
-void PeerLink::sendOn(const std::string& label, const std::vector<std::byte>& bytes) {
+bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& bytes) {
     auto it = dcs_.find(label);
-    if (it == dcs_.end() || !it->second || !it->second->isOpen()) return;
-    it->second->send(&bytes.front(), bytes.size());
+    if (it == dcs_.end() || !it->second) return false;
+    auto& ch = it->second;
+    if (!ch->isOpen()) return false;
+
+    // Optional backpressure guard (avoid unbounded memory use)
+    if (ch->bufferedAmount() > kMaxBufferedBytes) {
+        // You can queue locally instead of dropping, if you want
+        return false;
+    }
+
+    ch->send(rtc::binary{ bytes.begin(), bytes.end() }); // libdatachannel handles SCTP fragmentation
+    return true;
+}
+bool PeerLink::sendGame(const std::vector<uint8_t>& bytes) {
+    return sendOn(std::string(msg::dc::name::Game), bytes);
 }
 
 void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc, const std::string& label) {
@@ -175,12 +194,13 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
 
         // binary
         const auto& bin = std::get<rtc::binary>(m);
-        std::vector<std::byte> bytes(bin.begin(), bin.end());
+        std::vector<uint8_t> bytes(bin.size());
+        std::memcpy(bytes.data(), bin.data(), bin.size()); 
 
         if (auto nm = network_manager.lock()) {
             if (label == msg::dc::name::Game) {
                 // Your existing binary entrypoint:
-                //nm->onPeerBinaryMessage(peerId, bytes);
+                nm->onDcGameBinary(peerId, bytes);
             }
             else if (label == msg::dc::name::Chat) {
                 // Optional: add nm->onPeerChatBinary(peerId, bytes) later
