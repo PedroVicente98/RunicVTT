@@ -231,6 +231,22 @@ private:
         return off + need <= b.size();
     }
 
+    inline std::vector<unsigned char> readFileBytes(const std::string& path) {
+        std::ifstream file(path, std::ios::binary);
+        if (!file) {
+            return {}; // return empty if file not found
+        }
+        file.seekg(0, std::ios::end);
+        size_t size = file.tellg();
+        file.seekg(0, std::ios::beg);
+    
+        std::vector<unsigned char> buffer(size);
+        if (size > 0) {
+            file.read(reinterpret_cast<char*>(buffer.data()), size);
+        }
+        return buffer;
+    }
+
 };
 
 
