@@ -1,106 +1,32 @@
-#pragma once
-
-#include "imgui.h"                // for ImGui types/ImTextureID
-#include <vector>
-#include <deque>
-#include <string>
-#include <set>
-#include <unordered_map>
-#include <filesystem>
-#include <fstream>
-#include <optional>
-#include <ctime>
-#include <algorithm>
-#include <memory>
-
-// Forward-declare NetworkManager to avoid circular include in the header.
-class NetworkManager;
-
-// You already include flecs widely; world is stored by value, so we need the full type here.
-// If you prefer, store a pointer/reference to flecs::world and forward-declare instead.
-#include "flecs.h"
-
-// --------- DC schema ---------
-namespace chatmsg {
-    inline constexpr const char* Type     = "type";
-    inline constexpr const char* Chat     = "chat";
-    inline constexpr const char* From     = "from";
-    inline constexpr const char* Username = "username";
-    inline constexpr const char* To       = "to";       // array of peerIds (optional)
-    inline constexpr const char* Text     = "text";
-    inline constexpr const char* Ts       = "ts";
-    inline constexpr const char* Channel  = "channel";  // chat-id key (stable ID)
-}
-
-// --------- Model ---------
-struct ChatMessage {
-    enum class Kind { TEXT, IMAGE, LINK };
-    Kind        kind = Kind::TEXT;
-    std::string senderId;
-    std::string username;
-    std::string content;      // text or URL
-    ImTextureID texture = nullptr; // non-owning; renderer caches elsewhere
-    double      ts = 0.0;
-};
-
-struct ChatThread {
-    std::string id;                      // "all" or "peerA|peerB"
-    std::string displayName;             // "General" or "A,B,C"
-    std::set<std::string> participants;  // for non-general only; "all" is dynamic
-    std::deque<ChatMessage> messages;
-};
-
 class ChatManager : public std::enable_shared_from_this<ChatManager> {
 public:
-    ChatManager(std::shared_ptr<NetworkManager> nm,
-                flecs::world ecs,
-                std::string gameTableName);
+    // ... unchanged: ctor/dtor/setNetwork/bind/saveCurrent/ensureThreadByParticipants/sendTextToThread ...
 
-    // UI entry point
-    void render();
+    // ---------- GameTable Snapshot (BINARY) ----------
+    // Call from NetworkManager when building/parsing Snapshot_GameTable
+    void writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const;
+    void readThreadsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off);
 
-    // Inbound DC (JSON) -> append to chat
-    void onIncomingChatJson(const std::string& jsonStr);
+    // ---------- Inbound (binary DC frames) ----------
+    // Chat message (binary), replaces JSON path
+    void onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off);
 
-    // Persistence
-    bool saveToFile();
-    bool loadFromFile();
+    // Meta ops (binary)
+    void onChatThreadCreateFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onChatThreadUpdateFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onChatThreadDeleteFrame(const std::vector<uint8_t>& b, size_t& off);
 
 private:
-    std::weak_ptr<NetworkManager> network_; // weak to avoid cycles
-    flecs::world                  ecs_;
-    std::string                   gameTableName_;
+    // ... unchanged model/state ...
 
-    std::unordered_map<std::string, std::shared_ptr<ChatThread>> threads_;
-    std::string activeId_ = "all";
-    std::array<char, 512> input_{};
-    bool focusInput_ = false;
+    // emit meta + message frames (binary)
+    void emitThreadCreate(const ChatThreadModel& th);
+    void emitThreadUpdate(const ChatThreadModel& th);
+    void emitThreadDelete(uint64_t threadId);
+    void emitChatMessageFrame(uint64_t threadId, const std::string& username,
+                              const std::string& text, uint64_t ts);
 
-    // helpers
-    static double nowSec();
-    static ChatMessage::Kind classifyMessage(const std::string& s);
-    static ImVec4 colorForName(const std::string& name);
-    std::string guestLabel(const std::string& id) const;
-
-    static std::string makeThreadId(const std::set<std::string>& participants);
-    std::shared_ptr<ChatThread> getOrCreateThread(const std::set<std::string>& participants);
-    std::shared_ptr<ChatThread> getOrCreateThreadById(const std::string& id);
-    std::string participantsDisplayName(const std::set<std::string>& participants) const;
-
-    void ensureGeneral();
-    void refreshGeneralParticipants();
-
-    std::shared_ptr<ChatThread> currentThread();
-    void sendToThread(const std::shared_ptr<ChatThread>& th, const std::string& text);
-
-    // UI subpanels
-    void renderLeftSidebar();
-    void renderRightPanel();
-    void onSubmit();
-
-    static std::string processCommand(const std::string& input);
-
-    std::filesystem::path chatFilePath() const;
+    // utils (unchanged): makeDeterministicThreadId, classifyMessage, guestLabel, nowSec...
 };
 
 /*#pragma once
