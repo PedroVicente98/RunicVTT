@@ -150,3 +150,46 @@ private:
     std::deque<Toast> toasts_;
     Config cfg_;
 };
+/*
+USAGE
+--------------------------------------------------------
+// Somewhere in your app bootstrap:
+auto g_toaster = std::make_shared<ImGuiToaster>();
+
+// Optional: tweak look/feel
+ImGuiToaster::Config cfg;
+cfg.corner = ImGuiToaster::Config::Corner::TopRight;
+cfg.maxToasts = 8;
+g_toaster->SetConfig(cfg);
+
+// Give to your managers (NetworkManager, GameTableManager, AutosaveManager, etc.)
+networkManager->setToaster(g_toaster);
+gameTableManager->setToaster(g_toaster);
+// autosaveManager->setToaster(g_toaster); // if you want autosave messages here
+
+--------------------------------------------------------
+// In NetworkManager:
+class NetworkManager {
+public:
+    void setToaster(std::shared_ptr<ImGuiToaster> t) { toaster_ = std::move(t); }
+
+    void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec) {
+        if (toaster_) toaster_->Push(lvl, msg, durationSec);
+    }
+
+private:
+    std::shared_ptr<ImGuiToaster> toaster_;
+};
+----------------------------------------------------------
+// In your main GUI frame (once per frame, after NewFrame, before Render):
+if (g_toaster) g_toaster->Render();
+-----------------------------------------------------------
+bool ok = //your save routine /;
+if (ok) {
+    g_toaster->Good("GameTable Saved!!", 5.0f);
+} else {
+    g_toaster->Error("Save Failed: <reason>", 5.0f);
+}
+
+
+*/
