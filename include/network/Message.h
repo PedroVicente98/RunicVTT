@@ -4,12 +4,74 @@
 #include <string_view>
 #include <cstdint>
 #include "nlohmann/json.hpp"
+#include "Components.h"
 
 // If you use nlohmann::json in this TU, include it once anywhere before using helpers.
 // #include <nlohmann/json.hpp>
 
 namespace msg {
-    
+
+    enum class DCType : uint8_t {
+        // Snapshots and Composite Operations
+        Snapshot_GameTable = 100,
+        Snapshot_Board = 101,
+        CommitMarker = 102,
+        CommitBoard = 103,
+        ImageChunk = 104,
+
+        //Operations
+        MarkerCreate = 1,
+        MarkerUpdate = 2, //Position and/or Visibility
+        MarkerDelete = 3,
+        FogCreate = 4,
+        FogUpdate = 5, //Size and/or Visibility
+        FogDelete = 6,
+        GridUpdate = 7, //Position, Size and/or Visibility
+        Chat = 8,
+        NoteCreate = 9,
+        NoteUpdate = 10, //Metadata and/or Content 
+        NoteDelete = 11
+    };
+
+    enum class ImageOwnerKind : uint8_t { Board, Marker };
+
+    struct MarkerMeta {
+        uint64_t markerId = 0;
+        uint64_t boardId = 0;
+        std::string name;             // filename/hint if you want
+        Position pos{};
+        Size size{};
+        Visibility vis{};
+        Moving mov{};
+    };
+
+    struct BoardMeta {
+        uint64_t boardId = 0;
+        std::string boardName;
+        Panning pan{};
+        Grid grid{};
+        Size size{};
+    };
+
+    // Single “ready” container with tag + optionals (only 1 engaged)
+    struct ReadyMessage {
+        DCType kind;
+        std::string fromPeer; // optional: who sent it (fill in DC callback if you have it)
+
+        std::optional<uint64_t> tableId;
+        std::optional<uint64_t> boardId;
+
+        std::optional<uint64_t> fogId;
+        std::optional<Position> pos;
+        std::optional<Size> size;
+        std::optional<Visibility> vis;
+
+        std::optional<std::string > name;
+        std::optional<std::vector<uint8_t>> bytes;
+        std::optional<BoardMeta> boardMeta;
+        std::optional<MarkerMeta> markerMeta;
+    };
+
     // ---------- Common JSON keys (shared) ----------
     namespace key {
         inline constexpr std::string_view Type = "type";
@@ -92,31 +154,7 @@ namespace msg {
         inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
     }
 
-    // ---------- Optional: numeric IDs for DC binary mux ----------
-    enum class DCType : uint8_t {
-        // State (GM -> All)
-        State_MarkerCreated = 50,
-        State_MarkerMoved = 51,
-        State_MarkerDeleted = 52,
-
-        // Snapshots (GM -> Player)
-        Snapshot_GameTable = 100,
-        Snapshot_Board = 101,
-
-        // You already have these; keep them if you still use JSON side paths
-        Chat = 1,
-        Image = 2,
-        ToggleVisibility = 3,
-        CreateEntity = 4,
-        Move = 5,
-        MarkerMove = 6,
-        FogCreate = 7,
-        FogUpdate = 8,
-        GridUpdate = 9,
-        CommitMarker = 10,
-        CommitBoard = 11
-    };
-
+  
     // ========== Optional JSON helpers (nlohmann::json) ==========
     // Enable by including <nlohmann/json.hpp> before using these.
     using Json = nlohmann::json;

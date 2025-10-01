@@ -14,6 +14,8 @@
 #include <iostream>
 #include "MessageQueue.h"
 #include "Components.h"
+#include "Message.h" 
+#include <fstream>
 
 enum class Role {
     NONE,
@@ -34,53 +36,23 @@ struct NetworkToast {
     Level       level;
 };
 
-struct InboundMsg {
-    std::string fromPeer;                // who sent
-    std::string label;                   // DC label (e.g., msg::dc::name::Game)
-    std::vector<uint8_t> bytes;    // payload
-};
-
-struct OutboundMsg {
-    std::string toPeer;                  // empty = broadcast
-    std::string label;                   // DC label
-    std::vector<uint8_t> bytes;    // payload
-};
 
 
 // Forward declare
 class SignalingServer;
 class SignalingClient;
 class BoardManager;
-
-enum class ImageOwnerKind : uint8_t { Board, Marker };
-
-struct MarkerMeta {
-    uint64_t markerId = 0;
-    uint64_t boardId = 0;
-    std::string name;             // filename/hint if you want
-    Position pos{};
-    Size size{};
-    Visibility vis{};
-    Moving mov{};
-};
-
-struct BoardMeta {
-    uint64_t boardId = 0;
-    std::string boardName;
-    Panning pan{};
-    Grid grid{};
-    Size size{};
-};
+class GameTableManager;
 
 struct PendingImage {
-    ImageOwnerKind kind{};
+    msg::ImageOwnerKind kind{};
     uint64_t id = 0;              // boardId when kind=Board, markerId when kind=Marker
     uint64_t boardId = 0;         // only used when kind=Marker; for Board can be same as id or 0
     std::string name;             // optional filename/path hint
 
     // optional meta to finalize on commit:
-    std::optional<MarkerMeta> markerMeta;
-    std::optional<BoardMeta>  boardMeta;
+    std::optional<msg::MarkerMeta> markerMeta;
+    std::optional<msg::BoardMeta>  boardMeta;
 
     uint64_t total = 0;
     uint64_t received = 0;
@@ -90,12 +62,11 @@ struct PendingImage {
 };
 
 
-
 class NetworkManager : public std::enable_shared_from_this<NetworkManager>  {
 public:
     NetworkManager(flecs::world ecs);
 
-    void setup(std::weak_ptr<BoardManager> board_manager);
+    void setup(std::weak_ptr<BoardManager> board_manager, std::weak_ptr<GameTableManager> gametable_manager);
 
     ~NetworkManager();
 
@@ -151,38 +122,16 @@ public:
     const std::deque<NetworkToast>& toasts() const { return toasts_; }
     void pruneToasts(double now);
 
-    void queueMessage(OutboundMsg msg);
-    bool tryDequeueOutbound(OutboundMsg& msg);
+    bool tryPopReadyMessage(msg::ReadyMessage& out) { return inboundGame_.try_pop(out); }
 
     void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
 
     bool sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name);
     bool sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name);
 
-    static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
-private:
+    void onPeerChannelOpen(const std::string& peerId, const std::string& label);
+    void bootstrapPeerIfReady(const std::string& peerId);
 
-    void handleBoardMeta(const std::vector<uint8_t>& b, size_t& off);
-    void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
-    void handleFogCreate(const std::vector<uint8_t>& b, size_t& off);
-    void handleImageChunk(const std::vector<uint8_t>& b, size_t& off);
-    void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
-    void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
-
-    void createBoardFromBytesAndMeta(const BoardMeta& bm, const std::vector<uint8_t>& bytes);
-    void createFogFromMeta(uint64_t fogId, const Position& pos, const Size& size, const Visibility& vis, flecs::entity parentBoard);
-    void createMarkerFromBytesAndMeta(const MarkerMeta& mm, const std::vector<uint8_t>& bytes, flecs::entity parentBoard);
-
-    // frame builders
-    std::vector<uint8_t> buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name);
-    std::vector<uint8_t> buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal);
-    std::vector<uint8_t> buildCreateMarkerFrame(uint64_t boardId, const flecs::entity& marker, uint64_t imageBytesTotal);
-    std::vector<uint8_t> buildFogCreateFrame(uint64_t boardId, const flecs::entity& fog);
-    std::vector<uint8_t> buildImageChunkFrame(uint8_t ownerKind, uint64_t id, uint64_t offset, const uint8_t* data, size_t len);
-    std::vector<uint8_t> buildCommitBoardFrame(uint64_t boardId);
-    std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
-
-    std::vector<std::string> getConnectedPeerIds() const;
 
     void broadcastGameTable(const flecs::entity& gameTable);
     void broadcastBoard(const flecs::entity& board);
@@ -197,12 +146,32 @@ private:
     void sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
 
-    flecs::entity findBoardById(uint64_t boardId);
+private:
+    static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
+
+    void handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off);
+    void handleBoardMeta(const std::vector<uint8_t>& b, size_t& off);
+    void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
+    void handleFogCreate(const std::vector<uint8_t>& b, size_t& off);
+    void handleImageChunk(const std::vector<uint8_t>& b, size_t& off);
+    void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
+    void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
+
+    // frame builders
+    std::vector<uint8_t> buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name);
+    std::vector<uint8_t> buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal);
+    std::vector<uint8_t> buildCreateMarkerFrame(uint64_t boardId, const flecs::entity& marker, uint64_t imageBytesTotal);
+    std::vector<uint8_t> buildFogCreateFrame(uint64_t boardId, const flecs::entity& fog);
+    std::vector<uint8_t> buildImageChunkFrame(uint8_t ownerKind, uint64_t id, uint64_t offset, const uint8_t* data, size_t len);
+    std::vector<uint8_t> buildCommitBoardFrame(uint64_t boardId);
+    std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
+
+    std::vector<std::string> getConnectedPeerIds() const;
+
     std::deque<NetworkToast> toasts_;
     std::unordered_map<uint64_t, PendingImage> imagesRx_; 
 
-    MessageQueue<InboundMsg>  inbound_;
-    MessageQueue<OutboundMsg> outbound_; 
+    MessageQueue<msg::ReadyMessage> inboundGame_;
 
     std::string myClientId_;
     std::string myUsername_;
@@ -221,6 +190,7 @@ private:
     std::shared_ptr<SignalingClient> signalingClient;
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> peers;
     std::weak_ptr<BoardManager> board_manager;
+    std::weak_ptr<GameTableManager> gametable_manager;
 
     static bool hasUrlScheme(const std::string& s) {
         auto starts = [&](const char* p) { return s.rfind(p, 0) == 0; };

@@ -6,10 +6,9 @@
 #include "flecs.h"
 #include "Components.h"
 #include "PathManager.h"
-
 #include "NetworkManager.h"
 
-class GameTableManager {
+class GameTableManager : public std::enable_shared_from_this<GameTableManager> {
 public:
 	GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
 	~GameTableManager();
@@ -23,14 +22,7 @@ public:
 
 	bool isConnected() const;
 	
-	//void openConnection(unsigned short port);
-	//void closeConnection();
-
-	//void processSentMessages();
-	//void processReceivedMessages();
-
-	//void createGameTablePopUp();
-	//void loadGameTablePopUp();
+	void processReceivedGameMessages();
 
 	void hostGameTablePopUp();
 	void networkCenterPopUp();
@@ -47,9 +39,6 @@ public:
 	void guidePopUp();
 	void aboutPopUp();
 
-	//void createNetworkPopUp();
-	//void closeNetworkPopUp();
-	//void openNetworkInfoPopUp();
 	void renderNetworkToasts(std::shared_ptr<NetworkManager> nm);
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
@@ -71,13 +60,17 @@ public:
 	std::shared_ptr<DirectoryWindow> map_directory;
 	std::shared_ptr<NetworkManager> network_manager;
 	std::shared_ptr<BoardManager> board_manager;
+	flecs::entity active_game_table = flecs::entity();
+
+	void setActiveGameTableEntity(flecs::entity e) { active_game_table = e; }
+	flecs::entity getActiveGameTableEntity() const { return active_game_table; }
+
 private:
 
 	void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin,int fbo_height);
 	void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
 	void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
 
-	flecs::entity active_game_table = flecs::entity();
 	flecs::world ecs;
 
 	glm::vec2 current_mouse_pos;  // Posição atual do mouse em snake_case 

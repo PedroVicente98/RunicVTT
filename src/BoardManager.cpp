@@ -805,7 +805,15 @@ BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t 
     return BoardImageData(tex, glm::vec2(width, height), /*path*/"");
 }
 
-
+flecs::entity BoardManager::findBoardById(uint64_t boardId) {
+	flecs::entity result;
+	ecs.each([&](flecs::entity e, const Board&, const Identifier& id) {
+		if (e.is_valid() && id.id == boardId) {
+			result = e;
+		}
+		});
+	return result; // will be invalid if not found
+}
 
 
 

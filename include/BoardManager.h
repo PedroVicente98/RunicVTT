@@ -184,7 +184,9 @@ public:
     bool isPanning();
     bool isDraggingMarker();
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
-    
+
+    flecs::entity findBoardById(uint64_t boardId);
+
     // Generates a unique 64-bit ID
     uint64_t generateUniqueId();
     // Finds an entity by its Identifier component with the specified ID

@@ -159,24 +159,42 @@ bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& byte
         // You can queue locally instead of dropping, if you want
         return false;
     }
-
-    ch->send(rtc::binary{ bytes.begin(), bytes.end() }); // libdatachannel handles SCTP fragmentation
+    rtc::binary b;
+    b.resize(bytes.size());
+    if (!bytes.empty()) {
+        std::memcpy(b.data(), bytes.data(), bytes.size()); // std::byte is trivially copyable
+    }
+    ch->send(b); // libdatachannel handles SCTP fragmentation
     return true;
 }
 bool PeerLink::sendGame(const std::vector<uint8_t>& bytes) {
     return sendOn(std::string(msg::dc::name::Game), bytes);
 }
 
+bool PeerLink::allRequiredOpen() const {
+    // minimal: only require the channel used for snapshots
+    auto it = dcOpen_.find(msg::dc::name::Game);
+    return it != dcOpen_.end() && it->second;
+}
+
 void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc, const std::string& label) {
     if (!dc) return;
 
-    dc->onOpen([id = peerId, label]() {
+    dc->onOpen([this, id = peerId, label]() {
         std::cout << "[PeerLink] DC open \"" << label << "\" to " << id << "\n";
-        });
+        dcOpen_[label] = true;
+        if (label == msg::dc::name::Game /* or "state" if you split */) {
+            if (auto nm = network_manager.lock()) {
+                nm->onPeerChannelOpen(peerId, label);
+            }
+        }
+    });
 
-    dc->onClosed([id = peerId, label]() {
+    dc->onClosed([this, id = peerId, label]() {
         std::cout << "[PeerLink] DC closed \"" << label << "\" to " << id << "\n";
-        });
+        dcOpen_[label] = false;
+        bootstrapSent_ = false;
+    });
 
     dc->onMessage([this, label](rtc::message_variant m) {
         if (std::holds_alternative<std::string>(m)) {

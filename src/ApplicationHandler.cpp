@@ -235,7 +235,7 @@ int ApplicationHandler::run()
             ImGui::NewFrame();
 
             //game_table_manager.processSentMessages();
-            //game_table_manager.processReceivedMessages();
+            game_table_manager.processReceivedGameMessages();
             //system("cls");
             renderDockSpace();
             renderMainMenuBar();

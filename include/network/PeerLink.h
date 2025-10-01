@@ -48,6 +48,10 @@ public:
     bool isPcConnectedOnly() const;
     static constexpr size_t kMaxBufferedBytes = 5 /*MB*/*1024*1024; //(tune as you like)
 
+    bool allRequiredOpen() const;
+    bool bootstrapSent() const { return bootstrapSent_; }
+    void markBootstrapSent() { bootstrapSent_ = true; }
+
 private:
     std::string peerId;
     std::string displayName_;
@@ -63,6 +67,9 @@ private:
     std::atomic<bool> remoteDescSet_{ false };
     std::vector<rtc::Candidate> pendingRemoteCandidates_;
     std::mutex candMx_;
+
+    bool bootstrapSent_ = false; 
+    std::unordered_map<std::string, bool> dcOpen_;
 
     // internal handler dispatch (called from each dc->onMessage)
     void onIntentMessage(const std::vector<uint8_t>& bytes);

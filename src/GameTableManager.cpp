@@ -7,7 +7,7 @@
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
     : ecs(ecs),network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory)), chat()
 {
-    network_manager->setup(board_manager);
+    network_manager->setup(board_manager, weak_from_this());
 
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
@@ -88,43 +88,89 @@ bool GameTableManager::isConnected() const {
     return network_manager->isConnected();
 }
 
-//
-//void GameTableManager::openConnection(unsigned short port) {
-//    network_manager.startServer(port);
-//}
-//
-//void GameTableManager::closeConnection() {
-//    network_manager.stopServer();
-//}
-//
-//
-//void GameTableManager::processSentMessages() {
-//    network_manager.processSentMessages();
-//}
-//void GameTableManager::processReceivedMessages() {
-//    std::lock_guard<std::mutex> lock(network_manager.receivedQueueMutex);
-//    // Process all messages in the queue
-//    while (!network_manager.receivedQueue.empty()) {
-//        const ReceivedMessage& receivedMessage = network_manager.receivedQueue.front();
-//
-//        switch (receivedMessage.type) {
-//        case MessageType::ChatMessage:
-//            // Process chat message, you can pass it to your chat system
-//            std::cout << "[Chat] " << receivedMessage.user << ": " << receivedMessage.chatMessage << std::endl;
-//            chat.addReceivedTextMessage(receivedMessage.user, receivedMessage.chatMessage);
-//            break;
-//
-//        case MessageType::CreateMarker:
-//            std::cout << "Creating marker from received message." << std::endl;
-//            break;
-//
-//        default:
-//            std::cerr << "Unknown message type received!" << std::endl;
-//            break;
-//        }
-//        network_manager.receivedQueue.pop();
-//    }
-//}
+void GameTableManager::processReceivedGameMessages() {
+
+    constexpr int kMaxPerFrame = 32; // avoid long stalls
+    int processed = 0;
+
+    msg::ReadyMessage m;
+    while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m)) {
+        switch (m.kind) {
+        case msg::DCType::Snapshot_GameTable: {
+            if (!m.tableId || !m.name) break;
+            active_game_table = ecs.entity("GameTable")
+                .set(GameTable{ *m.name })
+                .set(Identifier{ *m.tableId });
+            break;
+        }
+
+        case msg::DCType::CommitBoard: {
+            if (!m.boardId || !m.boardMeta) break;
+            GLuint tex = 0;
+            glm::vec2 texSize{ 0,0 };
+            if (m.bytes && !m.bytes->empty()) {
+                auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
+                    m.bytes->size());
+                tex = image.textureID;
+                texSize = image.size;
+            }
+
+            const auto& bm = *m.boardMeta;
+            auto board = board_manager->createBoard(bm.boardName, /*map path*/"", tex, texSize);
+            board.set(Identifier{ bm.boardId });
+            board.set(bm.pan); 
+            board.set(bm.grid);
+            break;
+        }
+
+        case msg::DCType::CommitMarker: {
+            if (!m.boardId || !m.markerMeta) break;
+            auto boardEnt = board_manager->findBoardById(*m.boardId);
+            if (!boardEnt.is_valid()) break;
+
+            GLuint tex = 0;
+            glm::vec2 texSize{ m.markerMeta->size.width, m.markerMeta->size.height };
+            if (m.bytes && !m.bytes->empty()) {
+                auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
+                    m.bytes->size());
+                tex = image.textureID;
+                texSize = image.size;
+            }
+            const auto& mm = *m.markerMeta;
+            auto marker = board_manager->createMarker(
+                /*imageFilePath*/"", tex,
+                { (float)mm.pos.x, (float)mm.pos.y },
+                texSize
+            );
+            marker.set(Identifier{ mm.markerId });
+            marker.set(mm.vis);
+            marker.set(mm.mov);
+            marker.add(flecs::ChildOf, boardEnt);
+            break;
+        }
+
+        case msg::DCType::FogCreate: {
+            if (!m.boardId || !m.fogId || !m.pos || !m.size || !m.vis) break;
+            auto boardEnt = board_manager->findBoardById(*m.boardId);
+            if (!boardEnt.is_valid()) break;
+
+            auto fog = board_manager->createFogOfWar(
+                { (float)m.pos->x, (float)m.pos->y },
+                { m.size->width, m.size->height }
+            );
+            fog.set(Identifier{ *m.fogId });
+            fog.set(*m.vis);
+            fog.add(flecs::ChildOf, boardEnt);
+            break;
+        }
+
+        default:
+            break;
+        }
+
+        ++processed;
+    }
+}
 
 
 void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {

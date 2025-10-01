@@ -35,14 +35,11 @@ GLFWwindow* initializeOpenGLContext() {
     return window;
 }
 
-// Função para definir o ícone da janela
-void setWindowIcon(GLFWwindow* window, const char* iconPath) {
-    // Carrega a imagem do ícone usando stb_image
+GLFWimage loadImage(const char* iconPath) {
     int width, height, channels;
     unsigned char* image = stbi_load(iconPath, &width, &height, &channels, 4);  // Força 4 canais (RGBA)
     if (!image) {
         std::cerr << "Erro: Não foi possível carregar o ícone: " << iconPath << std::endl;
-        return;
     }
 
     // Cria o objeto GLFWimage e configura o ícone
@@ -50,35 +47,48 @@ void setWindowIcon(GLFWwindow* window, const char* iconPath) {
     icon.width = width;
     icon.height = height;
     icon.pixels = image;
-    glfwSetWindowIcon(window, 1, &icon);  // Define o ícone
+    
+    return icon;
+}
+
+// Função para definir o ícone da janela
+void setWindowIcon(GLFWwindow* window, std::filesystem::path iconFolderPath) {
+    // Carrega a imagem do ícone usando stb_image
+    auto icon16 = iconFolderPath / "RunicVTTIcon_16.png";
+    auto icon32 = iconFolderPath / "RunicVTTIcon_32.png";
+    auto icon64 = iconFolderPath / "RunicVTTIcon_64.png";
+    auto icon256 = iconFolderPath / "RunicVTTIcon.png";
+
+    GLFWimage icons[4];
+    icons[0] = loadImage(icon16.string().c_str());
+    icons[1] = loadImage(icon32.string().c_str());
+    icons[2] = loadImage(icon64.string().c_str());
+    icons[3] = loadImage(icon256.string().c_str());
+
+    glfwSetWindowIcon(window, 4, icons);  // Define o ícone
 
     // Libera a memória usada pela imagem
-    stbi_image_free(image);
+    stbi_image_free(icons[0].pixels);
+    stbi_image_free(icons[1].pixels);
+    stbi_image_free(icons[2].pixels);
+    stbi_image_free(icons[3].pixels);
 }
 
 int main() {
-//
-//#ifndef _DEBUG
-//    // Hide the console window in Release mode
-//    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-//#endif
-    // Inicializa o contexto OpenGL
     GLFWwindow* window = initializeOpenGLContext();
     if (!window) {
         return -1;  // Falha na inicialização
     }
 
-    //auto pathManager = PathManager();
     PathManager::ensureDirectories();
 
-    auto iconPath = PathManager::getResPath() / "RunicVTTIcon.png";
-    setWindowIcon(window, iconPath.string().c_str());
+    auto iconFolderPath = PathManager::getResPath();
+    setWindowIcon(window, iconFolderPath);
 
     std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
     std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(),"MarkersDirectory");
     ApplicationHandler app(window, map_directory, marker_directory);
-    app.run();  // Executa o loop principal da aplicação
+    app.run();  
 
-    glfwTerminate();  // Limpa os recursos do GLFW quando terminar
     return 0;
 }

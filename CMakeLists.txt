@@ -33,13 +33,6 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     vendor/imgui/*.cpp
 )
 
-list(REMOVE_ITEM SOURCES
-    ${CMAKE_SOURCE_DIR}/src/Application_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
-    ${CMAKE_SOURCE_DIR}/src/NetworkManager_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
-    ${CMAKE_SOURCE_DIR}/include/NetworkManager_OLD.h
-)
-
-
 add_executable(RunicVTT ${SOURCES})
 
 # ----------------------
