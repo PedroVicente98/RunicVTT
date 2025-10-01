@@ -1,0 +1,11 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf         # or 'lf' if you prefer; pick one and stick to it
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{h,hpp,hh,hxx,c,cc,cpp,cxx,inl}]
+indent_style = space
+indent_size = 4
