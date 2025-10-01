@@ -14,35 +14,39 @@ public:
 
     struct Config {
         // Visuals
-        float bgAlpha         = 0.90f;
-        float rounding        = 6.0f;
-        ImVec2 windowPadding  = ImVec2(10.f, 8.f);
-        float verticalSpacing = 36.f;
-        float edgePadding     = 10.f;
+        float  bgOpacity       = 0.80f;            // final window opacity (0..1). We'll apply this to level color.
+        float  rounding        = 6.0f;
+        ImVec2 windowPadding   = ImVec2(10.f, 8.f);
+        float  verticalSpacing = 36.f;
+        float  edgePadding     = 10.f;
 
         // Sizing
-        bool   autoResize     = true;               // if true, window fits content but respects minSize/maxSize
-        ImVec2 minSize        = ImVec2(360.f, 0.f); // ensure a decent width for long phrases
-        ImVec2 maxSize        = ImVec2(0.f, 0.f);   // 0,0 = no max constraint
-        ImVec2 fixedSize      = ImVec2(0.f, 0.f);   // if x>0 or y>0, forces exact window size (overrides autoResize)
-        float  maxWidth       = 480.f;              // wrap at this width (content), 0 = no wrap
-        bool   wrapText       = true;
+        bool   autoResize      = true;               // auto-fit to content (clamped by constraints)
+        ImVec2 minSize         = ImVec2(360.f, 0.f); // good base width for long phrases
+        ImVec2 maxSize         = ImVec2(0.f, 0.f);   // 0,0 => will auto-cap to 90% of work area
+        ImVec2 fixedSize       = ImVec2(0.f, 0.f);   // if >0 for x/y, forces that dimension
+        float  maxWidth        = 480.f;              // text wrap width (0 = use content region avail)
+        bool   wrapText        = true;
 
         // Positioning
-        ImVec2 anchorPivot    = ImVec2(1.f, 0.f);   // top-right by default
+        ImVec2 anchorPivot     = ImVec2(1.f, 0.f);   // top-right
         enum class Corner { TopLeft, TopRight, BottomLeft, BottomRight };
-        Corner corner         = Corner::TopRight;
+        Corner corner          = Corner::TopRight;
 
         // Behavior
-        size_t maxToasts      = 8;
-        bool   clickThrough   = true;               // let clicks pass through
-        bool   focusOnAppear  = false;              // typically false for toasts
+        size_t maxToasts       = 8;
+        bool   clickThrough    = true;               // let clicks pass through
+        bool   focusOnAppear   = false;
 
-        // Colors
-        ImVec4 colorInfo      = ImVec4(0.60f, 0.80f, 1.00f, 1.0f);
-        ImVec4 colorGood      = ImVec4(0.20f, 1.00f, 0.20f, 1.0f);
-        ImVec4 colorWarning   = ImVec4(1.00f, 0.90f, 0.20f, 1.0f);
-        ImVec4 colorError     = ImVec4(1.00f, 0.20f, 0.20f, 1.0f);
+        // Colors per level (used as WINDOW background color; text is always white)
+        ImVec4 colorInfo       = ImVec4(0.20f, 0.45f, 0.85f, 1.0f); // blue-ish
+        ImVec4 colorGood       = ImVec4(0.16f, 0.65f, 0.22f, 1.0f); // green
+        ImVec4 colorWarning    = ImVec4(0.90f, 0.70f, 0.10f, 1.0f); // yellow
+        ImVec4 colorError      = ImVec4(0.85f, 0.25f, 0.25f, 1.0f); // red
+        ImVec4 textColor       = ImVec4(1.0f, 1.0f, 1.0f, 1.0f);    // always white for contrast
+        bool   showBorder      = false;
+        ImVec4 borderColor     = ImVec4(0,0,0,0.35f);                // optional subtle border
+        float  borderSize      = 1.0f;
     };
 
     ImGuiToaster() = default;
@@ -71,7 +75,7 @@ public:
         toasts_.clear();
     }
 
-    // Call once per frame (after NewFrame, before Render)
+    // Call once per frame (after ImGui::NewFrame, before Render)
     void Render() {
         using clock = std::chrono::steady_clock;
 
@@ -105,31 +109,27 @@ public:
         int idx = 0;
 
         for (const auto& t : local) {
-            ImGui::SetNextWindowBgAlpha(cfg_.bgAlpha);
+            const ImVec4 lvlCol = ColorForLevel_(t.level);
+            ImVec4 bg = lvlCol; bg.w = cfg_.bgOpacity; // apply opacity to window bg
+
             ImGui::SetNextWindowViewport(vp->ID);
             ImGui::SetNextWindowPos(pos, ImGuiCond_Always, anchor);
 
-            // Sizing behavior:
-            // - If fixedSize.x/y > 0: force exact size
-            // - Else if autoResize: let it auto-resize but clamp to min/max with constraints
-            // - Else: use minSize as a default base size (still can be resized by the user if you enable it)
+            // Sizing setup
             if (cfg_.fixedSize.x > 0.f || cfg_.fixedSize.y > 0.f) {
                 ImGui::SetNextWindowSize(ImVec2(
                     cfg_.fixedSize.x > 0.f ? cfg_.fixedSize.x : 0.f,
                     cfg_.fixedSize.y > 0.f ? cfg_.fixedSize.y : 0.f
                 ), ImGuiCond_Always);
             } else {
-                // Constraints apply either way; with autoResize, it limits the auto size; without, it enforces min.
                 ImVec2 minC = cfg_.minSize;
-                ImVec2 maxC = cfg_.maxSize; // (0,0) means no max
+                ImVec2 maxC = cfg_.maxSize;
                 if (maxC.x <= 0.f || maxC.y <= 0.f) {
-                    // If not provided, you can safely allow giant height, and width up to work area
                     maxC.x = (maxC.x <= 0.f) ? (vp->WorkSize.x * 0.9f) : maxC.x;
                     maxC.y = (maxC.y <= 0.f) ? (vp->WorkSize.y * 0.9f) : maxC.y;
                 }
                 ImGui::SetNextWindowSizeConstraints(minC, maxC);
                 if (!cfg_.autoResize) {
-                    // Give it a starting size = minSize (so it doesn't collapse smaller than your desired default)
                     ImGui::SetNextWindowSize(minC, ImGuiCond_Always);
                 }
             }
@@ -142,29 +142,41 @@ public:
             if (cfg_.autoResize && !(cfg_.fixedSize.x > 0.f || cfg_.fixedSize.y > 0.f))
                 flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
+            // Style: background colored by level, text always white, optional border
             ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, cfg_.rounding);
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, cfg_.windowPadding);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding,  cfg_.windowPadding);
+
+            ImGui::PushStyleColor(ImGuiCol_WindowBg, bg);
+            if (cfg_.showBorder) {
+                ImGui::PushStyleColor(ImGuiCol_Border, cfg_.borderColor);
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, cfg_.borderSize);
+            }
 
             std::string name = "##toast-" + std::to_string(idx++);
             if (ImGui::Begin(name.c_str(), nullptr, flags)) {
-                ImVec4 col = ColorForLevel_(t.level);
-
-                // Optional wrap for long lines (uses content region width minus padding)
+                // Text wrapping
+                float wrapAt = 0.f;
                 if (cfg_.wrapText) {
-                    float wrapAt = cfg_.maxWidth > 0.f ? cfg_.maxWidth : 0.f;
-                    if (wrapAt <= 0.f) {
-                        // Use available content width as a fallback
-                        wrapAt = ImGui::GetContentRegionAvail().x;
-                    }
+                    wrapAt = (cfg_.maxWidth > 0.f) ? cfg_.maxWidth : ImGui::GetContentRegionAvail().x;
                     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + wrapAt);
-                    ImGui::TextColored(col, "%s", t.message.c_str());
+                }
+
+                ImGui::PushStyleColor(ImGuiCol_Text, cfg_.textColor);
+                ImGui::TextUnformatted(t.message.c_str());
+                ImGui::PopStyleColor();
+
+                if (cfg_.wrapText) {
                     ImGui::PopTextWrapPos();
-                } else {
-                    ImGui::TextColored(col, "%s", t.message.c_str());
                 }
             }
             ImGui::End();
-            ImGui::PopStyleVar(2);
+
+            if (cfg_.showBorder) {
+                ImGui::PopStyleVar(); // WindowBorderSize
+                ImGui::PopStyleColor(); // Border
+            }
+            ImGui::PopStyleColor(); // WindowBg
+            ImGui::PopStyleVar(2);  // rounding, padding
 
             pos.y += y_step;
         }
