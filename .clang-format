@@ -1,0 +1,19 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 0            # no hard wrap
+AccessModifierOffset: -4
+BreakBeforeBraces: Allman  # braces on new lines (common in game code)
+AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+NamespaceIndentation: All
+PointerAlignment: Left
+DerivePointerAlignment: false
+SortIncludes: true
+IncludeBlocks: Preserve
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: true
+SpaceBeforeParens: ControlStatements
+AlignOperands: true
+ReflowComments: false
