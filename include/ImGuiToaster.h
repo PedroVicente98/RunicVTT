@@ -247,6 +247,55 @@ if (ok) {
 } else {
     g_toaster->Error("Save Failed: <reason>", 5.0f);
 }
+--------------------------------------------------------------------
+// NetworkManager.hpp
+#include <memory>
+#include "ImGuiToaster.hpp"
 
+class NetworkManager {
+public:
+    void setToaster(std::shared_ptr<ImGuiToaster> t) { toaster_ = std::move(t); }
+
+    // Unified push (replaces your old pushStatusToast)
+    void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec = 5.0f) {
+        if (toaster_) toaster_->Push(lvl, msg, durationSec);
+    }
+
+    // Example: call on events
+    void onConnected()  { pushStatusToast("Connected",  ImGuiToaster::Level::Good,    4.0f); }
+    void onDisconnected(){ pushStatusToast("Disconnected", ImGuiToaster::Level::Warning, 5.0f); }
+    void onError(const std::string& e){ pushStatusToast("Network error: " + e, ImGuiToaster::Level::Error, 6.0f); }
+
+private:
+    std::shared_ptr<ImGuiToaster> toaster_;
+};
+--------------------------------------------------------------------
+void GameTableManager::renderToasts(std::shared_ptr<ImGuiToaster> toaster) {
+    if (toaster) toaster->Render();
+}
+--------------------------------------------------------------------
+// During initialization
+auto toaster = std::make_shared<ImGuiToaster>();
+ImGuiToaster::Config cfg;
+cfg.corner = ImGuiToaster::Config::Corner::TopRight;
+cfg.maxToasts = 8;
+toaster->SetConfig(cfg);
+
+// Pass to your managers
+networkManager->setToaster(toaster);
+gameTableManager->setToaster(toaster); // if you keep a ref there
+// autosaveManager->setToaster(toaster); // optional
+
+// In your frame loop, after ImGui::NewFrame() and before ImGui::Render():
+// ... your UI
+// Render toasts ONCE, globally
+toaster->Render();
+--------------------------------------------------------------------
+// Somewhere in your input handling (per-frame)
+if (ImGui::IsKeyPressed(ImGuiKey_1)) toaster->Info ("Info: Hello!", 5.0f);
+if (ImGui::IsKeyPressed(ImGuiKey_2)) toaster->Good ("Good: Saved",  5.0f);
+if (ImGui::IsKeyPressed(ImGuiKey_3)) toaster->Warn ("Warning: Ping high", 5.0f);
+if (ImGui::IsKeyPressed(ImGuiKey_4)) toaster->Error("Error: Failed op",   5.0f);
+---------------------------------------------------------------------------
 
 */
