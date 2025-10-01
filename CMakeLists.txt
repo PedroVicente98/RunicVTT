@@ -67,7 +67,7 @@ target_link_libraries(RunicVTT PRIVATE
     "${OPENSSL_SSL_LIBRARY}"
     "${OPENSSL_CRYPTO_LIBRARY}"
 )
-target_link_libraries(RunicVTT PRIVATE winhttp ws2_32)
+target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 Shell32)
 # ----------------------
 # nlohhmann json
 # ----------------------
