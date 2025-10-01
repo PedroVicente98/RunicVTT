@@ -1,4 +1,109 @@
 #pragma once
+
+#include "imgui.h"                // for ImGui types/ImTextureID
+#include <vector>
+#include <deque>
+#include <string>
+#include <set>
+#include <unordered_map>
+#include <filesystem>
+#include <fstream>
+#include <optional>
+#include <ctime>
+#include <algorithm>
+#include <memory>
+
+// Forward-declare NetworkManager to avoid circular include in the header.
+class NetworkManager;
+
+// You already include flecs widely; world is stored by value, so we need the full type here.
+// If you prefer, store a pointer/reference to flecs::world and forward-declare instead.
+#include "flecs.h"
+
+// --------- DC schema ---------
+namespace chatmsg {
+    inline constexpr const char* Type     = "type";
+    inline constexpr const char* Chat     = "chat";
+    inline constexpr const char* From     = "from";
+    inline constexpr const char* Username = "username";
+    inline constexpr const char* To       = "to";       // array of peerIds (optional)
+    inline constexpr const char* Text     = "text";
+    inline constexpr const char* Ts       = "ts";
+    inline constexpr const char* Channel  = "channel";  // chat-id key (stable ID)
+}
+
+// --------- Model ---------
+struct ChatMessage {
+    enum class Kind { TEXT, IMAGE, LINK };
+    Kind        kind = Kind::TEXT;
+    std::string senderId;
+    std::string username;
+    std::string content;      // text or URL
+    ImTextureID texture = nullptr; // non-owning; renderer caches elsewhere
+    double      ts = 0.0;
+};
+
+struct ChatThread {
+    std::string id;                      // "all" or "peerA|peerB"
+    std::string displayName;             // "General" or "A,B,C"
+    std::set<std::string> participants;  // for non-general only; "all" is dynamic
+    std::deque<ChatMessage> messages;
+};
+
+class ChatManager : public std::enable_shared_from_this<ChatManager> {
+public:
+    ChatManager(std::shared_ptr<NetworkManager> nm,
+                flecs::world ecs,
+                std::string gameTableName);
+
+    // UI entry point
+    void render();
+
+    // Inbound DC (JSON) -> append to chat
+    void onIncomingChatJson(const std::string& jsonStr);
+
+    // Persistence
+    bool saveToFile();
+    bool loadFromFile();
+
+private:
+    std::weak_ptr<NetworkManager> network_; // weak to avoid cycles
+    flecs::world                  ecs_;
+    std::string                   gameTableName_;
+
+    std::unordered_map<std::string, std::shared_ptr<ChatThread>> threads_;
+    std::string activeId_ = "all";
+    std::array<char, 512> input_{};
+    bool focusInput_ = false;
+
+    // helpers
+    static double nowSec();
+    static ChatMessage::Kind classifyMessage(const std::string& s);
+    static ImVec4 colorForName(const std::string& name);
+    std::string guestLabel(const std::string& id) const;
+
+    static std::string makeThreadId(const std::set<std::string>& participants);
+    std::shared_ptr<ChatThread> getOrCreateThread(const std::set<std::string>& participants);
+    std::shared_ptr<ChatThread> getOrCreateThreadById(const std::string& id);
+    std::string participantsDisplayName(const std::set<std::string>& participants) const;
+
+    void ensureGeneral();
+    void refreshGeneralParticipants();
+
+    std::shared_ptr<ChatThread> currentThread();
+    void sendToThread(const std::shared_ptr<ChatThread>& th, const std::string& text);
+
+    // UI subpanels
+    void renderLeftSidebar();
+    void renderRightPanel();
+    void onSubmit();
+
+    static std::string processCommand(const std::string& input);
+
+    std::filesystem::path chatFilePath() const;
+};
+
+/*#pragma once
 #include "imgui.h"
 #include <vector>
 #include <deque>
@@ -465,4 +570,4 @@ private:
     }
 
     std::filesystem::path chatFilePath() const { return std::filesystem::path(gameTableName_ + "_chat.runic"); }
-};
+};*/
