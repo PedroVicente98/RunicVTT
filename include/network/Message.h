@@ -27,10 +27,15 @@ namespace msg {
         FogUpdate = 5, //Size and/or Visibility
         FogDelete = 6,
         GridUpdate = 7, //Position, Size and/or Visibility
-        Chat = 8,
-        NoteCreate = 9,
-        NoteUpdate = 10, //Metadata and/or Content 
-        NoteDelete = 11
+        NoteCreate = 8,
+        NoteUpdate = 9, //Metadata and/or Content 
+        NoteDelete = 10,
+
+        // chat ops (binary)
+        ChatThreadCreate = 200,
+        ChatThreadUpdate = 201,
+        ChatThreadDelete = 202,
+        ChatMessage      = 203
     };
 
     enum class ImageOwnerKind : uint8_t { Board, Marker };
@@ -53,7 +58,7 @@ namespace msg {
         Size size{};
     };
 
-    // Single ìreadyî container with tag + optionals (only 1 engaged)
+    // Single ‚Äúready‚Äù container with tag + optionals (only 1 engaged)
     struct ReadyMessage {
         DCType kind;
         std::string fromPeer; // optional: who sent it (fill in DC callback if you have it)
