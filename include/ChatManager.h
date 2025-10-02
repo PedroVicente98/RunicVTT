@@ -132,6 +132,54 @@ private:
     bool          diceModPerDie_ = false;
 };
 
+/*
+NEW USAGE:
+--------------------------------------------------------------------------
+if (gameTableManager->chatManager) {
+    // Optionally, keep general participants in sync with current peers each frame:
+    // gameTableManager->chatManager->refreshGeneralParticipants(networkManager->getPeers());
+    gameTableManager->chatManager->render();
+}
+--------------------------------------------------------------------------
+// NetworkManager.h
+void setChatManager(std::weak_ptr<ChatManager> cm);
+
+// NetworkManager.cpp
+void NetworkManager::setChatManager(std::weak_ptr<ChatManager> cm) { chatManager_ = std::move(cm); }
+
+// When a DC message arrives, switch by msg::DCType and call:
+auto cm = chatManager_.lock();
+if (cm) {
+    size_t off = 0;
+    switch (type) {
+        case msg::DCType::ChatThreadCreate: cm->onChatThreadCreateFrame(payload, off); break;
+        case msg::DCType::ChatThreadUpdate: cm->onChatThreadUpdateFrame(payload, off); break;
+        case msg::DCType::ChatThreadDelete: cm->onChatThreadDeleteFrame(payload, off); break;
+        case msg::DCType::ChatMessage:      cm->onIncomingChatFrame    (payload, off); break;
+        default: break;
+    }
+}
+--------------------------------------------------------------------------
+// GameTableManager.h
+class GameTableManager {
+public:
+    std::shared_ptr<ChatManager> chatManager;
+    // ...
+};
+
+// GameTableManager.cpp (setup)
+gameTableManager->chatManager = std::make_shared<ChatManager>(networkManager);
+
+// When active table changes:
+chatManager->setActiveGameTable(activeTableId, activeTableName);
+--------------------------------------------------------------------------
+
+
+
+
+
+*/
+
 /*#pragma once
 
 #include <cstdint>
