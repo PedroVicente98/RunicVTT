@@ -656,13 +656,31 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
     return ids;
 }
 
+// In NetworkManager.cpp
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload) {
-
-};
+    for (auto& [pid, link] : peers_) {
+        if (!link) continue;
+        // build final buffer [u8 type][u32 size][bytes...] or your framing
+        std::vector<uint8_t> frame;
+        frame.push_back((uint8_t)t);
+        Serializer::serializeInt(frame, (int)payload.size());
+        frame.insert(frame.end(), payload.begin(), payload.end());
+        link->send(frame); // PeerLink::send(vector<uint8_t>) must exist
+    }
+}
 
 void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload) {
+    for (auto& pid : peers) {
+        auto it = peers_.find(pid);
+        if (it == peers_.end() || !it->second) continue;
+        std::vector<uint8_t> frame;
+        frame.push_back((uint8_t)t);
+        Serializer::serializeInt(frame, (int)payload.size());
+        frame.insert(frame.end(), payload.begin(), payload.end());
+        it->second->send(frame);
+    }
+}
 
-};
 
 // ----------- Broadcast wrappers -----------
 
