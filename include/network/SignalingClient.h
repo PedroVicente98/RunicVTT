@@ -5,9 +5,9 @@
 #include "rtc/rtc.hpp"
 
 class NetworkManager;
-class SignalingClient {
+class SignalingClient
+{
 public:
-
     SignalingClient(std::weak_ptr<NetworkManager> parent);
     // SignalingClient.h
     bool connectUrl(const std::string& url);

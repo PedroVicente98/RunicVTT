@@ -92,7 +92,6 @@ private:
     static constexpr uint64_t generalThreadId_ = 1;
 };
 
-
 /*#pragma once
 #include "imgui.h"
 #include <vector>
@@ -110,7 +109,7 @@ private:
 #include "PeerLink.h"
 #include "nlohmann/json.hpp"
 
-// --------- DC schema ---------
+ --------- DC schema ---------
 namespace chatmsg {
     inline constexpr const char* Type     = "type";
     inline constexpr const char* Chat     = "chat";
@@ -122,7 +121,7 @@ namespace chatmsg {
     inline constexpr const char* Channel  = "channel";  // chat-id key (stable ID)
 }
 
-// --------- Model ---------
+ --------- Model ---------
 struct ChatMessage {
     enum class Kind { TEXT, IMAGE, LINK };
     Kind        kind = Kind::TEXT;
@@ -150,9 +149,9 @@ public:
         ensureGeneral();
     }
 
-    // ---- UI entry ----
+     ---- UI entry ----
     void render() {
-        // keep general thread targeting current peers (no duplicates)
+         keep general thread targeting current peers (no duplicates)
         refreshGeneralParticipants();
 
         ImGui::Begin("Chat");
@@ -166,7 +165,7 @@ public:
         ImGui::End();
     }
 
-    // ---- inbound DC -> chat ----
+     ---- inbound DC -> chat ----
     void onIncomingChatJson(const std::string& jsonStr) {
         nlohmann::json j; try { j = nlohmann::json::parse(jsonStr); } catch (...) { return; }
         if (j.value(chatmsg::Type, "") != std::string(chatmsg::Chat)) return;
@@ -187,7 +186,7 @@ public:
         th->messages.push_back(std::move(m));
     }
 
-    // ---- persistence ----
+     ---- persistence ----
     bool saveToFile() {
         auto path = chatFilePath();
         std::vector<unsigned char> buf;
@@ -201,7 +200,7 @@ public:
             Serializer::serializeString(buf, th.id);
             Serializer::serializeString(buf, th.displayName);
 
-            // For "all" we persist empty; it is dynamic on load.
+             For "all" we persist empty; it is dynamic on load.
             if (th.id == "all") {
                 Serializer::serializeInt(buf, 0);
             } else {
@@ -292,7 +291,7 @@ private:
     std::array<char, 512> input_{};
     bool focusInput_ = false;
 
-    // ---- helpers ----
+     ---- helpers ----
     static double nowSec() { return (double)std::time(nullptr); }
 
     static ChatMessage::Kind classifyMessage(const std::string& s) {
@@ -373,7 +372,7 @@ private:
     }
 
     void refreshGeneralParticipants() {
-        // General must always include ALL current peers
+         General must always include ALL current peers
         auto it = threads_.find("all");
         if (it == threads_.end()) { ensureGeneral(); it = threads_.find("all"); }
         auto& th = *it->second;
@@ -381,7 +380,7 @@ private:
         if (network_) {
             for (auto& kv : network_->getPeers()) th.participants.insert(kv.first);
         }
-        // Optional: display as "General (N)"
+         Optional: display as "General (N)"
         th.displayName = "General (" + std::to_string(th.participants.size()) + ")";
     }
 
@@ -404,7 +403,7 @@ private:
         const std::string payload = j.dump();
 
         if (th->id == "all") {
-            // broadcast to all peers (General always targets all)
+             broadcast to all peers (General always targets all)
             for (auto& [pid, link] : network_->getPeers()) {
                 if (link) link->send(payload);
             }
@@ -416,7 +415,7 @@ private:
             }
         }
 
-        // append locally
+         append locally
         ChatMessage m;
         m.kind = classifyMessage(text);
         m.senderId = "me";
@@ -426,7 +425,7 @@ private:
         th->messages.push_back(std::move(m));
     }
 
-    // ---- UI ----
+     ---- UI ----
     void renderLeftSidebar() {
         ImGui::TextUnformatted("Chats");
         ImGui::Separator();
@@ -441,7 +440,7 @@ private:
         }
 
         ImGui::Separator();
-        if (ImGui::Button("New Group…")) ImGui::OpenPopup("NewGroupChat");
+        if (ImGui::Button("New Groupâ€¦")) ImGui::OpenPopup("NewGroupChat");
         if (ImGui::BeginPopupModal("NewGroupChat", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
             static std::set<std::string> tempSel;
 
@@ -492,7 +491,7 @@ private:
                     case ChatMessage::Kind::TEXT: ImGui::TextWrapped("%s", m.content.c_str()); break;
                     case ChatMessage::Kind::LINK:
                         if (ImGui::SmallButton(m.content.c_str())) {
-                            // TODO: open URL (ShellExecute)
+                             TODO: open URL (ShellExecute)
                         }
                         break;
                     case ChatMessage::Kind::IMAGE:
@@ -540,7 +539,7 @@ private:
     }
 
     static std::string processCommand(const std::string& input) {
-        // Minimal /roll NdM(+K)
+         Minimal /roll NdM(+K)
         auto parseInt = [](const std::string& s, size_t& i)->int{
             int v=0; bool any=false;
             while (i<s.size() && std::isdigit((unsigned char)s[i])) { any=true; v=v*10+(s[i]-'0'); ++i; }

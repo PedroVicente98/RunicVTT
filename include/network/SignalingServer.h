@@ -7,7 +7,8 @@
 // Forward declare to avoid circular include
 class NetworkManager;
 
-class SignalingServer {
+class SignalingServer
+{
 public:
     SignalingServer(std::weak_ptr<NetworkManager> parent);
     ~SignalingServer();
@@ -19,13 +20,15 @@ public:
     void onMessage(const std::string& clientId, const std::string& text);
     void sendTo(const std::string& clientId, const std::string& message);
 
-    void broadcast(const std::string& message); 
-    void broadcastShutdown();                
-    void disconnectAllClients();                
+    void broadcast(const std::string& message);
+    void broadcastShutdown();
+    void disconnectAllClients();
 
     // Config
-    void setPendingAuthTimeout(std::chrono::seconds s) { pendingTimeout_ = s; }
-
+    void setPendingAuthTimeout(std::chrono::seconds s)
+    {
+        pendingTimeout_ = s;
+    }
 
     // housekeeping
     //void prunePending(); // drop pending clients older than timeout
@@ -33,7 +36,8 @@ public:
     bool isAuthenticated(const std::string& clientId) const;
     void disconnectClient(const std::string& clientId);
 
-    const std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& authClients() const {
+    const std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& authClients() const
+    {
         return authClients_;
     }
 
@@ -49,6 +53,5 @@ private:
     // Authenticated clients (only these receive routed messages)
     std::unordered_map<std::string, std::string> authUsernames_;
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> authClients_;
-    std::chrono::seconds pendingTimeout_{ 60 }; // default: 60s to auth
-
+    std::chrono::seconds pendingTimeout_{60}; // default: 60s to auth
 };

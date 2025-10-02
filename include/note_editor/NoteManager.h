@@ -3,7 +3,8 @@
 #include <iostream>
 #include "Components.h"
 
-class NoteManager {
+class NoteManager
+{
 public:
     NoteManager(flecs::world& world, const std::string& noteDir = "notes/");
 
@@ -20,5 +21,4 @@ public:
 private:
     flecs::world& m_world;
     std::string m_noteDirectory;
-
 };

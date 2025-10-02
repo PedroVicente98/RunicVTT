@@ -1,21 +1,21 @@
 #include "ApplicationHandler.h"
 #include "Components.h"
 
-ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry)
-    : marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
+    marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
     ImGuiToaster::Config cfg;
     this->toaster_ = std::make_shared<ImGuiToaster>(cfg);
     game_table_manager.setToaster(toaster_);
 
-    ecs.component<Position>();// .member<float>("x").member<float>("y");
-    ecs.component<Size>();// .member<float>("width").member<float>("height");
-    ecs.component<Visibility>();// .member<bool>("isVisible");
-    ecs.component<Moving>();// .member<bool>("isDragging");
-    ecs.component<TextureComponent>();// .member<GLuint>("textureID").member<std::string>("imagePath");
+    ecs.component<Position>();         // .member<float>("x").member<float>("y");
+    ecs.component<Size>();             // .member<float>("width").member<float>("height");
+    ecs.component<Visibility>();       // .member<bool>("isVisible");
+    ecs.component<Moving>();           // .member<bool>("isDragging");
+    ecs.component<TextureComponent>(); // .member<GLuint>("textureID").member<std::string>("imagePath");
     //ecs.component<Zoom>();// .member<float>("zoomLevel");
-    ecs.component<Panning>();// .member<bool>("isPanning");
-    ecs.component<Grid>();// .member<glm::vec2>("offset").member<glm::vec2>("scale");
+    ecs.component<Panning>(); // .member<bool>("isPanning");
+    ecs.component<Grid>();    // .member<glm::vec2>("offset").member<glm::vec2>("scale");
     ecs.component<Board>();
     ecs.component<MarkerComponent>();
     ecs.component<FogOfWar>();
@@ -26,7 +26,6 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<NoteComponent>();
     //ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
-    
 }
 
 ApplicationHandler::~ApplicationHandler()
@@ -34,13 +33,15 @@ ApplicationHandler::~ApplicationHandler()
     DeleteMapFBO();
 }
 
-
-void ApplicationHandler::CreateMapFBO(int width, int height) {
-    if (map_fbo->fboID != 0) { // If FBO already exists, delete it first
+void ApplicationHandler::CreateMapFBO(int width, int height)
+{
+    if (map_fbo->fboID != 0)
+    { // If FBO already exists, delete it first
         DeleteMapFBO();
     }
 
-    if (width <= 0 || height <= 0) {
+    if (width <= 0 || height <= 0)
+    {
         std::cerr << "Warning: Attempted to create FBO with invalid dimensions: " << width << "x" << height << std::endl;
         // Keep FBO as 0,0,0 if dimensions are invalid to avoid errors
         map_fbo->width = 0;
@@ -71,40 +72,50 @@ void ApplicationHandler::CreateMapFBO(int width, int height) {
     GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
     GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, map_fbo->rboID));
 
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
         std::cerr << "ERROR::FRAMEBUFFER:: Framebuffer is not complete! Status: " << glCheckFramebufferStatus(GL_FRAMEBUFFER) << std::endl;
     }
 
     GLCall(glBindFramebuffer(GL_FRAMEBUFFER, 0)); // Unbind FBO, return to default framebuffer
 }
 
-void ApplicationHandler::ResizeMapFBO(int newWidth, int newHeight) {
-    if (map_fbo->width == newWidth && map_fbo->height == newHeight) {
+void ApplicationHandler::ResizeMapFBO(int newWidth, int newHeight)
+{
+    if (map_fbo->width == newWidth && map_fbo->height == newHeight)
+    {
         return; // No resize needed
     }
 
-    if (newWidth <= 0 && newHeight <= 0) {
+    if (newWidth <= 0 && newHeight <= 0)
+    {
         // Prevent creating FBO with invalid sizes, might occur when window is minimized
-        if (map_fbo->fboID != 0) DeleteMapFBO(); // Clean up if it exists
+        if (map_fbo->fboID != 0)
+            DeleteMapFBO(); // Clean up if it exists
         return;
     }
     // Only recreate if dimensions actually changed
-    if (map_fbo->width == newWidth && map_fbo->height == newHeight) {
+    if (map_fbo->width == newWidth && map_fbo->height == newHeight)
+    {
         return;
     }
     CreateMapFBO(newWidth, newHeight); // Recreate FBO with new dimensions
 }
 
-void ApplicationHandler::DeleteMapFBO() {
-    if (map_fbo->fboID != 0) {
+void ApplicationHandler::DeleteMapFBO()
+{
+    if (map_fbo->fboID != 0)
+    {
         GLCall(glDeleteFramebuffers(1, &map_fbo->fboID));
         map_fbo->fboID = 0;
     }
-    if (map_fbo->textureID != 0) {
+    if (map_fbo->textureID != 0)
+    {
         GLCall(glDeleteTextures(1, &map_fbo->textureID));
         map_fbo->textureID = 0;
     }
-    if (map_fbo->rboID != 0) {
+    if (map_fbo->rboID != 0)
+    {
         GLCall(glDeleteRenderbuffers(1, &map_fbo->rboID));
         map_fbo->rboID = 0;
     }
@@ -112,15 +123,14 @@ void ApplicationHandler::DeleteMapFBO() {
     map_fbo->height = 0;
 }
 
-
-int ApplicationHandler::run() 
+int ApplicationHandler::run()
 {
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1);
 
     glfwSetWindowUserPointer(window, &game_table_manager);
-    int minWidth = 1280; // AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÂO QUEBRA O LAYOUT
+    int minWidth = 1280; // AJUSTAR TAMANHOS, VERIFICAR TAMANHO MINIMO QUE NÃ‚O QUEBRA O LAYOUT
     int minHeight = 960;
     glfwSetWindowSizeLimits(window, minWidth, minHeight, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
@@ -128,7 +138,7 @@ int ApplicationHandler::run()
     glfwMaximizeWindow(window);
 
     std::cout << glGetString(GL_VERSION) << std::endl;
-    {//Escopo para finalizar OPenGL antes GlFW
+    { //Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
         GLCall(glEnable(GL_BLEND));
         GLCall(glDisable(GL_DEPTH_TEST));
@@ -140,20 +150,18 @@ int ApplicationHandler::run()
         //      -1.0f, 1.0f, 0.0f, 1.0f //3
         //};
         float positions[] = {
-             0.5f,  0.5f, 1.0f, 1.0f, // top-right corner 
-             0.5f, -0.5f, 1.0f, 0.0f, // bottom-right corner
+            0.5f, 0.5f, 1.0f, 1.0f,   // top-right corner
+            0.5f, -0.5f, 1.0f, 0.0f,  // bottom-right corner
             -0.5f, -0.5f, 0.0f, 0.0f, // bottom-left corner
-            -0.5f,  0.5f, 0.0f, 1.0f  // top-left corner
+            -0.5f, 0.5f, 0.0f, 1.0f   // top-left corner
         };
 
         unsigned int indices[] = {
-            0 , 1 , 2,
-            2 , 3 , 0
-        };
-
+            0, 1, 2,
+            2, 3, 0};
 
         VertexArray va;
-        VertexBuffer vb(positions, 4/*number of vertexes*/ * 4/*floats per vertex*/ * sizeof(float));
+        VertexBuffer vb(positions, 4 /*number of vertexes*/ * 4 /*floats per vertex*/ * sizeof(float));
         VertexBufferLayout layout;
 
         layout.Push<float>(2);
@@ -200,11 +208,12 @@ int ApplicationHandler::run()
 
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
-        ImGuiIO& io = ImGui::GetIO(); (void)io;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
-        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;       // Enable Multi-Viewport / Platform Windows
+        ImGuiIO& io = ImGui::GetIO();
+        (void)io;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+        io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
         //io.ConfigViewportsNoAutoMerge = true;
         io.ConfigWindowsMoveFromTitleBarOnly = true;
 
@@ -221,7 +230,6 @@ int ApplicationHandler::run()
         const char* glsl_version = "#version 330 core";
         ImGui_ImplGlfw_InitForOpenGL(window, true);
         ImGui_ImplOpenGL3_Init();
-
 
         /* Loop until the user closes the window */
         while (!glfwWindowShouldClose(window))
@@ -270,14 +278,14 @@ int ApplicationHandler::run()
 
     glfwTerminate();
     return 0;
-
 }
 
-void ApplicationHandler::renderDockSpace() 
+void ApplicationHandler::renderDockSpace()
 {
     auto dockspace_id = ImGui::GetID("Root");
     ImGuiViewport* viewport = ImGui::GetMainViewport();
-    if (g_dockspace_initialized == false) {
+    if (g_dockspace_initialized == false)
+    {
         g_dockspace_initialized = true;
         ImGui::DockBuilderRemoveNode(dockspace_id);
         ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode);
@@ -292,21 +300,22 @@ void ApplicationHandler::renderDockSpace()
         ImGui::DockBuilderFinish(dockspace_id);
     }
 
-    ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollWithMouse 
-                                | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoFocusOnAppearing /*<<--TESTING BEHAVIOUR FLAGS--*/ 
-                                | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus;
-    ImGui::SetNextWindowPos({ viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight() }, ImGuiCond_Always);
-    ImGui::SetNextWindowSize({ viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight() }, ImGuiCond_Always); //TESTING WITHOUT ImGuiCond_Once
+    ImGuiWindowFlags root_flags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoScrollWithMouse | ImGuiWindowFlags_NoMouseInputs | ImGuiWindowFlags_NoFocusOnAppearing /*<<--TESTING BEHAVIOUR FLAGS--*/
+                                  | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoBringToFrontOnFocus;
+    ImGui::SetNextWindowPos({viewport->Pos.x, viewport->Pos.y + ImGui::GetFrameHeight()}, ImGuiCond_Always);
+    ImGui::SetNextWindowSize({viewport->Size.x, viewport->Size.y - ImGui::GetFrameHeight()}, ImGuiCond_Always); //TESTING WITHOUT ImGuiCond_Once
     ImGui::Begin("RootWindow", nullptr, root_flags);
     ImGui::DockSpace(dockspace_id);
     ImGui::End();
 }
 
-void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer) {
-    if (map_fbo->fboID != 0 && map_fbo->width > 0 && map_fbo->height > 0) {
+void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
+{
+    if (map_fbo->fboID != 0 && map_fbo->width > 0 && map_fbo->height > 0)
+    {
         GLCall(glBindFramebuffer(GL_FRAMEBUFFER, map_fbo->fboID));
         GLCall(glViewport(0, 0, map_fbo->width, map_fbo->height)); // Crucial: Viewport matches FBO size
-        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 0.0f)); // Clear FBO background
+        GLCall(glClearColor(0.0f, 0.0f, 0.0f, 0.0f));              // Clear FBO background
         GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 
         // Inform the camera about the FBO's current dimensions for projection
@@ -319,7 +328,8 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
 void ApplicationHandler::renderActiveGametable()
 {
-    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected()) {
+    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected())
+    {
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar;
 
@@ -327,37 +337,39 @@ void ApplicationHandler::renderActiveGametable()
         ImGui::Begin("MapWindow", nullptr, window_flags);
         ImVec2 content_size = ImGui::GetContentRegionAvail();
 
-        if (content_size.x > 0 && content_size.y > 0) {
+        if (content_size.x > 0 && content_size.y > 0)
+        {
             ResizeMapFBO(static_cast<int>(content_size.x), static_cast<int>(content_size.y));
         }
         ImVec2 window_size = ImGui::GetWindowSize();
         ImVec2 window_pos = ImGui::GetWindowPos();
 
-        if (game_table_manager.isBoardActive()) {
-            if (map_fbo->textureID != 0) {
+        if (game_table_manager.isBoardActive())
+        {
+            if (map_fbo->textureID != 0)
+            {
                 // ImVec2(0,1), ImVec2(1,0) to flip Y for OpenGL textures in ImGui  ImVec2(0, 0), ImVec2(1, 1)
                 ImGui::Image((void*)(intptr_t)map_fbo->textureID, content_size, ImVec2(0, 1), ImVec2(1, 0));
 
-                ImVec2 displayed_image_size = ImGui::GetItemRectSize();;
+                ImVec2 displayed_image_size = ImGui::GetItemRectSize();
+                ;
                 ImVec2 image_min_screen_pos = ImGui::GetItemRectMin();
 
                 ImVec2 toolbar_cursor_pos_in_parent = ImVec2(image_min_screen_pos.x - window_pos.x,
-                    image_min_screen_pos.y - window_pos.y);
+                                                             image_min_screen_pos.y - window_pos.y);
                 game_table_manager.board_manager->renderToolbar(toolbar_cursor_pos_in_parent);
-
 
                 ImGuiIO& io = ImGui::GetIO();
                 ImVec2 mouse_pos_global = ImGui::GetMousePos();
 
-                bool is_mouse_within_image_bounds = (
-                    mouse_pos_global.x >= image_min_screen_pos.x &&
-                    mouse_pos_global.x < (image_min_screen_pos.x + displayed_image_size.x) &&
-                    mouse_pos_global.y >= image_min_screen_pos.y &&
-                    mouse_pos_global.y < (image_min_screen_pos.y + displayed_image_size.y)
-                    );
+                bool is_mouse_within_image_bounds = (mouse_pos_global.x >= image_min_screen_pos.x &&
+                                                     mouse_pos_global.x < (image_min_screen_pos.x + displayed_image_size.x) &&
+                                                     mouse_pos_global.y >= image_min_screen_pos.y &&
+                                                     mouse_pos_global.y < (image_min_screen_pos.y + displayed_image_size.y));
                 game_table_manager.processMouseInput(is_mouse_within_image_bounds);
 
-                if (is_mouse_within_image_bounds) {
+                if (is_mouse_within_image_bounds)
+                {
                     current_map_relative_mouse_pos = ImVec2(mouse_pos_global.x - image_min_screen_pos.x, mouse_pos_global.y - image_min_screen_pos.y);
                     float fbo_x = (current_map_relative_mouse_pos.x / displayed_image_size.x) * map_fbo->width;
                     float fbo_y = (current_map_relative_mouse_pos.y / displayed_image_size.y) * map_fbo->height;
@@ -366,24 +378,26 @@ void ApplicationHandler::renderActiveGametable()
                     game_table_manager.handleInputs(current_fbo_mouse_pos);
 
                     //DEBUG purposes
-                    if (g_draw_debug_circle) {
-                        DrawDebugCircle(mouse_pos_global, false, IM_COL32(0, 255, 0, 150), 10.0f); // Yellow for raw click
-                        DrawDebugCircle(image_min_screen_pos, false, IM_COL32(0, 255, 0, 255), 10.0f); // Yellow for image pos
+                    if (g_draw_debug_circle)
+                    {
+                        DrawDebugCircle(mouse_pos_global, false, IM_COL32(0, 255, 0, 150), 10.0f);                                                                                          // Yellow for raw click
+                        DrawDebugCircle(image_min_screen_pos, false, IM_COL32(0, 255, 0, 255), 10.0f);                                                                                      // Yellow for image pos
                         DrawDebugCircle(ImVec2(image_min_screen_pos.x + current_fbo_mouse_pos.x, image_min_screen_pos.y + current_fbo_mouse_pos.y), false, IM_COL32(255, 0, 0, 255), 5.0f); // Red for raw click
                     }
                 }
-                
+
                 ImGui::SetCursorScreenPos(image_min_screen_pos);
                 ImGui::InvisibleButton("##MapDropArea", displayed_image_size);
                 // Handle the drop payload
-                if (ImGui::BeginDragDropTarget()) {
-                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE")) {
-                    
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("MARKER_IMAGE"))
+                    {
+
                         const DirectoryWindow::ImageData* markerImage = (const DirectoryWindow::ImageData*)payload->Data;
 
                         glm::vec2 world_position = game_table_manager.board_manager->camera.screenToWorldPosition(current_fbo_mouse_pos);
                         game_table_manager.board_manager->createMarker(markerImage->filename, markerImage->textureID, world_position, markerImage->size);
-
                     }
                     ImGui::EndDragDropTarget();
                 }
@@ -391,9 +405,7 @@ void ApplicationHandler::renderActiveGametable()
         }
 
         ImGui::End();
-        
     }
-
 }
 //
 //void ApplicationHandler::renderMainMenuBar() {
@@ -401,7 +413,7 @@ void ApplicationHandler::renderActiveGametable()
 //    bool close_current_gametable = false;
 //    bool connect_to_gametable = false;
 //    bool load_active_gametable = false;
-//    
+//
 //    bool open_create_board = false;
 //    bool close_current_board = false;
 //
@@ -427,8 +439,8 @@ void ApplicationHandler::renderActiveGametable()
 //                game_table_manager.saveGameTable();
 //            }
 //        }
-//        
-//        if (ImGui::MenuItem("Open")) 
+//
+//        if (ImGui::MenuItem("Open"))
 //        {
 //            load_active_gametable = true;
 //        }
@@ -445,9 +457,9 @@ void ApplicationHandler::renderActiveGametable()
 //            //if(!game_table_manager.isConnectionActive()){
 //            //    if (ImGui::MenuItem("Open Connection")) { //ADD LATER TO REOPEN A CONNECTION, NEED TO SAVE THE PORT
 //            //        open_network_connection = true;
-//            //    } 
+//            //    }
 //            //}
-//            
+//
 //            if (ImGui::MenuItem("Connection Info")) {
 //                open_network_info = true;
 //            }
@@ -457,7 +469,7 @@ void ApplicationHandler::renderActiveGametable()
 //            }
 //            ImGui::EndMenu();
 //        }
-//        
+//
 //
 //        if (ImGui::BeginMenu("Board")) {
 //            if (ImGui::MenuItem("Create")) {
@@ -477,7 +489,7 @@ void ApplicationHandler::renderActiveGametable()
 //            if (ImGui::MenuItem("Open")) {
 //                load_active_board = true;
 //            }
-//         
+//
 //            ImGui::EndMenu();
 //        }
 //    }
@@ -522,7 +534,7 @@ void ApplicationHandler::renderActiveGametable()
 //
 //    if(ImGui::IsPopupOpen("NetworkInfo"))
 //        game_table_manager.openNetworkInfoPopUp();
-//     
+//
 //     if (open_network_connection)
 //        ImGui::OpenPopup("CreateNetwork");
 //
@@ -540,19 +552,19 @@ void ApplicationHandler::renderActiveGametable()
 //
 //    if(ImGui::IsPopupOpen("CreateGameTable"))
 //        game_table_manager.createGameTablePopUp();
-//    
+//
 //    if (close_current_gametable)
 //        ImGui::OpenPopup("CloseGameTable");
 //
 //    if (ImGui::IsPopupOpen("CloseGameTable"))
 //        game_table_manager.closeGameTablePopUp();
-//    
+//
 //    if (open_create_board)
 //        ImGui::OpenPopup("CreateBoard");
 //
 //    if (ImGui::IsPopupOpen("CreateBoard"))
 //        game_table_manager.createBoardPopUp();
-//    
+//
 //    if (close_current_board)
 //        ImGui::OpenPopup("CloseBoard");
 //
@@ -561,7 +573,8 @@ void ApplicationHandler::renderActiveGametable()
 //
 //
 //}
-void ApplicationHandler::renderMainMenuBar() {
+void ApplicationHandler::renderMainMenuBar()
+{
     // one-shot flags to open popups
     bool open_host_gametable = false; // NEW unified host modal (Create/Load + network + username)
     bool connect_to_gametable = false;
@@ -579,19 +592,25 @@ void ApplicationHandler::renderMainMenuBar() {
     ImGui::BeginMainMenuBar();
 
     // ---------------- Game Table ----------------
-    if (ImGui::BeginMenu("Game Table")) {
-        if (ImGui::MenuItem("Host...")) {                   // NEW: replaces Create/Open/Network
+    if (ImGui::BeginMenu("Game Table"))
+    {
+        if (ImGui::MenuItem("Host..."))
+        { // NEW: replaces Create/Open/Network
             open_host_gametable = true;
         }
-        if (ImGui::MenuItem("Connect...")) {                // players joining
+        if (ImGui::MenuItem("Connect..."))
+        { // players joining
             connect_to_gametable = true;
         }
 
-        if (game_table_manager.isGameTableActive()) {
-            if (ImGui::MenuItem("Save")) {                  // existing logic
+        if (game_table_manager.isGameTableActive())
+        {
+            if (ImGui::MenuItem("Save"))
+            { // existing logic
                 game_table_manager.saveGameTable();
             }
-            if (ImGui::MenuItem("Close")) {
+            if (ImGui::MenuItem("Close"))
+            {
                 close_current_gametable = true;
             }
         }
@@ -600,9 +619,12 @@ void ApplicationHandler::renderMainMenuBar() {
     bool showNetwork = (game_table_manager.network_manager && game_table_manager.network_manager->getPeerRole() != Role::NONE);
     // ---------------- Network ----------------
     //if (game_table_manager.isGameTableActive()) {
-    if (showNetwork) {
-        if (ImGui::BeginMenu("Network")) {
-            if (ImGui::MenuItem("Network Center")) {     // NEW: replaces Connection Info + Open/Close network
+    if (showNetwork)
+    {
+        if (ImGui::BeginMenu("Network"))
+        {
+            if (ImGui::MenuItem("Network Center"))
+            { // NEW: replaces Connection Info + Open/Close network
                 open_network_center = true;
             }
             ImGui::EndMenu();
@@ -610,32 +632,42 @@ void ApplicationHandler::renderMainMenuBar() {
     }
 
     // ---------------- Board ----------------
-    if (game_table_manager.isGameTableActive()) {
-        if (ImGui::BeginMenu("Board")) {
-            if (ImGui::MenuItem("Create")) {
+    if (game_table_manager.isGameTableActive())
+    {
+        if (ImGui::BeginMenu("Board"))
+        {
+            if (ImGui::MenuItem("Create"))
+            {
                 open_create_board = true;
             }
-            if (game_table_manager.board_manager->isBoardActive()) {
-                if (ImGui::MenuItem("Save")) {
+            if (game_table_manager.board_manager->isBoardActive())
+            {
+                if (ImGui::MenuItem("Save"))
+                {
                     auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
                     game_table_manager.board_manager->saveActiveBoard(board_folder_path);
                 }
-                if (ImGui::MenuItem("Close")) {
+                if (ImGui::MenuItem("Close"))
+                {
                     close_current_board = true;
                 }
             }
-            if (ImGui::MenuItem("Open")) {
+            if (ImGui::MenuItem("Open"))
+            {
                 load_active_board = true;
             }
             ImGui::EndMenu();
         }
     }
-    if (ImGui::BeginMenu("Help")) {
-        if (ImGui::MenuItem("Guide")) {
+    if (ImGui::BeginMenu("Help"))
+    {
+        if (ImGui::MenuItem("Guide"))
+        {
             guide = true;
         }
-        
-        if (ImGui::MenuItem("About")) {
+
+        if (ImGui::MenuItem("About"))
+        {
             about = true;
         }
         ImGui::EndMenu();
@@ -648,45 +680,45 @@ void ApplicationHandler::renderMainMenuBar() {
     if (open_host_gametable)
         ImGui::OpenPopup("Host GameTable");
     if (ImGui::IsPopupOpen("Host GameTable"))
-        game_table_manager.hostGameTablePopUp();         // NEW (Create/Load tabs + network + username)
+        game_table_manager.hostGameTablePopUp(); // NEW (Create/Load tabs + network + username)
 
     if (connect_to_gametable)
         ImGui::OpenPopup("ConnectToGameTable");
     if (ImGui::IsPopupOpen("ConnectToGameTable"))
-        game_table_manager.connectToGameTablePopUp();     // you already have this popup
+        game_table_manager.connectToGameTablePopUp(); // you already have this popup
 
     if (close_current_gametable)
         ImGui::OpenPopup("CloseGameTable");
     if (ImGui::IsPopupOpen("CloseGameTable"))
-        game_table_manager.closeGameTablePopUp();         // existing
+        game_table_manager.closeGameTablePopUp(); // existing
 
     if (open_network_center)
         ImGui::OpenPopup("Network Center");
     if (ImGui::IsPopupOpen("Network Center"))
-        game_table_manager.networkCenterPopUp();          // NEW unified network panel
+        game_table_manager.networkCenterPopUp(); // NEW unified network panel
 
     if (open_create_board)
         ImGui::OpenPopup("CreateBoard");
     if (ImGui::IsPopupOpen("CreateBoard"))
-        game_table_manager.createBoardPopUp();            // existing (good as-is)
+        game_table_manager.createBoardPopUp(); // existing (good as-is)
 
     if (load_active_board)
         ImGui::OpenPopup("LoadBoard");
     if (ImGui::IsPopupOpen("LoadBoard"))
-        game_table_manager.loadBoardPopUp();              // existing
+        game_table_manager.loadBoardPopUp(); // existing
 
     if (close_current_board)
         ImGui::OpenPopup("CloseBoard");
     if (ImGui::IsPopupOpen("CloseBoard"))
-        game_table_manager.closeBoardPopUp();    
+        game_table_manager.closeBoardPopUp();
 
     if (guide)
         ImGui::OpenPopup("Guide");
     if (ImGui::IsPopupOpen("Guide"))
-        game_table_manager.guidePopUp();      
-    
+        game_table_manager.guidePopUp();
+
     if (about)
         ImGui::OpenPopup("About");
     if (ImGui::IsPopupOpen("About"))
-        game_table_manager.aboutPopUp();         
+        game_table_manager.aboutPopUp();
 }

@@ -1,7 +1,6 @@
 #pragma once
 // Components.h
 
-
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
@@ -9,37 +8,41 @@
 #include "flecs.h"
 #include <shared_mutex>
 
-
-
 // Identifier Component
-struct Identifier {
-    uint64_t id;  // Unique identifier for each entity
+struct Identifier
+{
+    uint64_t id; // Unique identifier for each entity
 };
 
 // Position Component
-struct Position {
+struct Position
+{
     int x;
     int y;
 };
 
 // Size Component
-struct Size {
+struct Size
+{
     float width;
     float height;
 };
 
 // Visibility Component
-struct Visibility {
+struct Visibility
+{
     bool isVisible;
 };
 
 // Moving Component
-struct Moving {
+struct Moving
+{
     bool isDragging;
 };
 
 // Texture Component
-struct TextureComponent {
+struct TextureComponent
+{
     GLuint textureID;
     std::string image_path;
     glm::vec2 size;
@@ -51,12 +54,14 @@ struct TextureComponent {
 //};
 
 // Panning Component
-struct Panning {
+struct Panning
+{
     bool isPanning;
 };
 
 // Grid Component
-struct Grid {
+struct Grid
+{
     glm::vec2 offset;
     float cell_size;
     bool is_hex;
@@ -66,20 +71,24 @@ struct Grid {
 };
 
 // Board Component
-struct Board {
+struct Board
+{
     std::string board_name;
 };
 
 // Marker Component
-struct MarkerComponent {
+struct MarkerComponent
+{
 };
 
 // FogOfWar Component
-struct FogOfWar {
+struct FogOfWar
+{
 };
 
 // GameTable Component
-struct GameTable {
+struct GameTable
+{
     std::string gameTableName;
 };
 
@@ -87,15 +96,14 @@ struct ActiveBoard
 {
 };
 
-
-
-
 // Notes Component
-struct Notes {
+struct Notes
+{
     std::vector<flecs::entity> notes;
 };
 
-struct NoteComponent {
+struct NoteComponent
+{
     std::string uuid;
     std::string title;
     std::string markdown_text;
@@ -110,9 +118,6 @@ struct NoteComponent {
     bool has_conflict = false;
     std::string shared_from;
 };
-
-
-
 
 // Network Component
 //struct Network {

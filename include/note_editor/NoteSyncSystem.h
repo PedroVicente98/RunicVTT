@@ -3,7 +3,8 @@
 #include "Components.h"
 #include <string>
 
-class NoteSyncSystem {
+class NoteSyncSystem
+{
 public:
     NoteSyncSystem(flecs::world& world);
 

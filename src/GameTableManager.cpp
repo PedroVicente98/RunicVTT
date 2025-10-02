@@ -4,8 +4,8 @@
 #include "SignalingServer.h"
 #include "UPnPManager.h"
 
-GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs),network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory)), chat()
+GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
+    ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory)), chat()
 {
     network_manager->setup(board_manager, weak_from_this());
 
@@ -16,10 +16,8 @@ GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWi
     map_directory->generateTextureIDs();
 }
 
-
 GameTableManager::~GameTableManager()
 {
-
 }
 
 void GameTableManager::saveGameTable()
@@ -30,7 +28,8 @@ void GameTableManager::saveGameTable()
 void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
 {
     std::ifstream inFile(game_table_file_path, std::ios::binary);
-    if (inFile) {
+    if (inFile)
+    {
         std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
         inFile.close();
 
@@ -38,8 +37,9 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
         active_game_table = Serializer::deserializeGameTableEntity(buffer, offset, ecs);
         ecs.defer_begin();
         try
-        {   
-            active_game_table.children([&](flecs::entity child) {
+        {
+            active_game_table.children([&](flecs::entity child)
+                                       {
                 if (child.has<Board>()) {
                     board_manager->setActiveBoard(child);
                     auto texture = child.get_mut<TextureComponent>();
@@ -55,8 +55,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
                             grand_child_texture->size = marker_image.size;
                         }
                     });
-                }
-            });
+                } });
         }
         catch (const std::exception&)
         {
@@ -64,11 +63,11 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
         }
         ecs.defer_end();
     }
-    else {
+    else
+    {
         std::cerr << "Failed to load GameTable from " << game_table_file_path.string() << std::endl;
     }
 }
-
 
 bool GameTableManager::isBoardActive()
 {
@@ -77,107 +76,122 @@ bool GameTableManager::isBoardActive()
 
 bool GameTableManager::isGameTableActive()
 {
-	return active_game_table.is_valid();
+    return active_game_table.is_valid();
 }
 
 //bool GameTableManager::isConnectionActive() {
 //    return network_manager.isConnectionOpen();
 //}
 //
-bool GameTableManager::isConnected() const {
+bool GameTableManager::isConnected() const
+{
     return network_manager->isConnected();
 }
 
-void GameTableManager::processReceivedGameMessages() {
+void GameTableManager::processReceivedGameMessages()
+{
 
     constexpr int kMaxPerFrame = 32; // avoid long stalls
     int processed = 0;
 
     msg::ReadyMessage m;
-    while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m)) {
-        switch (m.kind) {
-        case msg::DCType::Snapshot_GameTable: {
-            if (!m.tableId || !m.name) break;
-            active_game_table = ecs.entity("GameTable")
-                .set(GameTable{ *m.name })
-                .set(Identifier{ *m.tableId });
-            break;
-        }
-
-        case msg::DCType::CommitBoard: {
-            if (!m.boardId || !m.boardMeta) break;
-            GLuint tex = 0;
-            glm::vec2 texSize{ 0,0 };
-            if (m.bytes && !m.bytes->empty()) {
-                auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
-                    m.bytes->size());
-                tex = image.textureID;
-                texSize = image.size;
+    while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m))
+    {
+        switch (m.kind)
+        {
+            case msg::DCType::Snapshot_GameTable:
+            {
+                if (!m.tableId || !m.name)
+                    break;
+                active_game_table = ecs.entity("GameTable")
+                                        .set(GameTable{*m.name})
+                                        .set(Identifier{*m.tableId});
+                break;
             }
 
-            const auto& bm = *m.boardMeta;
-            auto board = board_manager->createBoard(bm.boardName, /*map path*/"", tex, texSize);
-            board.set(Identifier{ bm.boardId });
-            board.set(bm.pan); 
-            board.set(bm.grid);
-            break;
-        }
+            case msg::DCType::CommitBoard:
+            {
+                if (!m.boardId || !m.boardMeta)
+                    break;
+                GLuint tex = 0;
+                glm::vec2 texSize{0, 0};
+                if (m.bytes && !m.bytes->empty())
+                {
+                    auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
+                                                                      m.bytes->size());
+                    tex = image.textureID;
+                    texSize = image.size;
+                }
 
-        case msg::DCType::CommitMarker: {
-            if (!m.boardId || !m.markerMeta) break;
-            auto boardEnt = board_manager->findBoardById(*m.boardId);
-            if (!boardEnt.is_valid()) break;
-
-            GLuint tex = 0;
-            glm::vec2 texSize{ m.markerMeta->size.width, m.markerMeta->size.height };
-            if (m.bytes && !m.bytes->empty()) {
-                auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
-                    m.bytes->size());
-                tex = image.textureID;
-                texSize = image.size;
+                const auto& bm = *m.boardMeta;
+                auto board = board_manager->createBoard(bm.boardName, /*map path*/ "", tex, texSize);
+                board.set(Identifier{bm.boardId});
+                board.set(bm.pan);
+                board.set(bm.grid);
+                break;
             }
-            const auto& mm = *m.markerMeta;
-            auto marker = board_manager->createMarker(
-                /*imageFilePath*/"", tex,
-                { (float)mm.pos.x, (float)mm.pos.y },
-                texSize
-            );
-            marker.set(Identifier{ mm.markerId });
-            marker.set(mm.vis);
-            marker.set(mm.mov);
-            marker.add(flecs::ChildOf, boardEnt);
-            break;
-        }
 
-        case msg::DCType::FogCreate: {
-            if (!m.boardId || !m.fogId || !m.pos || !m.size || !m.vis) break;
-            auto boardEnt = board_manager->findBoardById(*m.boardId);
-            if (!boardEnt.is_valid()) break;
+            case msg::DCType::CommitMarker:
+            {
+                if (!m.boardId || !m.markerMeta)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
 
-            auto fog = board_manager->createFogOfWar(
-                { (float)m.pos->x, (float)m.pos->y },
-                { m.size->width, m.size->height }
-            );
-            fog.set(Identifier{ *m.fogId });
-            fog.set(*m.vis);
-            fog.add(flecs::ChildOf, boardEnt);
-            break;
-        }
+                GLuint tex = 0;
+                glm::vec2 texSize{m.markerMeta->size.width, m.markerMeta->size.height};
+                if (m.bytes && !m.bytes->empty())
+                {
+                    auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
+                                                                      m.bytes->size());
+                    tex = image.textureID;
+                    texSize = image.size;
+                }
+                const auto& mm = *m.markerMeta;
+                auto marker = board_manager->createMarker(
+                    /*imageFilePath*/ "", tex,
+                    {(float)mm.pos.x, (float)mm.pos.y},
+                    texSize);
+                marker.set(Identifier{mm.markerId});
+                marker.set(mm.vis);
+                marker.set(mm.mov);
+                marker.add(flecs::ChildOf, boardEnt);
+                break;
+            }
 
-        default:
-            break;
+            case msg::DCType::FogCreate:
+            {
+                if (!m.boardId || !m.fogId || !m.pos || !m.size || !m.vis)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                auto fog = board_manager->createFogOfWar(
+                    {(float)m.pos->x, (float)m.pos->y},
+                    {m.size->width, m.size->height});
+                fog.set(Identifier{*m.fogId});
+                fog.set(*m.vis);
+                fog.add(flecs::ChildOf, boardEnt);
+                break;
+            }
+
+            default:
+                break;
         }
 
         ++processed;
     }
 }
 
-
-void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions) {
+void GameTableManager::setCameraFboDimensions(glm::vec2 fbo_dimensions)
+{
     board_manager->camera.setFboDimensions(fbo_dimensions);
 };
 
-void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos) {
+void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos)
+{
     current_mouse_world_pos = board_manager->camera.screenToWorldPosition(current_mouse_fbo_pos);
     this->current_mouse_fbo_pos = current_mouse_fbo_pos;
 
@@ -187,75 +201,97 @@ void GameTableManager::handleInputs(glm::vec2 current_mouse_fbo_pos) {
     handleScrollInputs();
 }
 
-void GameTableManager::handleMouseButtonInputs() {
+void GameTableManager::handleMouseButtonInputs()
+{
     // Check if board is active first
-    if (!isBoardActive()) return;
+    if (!isBoardActive())
+        return;
 
     // Left Mouse Button Press
-    if (mouse_left_clicked) {
-        if (board_manager->getCurrentTool() == Tool::MOVE) {
-            if (board_manager->isMouseOverMarker(current_mouse_world_pos) /*and !board_manager->isDraggingMarker()*/) {
+    if (mouse_left_clicked)
+    {
+        if (board_manager->getCurrentTool() == Tool::MOVE)
+        {
+            if (board_manager->isMouseOverMarker(current_mouse_world_pos) /*and !board_manager->isDraggingMarker()*/)
+            {
                 board_manager->startMouseDrag(current_mouse_world_pos, false); // Drag Marker
             }
-            else /*if(!board_manager->isPanning())*/ {
+            else /*if(!board_manager->isPanning())*/
+            {
                 board_manager->startMouseDrag(current_mouse_world_pos, true); // Pan Board
             }
         }
-        if (board_manager->getCurrentTool() == Tool::FOG and !board_manager->isCreatingFog()) {
+        if (board_manager->getCurrentTool() == Tool::FOG and !board_manager->isCreatingFog())
+        {
             board_manager->startMouseDrag(current_mouse_world_pos, false); // Start fog drawing/erasing
         }
-        if (board_manager->getCurrentTool() == Tool::SELECT) {
+        if (board_manager->getCurrentTool() == Tool::SELECT)
+        {
             auto entity = board_manager->getEntityAtMousePosition(current_mouse_world_pos);
-            if (entity.is_valid()) {
+            if (entity.is_valid())
+            {
                 board_manager->setShowEditWindow(true, entity);
             }
         }
     }
 
     // Left Mouse Button Release
-    if (mouse_left_released || ImGui::IsMouseReleased(ImGuiMouseButton_Left)) {
-        if (board_manager->isPanning() || board_manager->isDraggingMarker()) {
+    if (mouse_left_released || ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        if (board_manager->isPanning() || board_manager->isDraggingMarker())
+        {
             board_manager->endMouseDrag();
         }
-        if (board_manager->isCreatingFog()) {
+        if (board_manager->isCreatingFog())
+        {
             board_manager->handleFogCreation(current_mouse_world_pos); // Use world_pos
             board_manager->endMouseDrag();
         }
     }
 }
 
-void GameTableManager::handleCursorInputs() {
-    if (!isBoardActive()) return;
+void GameTableManager::handleCursorInputs()
+{
+    if (!isBoardActive())
+        return;
 
-    if (board_manager->isDraggingMarker()) {
+    if (board_manager->isDraggingMarker())
+    {
         board_manager->handleMarkerDragging(current_mouse_world_pos);
     }
 
-    if (board_manager->isPanning()) {
+    if (board_manager->isPanning())
+    {
         board_manager->panBoard(current_mouse_fbo_pos);
     }
-
 }
 
-void GameTableManager::handleScrollInputs() {
-    if (!isBoardActive()) return;
-    if (mouse_wheel_delta != 0.0f) {
+void GameTableManager::handleScrollInputs()
+{
+    if (!isBoardActive())
+        return;
+    if (mouse_wheel_delta != 0.0f)
+    {
         float zoom_factor;
-        if (mouse_wheel_delta > 0) {
+        if (mouse_wheel_delta > 0)
+        {
             zoom_factor = 1.1f; // Zoom in by 10%
         }
-        else {
+        else
+        {
             zoom_factor = 0.9f; // Zoom out by 10%
         }
         board_manager->camera.zoom(zoom_factor, current_mouse_world_pos);
     }
 }
 
-void GameTableManager::createGameTableFile(flecs::entity game_table) {
+void GameTableManager::createGameTableFile(flecs::entity game_table)
+{
     namespace fs = std::filesystem;
     auto game_tables_directory = PathManager::getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
-    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
+    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder))
+    {
         std::filesystem::create_directory(active_game_table_folder);
     }
 
@@ -264,59 +300,69 @@ void GameTableManager::createGameTableFile(flecs::entity game_table) {
 
     auto game_table_file = active_game_table_folder / (game_table_name + ".runic");
     std::ofstream file(game_table_file.string(), std::ios::binary);
-    if (file.is_open()) {
+    if (file.is_open())
+    {
         file.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         file.close();
     }
-    else {
+    else
+    {
         std::cerr << "Failed to open the file." << std::endl;
     }
-
 }
 
 //
-std::vector<std::string> GameTableManager::listBoardFiles() {
+std::vector<std::string> GameTableManager::listBoardFiles()
+{
     namespace fs = std::filesystem;
     auto game_tables_directory = PathManager::getGameTablesPath();
     auto active_game_table_folder = game_tables_directory / game_table_name;
-    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder)) {
+    if (!fs::exists(active_game_table_folder) && !fs::is_directory(active_game_table_folder))
+    {
         std::filesystem::create_directory(active_game_table_folder);
     }
     auto game_table_boards_folder = active_game_table_folder / "Boards";
 
-    if (!fs::exists(game_table_boards_folder) && !fs::is_directory(game_table_boards_folder)) {
+    if (!fs::exists(game_table_boards_folder) && !fs::is_directory(game_table_boards_folder))
+    {
         std::filesystem::create_directory(game_table_boards_folder);
     }
     std::vector<std::string> boards;
-    for (const auto& entry : std::filesystem::directory_iterator(game_table_boards_folder)) {
-        if (entry.is_regular_file()) {
+    for (const auto& entry : std::filesystem::directory_iterator(game_table_boards_folder))
+    {
+        if (entry.is_regular_file())
+        {
             boards.emplace_back(entry.path().filename().string());
         }
     }
 
     return boards;
-
 }
 
-std::vector<std::string> GameTableManager::listGameTableFiles() {
+std::vector<std::string> GameTableManager::listGameTableFiles()
+{
     namespace fs = std::filesystem;
     auto game_tables_directory = PathManager::getGameTablesPath();
 
-    // Verifica se o diretório "GameTables" existe
-    if (!fs::exists(game_tables_directory) || !fs::is_directory(game_tables_directory)) {
+    // Verifica se o diretÃ³rio "GameTables" existe
+    if (!fs::exists(game_tables_directory) || !fs::is_directory(game_tables_directory))
+    {
         std::cerr << "GameTables directory does not exist!" << std::endl;
         return {};
     }
     std::vector<std::string> game_tables;
-    // Itera sobre todos os diretórios dentro de "GameTables"
-    for (const auto& folder : fs::directory_iterator(game_tables_directory)) {
-        if (folder.is_directory()) {
+    // Itera sobre todos os diretÃ³rios dentro de "GameTables"
+    for (const auto& folder : fs::directory_iterator(game_tables_directory))
+    {
+        if (folder.is_directory())
+        {
             std::string folder_name = folder.path().filename().string();
             auto runic_file_path = folder.path() / (folder_name + ".runic");
 
             // Verifica se o arquivo "folder_name.runic" existe dentro da pasta
-            if (fs::exists(runic_file_path) && fs::is_regular_file(runic_file_path)) {
-                game_tables.emplace_back(runic_file_path.filename().string());  // Adiciona o nome do arquivo na lista
+            if (fs::exists(runic_file_path) && fs::is_regular_file(runic_file_path))
+            {
+                game_tables.emplace_back(runic_file_path.filename().string()); // Adiciona o nome do arquivo na lista
             }
         }
     }
@@ -324,20 +370,19 @@ std::vector<std::string> GameTableManager::listGameTableFiles() {
     return game_tables;
 }
 
-
-
-
-
 // ----------------------------- GUI --------------------------------------------------------------------------------
 
-void GameTableManager::createBoardPopUp() {
+void GameTableManager::createBoardPopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-    if (ImGui::BeginPopupModal("CreateBoard")) {
+    if (ImGui::BeginPopupModal("CreateBoard"))
+    {
         ImGui::SetItemDefaultFocus();
         ImGuiID dockspace_id = ImGui::GetID("CreateBoardDockspace");
 
-        if (ImGui::DockBuilderGetNode(dockspace_id) == 0) {
+        if (ImGui::DockBuilderGetNode(dockspace_id) == 0)
+        {
             ImGui::DockBuilderRemoveNode(dockspace_id);
             ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_DockSpace | ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoUndocking);
 
@@ -356,18 +401,21 @@ void GameTableManager::createBoardPopUp() {
 
         DirectoryWindow::ImageData selectedImage = map_directory->getSelectedImage();
 
-        if (!selectedImage.filename.empty()) {
+        if (!selectedImage.filename.empty())
+        {
             ImGui::Text("Selected Map: %s", selectedImage.filename.c_str());
             ImGui::Image((void*)(intptr_t)selectedImage.textureID, ImVec2(256, 256));
         }
-        else {
+        else
+        {
             ImGui::Text("No map selected. Please select a map.");
         }
 
         ImGui::NewLine();
 
         bool saved = false;
-        if (ImGui::Button("Save") && !selectedImage.filename.empty() && buffer[0] != '\0') {
+        if (ImGui::Button("Save") && !selectedImage.filename.empty() && buffer[0] != '\0')
+        {
             auto board = board_manager->createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
             board.add(flecs::ChildOf, active_game_table);
 
@@ -380,7 +428,8 @@ void GameTableManager::createBoardPopUp() {
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Close")) {
+        if (ImGui::Button("Close"))
+        {
             map_directory->clearSelectedImage();
             ImGui::CloseCurrentPopup();
         }
@@ -420,8 +469,8 @@ void GameTableManager::closeBoardPopUp()
     }
 }
 
-
-void GameTableManager::saveBoardPopUp() {
+void GameTableManager::saveBoardPopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("SaveBoard", 0, ImGuiWindowFlags_AlwaysAutoResize))
@@ -430,7 +479,8 @@ void GameTableManager::saveBoardPopUp() {
         ImGui::NewLine();
 
         bool saved = false;
-        if (ImGui::Button("Save")) {
+        if (ImGui::Button("Save"))
+        {
             // your save logic here (you already said logic functions exist)
             saved = true;
             ImGui::CloseCurrentPopup();
@@ -449,7 +499,8 @@ void GameTableManager::saveBoardPopUp() {
     }
 }
 
-void GameTableManager::loadBoardPopUp() {
+void GameTableManager::loadBoardPopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("LoadBoard", 0, ImGuiWindowFlags_AlwaysAutoResize))
@@ -461,7 +512,8 @@ void GameTableManager::loadBoardPopUp() {
 
         auto boards = listBoardFiles();
         bool loaded = false;
-        for (auto& board : boards) {
+        for (auto& board : boards)
+        {
             if (ImGui::Button(board.c_str()))
             {
                 std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
@@ -495,7 +547,7 @@ void GameTableManager::closeGameTablePopUp()
         {
             board_manager->closeBoard();
             active_game_table = flecs::entity();
-             network_manager->closeServer();
+            network_manager->closeServer();
             chat.clearChat();
             ImGui::CloseCurrentPopup();
         }
@@ -548,57 +600,59 @@ void GameTableManager::connectToGameTablePopUp()
             network_manager->setMyIdentity("", username_buffer);
 
             // this already accepts LocalTunnel URLs or host:port (parseConnectionString handles both)
-            if (network_manager->connectToPeer(buffer)) {
+            if (network_manager->connectToPeer(buffer))
+            {
                 // cleanup & close
                 memset(buffer, 0, sizeof(buffer));
                 memset(username_buffer, 0, sizeof(username_buffer));
                 ImGui::CloseCurrentPopup();
             }
-            else {
+            else
+            {
                 connectFailed = true;
             }
         }
 
         ImGui::SameLine();
-        if (ImGui::Button("Close")) {
+        if (ImGui::Button("Close"))
+        {
             ImGui::CloseCurrentPopup();
             memset(buffer, 0, sizeof(buffer));
         }
 
         // transient error (uses your helper)
         UI_TransientLine("conn-fail",
-            connectFailed,
-            ImVec4(1.f, 0.f, 0.f, 1.f),
-            "Failed to Connect! Check your connection string and reachability.",
-            2.5f);
+                         connectFailed,
+                         ImVec4(1.f, 0.f, 0.f, 1.f),
+                         "Failed to Connect! Check your connection string and reachability.",
+                         2.5f);
 
         // Helpful hint (host-side details)
         ImGui::Separator();
         ImGui::TextDisabled("Tip: The host chooses the network mode while hosting.\n"
-            "LocalTunnel URLs may take a few seconds to become available.");
+                            "LocalTunnel URLs may take a few seconds to become available.");
 
         ImGui::EndPopup();
     }
 }
 
-
 // ================== 1) Router popup (keeps your STATUS header) ==================
-void GameTableManager::networkCenterPopUp() {
+void GameTableManager::networkCenterPopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Network Center", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
 
         // ---------- STATUS (keep this block) ----------
         Role role = network_manager->getPeerRole();
         const char* roleStr =
-            role == Role::GAMEMASTER ? "Hosting (GM)" :
-            role == Role::PLAYER ? "Connected (Player)" :
-            "Idle";
+            role == Role::GAMEMASTER ? "Hosting (GM)" : role == Role::PLAYER ? "Connected (Player)"
+                                                                             : "Idle";
         ImVec4 roleClr =
-            role == Role::GAMEMASTER ? ImVec4(0.2f, 0.9f, 0.2f, 1) :
-            role == Role::PLAYER ? ImVec4(0.2f, 0.6f, 1.0f, 1) :
-            ImVec4(1.0f, 0.6f, 0.2f, 1);
+            role == Role::GAMEMASTER ? ImVec4(0.2f, 0.9f, 0.2f, 1) : role == Role::PLAYER ? ImVec4(0.2f, 0.6f, 1.0f, 1)
+                                                                                          : ImVec4(1.0f, 0.6f, 0.2f, 1);
         ImGui::Text("Status: ");
         ImGui::SameLine();
         ImGui::TextColored(roleClr, "%s", roleStr);
@@ -606,25 +660,29 @@ void GameTableManager::networkCenterPopUp() {
         ImGui::Separator();
 
         // ---------- BODY ----------
-        if (role == Role::GAMEMASTER) {
-            renderNetworkCenterGM();       // full GM center
+        if (role == Role::GAMEMASTER)
+        {
+            renderNetworkCenterGM(); // full GM center
         }
-        else if (role == Role::PLAYER) {
-            renderNetworkCenterPlayer();   // player center (read-only)
+        else if (role == Role::PLAYER)
+        {
+            renderNetworkCenterPlayer(); // player center (read-only)
         }
-        else {
+        else
+        {
             ImGui::TextDisabled("No network connection established.");
         }
 
         ImGui::Separator();
-        if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
 
         ImGui::EndPopup();
     }
 }
 
-
-void GameTableManager::renderNetworkCenterGM() {
+void GameTableManager::renderNetworkCenterGM()
+{
     // ---------- INFO ----------
     const auto local_ip = network_manager->getLocalIPAddress();
     const auto external_ip = network_manager->getExternalIPAddress();
@@ -633,20 +691,27 @@ void GameTableManager::renderNetworkCenterGM() {
     const auto cs_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
     const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
 
-    ImGui::TextUnformatted("Local IP:");     ImGui::SameLine(); ImGui::TextUnformatted(local_ip.c_str());
-    ImGui::TextUnformatted("External IP:");  ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
-    ImGui::TextUnformatted("Port:");         ImGui::SameLine(); ImGui::Text("%u", port);
+    ImGui::TextUnformatted("Local IP:");
+    ImGui::SameLine();
+    ImGui::TextUnformatted(local_ip.c_str());
+    ImGui::TextUnformatted("External IP:");
+    ImGui::SameLine();
+    ImGui::TextUnformatted(external_ip.c_str());
+    ImGui::TextUnformatted("Port:");
+    ImGui::SameLine();
+    ImGui::Text("%u", port);
 
     ImGui::Separator();
 
     auto copyRow = [this](const char* label, const std::string& value,
-        const char* btnId, const char* toastId) {
-            ImGui::TextUnformatted(label);
-            ImGui::SameLine();
-            ImGui::TextUnformatted(value.c_str());
-            ImGui::SameLine();
-            UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
-        };
+                          const char* btnId, const char* toastId)
+    {
+        ImGui::TextUnformatted(label);
+        ImGui::SameLine();
+        ImGui::TextUnformatted(value.c_str());
+        ImGui::SameLine();
+        UI_CopyButtonWithToast(btnId, value, toastId, 1.5f);
+    };
 
     copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
     copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
@@ -655,7 +720,8 @@ void GameTableManager::renderNetworkCenterGM() {
     // ---------- PLAYERS (P2P) ----------
     ImGui::Separator();
     ImGui::Text("Players (P2P)");
-    if (ImGui::BeginTable("PeersTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+    if (ImGui::BeginTable("PeersTable", 5, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+    {
         ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
         ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
         ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
@@ -663,8 +729,10 @@ void GameTableManager::renderNetworkCenterGM() {
         ImGui::TableSetupColumn("Actions", ImGuiTableColumnFlags_WidthFixed, 120.f);
         ImGui::TableHeadersRow();
 
-        for (auto& [peerId, link] : network_manager->getPeers()) {
-            if (!link) continue;
+        for (auto& [peerId, link] : network_manager->getPeers())
+        {
+            if (!link)
+                continue;
 
             ImGui::TableNextRow();
 
@@ -680,8 +748,10 @@ void GameTableManager::renderNetworkCenterGM() {
             ImGui::TableSetColumnIndex(2);
             const char* pcStr = link->pcStateString();
             ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
-            if (strcmp(pcStr, "Connected") == 0) pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
-            else if (strcmp(pcStr, "Connecting") == 0) pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+            if (strcmp(pcStr, "Connected") == 0)
+                pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+            else if (strcmp(pcStr, "Connecting") == 0)
+                pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
             else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
                 pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
             ImGui::TextColored(pcCol, "%s", pcStr);
@@ -708,22 +778,25 @@ void GameTableManager::renderNetworkCenterGM() {
             }
             ImGui::PopID();*/
 
-			ImGui::PushID(peerId.c_str());
-			if (ImGui::SmallButton("Disconnect")) {
-			    ImGui::OpenPopup("ConfirmKickPeer");
-			}
-			if (UI_ConfirmModal("ConfirmKickPeer", "Disconnect this peer?",
-			                    "This will disconnect the selected peer and notify others to drop it.")) {
-			    // 1) Broadcast PeerDisconnect (so other peers drop links to this id)
-			    network_manager->broadcastPeerDisconnect(peerId);
-			    // 2) Optionally kick WS client too (server-side)
-			    if (auto srv = network_manager->getSignalingServer()) {
-			        srv->disconnectClient(peerId); // add this helper to server if not present
-			    }
-			    // 3) Locally close our peer link
-			    network_manager->removePeer(peerId);
-			}
-			ImGui::PopID();
+            ImGui::PushID(peerId.c_str());
+            if (ImGui::SmallButton("Disconnect"))
+            {
+                ImGui::OpenPopup("ConfirmKickPeer");
+            }
+            if (UI_ConfirmModal("ConfirmKickPeer", "Disconnect this peer?",
+                                "This will disconnect the selected peer and notify others to drop it."))
+            {
+                // 1) Broadcast PeerDisconnect (so other peers drop links to this id)
+                network_manager->broadcastPeerDisconnect(peerId);
+                // 2) Optionally kick WS client too (server-side)
+                if (auto srv = network_manager->getSignalingServer())
+                {
+                    srv->disconnectClient(peerId); // add this helper to server if not present
+                }
+                // 3) Locally close our peer link
+                network_manager->removePeer(peerId);
+            }
+            ImGui::PopID();
         }
         ImGui::EndTable();
     }
@@ -731,14 +804,17 @@ void GameTableManager::renderNetworkCenterGM() {
     // ---------- CLIENTS (WS) ----------
     ImGui::Separator();
     ImGui::Text("Clients (WebSocket)");
-    if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+    if (ImGui::BeginTable("ClientsTable", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+    {
         ImGui::TableSetupColumn("ClientId");
         ImGui::TableSetupColumn("Username");
         ImGui::TableSetupColumn("Actions");
         ImGui::TableHeadersRow();
 
-        if (auto srv = network_manager->getSignalingServer()) {
-            for (auto& [cid, ws] : srv->authClients()) {
+        if (auto srv = network_manager->getSignalingServer())
+        {
+            for (auto& [cid, ws] : srv->authClients())
+            {
                 ImGui::TableNextRow();
 
                 ImGui::TableSetColumnIndex(0);
@@ -748,12 +824,14 @@ void GameTableManager::renderNetworkCenterGM() {
                 ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
 
                 ImGui::TableSetColumnIndex(2);
-                if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str())) {
+                if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str()))
+                {
                     srv->disconnectClient(cid);
                 }
             }
         }
-        else {
+        else
+        {
             ImGui::TableNextRow();
             ImGui::TableSetColumnIndex(0);
             ImGui::TextDisabled("No signaling server");
@@ -762,46 +840,53 @@ void GameTableManager::renderNetworkCenterGM() {
     }
 
     // ---------- Controls ----------
-	ImGui::Separator();
-	if (ImGui::Button("Disconnect All")) {
-	    ImGui::OpenPopup("ConfirmGMDisconnectAll");
-	}
-	ImGui::SameLine();
-	if (UI_ConfirmModal("ConfirmGMDisconnectAll", "Disconnect ALL clients?",
-	                    "This will broadcast a shutdown and disconnect all clients, "
-	                    "close all peer links, and stop the signaling server.")) {
-	    network_manager->disconnectAllPeers(); // your GM teardown
-	    ImGui::CloseCurrentPopup();
-	}
-    
-    if (ImGui::Button("Close Network")) {
+    ImGui::Separator();
+    if (ImGui::Button("Disconnect All"))
+    {
+        ImGui::OpenPopup("ConfirmGMDisconnectAll");
+    }
+    ImGui::SameLine();
+    if (UI_ConfirmModal("ConfirmGMDisconnectAll", "Disconnect ALL clients?",
+                        "This will broadcast a shutdown and disconnect all clients, "
+                        "close all peer links, and stop the signaling server."))
+    {
+        network_manager->disconnectAllPeers(); // your GM teardown
+        ImGui::CloseCurrentPopup();
+    }
+
+    if (ImGui::Button("Close Network"))
+    {
         ImGui::OpenPopup("ConfirmCloseNetwork");
-        
     }
 
     if (UI_ConfirmModal("ConfirmCloseNetwork", "Close Network?",
-        "This close will close the server"
-        "and stop the signaling server.")) {
+                        "This close will close the server"
+                        "and stop the signaling server."))
+    {
         network_manager->closeServer();
         ImGui::CloseCurrentPopup();
     }
 }
 
-void GameTableManager::renderNetworkCenterPlayer() {
+void GameTableManager::renderNetworkCenterPlayer()
+{
     // Username
     ImGui::Text("Username: %s", network_manager->getMyUsername().c_str());
     ImGui::NewLine();
 
     // Peers (read-only)
-    if (ImGui::BeginTable("PeersPlayer", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp)) {
+    if (ImGui::BeginTable("PeersPlayer", 4, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_SizingStretchProp))
+    {
         ImGui::TableSetupColumn("Username", ImGuiTableColumnFlags_WidthStretch, 1.5f);
         ImGui::TableSetupColumn("Peer ID", ImGuiTableColumnFlags_WidthStretch, 2.0f);
         ImGui::TableSetupColumn("PC State", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableSetupColumn("DataChannel", ImGuiTableColumnFlags_WidthFixed, 100.f);
         ImGui::TableHeadersRow();
 
-        for (auto& [peerId, link] : network_manager->getPeers()) {
-            if (!link) continue;
+        for (auto& [peerId, link] : network_manager->getPeers())
+        {
+            if (!link)
+                continue;
 
             ImGui::TableNextRow();
 
@@ -817,8 +902,10 @@ void GameTableManager::renderNetworkCenterPlayer() {
             ImGui::TableSetColumnIndex(2);
             const char* pcStr = link->pcStateString();
             ImVec4 pcCol = ImVec4(0.8f, 0.8f, 0.8f, 1);
-            if (strcmp(pcStr, "Connected") == 0) pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
-            else if (strcmp(pcStr, "Connecting") == 0) pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
+            if (strcmp(pcStr, "Connected") == 0)
+                pcCol = ImVec4(0.3f, 1.0f, 0.3f, 1);
+            else if (strcmp(pcStr, "Connecting") == 0)
+                pcCol = ImVec4(1.0f, 0.8f, 0.2f, 1);
             else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
                 pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
             ImGui::TextColored(pcCol, "%s", pcStr);
@@ -830,76 +917,92 @@ void GameTableManager::renderNetworkCenterPlayer() {
 
         ImGui::EndTable();
     }
-	// At end of renderNetworkCenterPlayer()
-	if (ImGui::Button("Disconnect")) {
-	    ImGui::OpenPopup("ConfirmPlayerDisconnect");
-	}
-	if (UI_ConfirmModal("ConfirmPlayerDisconnect", "Disconnect?",
-	                    "This will close your WebSocket and all peer connections.")) {
-	    network_manager->disconectFromPeers(); // your player teardown
-	    ImGui::CloseCurrentPopup();            // close Network Center
-	}
+    // At end of renderNetworkCenterPlayer()
+    if (ImGui::Button("Disconnect"))
+    {
+        ImGui::OpenPopup("ConfirmPlayerDisconnect");
+    }
+    if (UI_ConfirmModal("ConfirmPlayerDisconnect", "Disconnect?",
+                        "This will close your WebSocket and all peer connections."))
+    {
+        network_manager->disconectFromPeers(); // your player teardown
+        ImGui::CloseCurrentPopup();            // close Network Center
+    }
 }
 
-
 // ======================= Host GameTable (Create / Load + Network) =======================
-void GameTableManager::hostGameTablePopUp() {
+void GameTableManager::hostGameTablePopUp()
+{
     static ConnectionType hostMode = ConnectionType::LOCALTUNNEL;
     static bool tryUpnp = false; // only used for EXTERNAL
 
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Host GameTable", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Host GameTable", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
 
-        if (ImGui::BeginTabBar("HostTabs")) {
+        if (ImGui::BeginTabBar("HostTabs"))
+        {
 
             // ----------------------- CREATE TAB -----------------------
-            if (ImGui::BeginTabItem("Create")) {
+            if (ImGui::BeginTabItem("Create"))
+            {
 
                 ImGui::InputText("GameTable Name", buffer, sizeof(buffer));
                 ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
                 ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
                 ImGui::InputText("Port", port_buffer, sizeof(port_buffer),
-                    ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+                                 ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
                 // Mode selection
                 ImGui::Separator();
                 ImGui::TextUnformatted("Connection Mode:");
-                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
-                    hostMode == ConnectionType::LOCAL ? 1 : 2);
-                if (ImGui::RadioButton("LocalTunnel", m == 0)) m = 0; ImGui::SameLine();
-                if (ImGui::RadioButton("Local (LAN)", m == 1)) m = 1; ImGui::SameLine();
-                if (ImGui::RadioButton("External (Internet)", m == 2)) m = 2;
-                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL : ConnectionType::EXTERNAL);
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL ? 1
+                                                                                                         : 2);
+                if (ImGui::RadioButton("LocalTunnel", m == 0))
+                    m = 0;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Local (LAN)", m == 1))
+                    m = 1;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("External (Internet)", m == 2))
+                    m = 2;
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL
+                                                                          : ConnectionType::EXTERNAL);
 
                 // Explanations
-                if (hostMode == ConnectionType::LOCALTUNNEL) {
+                if (hostMode == ConnectionType::LOCALTUNNEL)
+                {
                     ImGui::TextDisabled("LocalTunnel: exposes your local server via a public URL.\n"
-                        "The URL becomes available a few seconds after the server starts.\n"
-                        "You can copy the connection string from Network Center.");
+                                        "The URL becomes available a few seconds after the server starts.\n"
+                                        "You can copy the connection string from Network Center.");
                     tryUpnp = false;
                 }
-                else if (hostMode == ConnectionType::LOCAL) {
+                else if (hostMode == ConnectionType::LOCAL)
+                {
                     ImGui::TextDisabled("Local (LAN): works only on the same local network.\n"
-                        "Share your LAN IP + port with players.");
+                                        "Share your LAN IP + port with players.");
                     tryUpnp = false;
                 }
-                else { // EXTERNAL
+                else
+                { // EXTERNAL
                     ImGui::TextDisabled("External: reachable from the Internet.\n"
-                        "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
-                        "It might not work depending on your network.");
+                                        "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
+                                        "It might not work depending on your network.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
                 }
 
                 ImGui::Separator();
 
                 const bool valid = buffer[0] != '\0' && port_buffer[0] != '\0';
-                if (!valid) {
+                if (!valid)
+                {
                     ImGui::TextColored(ImVec4(1, 0.6f, 0.2f, 1), "Name and Port are required.");
                 }
 
-                if (ImGui::Button("Create & Host") && valid) {
+                if (ImGui::Button("Create & Host") && valid)
+                {
                     // Close whatever is running
                     board_manager->closeBoard();
                     active_game_table = flecs::entity();
@@ -928,7 +1031,8 @@ void GameTableManager::hostGameTablePopUp() {
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Cancel")) {
+                if (ImGui::Button("Cancel"))
+                {
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -936,11 +1040,14 @@ void GameTableManager::hostGameTablePopUp() {
             }
 
             // ------------------------ LOAD TAB ------------------------
-            if (ImGui::BeginTabItem("Load")) {
+            if (ImGui::BeginTabItem("Load"))
+            {
                 ImGui::BeginChild("GTList", ImVec2(260, 360), true);
                 auto game_tables = listGameTableFiles();
-                for (auto& file : game_tables) {
-                    if (ImGui::Selectable(file.c_str())) {
+                for (auto& file : game_tables)
+                {
+                    if (ImGui::Selectable(file.c_str()))
+                    {
                         strncpy(buffer, file.c_str(), sizeof(buffer) - 1);
                         buffer[sizeof(buffer) - 1] = '\0';
                     }
@@ -951,34 +1058,44 @@ void GameTableManager::hostGameTablePopUp() {
 
                 ImGui::BeginChild("GTDetails", ImVec2(420, 360), true);
                 ImGui::Text("Selected:");
-                ImGui::SameLine(); ImGui::TextUnformatted(buffer[0] ? buffer : "(none)");
+                ImGui::SameLine();
+                ImGui::TextUnformatted(buffer[0] ? buffer : "(none)");
 
                 ImGui::Separator();
                 ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
                 ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
                 ImGui::InputText("Port", port_buffer, sizeof(port_buffer),
-                    ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+                                 ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
 
                 // Mode
                 ImGui::Separator();
                 ImGui::TextUnformatted("Connection Mode:");
-                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
-                    hostMode == ConnectionType::LOCAL ? 1 : 2);
-                if (ImGui::RadioButton("LocalTunnel (Recommended)", m == 0)) m = 0; ImGui::SameLine();
-                if (ImGui::RadioButton("Local (LAN)", m == 1)) m = 1; ImGui::SameLine();
-                if (ImGui::RadioButton("External (Internet)", m == 2)) m = 2;
-                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL : ConnectionType::EXTERNAL);
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL ? 1
+                                                                                                         : 2);
+                if (ImGui::RadioButton("LocalTunnel (Recommended)", m == 0))
+                    m = 0;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Local (LAN)", m == 1))
+                    m = 1;
+                ImGui::SameLine();
+                if (ImGui::RadioButton("External (Internet)", m == 2))
+                    m = 2;
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL
+                                                                          : ConnectionType::EXTERNAL);
 
-                if (hostMode == ConnectionType::LOCALTUNNEL) {
+                if (hostMode == ConnectionType::LOCALTUNNEL)
+                {
                     ImGui::TextDisabled("LocalTunnel: URL appears after server starts.\n"
-                        "Copy connection string from Network Center.");
+                                        "Copy connection string from Network Center.");
                     tryUpnp = false;
                 }
-                else if (hostMode == ConnectionType::LOCAL) {
+                else if (hostMode == ConnectionType::LOCAL)
+                {
                     ImGui::TextDisabled("Local (LAN): for players on the same network.");
                     tryUpnp = false;
                 }
-                else {
+                else
+                {
                     ImGui::TextDisabled("External: requires port forward (UPnP/manual) and may not work.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
                 }
@@ -986,13 +1103,15 @@ void GameTableManager::hostGameTablePopUp() {
                 ImGui::Separator();
 
                 const bool valid = buffer[0] != '\0' && port_buffer[0] != '\0';
-                if (ImGui::Button("Load & Host") && valid) {
-                    // strip ".runic" → game_table_name
+                if (ImGui::Button("Load & Host") && valid)
+                {
+                    // strip ".runic" â†’ game_table_name
                     std::string file = buffer;
                     std::string name = file;
                     const std::string suffix = ".runic";
                     if (name.size() >= suffix.size() &&
-                        name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0) {
+                        name.compare(name.size() - suffix.size(), suffix.size(), suffix) == 0)
+                    {
                         name.resize(name.size() - suffix.size());
                     }
                     game_table_name = name;
@@ -1023,7 +1142,8 @@ void GameTableManager::hostGameTablePopUp() {
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Cancel")) {
+                if (ImGui::Button("Cancel"))
+                {
                     ImGui::CloseCurrentPopup();
                 }
 
@@ -1041,17 +1161,18 @@ void GameTableManager::hostGameTablePopUp() {
 
 // INFORMATIONAL POPUPS
 // ======================= Guide (Mini Wiki) =======================
-void GameTableManager::guidePopUp() {
+void GameTableManager::guidePopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("Guide", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("Guide", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
         // Left: vertical sections; Right: content
         static int section = 0;
         static const char* kSections[] = {
             "Networking",
-            "GameTable"
-        };
+            "GameTable"};
 
         ImGui::TextUnformatted("RunicVTT Guide");
         ImGui::Separator();
@@ -1061,8 +1182,10 @@ void GameTableManager::guidePopUp() {
 
         // Left panel: list
         ImGui::BeginChild("GuideNav", ImVec2(220, 0), true);
-        for (int i = 0; i < IM_ARRAYSIZE(kSections); ++i) {
-            if (ImGui::Selectable(kSections[i], section == i)) {
+        for (int i = 0; i < IM_ARRAYSIZE(kSections); ++i)
+        {
+            if (ImGui::Selectable(kSections[i], section == i))
+            {
                 section = i;
             }
         }
@@ -1073,44 +1196,43 @@ void GameTableManager::guidePopUp() {
         // Right panel: text content (expandable later with images)
         ImGui::BeginChild("GuideBody", ImVec2(0, 0), false);
 
-        if (section == 0) {
+        if (section == 0)
+        {
             ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.0f, 1.0f), "Networking");
             ImGui::Separator();
             ImGui::TextWrapped(
                 "Hosting:\n"
-                " • Choose a mode when hosting your GameTable:\n"
+                " â€¢ Choose a mode when hosting your GameTable:\n"
                 "   - LocalTunnel: easiest sharing via public URL. URL appears shortly after server start.\n"
                 "   - Local (LAN): for players on the same local network (use LAN IP + port).\n"
                 "   - External: requires port forwarding (UPnP/manual). May not work depending on your router/ISP.\n"
                 "\n"
-                "Copy the connection string from the Network Center after hosting."
-            );
+                "Copy the connection string from the Network Center after hosting.");
             ImGui::NewLine();
             ImGui::TextWrapped(
                 "Connecting:\n"
-                " • Ask the host for a connection string and your password.\n"
-                " • Open 'Connect to GameTable', enter username and paste the connection string:\n"
+                " â€¢ Ask the host for a connection string and your password.\n"
+                " â€¢ Open 'Connect to GameTable', enter username and paste the connection string:\n"
                 "   - runic:https://<sub>.loca.lt?PASSWORD\n"
                 "   - runic:<host>:<port>?PASSWORD\n"
                 "\n"
-                "After connecting, WebRTC peer links will establish automatically via signaling."
-            );
+                "After connecting, WebRTC peer links will establish automatically via signaling.");
         }
-        else if (section == 1) {
+        else if (section == 1)
+        {
             ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.0f, 1.0f), "GameTable");
             ImGui::Separator();
             ImGui::TextWrapped(
                 "Create & Host:\n"
-                " • Open 'Host GameTable'. In Create tab, set name, username, password, and port.\n"
-                " • Choose a connection mode (LocalTunnel / Local / External) and Host.\n"
+                " â€¢ Open 'Host GameTable'. In Create tab, set name, username, password, and port.\n"
+                " â€¢ Choose a connection mode (LocalTunnel / Local / External) and Host.\n"
                 "\n"
                 "Load & Host:\n"
-                " • Open 'Host GameTable'. In Load tab, select a saved table, set credentials, port, and Host.\n"
+                " â€¢ Open 'Host GameTable'. In Load tab, select a saved table, set credentials, port, and Host.\n"
                 "\n"
                 "Network Lifecycle:\n"
-                " • Network is tied to the GameTable. Closing the GameTable stops the network.\n"
-                " • Inspect peers/clients and copy connection strings in the Network Center."
-            );
+                " â€¢ Network is tied to the GameTable. Closing the GameTable stops the network.\n"
+                " â€¢ Inspect peers/clients and copy connection strings in the Network Center.");
         }
 
         // Placeholder for future images:
@@ -1120,18 +1242,21 @@ void GameTableManager::guidePopUp() {
         ImGui::EndChild(); // GuideContent
 
         ImGui::Separator();
-        if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
 
         ImGui::EndPopup();
     }
 }
 
 // ======================= About =======================
-void GameTableManager::aboutPopUp() {
+void GameTableManager::aboutPopUp()
+{
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-    if (ImGui::BeginPopupModal("About", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+    if (ImGui::BeginPopupModal("About", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
         const char* appName = "RunicVTT";
         const char* version = "0.0.1";
         const char* author = "Pedro Vicente dos Santos";
@@ -1143,8 +1268,7 @@ void GameTableManager::aboutPopUp() {
 
         ImGui::TextWrapped(
             "RunicVTT is a virtual tabletop focused on fast peer-to-peer play using WebRTC data channels. "
-            "It’s built with C++ and integrates ImGui, GLFW, GLEW, and Flecs."
-        );
+            "Itâ€™s built with C++ and integrates ImGui, GLFW, GLEW, and Flecs.");
 
         ImGui::NewLine();
         ImGui::Text("Author: %s", author);
@@ -1155,7 +1279,8 @@ void GameTableManager::aboutPopUp() {
         ImGui::SameLine();
         ImGui::TextColored(ImVec4(0.4f, 0.7f, 1.0f, 1.0f), "%s", repoUrl);
         ImGui::SameLine();
-        if (ImGui::SmallButton("Copy URL")) {
+        if (ImGui::SmallButton("Copy URL"))
+        {
             ImGui::SetClipboardText(repoUrl);
         }
 
@@ -1167,15 +1292,14 @@ void GameTableManager::aboutPopUp() {
         // }
 
         ImGui::Separator();
-        if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
 
         ImGui::EndPopup();
     }
 }
 
-
-
-//RENDER ========================================================================================================================================================= 
+//RENDER =========================================================================================================================================================
 //
 //// Call this each frame (after BeginFrame, before EndFrame)
 //void GameTableManager::renderNetworkToasts(std::shared_ptr<NetworkManager> nm) {
@@ -1225,11 +1349,14 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
     chat.renderChat();
     //renderNetworkToasts(network_manager);
     toaster_->Render();
-    if (board_manager->isBoardActive()) {
-        if (board_manager->isEditWindowOpen()) {
+    if (board_manager->isBoardActive())
+    {
+        if (board_manager->isEditWindowOpen())
+        {
             board_manager->renderEditWindow();
         }
-        else {
+        else
+        {
             board_manager->setShowEditWindow(false);
         }
 
@@ -1239,7 +1366,6 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
         board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
     }
 }
-
 
 //
 //void GameTableManager::connectToGameTablePopUp()
@@ -1321,10 +1447,10 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        const auto cs_lt = network_manager->getNetworkInfo(ConnectionType::LOCALTUNNEL);
 //
 //        // quick inline labels (use your UI_LabelValue helpers if you have them)
-//        ImGui::TextUnformatted("Local IP:");    
-//        ImGui::SameLine(); 
+//        ImGui::TextUnformatted("Local IP:");
+//        ImGui::SameLine();
 //        ImGui::TextUnformatted(local_ip.c_str());
-//        ImGui::TextUnformatted("External IP:"); 
+//        ImGui::TextUnformatted("External IP:");
 //        ImGui::SameLine(); ImGui::TextUnformatted(external_ip.c_str());
 //        ImGui::TextUnformatted("Port:");        ImGui::SameLine(); ImGui::Text("%u", port);
 //
@@ -1390,7 +1516,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //                else if (strcmp(pcStr, "Disconnected") == 0 || strcmp(pcStr, "Failed") == 0)
 //                    pcCol = ImVec4(1.0f, 0.3f, 0.3f, 1);
 //                ImGui::TextColored(pcCol, "%s", pcStr);
-//                
+//
 //                ImGui::TableSetColumnIndex(2);
 //                ImGui::TextUnformatted(peerId.c_str());
 //
@@ -1464,7 +1590,6 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::EndPopup();
 //    }
 //}
-
 
 //void GameTableManager::hostGameTablePopUp() {
 //    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -1774,7 +1899,6 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //    }
 //}
 
-
 //
 //void GameTableManager::openNetworkInfoPopUp()
 //{
@@ -1862,10 +1986,8 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //    }
 //}
 
-
-
 //void GameTableManager::createGameTablePopUp()
-//{   
+//{
 //    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 //    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 //    if (ImGui::BeginPopupModal("CreateGameTable", 0, ImGuiWindowFlags_AlwaysAutoResize))
@@ -1956,23 +2078,23 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //        ImGui::NewLine();
 //
-//        // Botão para salvar o board, habilitado apenas se houver nome e mapa selecionado
+//        // BotÃ£o para salvar o board, habilitado apenas se houver nome e mapa selecionado
 //        if (ImGui::Button("Save") && !selectedImage.filename.empty() && strlen(buffer) > 0) {
 //            // Cria o board com o mapa e o nome inseridos
 //            auto board = board_manager->createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
 //            board.add(flecs::ChildOf, active_game_table);
 //
-//            // Limpa a seleção após salvar
+//            // Limpa a seleÃ§Ã£o apÃ³s salvar
 //            map_directory->clearSelectedImage();
 //            memset(buffer, '\0', sizeof(buffer));
 //
-//            // Fecha o popup após salvar
+//            // Fecha o popup apÃ³s salvar
 //            ImGui::CloseCurrentPopup();
 //        }
 //
 //        ImGui::SameLine();
 //
-//        // Botão para fechar o popup
+//        // BotÃ£o para fechar o popup
 //        if (ImGui::Button("Close")) {
 //            map_directory->clearSelectedImage();  // Limpa o caminho ao fechar
 //            ImGui::CloseCurrentPopup();
@@ -1982,10 +2104,10 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //        ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
 //
-//        // Coluna direita: diretório de mapas para seleção de imagem
-//        map_directory->renderDirectory(true);  // Renderiza o diretório de mapas dentro da coluna direita
+//        // Coluna direita: diretÃ³rio de mapas para seleÃ§Ã£o de imagem
+//        map_directory->renderDirectory(true);  // Renderiza o diretÃ³rio de mapas dentro da coluna direita
 //
-//        ImGui::Columns(1);  // Volta para uma única coluna
+//        ImGui::Columns(1);  // Volta para uma Ãºnica coluna
 //
 //        ImGui::EndPopup();
 //    }
@@ -2054,10 +2176,10 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::Separator();
 //
 //        if (ImGui::Button("Connect") && strlen(buffer) > 0)
-//        {   
+//        {
 //            network_manager->setMyIdentity("", username_buffer);
-//            if (network_manager->connectToPeer(buffer)) 
-//            {  
+//            if (network_manager->connectToPeer(buffer))
+//            {
 //                memset(buffer, '\0', sizeof(buffer));
 //
 //                ImGui::CloseCurrentPopup();
@@ -2066,7 +2188,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //            {
 //                ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Failed to Connect!!");
 //            }
-//            
+//
 //        }
 //
 //        ImGui::SameLine();
@@ -2079,7 +2201,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::EndPopup();
 //    }
 //}
-////DEPRECATED - NOT USED!!(I THINK ;) 
+////DEPRECATED - NOT USED!!(I THINK ;)
 //void GameTableManager::createNetworkPopUp() {
 //    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 //    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -2137,7 +2259,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        {
 //            network_manager->closeServer();
 //            network_manager->disconectFromPeers();
-//            
+//
 //            ImGui::CloseCurrentPopup();
 //        }
 //
@@ -2169,16 +2291,16 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::Text("Local IP: ");
 //        ImGui::SameLine();
 //        ImGui::Text(local_ip.c_str());
-//        
+//
 //        ImGui::Text("Local IP: ");
 //        ImGui::SameLine();
 //        ImGui::Text(local_ip.c_str());
 //
-//        
+//
 //        ImGui::Text("PORT: ");
 //        ImGui::SameLine();
 //        ImGui::Text(std::to_string(port).c_str());
-//        
+//
 //        ImGui::Text("LocalTunnel URL: ");
 //        ImGui::SameLine();
 //        ImGui::Text(local_tunnel_ip.c_str());
@@ -2196,7 +2318,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //            ImGui::SetClipboardText(local_connection_string.c_str());  // Copy the connection string to the clipboard
 //            ImGui::Text("Copied to clipboard!");
 //        }
-//        
+//
 //        ImGui::Text("External Connection String: ");
 //        ImGui::SameLine();
 //        ImGui::Text(external_connection_string.c_str());
@@ -2226,7 +2348,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //    {
 //
 //        ImGui::Text("IP: ");
-//       
+//
 //
 //
 //        ImGui::NewLine();
@@ -2256,11 +2378,11 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        auto network_info_local = network_manager->getNetworkInfo(ConnectionType::LOCAL);
 //        ImGui::Text("Network Info Local");
 //        ImGui::Text(network_info_local.c_str());
-//        
+//
 //        auto network_info_external = network_manager->getNetworkInfo(ConnectionType::EXTERNAL);
 //        ImGui::Text("Network Info External");
 //        ImGui::Text(network_info_external.c_str());
-//        
+//
 //        auto local_tunnel_url = network_manager->getLocalTunnelURL();
 //        ImGui::Text("Local Tunnel URL");
 //        ImGui::Text(local_tunnel_url.c_str());
@@ -2334,7 +2456,7 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //
 //        auto boards = listBoardFiles();
 //        for (auto& board : boards) {
-//            if (ImGui::Button(board.c_str())) 
+//            if (ImGui::Button(board.c_str()))
 //            {
 //                std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
 //                board_manager->loadActiveBoard(board_file_path.string());
@@ -2352,4 +2474,3 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
 //        ImGui::EndPopup();
 //    }
 //}
-

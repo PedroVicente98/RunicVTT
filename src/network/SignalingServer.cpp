@@ -1,25 +1,25 @@
-﻿#include "SignalingServer.h"
+#include "SignalingServer.h"
 #include <rtc/rtc.hpp>
 #include <iostream>
-#include "NetworkManager.h" 
+#include "NetworkManager.h"
 #include <nlohmann/json.hpp>
 #include "Message.h"
 
 using json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
 
-SignalingServer::SignalingServer(std::weak_ptr<NetworkManager> parent) 
-    : network_manager(parent)
+SignalingServer::SignalingServer(std::weak_ptr<NetworkManager> parent) :
+    network_manager(parent)
 {
 }
-
 
 SignalingServer::~SignalingServer()
 {
     this->stop();
 }
 
-void SignalingServer::start(unsigned short port) {
+void SignalingServer::start(unsigned short port)
+{
     rtc::WebSocketServerConfiguration cfg;
     cfg.bindAddress = "0.0.0.0";
     cfg.port = port;
@@ -27,7 +27,8 @@ void SignalingServer::start(unsigned short port) {
 
     server = std::make_shared<rtc::WebSocketServer>(cfg);
 
-    server->onClient([this](std::shared_ptr<rtc::WebSocket> ws) {
+    server->onClient([this](std::shared_ptr<rtc::WebSocket> ws)
+                     {
         auto addrOpt = ws->remoteAddress();
         if (!addrOpt) { std::cout << "[SignalingServer] Client connected (no addr)\n"; return; }
         std::string clientId = *addrOpt;
@@ -53,67 +54,88 @@ void SignalingServer::start(unsigned short port) {
             pendingClients_.erase(clientId);
             //pendingSince_.erase(clientId);
             authClients_.erase(clientId);
-            });
-        });
+            }); });
 
     std::cout << "[SignalingServer] Listening at ws://0.0.0.0:" << port << "\n";
 }
 
-void SignalingServer::stop() {
-    if (server) { server->stop(); server.reset(); }
+void SignalingServer::stop()
+{
+    if (server)
+    {
+        server->stop();
+        server.reset();
+    }
     pendingClients_.clear();
     //pendingSince_.clear();
     authClients_.clear();
 }
 
-void SignalingServer::onConnect(std::string clientId, std::shared_ptr<rtc::WebSocket> ws) {
+void SignalingServer::onConnect(std::string clientId, std::shared_ptr<rtc::WebSocket> ws)
+{
     pendingClients_[clientId] = std::move(ws);
     //pendingSince_[clientId] = Clock::now();
 }
 
-void SignalingServer::onMessage(const std::string& clientId, const std::string& text) {
-    
+void SignalingServer::onMessage(const std::string& clientId, const std::string& text)
+{
+
     json j;
-    try { j = json::parse(text); }
-    catch (...) { return; }
+    try
+    {
+        j = json::parse(text);
+    }
+    catch (...)
+    {
+        return;
+    }
 
     const std::string type = j.value(msg::key::Type, "");
-    if (type.empty()) return;
+    if (type.empty())
+        return;
 
     // AUTH
-    if (type == msg::signaling::Auth) {
+    if (type == msg::signaling::Auth)
+    {
         std::string provided = j.value(msg::key::AuthToken, "");
         std::string expected;
 
         auto nm = network_manager.lock();
-        if (!nm) {
+        if (!nm)
+        {
             throw std::runtime_error("SignalingServer::onMessage: NetworkManager expired");
         }
         expected = nm->getNetworkPassword();
 
         const bool ok = (expected.empty() || provided == expected);
 
-        if (ok) {
+        if (ok)
+        {
             moveToAuthenticated(clientId);
             std::vector<std::string> others;
             others.reserve(authClients_.size());
-            for (auto& [id, ws] : authClients_) {
-                if (id == clientId) continue;
+            for (auto& [id, ws] : authClients_)
+            {
+                if (id == clientId)
+                    continue;
                 others.emplace_back(id);
             }
 
-            auto username = j.value(msg::key::Username, "guest"+clientId);
+            auto username = j.value(msg::key::Username, "guest" + clientId);
             auto msg = msg::makeAuthResponse(msg::value::True, "welcome", clientId, username, others);
             sendTo(clientId, msg.dump());
         }
-        else {
+        else
+        {
             auto username = j.value(msg::key::Username, "guest" + clientId);
             auto msg = msg::makeAuthResponse(msg::value::False, "invalid password", clientId, username);
             sendTo(clientId, msg.dump());
-            if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second) {
+            if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second)
+            {
                 it->second->close();
             }
-            else if (auto it2 = authClients_.find(clientId); it2 != authClients_.end() && it2->second) {
+            else if (auto it2 = authClients_.find(clientId); it2 != authClients_.end() && it2->second)
+            {
                 it2->second->close();
             }
         }
@@ -121,7 +143,8 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     }
 
     // All other types require authentication
-    if (!isAuthenticated(clientId)) {
+    if (!isAuthenticated(clientId))
+    {
         auto username = j.value(msg::key::Username, "guest" + clientId);
         auto msg = msg::makeAuthResponse(msg::value::False, "unauthenticated", clientId, username);
         sendTo(clientId, msg);
@@ -132,80 +155,118 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     j[msg::key::From] = clientId;
 
     // In SignalingServer::onMessage (after auth checks)
-    if (type == msg::signaling::PeerDisconnect) {
+    if (type == msg::signaling::PeerDisconnect)
+    {
         // Optional: verify this clientId is GM
         // if (!isFromGM(clientId)) return;
-    
+
         // Overwrite from for trust (already done in your router)
         const std::string target = j.value(std::string(msg::key::Target), "");
-        if (target.empty()) return;
-    
+        if (target.empty())
+            return;
+
         // Broadcast to all authed clients (including target)
         const std::string dump = j.dump();
-        for (auto& [id, ws] : authClients_) {
-            if (ws && !ws->isClosed()) ws->send(dump);
+        for (auto& [id, ws] : authClients_)
+        {
+            if (ws && !ws->isClosed())
+                ws->send(dump);
         }
-    
+
         // Optionally kick the target at signaling level
-        if (auto it = authClients_.find(target); it != authClients_.end()) {
-            if (it->second) it->second->close();
+        if (auto it = authClients_.find(target); it != authClients_.end())
+        {
+            if (it->second)
+                it->second->close();
         }
         return;
     }
 
-    
     // Broadcast to authenticated only
-    if (j.value(msg::key::Broadcast, msg::value::False) == msg::value::True) {
+    if (j.value(msg::key::Broadcast, msg::value::False) == msg::value::True)
+    {
         const std::string dump = j.dump();
-        for (auto& [id, ws] : authClients_) {
-            if (id == clientId) continue; // don't echo to sender
-            if (ws && !ws->isClosed()) ws->send(dump);
+        for (auto& [id, ws] : authClients_)
+        {
+            if (id == clientId)
+                continue; // don't echo to sender
+            if (ws && !ws->isClosed())
+                ws->send(dump);
         }
         return;
     }
 
     // Direct
     const std::string to = j.value(msg::key::To, "");
-    if (to.empty()) return;
+    if (to.empty())
+        return;
     auto it = authClients_.find(to);
-    if (it != authClients_.end() && it->second && !it->second->isClosed()) {
+    if (it != authClients_.end() && it->second && !it->second->isClosed())
+    {
         it->second->send(j.dump());
     }
 }
 
-void SignalingServer::sendTo(const std::string& clientId, const std::string& message) {
-    if (auto it = authClients_.find(clientId); it != authClients_.end() && it->second && !it->second->isClosed()) {
+void SignalingServer::sendTo(const std::string& clientId, const std::string& message)
+{
+    if (auto it = authClients_.find(clientId); it != authClients_.end() && it->second && !it->second->isClosed())
+    {
         it->second->send(message);
         return;
     }
-    if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second && !it->second->isClosed()) {
+    if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second && !it->second->isClosed())
+    {
         it->second->send(message);
     }
 }
 
-void SignalingServer::broadcast(const std::string& message) {
-    for (auto& [id, ws] : authClients_) {
-        if (ws && !ws->isClosed()) ws->send(message);
+void SignalingServer::broadcast(const std::string& message)
+{
+    for (auto& [id, ws] : authClients_)
+    {
+        if (ws && !ws->isClosed())
+            ws->send(message);
     }
 }
 
-void SignalingServer::broadcastShutdown() {
+void SignalingServer::broadcastShutdown()
+{
     nlohmann::json j = msg::makeBroadcastShutdown();
     broadcast(j.dump());
 }
 
-void SignalingServer::disconnectAllClients() {
-    for (auto& [id, ws] : authClients_) {
-        if (ws) { try { ws->close(); } catch (...) {} }
+void SignalingServer::disconnectAllClients()
+{
+    for (auto& [id, ws] : authClients_)
+    {
+        if (ws)
+        {
+            try
+            {
+                ws->close();
+            }
+            catch (...)
+            {
+            }
+        }
     }
     authClients_.clear();
     // You may also want to clear pendingClients_
-    for (auto& [id, ws] : pendingClients_) {
-        if (ws) { try { ws->close(); } catch (...) {} }
+    for (auto& [id, ws] : pendingClients_)
+    {
+        if (ws)
+        {
+            try
+            {
+                ws->close();
+            }
+            catch (...)
+            {
+            }
+        }
     }
     pendingClients_.clear();
 }
-
 
 //void SignalingServer::prunePending() {
 //    if (pendingTimeout_.count() <= 0) return;
@@ -225,22 +286,27 @@ void SignalingServer::disconnectAllClients() {
 //    }
 //}
 
-void SignalingServer::moveToAuthenticated(const std::string& clientId) {
+void SignalingServer::moveToAuthenticated(const std::string& clientId)
+{
     auto it = pendingClients_.find(clientId);
-    if (it == pendingClients_.end()) return;
+    if (it == pendingClients_.end())
+        return;
     authClients_[clientId] = it->second;
     pendingClients_.erase(it);
     //pendingSince_.erase(clientId);
     std::cout << "[SignalingServer] Authenticated: " << clientId << "\n";
 }
 
-bool SignalingServer::isAuthenticated(const std::string& clientId) const {
+bool SignalingServer::isAuthenticated(const std::string& clientId) const
+{
     return authClients_.find(clientId) != authClients_.end();
 }
 
-void SignalingServer::disconnectClient(const std::string& clientId) {
+void SignalingServer::disconnectClient(const std::string& clientId)
+{
     auto it = authClients_.find(clientId);
-    if (it != authClients_.end() && it->second) {
+    if (it != authClients_.end() && it->second)
+    {
         it->second->close();
     }
 }
@@ -285,7 +351,6 @@ void SignalingServer::disconnectClient(const std::string& clientId) {
 //    std::cout << "[SignalingServer] Listening at ws://0.0.0.0:" << port << "\n";
 //}
 
-
 //void SignalingServer::stop() {
 //    if (server) { server->stop(); server.reset(); }
 //    if (auto nm = network_manager.lock()) {
@@ -310,7 +375,7 @@ void SignalingServer::disconnectClient(const std::string& clientId) {
 //void SignalingServer::onMessage(const std::string client_id, const std::string msg) {
 //    auto nm = network_manager.lock();
 //    if (!nm) throw std::runtime_error("NetworkManager expired");
-//    
+//
 //    auto& clients = nm->getClients();
 //
 //    nlohmann::json j;
@@ -339,57 +404,56 @@ void SignalingServer::disconnectClient(const std::string& clientId) {
 //    }
 //}
 
-
 //void SignalingServer::onSignal(const std::string& msg) {
-    //try {
-    //    auto j = nlohmann::json::parse(msg);
+//try {
+//    auto j = nlohmann::json::parse(msg);
 
-    //    std::string type = j.value("type", "");
-    //    std::string clientId = j.value("clientId", ""); // or use ws pointer id
+//    std::string type = j.value("type", "");
+//    std::string clientId = j.value("clientId", ""); // or use ws pointer id
 
-    //    // Find client in list
-    //    auto it = std::find_if(clients.begin(), clients.end(),
-    //        [&](const ClientInfo& c) { return c.id == clientId; });
+//    // Find client in list
+//    auto it = std::find_if(clients.begin(), clients.end(),
+//        [&](const ClientInfo& c) { return c.id == clientId; });
 
-    //    // If client not found, add it
-    //    if (it == clients.end()) {
-    //        clients.push_back({ clientId, false });
-    //        it = std::prev(clients.end());
-    //    }
+//    // If client not found, add it
+//    if (it == clients.end()) {
+//        clients.push_back({ clientId, false });
+//        it = std::prev(clients.end());
+//    }
 
-    //    // --- Password Authentication ---
-    //    if (type == "auth" && !it->authenticated) {
-    //        std::string password = j.value("password", "");
-    //        if (password == "") {
-    //            it->authenticated = true;
-    //            // Optionally send a success response
-    //        }
-    //        else {
-    //            // Invalid password → close connection
-    //            it->authenticated = false;
-    //            // close client WS here
-    //            // e.g., ws->close();
-    //        }
-    //        return; // do not process further until authenticated
-    //    }
-    //    // --- Other message types ---
-    //    if (!it->authenticated) {
-    //        // drop or ignore any non-auth messages from unauthenticated clients
-    //        return;
-    //    }
+//    // --- Password Authentication ---
+//    if (type == "auth" && !it->authenticated) {
+//        std::string password = j.value("password", "");
+//        if (password == "") {
+//            it->authenticated = true;
+//            // Optionally send a success response
+//        }
+//        else {
+//            // Invalid password → close connection
+//            it->authenticated = false;
+//            // close client WS here
+//            // e.g., ws->close();
+//        }
+//        return; // do not process further until authenticated
+//    }
+//    // --- Other message types ---
+//    if (!it->authenticated) {
+//        // drop or ignore any non-auth messages from unauthenticated clients
+//        return;
+//    }
 
-    //    if (type == "offer") {
-    //        // handle WebRTC offer
-    //    }
-    //    else if (type == "answer") {
-    //        // handle WebRTC answer
-    //    }
-    //    else if (type == "ice") {
-    //        // handle ICE candidate
-    //    }
+//    if (type == "offer") {
+//        // handle WebRTC offer
+//    }
+//    else if (type == "answer") {
+//        // handle WebRTC answer
+//    }
+//    else if (type == "ice") {
+//        // handle ICE candidate
+//    }
 
-    //}
-    //catch (const std::exception& e) {
-    //    // parsing failed → ignore or close client
-    //}
+//}
+//catch (const std::exception& e) {
+//    // parsing failed → ignore or close client
+//}
 //}
