@@ -1,6 +1,6 @@
 #pragma once
 #include "BoardManager.h"
-#include "Chat.h"
+//#include "Chat.h"
 #include <vector>
 
 #include "flecs.h"
