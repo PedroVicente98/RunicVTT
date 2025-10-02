@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 
 find_package(Git REQUIRED)
 execute_process(
@@ -67,7 +67,7 @@ target_link_libraries(RunicVTT PRIVATE
     "${OPENSSL_SSL_LIBRARY}"
     "${OPENSSL_CRYPTO_LIBRARY}"
 )
-target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 Shell32)
+target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 ) #Shell32 Ole32
 # ----------------------
 # nlohhmann json
 # ----------------------

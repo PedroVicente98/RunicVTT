@@ -39,7 +39,7 @@ public:
 	void guidePopUp();
 	void aboutPopUp();
 
-	void renderNetworkToasts(std::shared_ptr<NetworkManager> nm);
+	//void renderNetworkToasts(std::shared_ptr<NetworkManager> nm);
 	void render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
 
 
@@ -65,7 +65,18 @@ public:
 	void setActiveGameTableEntity(flecs::entity e) { active_game_table = e; }
 	flecs::entity getActiveGameTableEntity() const { return active_game_table; }
 
+    void setToaster(std::shared_ptr<ImGuiToaster> t)
+    {
+        toaster_ = std::move(t);
+        network_manager->setToaster(t);
+    }
+    void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec = 5.0f)
+    {
+        if (toaster_)
+            toaster_->Push(lvl, msg, durationSec);
+    }
 private:
+    std::shared_ptr<ImGuiToaster> toaster_;
 
 	void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin,int fbo_height);
 	void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);

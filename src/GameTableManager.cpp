@@ -1176,54 +1176,55 @@ void GameTableManager::aboutPopUp() {
 
 
 //RENDER ========================================================================================================================================================= 
-
-// Call this each frame (after BeginFrame, before EndFrame)
-void GameTableManager::renderNetworkToasts(std::shared_ptr<NetworkManager> nm) {
-    const double now = ImGui::GetTime();
-    nm->pruneToasts(now);
-    const auto& toasts = nm->toasts();
-    if (toasts.empty()) return;
-
-    const float PAD = 10.f;
-    ImGuiViewport* vp = ImGui::GetMainViewport();
-    ImVec2 pos = ImVec2(vp->WorkPos.x + vp->WorkSize.x - PAD, vp->WorkPos.y + PAD); // top-right
-
-    // Stack to draw newest last (top-down)
-    int idx = 0;
-    for (const auto& t : toasts) {
-        ImGui::SetNextWindowBgAlpha(0.9f);
-        ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(1, 0)); // anchor top-right
-        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
-                                 ImGuiWindowFlags_AlwaysAutoResize |
-                                 ImGuiWindowFlags_NoSavedSettings |
-                                 ImGuiWindowFlags_NoFocusOnAppearing |
-                                 ImGuiWindowFlags_NoNav |
-                                 ImGuiWindowFlags_NoInputs; // let clicks pass through
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.f);
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 8));
-
-        ImGui::Begin((std::string("##toast-") + std::to_string(idx++)).c_str(), nullptr, flags);
-
-        ImVec4 col;
-        switch (t.level) {
-            case NetworkToast::Level::Good:    col = ImVec4(0.2f, 1.f, 0.2f, 1); break; // green
-            case NetworkToast::Level::Error:   col = ImVec4(1.f, 0.2f, 0.2f, 1); break; // red
-            case NetworkToast::Level::Warning: col = ImVec4(1.f, 0.9f, 0.2f, 1); break; // yellow
-            default:                           col = ImVec4(0.6f, 0.8f, 1.f, 1); break; // blue/info
-        }
-        ImGui::TextColored(col, "%s", t.message.c_str());
-        ImGui::End();
-
-        ImGui::PopStyleVar(2);
-        // Move down for next toast
-        pos.y += 36.f; // spacing between toasts
-    }
-}
+//
+//// Call this each frame (after BeginFrame, before EndFrame)
+//void GameTableManager::renderNetworkToasts(std::shared_ptr<NetworkManager> nm) {
+//    const double now = ImGui::GetTime();
+//    nm->pruneToasts(now);
+//    const auto& toasts = nm->toasts();
+//    if (toasts.empty()) return;
+//
+//    const float PAD = 10.f;
+//    ImGuiViewport* vp = ImGui::GetMainViewport();
+//    ImVec2 pos = ImVec2(vp->WorkPos.x + vp->WorkSize.x - PAD, vp->WorkPos.y + PAD); // top-right
+//
+//    // Stack to draw newest last (top-down)
+//    int idx = 0;
+//    for (const auto& t : toasts) {
+//        ImGui::SetNextWindowBgAlpha(0.9f);
+//        ImGui::SetNextWindowPos(pos, ImGuiCond_Always, ImVec2(1, 0)); // anchor top-right
+//        ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration |
+//                                 ImGuiWindowFlags_AlwaysAutoResize |
+//                                 ImGuiWindowFlags_NoSavedSettings |
+//                                 ImGuiWindowFlags_NoFocusOnAppearing |
+//                                 ImGuiWindowFlags_NoNav |
+//                                 ImGuiWindowFlags_NoInputs; // let clicks pass through
+//        ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 6.f);
+//        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(10, 8));
+//
+//        ImGui::Begin((std::string("##toast-") + std::to_string(idx++)).c_str(), nullptr, flags);
+//
+//        ImVec4 col;
+//        switch (t.level) {
+//            case NetworkToast::Level::Good:    col = ImVec4(0.2f, 1.f, 0.2f, 1); break; // green
+//            case NetworkToast::Level::Error:   col = ImVec4(1.f, 0.2f, 0.2f, 1); break; // red
+//            case NetworkToast::Level::Warning: col = ImVec4(1.f, 0.9f, 0.2f, 1); break; // yellow
+//            default:                           col = ImVec4(0.6f, 0.8f, 1.f, 1); break; // blue/info
+//        }
+//        ImGui::TextColored(col, "%s", t.message.c_str());
+//        ImGui::End();
+//
+//        ImGui::PopStyleVar(2);
+//        // Move down for next toast
+//        pos.y += 36.f; // spacing between toasts
+//    }
+//}
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
     chat.renderChat();
-    renderNetworkToasts(network_manager);
+    //renderNetworkToasts(network_manager);
+    toaster_->Render();
     if (board_manager->isBoardActive()) {
         if (board_manager->isEditWindowOpen()) {
             board_manager->renderEditWindow();

@@ -74,7 +74,7 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
 		break;
 	}
 	}
-	pushStatusToast("Signalling Server Started!!", NetworkToast::Level::Good, 4);
+    pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
 }
 
 // Keep your old method (back-compat). Default it to LocalTunnel behavior.
@@ -433,18 +433,6 @@ void NetworkManager::broadcastPeerDisconnect(const std::string& targetId) {
     signalingClient->send(j.dump());
 }
 
-void NetworkManager::pushStatusToast(const std::string& msg, NetworkToast::Level lvl, double durationSec) {
-    const double now = ImGui::GetTime();
-    toasts_.push_back(NetworkToast{ msg, now + durationSec, lvl });
-    if (toasts_.size() > 8) toasts_.pop_front(); // keep a small backlog
-}
-
-void NetworkManager::pruneToasts(double now) {
-    while (!toasts_.empty() && toasts_.front().expiresAt <= now) {
-        toasts_.pop_front();
-    }
-}
-
 bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId,	const std::vector<uint8_t>& img, const std::string& name)
 {
 	if (img.empty()) return false;
@@ -547,6 +535,14 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const {
 	}
 	return ids;
 }
+
+void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload) {
+
+};
+
+void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload) {
+
+};
 
 // ----------- Broadcast wrappers -----------
 
@@ -694,9 +690,6 @@ void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vect
 		    //handlegridupdate(b, off);
 		    break;
 
-		case msg::DCType::Chat:
-			//handleChat(b, off);
-			break;
 		case msg::DCType::FogUpdate:
 			//handleFogUpdate(b, off);
 			break;

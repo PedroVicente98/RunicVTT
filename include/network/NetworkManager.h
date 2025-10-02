@@ -16,6 +16,7 @@
 #include "Components.h"
 #include "Message.h" 
 #include <fstream>
+#include "ImGuiToaster.h"
 
 enum class Role {
     NONE,
@@ -28,15 +29,6 @@ enum class ConnectionType {
     LOCAL,
     LOCALTUNNEL
 };
-
-struct NetworkToast {
-    enum class Level { Info, Good, Warning, Error };
-    std::string message;
-    double      expiresAt; // ImGui::GetTime() + duration
-    Level       level;
-};
-
-
 
 // Forward declare
 class SignalingServer;
@@ -117,11 +109,6 @@ public:
     std::shared_ptr<SignalingServer> getSignalingServer() const { return signalingServer; }
 
 
-    // Toaster Notification;
-    void pushStatusToast(const std::string& msg, NetworkToast::Level lvl, double durationSec = 3.0);
-    const std::deque<NetworkToast>& toasts() const { return toasts_; }
-    void pruneToasts(double now);
-
     bool tryPopReadyMessage(msg::ReadyMessage& out) { return inboundGame_.try_pop(out); }
 
     void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
@@ -146,7 +133,24 @@ public:
     void sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
 
+    void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
+    void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
+
+
+    void setToaster(std::shared_ptr<ImGuiToaster> t)
+    {
+        toaster_ = std::move(t);
+    }
+    // Unified push (replaces your old pushStatusToast)
+    void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec = 5.0f)
+    {
+        if (toaster_)
+            toaster_->Push(lvl, msg, durationSec);
+    }
+
 private:
+    std::shared_ptr<ImGuiToaster> toaster_;
+
     static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
 
     void handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off);
@@ -168,7 +172,6 @@ private:
 
     std::vector<std::string> getConnectedPeerIds() const;
 
-    std::deque<NetworkToast> toasts_;
     std::unordered_map<uint64_t, PendingImage> imagesRx_; 
 
     MessageQueue<msg::ReadyMessage> inboundGame_;

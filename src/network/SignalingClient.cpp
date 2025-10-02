@@ -1,4 +1,4 @@
-﻿#include "SignalingClient.h"
+#include "SignalingClient.h"
 #include <rtc/rtc.hpp>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -24,14 +24,14 @@ bool SignalingClient::connectUrl(const std::string& url) {
 
     ws->onOpen([=]() {
         if (auto nm = network_manager.lock()) {
-            nm->pushStatusToast("Signaling connected", NetworkToast::Level::Good);
+            nm->pushStatusToast("Signaling connected", ImGuiToaster::Level::Good);
             ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername()).dump());
         }
     });
     
     ws->onClosed([=]() { 
         if (auto nm = network_manager.lock())
-            nm->pushStatusToast("Signaling disconnected", NetworkToast::Level::Error);
+            nm->pushStatusToast("Signaling disconnected", ImGuiToaster::Level::Error);
     });
     
     ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg) {

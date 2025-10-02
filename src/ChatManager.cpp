@@ -33,7 +33,6 @@ static ChatMessageModel::Kind classifyMessage(const std::string &s) {
 // --------- ctor / state ---------
 ChatManager::ChatManager(std::weak_ptr<NetworkManager> nm)
     : network_(std::move(nm)) {
-    // no table selected yet; UI callers should SetActiveGameTable(...) before use
 }
 
 void ChatManager::setNetwork(std::weak_ptr<NetworkManager> nm) {

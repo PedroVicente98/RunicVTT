@@ -1,13 +1,19 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <string>
 #include <array>
 #include <memory>
 #include "PathManager.h"
+//#define WIN32_LEAN_AND_MEAN
+//#include <winsock2.h>
+//#include <ws2tcpip.h>
+//#include <windows.h> // depois de winsock2.h
 #define WIN32_LEAN_AND_MEAN
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h> // depois de winsock2.h
+#define NOMINMAX
+#include <WinSock2.h>     // must be BEFORE windows.h
+#include <WS2tcpip.h>
+#include <Windows.h>
+
 #include <winhttp.h>
 
 #include <mutex>

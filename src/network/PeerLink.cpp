@@ -109,7 +109,7 @@ void PeerLink::setupCallbacks() {
         std::cout << "[PeerLink] State(" << peerId << "): " << (int)s << "at " << lastStateAt_ << "\n";
        
         if (auto nm = network_manager.lock()) {
-            using L = NetworkToast::Level;
+            using L = ImGuiToaster::Level;
             const char* stateStr =
                 s == rtc::PeerConnection::State::Connected    ? "Connected" :
                 s == rtc::PeerConnection::State::Connecting   ? "Connecting" :
@@ -237,7 +237,7 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
 }
 
 bool PeerLink::isConnected() const {
-    // “usable” = PC connected AND at least Game channel open
+    // â€œusableâ€ = PC connected AND at least Game channel open
     auto it = dcs_.find(std::string(msg::dc::name::Game));
     return isPcConnectedOnly() && it != dcs_.end() && it->second && it->second->isOpen();
 }

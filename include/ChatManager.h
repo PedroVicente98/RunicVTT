@@ -1,33 +1,97 @@
-class ChatManager : public std::enable_shared_from_this<ChatManager> {
-public:
-    // ... unchanged: ctor/dtor/setNetwork/bind/saveCurrent/ensureThreadByParticipants/sendTextToThread ...
+#pragma once
 
-    // ---------- GameTable Snapshot (BINARY) ----------
-    // Call from NetworkManager when building/parsing Snapshot_GameTable
+#include <cstdint>
+#include <string>
+#include <vector>
+#include <deque>
+#include <set>
+#include <unordered_map>
+#include <filesystem>
+#include <optional>
+#include <memory>
+
+class NetworkManager; // fwd
+class PeerLink;       // fwd
+
+// ---- Chat model ----
+struct ChatMessageModel
+{
+    enum class Kind
+    {
+        TEXT,
+        IMAGE,
+        LINK
+    };
+    Kind kind = Kind::TEXT;
+    std::string senderId;
+    std::string username;
+    std::string content;
+    double ts = 0.0;
+};
+
+struct ChatThreadModel
+{
+    uint64_t id = 0;
+    std::string displayName;
+    std::set<std::string> participants;
+    std::deque<ChatMessageModel> messages;
+};
+
+class ChatManager : public std::enable_shared_from_this<ChatManager>
+{
+public:
+    explicit ChatManager(std::weak_ptr<NetworkManager> nm);
+
+    // lifecycle / binding
+    void setNetwork(std::weak_ptr<NetworkManager> nm);
+    void setActiveGameTable(uint64_t tableId, const std::string& gameTableName);
+    bool hasCurrent() const;
+
+    // persistence
+    bool saveCurrent();
+    bool loadCurrent();
+
+    // snapshot helpers (GameTable snapshot)
     void writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const;
     void readThreadsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off);
 
-    // ---------- Inbound (binary DC frames) ----------
-    // Chat message (binary), replaces JSON path
-    void onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off);
-
-    // Meta ops (binary)
+    // inbound (binary DC frames)
     void onChatThreadCreateFrame(const std::vector<uint8_t>& b, size_t& off);
     void onChatThreadUpdateFrame(const std::vector<uint8_t>& b, size_t& off);
     void onChatThreadDeleteFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off);
+
+    // UI/api helpers
+    void refreshGeneralParticipants(const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& peers);
+    uint64_t ensureThreadByParticipants(const std::set<std::string>& participants,
+                                        const std::string& displayName);
+    void sendTextToThread(uint64_t threadId, const std::string& text);
 
 private:
-    // ... unchanged model/state ...
+    // utils
+    std::filesystem::path chatFilePathFor(uint64_t tableId, const std::string& name) const;
+    void ensureGeneral();
+    ChatThreadModel* getThread(uint64_t id);
+    uint64_t findThreadByParticipants(const std::set<std::string>& parts) const;
+    uint64_t makeDeterministicThreadId(const std::set<std::string>& parts);
 
-    // emit meta + message frames (binary)
+    // emit frames
     void emitThreadCreate(const ChatThreadModel& th);
     void emitThreadUpdate(const ChatThreadModel& th);
     void emitThreadDelete(uint64_t threadId);
     void emitChatMessageFrame(uint64_t threadId, const std::string& username,
                               const std::string& text, uint64_t ts);
 
-    // utils (unchanged): makeDeterministicThreadId, classifyMessage, guestLabel, nowSec...
+private:
+    std::weak_ptr<NetworkManager> network_;
+    uint64_t currentTableId_ = 0;
+    std::string currentTableName_;
+
+    std::unordered_map<uint64_t, ChatThreadModel> threads_;
+    uint64_t activeThreadId_ = 0;
+    static constexpr uint64_t generalThreadId_ = 1;
 };
+
 
 /*#pragma once
 #include "imgui.h"

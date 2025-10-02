@@ -54,8 +54,13 @@ public:
 	~ApplicationHandler();
 	int run();
 
-	
+void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec = 5.0f)
+    {
+        if (toaster_)
+            toaster_->Push(lvl, msg, durationSec);
+    }
 private:
+    std::shared_ptr<ImGuiToaster> toaster_;
 	void renderMainMenuBar();
 	void renderDockSpace();
 	void renderMapFBO(VertexArray &va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer);
@@ -98,5 +103,17 @@ private:
 
 		draw_list->AddCircleFilled(final_screen_pos, radius, color, 16);
 	}
+
+
+    void handleToasterDebug() {
+        if (ImGui::IsKeyPressed(ImGuiKey_1))
+            pushStatusToast("Info: Hello!", ImGuiToaster::Level::Info, 5.0f);
+        if (ImGui::IsKeyPressed(ImGuiKey_2))
+            pushStatusToast("Good: Saved", ImGuiToaster::Level::Good, 4.0f);
+        if (ImGui::IsKeyPressed(ImGuiKey_3))
+            pushStatusToast("Warning: Ping high", ImGuiToaster::Level::Warning, 6.0f);
+        if (ImGui::IsKeyPressed(ImGuiKey_4))
+            pushStatusToast("Error: Failed op", ImGuiToaster::Level::Error);
+    }
 
 };

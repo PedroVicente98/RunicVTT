@@ -4,6 +4,9 @@
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry)
     : marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
+    ImGuiToaster::Config cfg;
+    this->toaster_ = std::make_shared<ImGuiToaster>(cfg);
+    game_table_manager.setToaster(toaster_);
 
     ecs.component<Position>();// .member<float>("x").member<float>("y");
     ecs.component<Size>();// .member<float>("width").member<float>("height");
@@ -236,6 +239,8 @@ int ApplicationHandler::run()
 
             //game_table_manager.processSentMessages();
             game_table_manager.processReceivedGameMessages();
+            handleToasterDebug();
+
             //system("cls");
             renderDockSpace();
             renderMainMenuBar();
@@ -312,8 +317,8 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
     }
 }
 
-void ApplicationHandler::renderActiveGametable() {
-
+void ApplicationHandler::renderActiveGametable()
+{
     if (game_table_manager.isGameTableActive() || game_table_manager.isConnected()) {
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar;

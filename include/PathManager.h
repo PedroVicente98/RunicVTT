@@ -1,9 +1,11 @@
-﻿#pragma once
+#pragma once
 #include <filesystem>
 #include <string>
 #include <iostream>
 #include <cstdlib>
-#include <shlobj.h>   // for SHGetKnownFolderPath
+//#include <shlobj.h>   // for SHGetKnownFolderPath
+//#include <ShlObj_core.h>   // or <ShlObj.h>
+//#include <KnownFolders.h>
 
 namespace fs = std::filesystem;
 
@@ -12,18 +14,18 @@ private:
 
     static fs::path getDocumentsFolder() {
 #ifdef _WIN32
-        PWSTR path_w = nullptr;
-        HRESULT result = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &path_w);
-        if (SUCCEEDED(result)) {
-            std::wstring wpath(path_w);
-            CoTaskMemFree(path_w); // free COM-allocated string
-            return std::filesystem::path(wpath);
-        } else {
-            throw std::runtime_error("Failed to get Documents folder");
-        }
-        
-        //const char* userProfile = std::getenv("USERPROFILE");
-        //return fs::path(userProfile ? userProfile : "C:\\Users\\Default") / "Documents";
+        //PWSTR path_w = nullptr;
+        //HRESULT result = SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &path_w);
+        //if (SUCCEEDED(result)) {
+        //    std::wstring wpath(path_w);
+        //    CoTaskMemFree(path_w); // free COM-allocated string
+        //    return std::filesystem::path(wpath);
+        //} else {
+        //    throw std::runtime_error("Failed to get Documents folder");
+        //}
+        //
+        const char* userProfile = std::getenv("USERPROFILE");
+        return fs::path(userProfile ? userProfile : "C:\\Users\\Default") / "Documents";
 #elif __APPLE__
         const char* home = std::getenv("HOME");
         return fs::path(home ? home : "/Users/Default") / "Documents";
