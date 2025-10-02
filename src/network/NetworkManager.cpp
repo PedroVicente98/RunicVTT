@@ -658,26 +658,26 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 
 // In NetworkManager.cpp
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload) {
-    for (auto& [pid, link] : peers_) {
+    for (auto& [pid, link] : peers) {
         if (!link) continue;
         // build final buffer [u8 type][u32 size][bytes...] or your framing
         std::vector<uint8_t> frame;
         frame.push_back((uint8_t)t);
         Serializer::serializeInt(frame, (int)payload.size());
         frame.insert(frame.end(), payload.begin(), payload.end());
-        link->send(frame); // PeerLink::send(vector<uint8_t>) must exist
+        link->sendOn(msg::dc::name::Chat, frame); // PeerLink::send(vector<uint8_t>) must exist
     }
 }
 
-void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload) {
-    for (auto& pid : peers) {
-        auto it = peers_.find(pid);
-        if (it == peers_.end() || !it->second) continue;
+void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload) {
+    for (auto& pid : peers_) {
+        auto it = peers.find(pid);
+        if (it == peers.end() || !it->second) continue;
         std::vector<uint8_t> frame;
         frame.push_back((uint8_t)t);
         Serializer::serializeInt(frame, (int)payload.size());
         frame.insert(frame.end(), payload.begin(), payload.end());
-        it->second->send(frame);
+        it->second->sendOn(msg::dc::name::Chat,frame);
     }
 }
 

@@ -217,7 +217,7 @@ void ChatManager::emitThreadCreate(const ChatThreadModel& th) {
     Serializer::serializeString(buf, th.displayName);
     Serializer::serializeInt(buf, (int)th.participants.size());
     for (auto& p : th.participants) Serializer::serializeString(buf, p);
-    nm->broadcastChatThreadFrame(/*msg::DCType::ChatThreadCreate*/ NetworkManager::DC_CHAT_THREAD_CREATE, buf);
+    nm->broadcastChatThreadFrame(msg::DCType::ChatThreadCreate, buf);
 }
 
 void ChatManager::emitThreadUpdate(const ChatThreadModel& th) {
@@ -228,7 +228,7 @@ void ChatManager::emitThreadUpdate(const ChatThreadModel& th) {
     Serializer::serializeString(buf, th.displayName);
     Serializer::serializeInt(buf, (int)th.participants.size());
     for (auto& p : th.participants) Serializer::serializeString(buf, p);
-    nm->broadcastChatThreadFrame(/*msg::DCType::ChatThreadUpdate*/ NetworkManager::DC_CHAT_THREAD_UPDATE, buf);
+    nm->broadcastChatThreadFrame(msg::DCType::ChatThreadUpdate, buf);
 }
 
 void ChatManager::emitThreadDelete(uint64_t threadId) {
@@ -236,7 +236,7 @@ void ChatManager::emitThreadDelete(uint64_t threadId) {
     std::vector<uint8_t> buf;
     Serializer::serializeUInt64(buf, currentTableId_);
     Serializer::serializeUInt64(buf, threadId);
-    nm->broadcastChatThreadFrame(/*msg::DCType::ChatThreadDelete*/ NetworkManager::DC_CHAT_THREAD_DELETE, buf);
+    nm->broadcastChatThreadFrame(msg::DCType::ChatThreadDelete, buf);
 }
 
 void ChatManager::emitChatMessageFrame(uint64_t threadId, const std::string& username,
@@ -254,9 +254,9 @@ void ChatManager::emitChatMessageFrame(uint64_t threadId, const std::string& use
     if (!th) return;
 
     if (th->id == generalThreadId_ || th->participants.empty()) {
-        nm->broadcastChatThreadFrame(/*msg::DCType::ChatMessage*/ NetworkManager::DC_CHAT_MESSAGE, buf);
+        nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
     } else {
-        nm->sendChatThreadFrameTo(th->participants, /*msg::DCType::ChatMessage*/ NetworkManager::DC_CHAT_MESSAGE, buf);
+        nm->sendChatThreadFrameTo(th->participants, msg::DCType::ChatMessage, buf);
     }
 }
 
