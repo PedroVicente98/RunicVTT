@@ -238,6 +238,9 @@ void BoardManager::renderGridWindow()
 }
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
 
     const TextureComponent* texture = active_board.get<TextureComponent>();
     if (texture->textureID != 0)
@@ -286,7 +289,6 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         ecs.defer_begin(); // Start deferring modifications
         active_board.children([&](flecs::entity child)
                               {
-            //if (child.has<MarkerComponent>()) {
             if (child.has<MarkerComponent>()) {
                 const TextureComponent* texture_marker = child.get<TextureComponent>();
                 if (texture_marker->textureID != 0) {
@@ -300,12 +302,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     //glm::mat4 mvp = projection * viewMatrix * marker_model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
                     float alpha = 1.0f;
                     if (!visibility_marker->isVisible) {
-                        //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                        if (nm->getPeerRole() == Role::GAMEMASTER)
+                        {
                             alpha = 0.5f;
-                        //}
-                        //else {
-                            //alpha = 0.0f;
-                        //}
+                        }
+                        else {
+                            alpha = 0.0f;
+                        }
                     }
 
                     shader.Bind();
@@ -335,13 +338,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
                 float alpha = 1.0f;
                 if (!visibility_marker->isVisible) {
-                    //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                    if (nm->getPeerRole() == Role::GAMEMASTER) {
                         alpha = 0.3f;
-                    //}
-                    //else
-                    //{
-                        //alpha = 0.0f;
-                    //}
+                    }
+                    else
+                    {
+                        alpha = 0.0f;
+                    }
                 }
 
                 shader.Bind();
@@ -361,6 +364,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
 flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size)
 {
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
 
     flecs::entity marker = ecs.entity()
                                .set(Identifier{generateUniqueId()})
@@ -368,13 +374,15 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
                                .set(Size{size.x, size.y})
                                .set(TextureComponent{textureId, imageFilePath, size})
                                .set(Visibility{true})
+                               .set(MarkerComponent{"", false, false})
                                .set(Moving{false});
 
-    marker.add<MarkerComponent>();
+    //marker.add<MarkerComponent>();
     marker.add(flecs::ChildOf, active_board);
 
-    //auto message = network_manager->buildCreateMarkerMessage(marker);
-    //network_manager->queueMessage(message);
+    /*auto message = nm->buildCreateMarkerMessage(marker);
+    nm->queueMessage(message);*/
+
     return marker;
 }
 
@@ -385,7 +393,10 @@ void BoardManager::deleteMarker(flecs::entity markerEntity)
 
 void BoardManager::handleMarkerDragging(glm::vec2 world_position)
 {
-    //mousePos(Screen Position) use screenToWorldPosition(mousePos)  position(World Position)
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
+
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position)
              {
@@ -396,8 +407,8 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
             position.y += delta.y;
             mouse_start_world_pos = world_position;
 
-            //auto message = network_manager->buildUpdateMarkerMessage(entity);
-            //network_manager->queueMessage(message);
+            //auto message = nm->buildUpdateMarkerMessage(entity);
+            //nm->queueMessage(message);
         } });
     ecs.defer_end();
 }

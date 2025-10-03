@@ -28,6 +28,8 @@ void NetworkManager::setup(std::weak_ptr<BoardManager> board_manager, std::weak_
 
 NetworkManager::~NetworkManager()
 {
+    closeServer();
+    disconnectAllPeers();
 }
 
 void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool tryUpnp)

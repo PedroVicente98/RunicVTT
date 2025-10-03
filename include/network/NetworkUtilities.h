@@ -204,107 +204,318 @@ public:
     }
 
     // Start a local tunnel, returns the subdomain used
+    //static std::string startLocalTunnel(const std::string& subdomainBase, int port)
+    //{
+    //    stopLocalTunnel(); // Stop any previous tunnel
+
+    //    // Clean the subdomain (remove dots, lowercase)
+    //    std::string subdomain = std::regex_replace(subdomainBase, std::regex("\\."), "");
+    //    for (auto& c : subdomain)
+    //        c = std::tolower(c);
+
+    //    // Reset URL before starting
+    //    {
+    //        std::lock_guard<std::mutex> lk(urlMutex);
+    //        localTunnelUrl.clear();
+    //    }
+
+    //    running = true;
+    //    tunnelThread = std::thread([subdomain, port]()
+    //                               {
+    //                                   std::string nodePath = PathManager::getNodeExePath().string();
+    //                                   std::string ltPath = PathManager::getLocalTunnelClientPath().string();
+    //                                   std::ostringstream cmd;
+    //                                   cmd << nodePath + " " + ltPath + " --port " + std::to_string(port) + " --subdomain " + subdomain;
+    //                                   std::cout << "Starting LocalTunnel: " << cmd.str() << std::endl;
+    //                                   std::array<char, 128> buffer;
+    //                                   tunnelProcess = _popen(cmd.str().c_str(), "r");
+    //                                   if (!tunnelProcess)
+    //                                   {
+    //                                       std::cerr << "Failed to start local tunnel process!" << std::endl;
+    //                                       running = false;
+    //                                       urlCv.notify_all(); // wake waiters
+    //                                       return;
+    //                                   }
+
+    //                                   std::string output;
+    //                                   while (fgets(buffer.data(), buffer.size(), tunnelProcess) != nullptr && running)
+    //                                   {
+    //                                       output += buffer.data();
+    //                                       // Capture the URL once
+    //                                       auto pos = output.find("https://");
+    //                                       if (pos != std::string::npos)
+    //                                       {
+    //                                           auto end = output.find("\n", pos);
+    //                                           std::string found = output.substr(pos, (end == std::string::npos) ? std::string::npos : end - pos);
+    //                                           {
+    //                                               std::lock_guard<std::mutex> lk(urlMutex);
+    //                                               if (localTunnelUrl.empty())
+    //                                               {
+    //                                                   localTunnelUrl = std::move(found);
+    //                                                   std::cout << "LocalTunnel URL: " << localTunnelUrl << std::endl;
+    //                                               }
+    //                                           }
+    //                                           urlCv.notify_all(); // wake waiters
+    //                                       }
+    //                                   }
+
+    //                                   _pclose(tunnelProcess);
+    //                                   tunnelProcess = nullptr;
+    //                                   running = false;
+    //                                   urlCv.notify_all(); // wake waiters even if no URL found
+    //                               });
+
+    //    // Wait up to 15s for URL to be set (or process to end)
+    //    std::unique_lock<std::mutex> lk(urlMutex);
+    //    bool ok = urlCv.wait_for(lk, std::chrono::seconds(15), []
+    //                             { return !localTunnelUrl.empty() || !running.load(); });
+
+    //    // Return the URL (copy). If not available, return empty string.
+    //    return ok ? localTunnelUrl : std::string{};
+    //}
+
+    //static void stopLocalTunnel()
+    //{
+    //    if (running)
+    //    {
+    //        running = false;
+    //        if (tunnelProcess)
+    //        {
+    //            _pclose(tunnelProcess);
+    //            tunnelProcess = nullptr;
+    //        }
+
+    //        if (tunnelThread.joinable())
+    //        {
+    //            tunnelThread.join();
+    //        }
+
+    //        localTunnelUrl.clear();
+    //    }
+    //}
+
+    //static std::string getLocalTunnelUrl()
+    //{
+    //    return localTunnelUrl;
+    //}
+
+private:
+    //inline static std::thread tunnelThread;
+    //inline static FILE* tunnelProcess{nullptr};
+
+    inline static std::atomic<bool> running{false};
+    inline static std::string localTunnelUrl;
+    inline static std::mutex urlMutex;
+    inline static std::condition_variable urlCv;
+
+
+// ================== LocalTunnel (Windows-only, header-only) ==================
+    // --- Process & pipe state (Windows HANDLEs) ---
+    inline static HANDLE ltProc = nullptr;
+    inline static HANDLE ltThread = nullptr;
+    inline static HANDLE ltPipeRd = nullptr; // parent read end
+    inline static HANDLE ltPipeWr = nullptr; // child write end (stdout/stderr)
+    inline static HANDLE ltJob = nullptr;    // job object to kill process tree
+
+    // REUSE your existing fields:
+    // inline static std::atomic<bool> running{false};
+    // inline static std::string       localTunnelUrl;
+    // inline static std::mutex        urlMutex;
+    // inline static std::condition_variable urlCv;
+
+    // --- helpers ---
+    static void closeHandleIf(HANDLE& h)
+    {
+        if (h)
+        {
+            CloseHandle(h);
+            h = nullptr;
+        }
+    }
+    static void createKillJobIfNeeded()
+    {
+        if (ltJob)
+            return;
+        ltJob = CreateJobObjectA(nullptr, nullptr);
+        if (!ltJob)
+            return;
+        JOBOBJECT_EXTENDED_LIMIT_INFORMATION info{};
+        info.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+        SetInformationJobObject(ltJob, JobObjectExtendedLimitInformation, &info, sizeof(info));
+    }
+    static void assignToJob(HANDLE process)
+    {
+        createKillJobIfNeeded();
+        if (ltJob)
+            AssignProcessToJobObject(ltJob, process);
+    }
+
+public:
+    // Start LocalTunnel: launches hidden node process, waits up to 15s for URL, returns URL or "".
     static std::string startLocalTunnel(const std::string& subdomainBase, int port)
     {
-        stopLocalTunnel(); // Stop any previous tunnel
+        // Nuke any previous instance
+        stopLocalTunnel();
 
-        // Clean the subdomain (remove dots, lowercase)
+        // Normalize subdomain: remove dots, lowercase
         std::string subdomain = std::regex_replace(subdomainBase, std::regex("\\."), "");
         for (auto& c : subdomain)
-            c = std::tolower(c);
+            c = (char)std::tolower((unsigned char)c);
 
-        // Reset URL before starting
         {
             std::lock_guard<std::mutex> lk(urlMutex);
             localTunnelUrl.clear();
         }
 
-        running = true;
-        tunnelThread = std::thread([subdomain, port]()
-                                   {
-                                       std::string nodePath = PathManager::getNodeExePath().string();
-                                       std::string ltPath = PathManager::getLocalTunnelClientPath().string();
-                                       std::ostringstream cmd;
-                                       cmd << nodePath + " " + ltPath + " --port " + std::to_string(port) + " --subdomain " + subdomain;
-                                       std::cout << "Starting LocalTunnel: " << cmd.str() << std::endl;
-                                       std::array<char, 128> buffer;
-                                       tunnelProcess = _popen(cmd.str().c_str(), "r");
-                                       if (!tunnelProcess)
-                                       {
-                                           std::cerr << "Failed to start local tunnel process!" << std::endl;
-                                           running = false;
-                                           urlCv.notify_all(); // wake waiters
-                                           return;
-                                       }
+        // ---- Create pipe to capture child's stdout/stderr ----
+        SECURITY_ATTRIBUTES sa{};
+        sa.nLength = sizeof(sa);
+        sa.bInheritHandle = TRUE;
 
-                                       std::string output;
-                                       while (fgets(buffer.data(), buffer.size(), tunnelProcess) != nullptr && running)
-                                       {
-                                           output += buffer.data();
-                                           // Capture the URL once
-                                           auto pos = output.find("https://");
-                                           if (pos != std::string::npos)
-                                           {
-                                               auto end = output.find("\n", pos);
-                                               std::string found = output.substr(pos, (end == std::string::npos) ? std::string::npos : end - pos);
-                                               {
-                                                   std::lock_guard<std::mutex> lk(urlMutex);
-                                                   if (localTunnelUrl.empty())
-                                                   {
-                                                       localTunnelUrl = std::move(found);
-                                                       std::cout << "LocalTunnel URL: " << localTunnelUrl << std::endl;
-                                                   }
-                                               }
-                                               urlCv.notify_all(); // wake waiters
-                                           }
-                                       }
+        HANDLE rd = nullptr, wr = nullptr;
+        if (!CreatePipe(&rd, &wr, &sa, 0))
+        {
+            return {};
+        }
+        // Ensure our read end is NOT inheritable
+        SetHandleInformation(rd, HANDLE_FLAG_INHERIT, 0);
 
-                                       _pclose(tunnelProcess);
-                                       tunnelProcess = nullptr;
-                                       running = false;
-                                       urlCv.notify_all(); // wake waiters even if no URL found
-                                   });
+        ltPipeRd = rd;
+        ltPipeWr = wr;
 
-        // Wait up to 15s for URL to be set (or process to end)
+        // ---- Build command line: "node.exe" <ltPath> --port N --subdomain X ----
+        std::string nodePath = PathManager::getNodeExePath().string();
+        std::string ltPath = PathManager::getLocalTunnelClientPath().string();
+
+        std::ostringstream cmd;
+        cmd << "\"" << nodePath << "\" "
+            << ltPath << " --port " << port << " --subdomain " << subdomain;
+
+        STARTUPINFOA si{};
+        PROCESS_INFORMATION pi{};
+        si.cb = sizeof(si);
+        si.dwFlags |= STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+        si.hStdInput = nullptr;
+        si.hStdOutput = ltPipeWr; // child writes here
+        si.hStdError = ltPipeWr;  // merge stderr
+        si.wShowWindow = SW_HIDE;
+
+        DWORD flags = CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP;
+
+        std::string cmdLine = cmd.str();
+        std::vector<char> mutableCmd(cmdLine.begin(), cmdLine.end());
+        mutableCmd.push_back('\0');
+
+        BOOL created = CreateProcessA(
+            /*lpApplicationName*/ nullptr,          // command line form
+            /*lpCommandLine   */ mutableCmd.data(), // "node.exe ... args"
+            /*lpProcessAttrs  */ nullptr,
+            /*lpThreadAttrs   */ nullptr,
+            /*bInheritHandles */ TRUE, // child must inherit ltPipeWr
+            /*dwCreationFlags */ flags,
+            /*lpEnvironment   */ nullptr,
+            /*lpCurrentDir    */ nullptr,
+            /*lpStartupInfo   */ &si,
+            /*lpProcessInfo   */ &pi);
+
+        // Parent no longer needs its write end
+        closeHandleIf(ltPipeWr);
+
+        if (!created)
+        {
+            closeHandleIf(ltPipeRd);
+            return {};
+        }
+
+        ltProc = pi.hProcess;
+        ltThread = pi.hThread;
+        running.store(true, std::memory_order_relaxed);
+
+        // Ensure the entire tree dies on stop
+        assignToJob(ltProc);
+
+        // ---- Reader thread: parse first https://... and signal ----
+        std::thread([rd = ltPipeRd]()
+                    {
+            std::string buf;
+            buf.reserve(4096);
+            constexpr DWORD CHUNK = 512;
+            char local[CHUNK + 1];
+
+            while (NetworkUtilities::running.load(std::memory_order_relaxed)) {
+                DWORD read = 0;
+                BOOL ok = ReadFile(rd, local, CHUNK, &read, nullptr);
+                if (!ok || read == 0) break;
+                local[read] = '\0';
+                buf.append(local, read);
+
+                auto pos = buf.find("https://");
+                if (pos != std::string::npos) {
+                    // capture until whitespace/newline
+                    size_t end = pos;
+                    while (end < buf.size() && buf[end] != '\r' && buf[end] != '\n'
+                           && !isspace((unsigned char)buf[end])) {
+                        ++end;
+                    }
+                    std::string found = buf.substr(pos, end - pos);
+                    {
+                        std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
+                        if (NetworkUtilities::localTunnelUrl.empty())
+                            NetworkUtilities::localTunnelUrl = std::move(found);
+                    }
+                    NetworkUtilities::urlCv.notify_all();
+                    // We can keep reading, but URL is set already.
+                }
+            }
+            // End: wake any waiters
+            NetworkUtilities::urlCv.notify_all(); })
+            .detach();
+
+        // ---- Wait up to 15s for URL (or for process to die) ----
         std::unique_lock<std::mutex> lk(urlMutex);
         bool ok = urlCv.wait_for(lk, std::chrono::seconds(15), []
-                                 { return !localTunnelUrl.empty() || !running.load(); });
+                                 { return !localTunnelUrl.empty() || !running.load(std::memory_order_relaxed); });
 
-        // Return the URL (copy). If not available, return empty string.
         return ok ? localTunnelUrl : std::string{};
     }
 
+    // Kill immediately; non-blocking
     static void stopLocalTunnel()
     {
-        if (running)
+        // Tell reader to stop
+        running.store(false, std::memory_order_relaxed);
+
+        // Terminate process (and its children via Job)
+        if (ltProc)
         {
-            running = false;
-            if (tunnelProcess)
-            {
-                _pclose(tunnelProcess);
-                tunnelProcess = nullptr;
-            }
+            TerminateProcess(ltProc, 0);
+        }
 
-            if (tunnelThread.joinable())
-            {
-                tunnelThread.join();
-            }
+        // Close handles
+        closeHandleIf(ltThread);
+        closeHandleIf(ltProc);
+        closeHandleIf(ltPipeWr); // usually already closed by parent after CreateProcess
+        closeHandleIf(ltPipeRd);
 
+        // Closing job kills any remaining children (KILL_ON_JOB_CLOSE)
+        if (ltJob)
+        {
+            CloseHandle(ltJob);
+            ltJob = nullptr;
+        }
+
+        // Clear URL & wake any waiters
+        {
+            std::lock_guard<std::mutex> lk(urlMutex);
             localTunnelUrl.clear();
         }
+        urlCv.notify_all();
     }
 
     static std::string getLocalTunnelUrl()
     {
+        std::lock_guard<std::mutex> lk(urlMutex);
         return localTunnelUrl;
     }
-
-private:
-    inline static std::thread tunnelThread;
-    inline static std::atomic<bool> running{false};
-    inline static FILE* tunnelProcess{nullptr};
-    inline static std::string localTunnelUrl;
-
-    inline static std::mutex urlMutex;
-    inline static std::condition_variable urlCv;
+    // ================== /LocalTunnel ==================
 };

@@ -5,8 +5,10 @@
 #include "UPnPManager.h"
 
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
-    ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory)), chat()
+    ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory))
 {
+
+    chat_manager = std::make_shared<ChatManager>(network_manager);
     network_manager->setup(board_manager, weak_from_this());
 
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
@@ -35,6 +37,10 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
 
         size_t offset = 0;
         active_game_table = Serializer::deserializeGameTableEntity(buffer, offset, ecs);
+        auto tableId = active_game_table.get<Identifier>()->id;
+        game_table_name = active_game_table.get<GameTable>()->gameTableName;
+        chat_manager->setActiveGameTable(tableId, game_table_name);
+
         ecs.defer_begin();
         try
         {
@@ -106,6 +112,8 @@ void GameTableManager::processReceivedGameMessages()
                 active_game_table = ecs.entity("GameTable")
                                         .set(GameTable{*m.name})
                                         .set(Identifier{*m.tableId});
+                game_table_name = *m.name;
+                chat_manager->setActiveGameTable(*m.tableId, *m.name);
                 break;
             }
 
@@ -548,7 +556,7 @@ void GameTableManager::closeGameTablePopUp()
             board_manager->closeBoard();
             active_game_table = flecs::entity();
             network_manager->closeServer();
-            chat.clearChat();
+            chat_manager->saveCurrent();
             ImGui::CloseCurrentPopup();
         }
 
@@ -1010,8 +1018,10 @@ void GameTableManager::hostGameTablePopUp()
 
                     // Create GT entity + file
                     game_table_name = buffer;
-                    auto game_table = ecs.entity("GameTable").set(Identifier{board_manager->generateUniqueId()}).set(GameTable{game_table_name});
+                    auto identifier = Identifier{board_manager->generateUniqueId()};
+                    auto game_table = ecs.entity("GameTable").set(identifier).set(GameTable{game_table_name});
                     active_game_table = game_table;
+                    chat_manager->setActiveGameTable(identifier.id, game_table_name);
                     createGameTableFile(game_table);
 
                     // Identity + network
@@ -1346,7 +1356,7 @@ void GameTableManager::aboutPopUp()
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
-    chat.renderChat();
+    chat_manager->render();
     //renderNetworkToasts(network_manager);
     toaster_->Render();
     if (board_manager->isBoardActive())

@@ -29,6 +29,8 @@
 #include "flecs.h"
 #include "PathManager.h"
 
+#include "ConsoleUtils.h"
+
 namespace fs = std::filesystem;
 
 struct MapFBO
@@ -87,6 +89,8 @@ private:
     ImVec2 current_map_relative_mouse_pos = ImVec2(0, 0);
 
     //DEBUG STUFF --------------------------------------
+    bool isOpen = ConsoleUtils::IsConsoleOpen();
+
     bool g_draw_debug_circle = true;
     void DrawDebugCircle(ImVec2 coords, bool is_relative_to_window, ImU32 color, float radius = 10.0f)
     {

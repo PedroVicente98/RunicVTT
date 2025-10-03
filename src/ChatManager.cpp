@@ -461,7 +461,7 @@ void ChatManager::sendTextToThread(uint64_t threadId, const std::string& text) {
 void ChatManager::render() {
     if (!hasCurrent()) return;
 
-    ImGui::Begin("Chat");
+    ImGui::Begin("ChatWindow");
     chatWindowFocused_ = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow);
 
     // Layout: left fixed width panel, right expands

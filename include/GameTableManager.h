@@ -2,11 +2,11 @@
 #include "BoardManager.h"
 //#include "Chat.h"
 #include <vector>
-
 #include "flecs.h"
 #include "Components.h"
 #include "PathManager.h"
 #include "NetworkManager.h"
+#include "ChatManager.h"
 
 class GameTableManager : public std::enable_shared_from_this<GameTableManager>
 {
@@ -55,7 +55,8 @@ public:
     void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
     std::string game_table_name;
-    Chat chat;
+    //Chat chat;
+    std::shared_ptr<ChatManager> chat_manager;
     std::shared_ptr<DirectoryWindow> map_directory;
     std::shared_ptr<NetworkManager> network_manager;
     std::shared_ptr<BoardManager> board_manager;

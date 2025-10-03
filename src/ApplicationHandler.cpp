@@ -1,5 +1,6 @@
 #include "ApplicationHandler.h"
 #include "Components.h"
+#include "NetworkUtilities.h"
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
     marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
@@ -272,10 +273,12 @@ int ApplicationHandler::run()
             glfwSwapBuffers(window);
         }
 
-        //map_directory.stopMonitoring();
-        //marker_directory.stopMonitoring();
+        map_directory->stopMonitoring();
+        marker_directory->stopMonitoring();
     }
-
+    if (ConsoleUtils::IsConsoleOpen())
+        ConsoleUtils::CloseConsole();
+    glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
 }
@@ -670,6 +673,20 @@ void ApplicationHandler::renderMainMenuBar()
         {
             about = true;
         }
+
+        isOpen = ConsoleUtils::IsConsoleOpen();
+        if (ImGui::MenuItem("Open/Close Console", nullptr))
+        {
+            if (!isOpen)
+            {
+                ConsoleUtils::OpenConsole();
+            }
+            else
+            {
+                ConsoleUtils::CloseConsole();
+            }
+        }
+
         ImGui::EndMenu();
     }
 

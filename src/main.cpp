@@ -98,6 +98,6 @@ int main()
     std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory");
     ApplicationHandler app(window, map_directory, marker_directory);
     app.run();
-
+    
     return 0;
 }
