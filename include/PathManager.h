@@ -94,6 +94,11 @@ public:
     {
         return getExternalPath() / "localtunnel" / "node_modules" / "localtunnel" / "bin" / "client";
     }
+
+    static fs::path getLocalTunnelControllerPath()
+    {
+        return getExternalPath() / "lt-controller.js";
+    }
     static fs::path getUpnpcExePath()
     {
         return executableDir / "upnpc-static.exe";

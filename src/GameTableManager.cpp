@@ -1357,8 +1357,6 @@ void GameTableManager::aboutPopUp()
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
     chat_manager->render();
-    //renderNetworkToasts(network_manager);
-    toaster_->Render();
     if (board_manager->isBoardActive())
     {
         if (board_manager->isEditWindowOpen())

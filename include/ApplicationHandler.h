@@ -29,7 +29,7 @@
 #include "flecs.h"
 #include "PathManager.h"
 
-#include "ConsoleUtils.h"
+//#include "ConsoleUtils.h"
 
 namespace fs = std::filesystem;
 
@@ -89,7 +89,6 @@ private:
     ImVec2 current_map_relative_mouse_pos = ImVec2(0, 0);
 
     //DEBUG STUFF --------------------------------------
-    bool isOpen = ConsoleUtils::IsConsoleOpen();
 
     bool g_draw_debug_circle = true;
     void DrawDebugCircle(ImVec2 coords, bool is_relative_to_window, ImU32 color, float radius = 10.0f)
@@ -111,15 +110,17 @@ private:
         draw_list->AddCircleFilled(final_screen_pos, radius, color, 16);
     }
 
-    void handleToasterDebug()
-    {
-        if (ImGui::IsKeyPressed(ImGuiKey_1))
-            pushStatusToast("Info: Hello!", ImGuiToaster::Level::Info, 5.0f);
-        if (ImGui::IsKeyPressed(ImGuiKey_2))
-            pushStatusToast("Good: Saved", ImGuiToaster::Level::Good, 4.0f);
-        if (ImGui::IsKeyPressed(ImGuiKey_3))
-            pushStatusToast("Warning: Ping high", ImGuiToaster::Level::Warning, 6.0f);
-        if (ImGui::IsKeyPressed(ImGuiKey_4))
-            pushStatusToast("Error: Failed op", ImGuiToaster::Level::Error);
-    }
+
+
+    //void handleToasterDebug()
+    //{
+    //    if (ImGui::IsKeyPressed(ImGuiKey_1))
+    //        pushStatusToast("Info: Hello!", ImGuiToaster::Level::Info, 5.0f);
+    //    if (ImGui::IsKeyPressed(ImGuiKey_2))
+    //        pushStatusToast("Good: Saved", ImGuiToaster::Level::Good, 4.0f);
+    //    if (ImGui::IsKeyPressed(ImGuiKey_3))
+    //        pushStatusToast("Warning: Ping high", ImGuiToaster::Level::Warning, 6.0f);
+    //    if (ImGui::IsKeyPressed(ImGuiKey_4))
+    //        pushStatusToast("Error: Failed op", ImGuiToaster::Level::Error);
+    //}
 };

@@ -308,22 +308,26 @@ private:
     inline static std::mutex urlMutex;
     inline static std::condition_variable urlCv;
 
-
 // ================== LocalTunnel (Windows-only, header-only) ==================
-    // --- Process & pipe state (Windows HANDLEs) ---
+private:
+    // Process & pipes
     inline static HANDLE ltProc = nullptr;
     inline static HANDLE ltThread = nullptr;
-    inline static HANDLE ltPipeRd = nullptr; // parent read end
-    inline static HANDLE ltPipeWr = nullptr; // child write end (stdout/stderr)
-    inline static HANDLE ltJob = nullptr;    // job object to kill process tree
 
-    // REUSE your existing fields:
+    inline static HANDLE ltStdoutRd = nullptr; // parent read side (child stdout/stderr)
+    inline static HANDLE ltStdoutWr = nullptr; // child write side
+
+    inline static HANDLE ltStdinRd = nullptr; // child read side (stdin)
+    inline static HANDLE ltStdinWr = nullptr; // parent write side
+
+    inline static HANDLE ltJob = nullptr; // job to kill process tree
+
+    // reuse your existing:
     // inline static std::atomic<bool> running{false};
-    // inline static std::string       localTunnelUrl;
-    // inline static std::mutex        urlMutex;
+    // inline static std::string localTunnelUrl;
+    // inline static std::mutex urlMutex;
     // inline static std::condition_variable urlCv;
 
-    // --- helpers ---
     static void closeHandleIf(HANDLE& h)
     {
         if (h)
@@ -332,6 +336,7 @@ private:
             h = nullptr;
         }
     }
+
     static void createKillJobIfNeeded()
     {
         if (ltJob)
@@ -350,12 +355,24 @@ private:
             AssignProcessToJobObject(ltJob, process);
     }
 
+    static std::string lastErrorToString(DWORD err)
+    {
+        LPVOID msg = nullptr;
+        DWORD n = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 nullptr, err, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&msg, 0, nullptr);
+        std::string s;
+        if (n && msg)
+        {
+            s.assign((LPSTR)msg, n);
+            LocalFree(msg);
+        }
+        return s;
+    }
+
 public:
-    // Start LocalTunnel: launches hidden node process, waits up to 15s for URL, returns URL or "".
     static std::string startLocalTunnel(const std::string& subdomainBase, int port)
     {
-        // Nuke any previous instance
-        stopLocalTunnel();
+        stopLocalTunnel(); // ensure clean start
 
         // Normalize subdomain: remove dots, lowercase
         std::string subdomain = std::regex_replace(subdomainBase, std::regex("\\."), "");
@@ -367,37 +384,43 @@ public:
             localTunnelUrl.clear();
         }
 
-        // ---- Create pipe to capture child's stdout/stderr ----
+        // Create stdout pipe
         SECURITY_ATTRIBUTES sa{};
         sa.nLength = sizeof(sa);
         sa.bInheritHandle = TRUE;
-
-        HANDLE rd = nullptr, wr = nullptr;
-        if (!CreatePipe(&rd, &wr, &sa, 0))
+        if (!CreatePipe(&ltStdoutRd, &ltStdoutWr, &sa, 0))
         {
+            OutputDebugStringA("[LT] CreatePipe stdout failed\n");
             return {};
         }
-        // Ensure our read end is NOT inheritable
-        SetHandleInformation(rd, HANDLE_FLAG_INHERIT, 0);
+        SetHandleInformation(ltStdoutRd, HANDLE_FLAG_INHERIT, 0); // parent read end: not inheritable
 
-        ltPipeRd = rd;
-        ltPipeWr = wr;
+        // Create stdin pipe
+        if (!CreatePipe(&ltStdinRd, &ltStdinWr, &sa, 0))
+        {
+            OutputDebugStringA("[LT] CreatePipe stdin failed\n");
+            closeHandleIf(ltStdoutWr);
+            closeHandleIf(ltStdoutRd);
+            return {};
+        }
+        SetHandleInformation(ltStdinWr, HANDLE_FLAG_INHERIT, 0); // parent write end: not inheritable
 
-        // ---- Build command line: "node.exe" <ltPath> --port N --subdomain X ----
+        // Build command: "node.exe" "lt-controller.js" --port N --subdomain X
         std::string nodePath = PathManager::getNodeExePath().string();
-        std::string ltPath = PathManager::getLocalTunnelClientPath().string();
+        std::string ctlPath = PathManager::getLocalTunnelControllerPath().string();
 
         std::ostringstream cmd;
-        cmd << "\"" << nodePath << "\" "
-            << ltPath << " --port " << port << " --subdomain " << subdomain;
+        cmd << "\"" << nodePath << "\" \"" << ctlPath << "\""
+            << " --port " << port
+            << " --subdomain " << subdomain;
 
         STARTUPINFOA si{};
         PROCESS_INFORMATION pi{};
         si.cb = sizeof(si);
-        si.dwFlags |= STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
-        si.hStdInput = nullptr;
-        si.hStdOutput = ltPipeWr; // child writes here
-        si.hStdError = ltPipeWr;  // merge stderr
+        si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+        si.hStdInput = ltStdinRd;
+        si.hStdOutput = ltStdoutWr;
+        si.hStdError = ltStdoutWr;
         si.wShowWindow = SW_HIDE;
 
         DWORD flags = CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP;
@@ -406,24 +429,30 @@ public:
         std::vector<char> mutableCmd(cmdLine.begin(), cmdLine.end());
         mutableCmd.push_back('\0');
 
-        BOOL created = CreateProcessA(
-            /*lpApplicationName*/ nullptr,          // command line form
-            /*lpCommandLine   */ mutableCmd.data(), // "node.exe ... args"
-            /*lpProcessAttrs  */ nullptr,
-            /*lpThreadAttrs   */ nullptr,
-            /*bInheritHandles */ TRUE, // child must inherit ltPipeWr
-            /*dwCreationFlags */ flags,
-            /*lpEnvironment   */ nullptr,
-            /*lpCurrentDir    */ nullptr,
-            /*lpStartupInfo   */ &si,
-            /*lpProcessInfo   */ &pi);
+        // Optionally set working dir so require('localtunnel') resolves next to lt-controller.js
+        std::string workingDir = PathManager::getLocalTunnelControllerPath().parent_path().string();
 
-        // Parent no longer needs its write end
-        closeHandleIf(ltPipeWr);
+        BOOL ok = CreateProcessA(
+            /*appName*/ nullptr,
+            /*cmdLine*/ mutableCmd.data(),
+            nullptr, nullptr,
+            /*inherit handles*/ TRUE, // child inherits ltStdoutWr, ltStdinRd
+            flags,
+            /*env*/ nullptr,
+            /*current dir*/ workingDir.empty() ? nullptr : workingDir.c_str(),
+            &si, &pi);
 
-        if (!created)
+        // Parent no longer needs these ends
+        closeHandleIf(ltStdoutWr);
+        closeHandleIf(ltStdinRd);
+
+        if (!ok)
         {
-            closeHandleIf(ltPipeRd);
+            DWORD err = GetLastError();
+            std::string em = "[LT] CreateProcess failed: " + lastErrorToString(err);
+            OutputDebugStringA(em.c_str());
+            closeHandleIf(ltStdoutRd);
+            closeHandleIf(ltStdinWr);
             return {};
         }
 
@@ -431,80 +460,104 @@ public:
         ltThread = pi.hThread;
         running.store(true, std::memory_order_relaxed);
 
-        // Ensure the entire tree dies on stop
         assignToJob(ltProc);
 
-        // ---- Reader thread: parse first https://... and signal ----
-        std::thread([rd = ltPipeRd]()
+        // Reader thread: read one JSON line with {"event":"ready","url":...}
+        std::thread([rd = ltStdoutRd]()
                     {
-            std::string buf;
-            buf.reserve(4096);
-            constexpr DWORD CHUNK = 512;
-            char local[CHUNK + 1];
+            std::string buf; buf.reserve(4096);
+            constexpr DWORD CHUNK = 1024;
+            char tmp[CHUNK + 1];
+
+            auto parseLine = [](const std::string& line) -> std::string {
+                // very tiny JSON extraction: look for "event":"ready" + extract url
+                if (line.find("\"event\":\"ready\"") == std::string::npos) return {};
+                auto u = line.find("\"url\"");
+                if (u == std::string::npos) return {};
+                u = line.find('"', u + 4); // first quote after "url"
+                if (u == std::string::npos) return {};
+                auto v = line.find('"', u + 1);
+                if (v == std::string::npos) return {};
+                return line.substr(u + 1, v - (u + 1));
+            };
 
             while (NetworkUtilities::running.load(std::memory_order_relaxed)) {
-                DWORD read = 0;
-                BOOL ok = ReadFile(rd, local, CHUNK, &read, nullptr);
-                if (!ok || read == 0) break;
-                local[read] = '\0';
-                buf.append(local, read);
+                DWORD got = 0;
+                BOOL ok = ReadFile(rd, tmp, CHUNK, &got, nullptr);
+                if (!ok || got == 0) break;
+                tmp[got] = '\0';
+                buf.append(tmp, got);
 
-                auto pos = buf.find("https://");
-                if (pos != std::string::npos) {
-                    // capture until whitespace/newline
-                    size_t end = pos;
-                    while (end < buf.size() && buf[end] != '\r' && buf[end] != '\n'
-                           && !isspace((unsigned char)buf[end])) {
-                        ++end;
+                // process complete lines
+                size_t pos = 0;
+                while (true) {
+                    size_t nl = buf.find('\n', pos);
+                    if (nl == std::string::npos) break;
+                    std::string line = buf.substr(pos, nl - pos);
+                    pos = nl + 1;
+
+                    if (auto url = parseLine(line); !url.empty()) {
+                        {
+                            std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
+                            if (NetworkUtilities::localTunnelUrl.empty())
+                                NetworkUtilities::localTunnelUrl = std::move(url);
+                        }
+                        NetworkUtilities::urlCv.notify_all();
                     }
-                    std::string found = buf.substr(pos, end - pos);
-                    {
-                        std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
-                        if (NetworkUtilities::localTunnelUrl.empty())
-                            NetworkUtilities::localTunnelUrl = std::move(found);
-                    }
-                    NetworkUtilities::urlCv.notify_all();
-                    // We can keep reading, but URL is set already.
                 }
+                if (pos > 0) buf.erase(0, pos);
             }
-            // End: wake any waiters
             NetworkUtilities::urlCv.notify_all(); })
             .detach();
 
-        // ---- Wait up to 15s for URL (or for process to die) ----
+        // Wait up to 15s for URL or process exit
         std::unique_lock<std::mutex> lk(urlMutex);
-        bool ok = urlCv.wait_for(lk, std::chrono::seconds(15), []
-                                 { return !localTunnelUrl.empty() || !running.load(std::memory_order_relaxed); });
+        bool have = urlCv.wait_for(lk, std::chrono::seconds(15), []
+                                   { return !localTunnelUrl.empty() || !running.load(std::memory_order_relaxed); });
 
-        return ok ? localTunnelUrl : std::string{};
+        return have ? localTunnelUrl : std::string{};
     }
 
-    // Kill immediately; non-blocking
     static void stopLocalTunnel()
     {
-        // Tell reader to stop
+        // tell reader thread to stop
         running.store(false, std::memory_order_relaxed);
 
-        // Terminate process (and its children via Job)
-        if (ltProc)
+        // try graceful: send "stop\n" if stdin is open
+        if (ltStdinWr)
         {
-            TerminateProcess(ltProc, 0);
+            DWORD written = 0;
+            const char* stopCmd = "stop\n";
+            WriteFile(ltStdinWr, stopCmd, (DWORD)strlen(stopCmd), &written, nullptr);
         }
 
-        // Close handles
+        // wait a moment for clean exit
+        if (ltProc)
+        {
+            DWORD wait = WaitForSingleObject(ltProc, 300); // 300ms grace
+            if (wait != WAIT_OBJECT_0)
+            {
+                // force kill now (non-blocking)
+                TerminateProcess(ltProc, 0);
+            }
+        }
+
+        // close all handles
         closeHandleIf(ltThread);
         closeHandleIf(ltProc);
-        closeHandleIf(ltPipeWr); // usually already closed by parent after CreateProcess
-        closeHandleIf(ltPipeRd);
+        closeHandleIf(ltStdoutWr); // usually already closed
+        closeHandleIf(ltStdoutRd);
+        closeHandleIf(ltStdinRd); // already closed
+        closeHandleIf(ltStdinWr);
 
-        // Closing job kills any remaining children (KILL_ON_JOB_CLOSE)
+        // close job (kills any remaining children)
         if (ltJob)
         {
             CloseHandle(ltJob);
             ltJob = nullptr;
         }
 
-        // Clear URL & wake any waiters
+        // clear URL and wake any waiters
         {
             std::lock_guard<std::mutex> lk(urlMutex);
             localTunnelUrl.clear();
@@ -518,4 +571,6 @@ public:
         return localTunnelUrl;
     }
     // ================== /LocalTunnel ==================
+
+
 };

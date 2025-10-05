@@ -1,6 +1,9 @@
 #include "ApplicationHandler.h"
 #include "Components.h"
 #include "NetworkUtilities.h"
+#include "DebugConsole.h"
+#include "Logger.h"
+#include "DebugActions.h"
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
     marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
@@ -27,6 +30,8 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     ecs.component<NoteComponent>();
     //ecs.component<PeerInfo>();
     //ecs.component<ToolComponent>();
+    DebugActions::RegisterToasterToggles(toaster_);
+    DebugActions::RegisterAllDefaultToggles();
 }
 
 ApplicationHandler::~ApplicationHandler()
@@ -122,6 +127,7 @@ void ApplicationHandler::DeleteMapFBO()
     }
     map_fbo->width = 0;
     map_fbo->height = 0;
+
 }
 
 int ApplicationHandler::run()
@@ -248,14 +254,18 @@ int ApplicationHandler::run()
 
             //game_table_manager.processSentMessages();
             game_table_manager.processReceivedGameMessages();
-            handleToasterDebug();
 
-            //system("cls");
+            DebugConsole::Render();
+            DebugConsole::RunActiveDebugToggles();
+
+            //handleToasterDebug();
+
             renderDockSpace();
             renderMainMenuBar();
 
             renderMapFBO(va, ib, shader, grid_shader, renderer);
             renderActiveGametable();
+            toaster_->Render();
 
             // Rendering
             //ImGui::ShowMetricsWindow();
@@ -276,8 +286,8 @@ int ApplicationHandler::run()
         map_directory->stopMonitoring();
         marker_directory->stopMonitoring();
     }
-    if (ConsoleUtils::IsConsoleOpen())
-        ConsoleUtils::CloseConsole();
+    /*if (ConsoleUtils::IsConsoleOpen())
+        ConsoleUtils::CloseConsole();*/
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
@@ -410,6 +420,166 @@ void ApplicationHandler::renderActiveGametable()
         ImGui::End();
     }
 }
+
+void ApplicationHandler::renderMainMenuBar()
+{
+    // one-shot flags to open popups
+    bool open_host_gametable = false; // NEW unified host modal (Create/Load + network + username)
+    bool connect_to_gametable = false;
+    bool close_current_gametable = false;
+
+    bool open_network_center = false; // NEW unified network management popup
+
+    bool open_create_board = false;
+    bool close_current_board = false;
+    bool load_active_board = false;
+
+    bool about = false;
+    bool guide = false;
+
+    ImGui::BeginMainMenuBar();
+
+    // ---------------- Game Table ----------------
+    if (ImGui::BeginMenu("Game Table"))
+    {
+        if (ImGui::MenuItem("Host..."))
+        { // NEW: replaces Create/Open/Network
+            open_host_gametable = true;
+        }
+        if (ImGui::MenuItem("Connect..."))
+        { // players joining
+            connect_to_gametable = true;
+        }
+
+        if (game_table_manager.isGameTableActive())
+        {
+            if (ImGui::MenuItem("Save"))
+            { // existing logic
+                game_table_manager.saveGameTable();
+            }
+            if (ImGui::MenuItem("Close"))
+            {
+                close_current_gametable = true;
+            }
+        }
+        ImGui::EndMenu();
+    }
+    bool showNetwork = (game_table_manager.network_manager && game_table_manager.network_manager->getPeerRole() != Role::NONE);
+    // ---------------- Network ----------------
+    //if (game_table_manager.isGameTableActive()) {
+    if (showNetwork)
+    {
+        if (ImGui::BeginMenu("Network"))
+        {
+            if (ImGui::MenuItem("Network Center"))
+            { // NEW: replaces Connection Info + Open/Close network
+                open_network_center = true;
+            }
+            ImGui::EndMenu();
+        }
+    }
+
+    // ---------------- Board ----------------
+    if (game_table_manager.isGameTableActive())
+    {
+        if (ImGui::BeginMenu("Board"))
+        {
+            if (ImGui::MenuItem("Create"))
+            {
+                open_create_board = true;
+            }
+            if (game_table_manager.board_manager->isBoardActive())
+            {
+                if (ImGui::MenuItem("Save"))
+                {
+                    auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
+                    game_table_manager.board_manager->saveActiveBoard(board_folder_path);
+                }
+                if (ImGui::MenuItem("Close"))
+                {
+                    close_current_board = true;
+                }
+            }
+            if (ImGui::MenuItem("Open"))
+            {
+                load_active_board = true;
+            }
+            ImGui::EndMenu();
+        }
+    }
+    if (ImGui::BeginMenu("Help"))
+    {
+        if (ImGui::MenuItem("Guide"))
+        {
+            guide = true;
+        }
+
+        if (ImGui::MenuItem("About"))
+        {
+            about = true;
+        }
+
+        bool vis = DebugConsole::isVisible();
+        if (ImGui::MenuItem("Console", nullptr, vis))
+        {
+            DebugConsole::setVisible(!vis);
+        }
+
+        ImGui::EndMenu();
+    }
+
+    ImGui::EndMainMenuBar();
+
+    // ---------------- Popups (open + render) ----------------
+
+    if (open_host_gametable)
+        ImGui::OpenPopup("Host GameTable");
+    if (ImGui::IsPopupOpen("Host GameTable"))
+        game_table_manager.hostGameTablePopUp(); // NEW (Create/Load tabs + network + username)
+
+    if (connect_to_gametable)
+        ImGui::OpenPopup("ConnectToGameTable");
+    if (ImGui::IsPopupOpen("ConnectToGameTable"))
+        game_table_manager.connectToGameTablePopUp(); // you already have this popup
+
+    if (close_current_gametable)
+        ImGui::OpenPopup("CloseGameTable");
+    if (ImGui::IsPopupOpen("CloseGameTable"))
+        game_table_manager.closeGameTablePopUp(); // existing
+
+    if (open_network_center)
+        ImGui::OpenPopup("Network Center");
+    if (ImGui::IsPopupOpen("Network Center"))
+        game_table_manager.networkCenterPopUp(); // NEW unified network panel
+
+    if (open_create_board)
+        ImGui::OpenPopup("CreateBoard");
+    if (ImGui::IsPopupOpen("CreateBoard"))
+        game_table_manager.createBoardPopUp(); // existing (good as-is)
+
+    if (load_active_board)
+        ImGui::OpenPopup("LoadBoard");
+    if (ImGui::IsPopupOpen("LoadBoard"))
+        game_table_manager.loadBoardPopUp(); // existing
+
+    if (close_current_board)
+        ImGui::OpenPopup("CloseBoard");
+    if (ImGui::IsPopupOpen("CloseBoard"))
+        game_table_manager.closeBoardPopUp();
+
+    if (guide)
+        ImGui::OpenPopup("Guide");
+    if (ImGui::IsPopupOpen("Guide"))
+        game_table_manager.guidePopUp();
+
+    if (about)
+        ImGui::OpenPopup("About");
+    if (ImGui::IsPopupOpen("About"))
+        game_table_manager.aboutPopUp();
+}
+
+
+
 //
 //void ApplicationHandler::renderMainMenuBar() {
 //    bool open_create_gametable = false;
@@ -576,166 +746,3 @@ void ApplicationHandler::renderActiveGametable()
 //
 //
 //}
-void ApplicationHandler::renderMainMenuBar()
-{
-    // one-shot flags to open popups
-    bool open_host_gametable = false; // NEW unified host modal (Create/Load + network + username)
-    bool connect_to_gametable = false;
-    bool close_current_gametable = false;
-
-    bool open_network_center = false; // NEW unified network management popup
-
-    bool open_create_board = false;
-    bool close_current_board = false;
-    bool load_active_board = false;
-
-    bool about = false;
-    bool guide = false;
-
-    ImGui::BeginMainMenuBar();
-
-    // ---------------- Game Table ----------------
-    if (ImGui::BeginMenu("Game Table"))
-    {
-        if (ImGui::MenuItem("Host..."))
-        { // NEW: replaces Create/Open/Network
-            open_host_gametable = true;
-        }
-        if (ImGui::MenuItem("Connect..."))
-        { // players joining
-            connect_to_gametable = true;
-        }
-
-        if (game_table_manager.isGameTableActive())
-        {
-            if (ImGui::MenuItem("Save"))
-            { // existing logic
-                game_table_manager.saveGameTable();
-            }
-            if (ImGui::MenuItem("Close"))
-            {
-                close_current_gametable = true;
-            }
-        }
-        ImGui::EndMenu();
-    }
-    bool showNetwork = (game_table_manager.network_manager && game_table_manager.network_manager->getPeerRole() != Role::NONE);
-    // ---------------- Network ----------------
-    //if (game_table_manager.isGameTableActive()) {
-    if (showNetwork)
-    {
-        if (ImGui::BeginMenu("Network"))
-        {
-            if (ImGui::MenuItem("Network Center"))
-            { // NEW: replaces Connection Info + Open/Close network
-                open_network_center = true;
-            }
-            ImGui::EndMenu();
-        }
-    }
-
-    // ---------------- Board ----------------
-    if (game_table_manager.isGameTableActive())
-    {
-        if (ImGui::BeginMenu("Board"))
-        {
-            if (ImGui::MenuItem("Create"))
-            {
-                open_create_board = true;
-            }
-            if (game_table_manager.board_manager->isBoardActive())
-            {
-                if (ImGui::MenuItem("Save"))
-                {
-                    auto board_folder_path = PathManager::getGameTablesPath() / game_table_manager.game_table_name / "Boards";
-                    game_table_manager.board_manager->saveActiveBoard(board_folder_path);
-                }
-                if (ImGui::MenuItem("Close"))
-                {
-                    close_current_board = true;
-                }
-            }
-            if (ImGui::MenuItem("Open"))
-            {
-                load_active_board = true;
-            }
-            ImGui::EndMenu();
-        }
-    }
-    if (ImGui::BeginMenu("Help"))
-    {
-        if (ImGui::MenuItem("Guide"))
-        {
-            guide = true;
-        }
-
-        if (ImGui::MenuItem("About"))
-        {
-            about = true;
-        }
-
-        isOpen = ConsoleUtils::IsConsoleOpen();
-        if (ImGui::MenuItem("Open/Close Console", nullptr))
-        {
-            if (!isOpen)
-            {
-                ConsoleUtils::OpenConsole();
-            }
-            else
-            {
-                ConsoleUtils::CloseConsole();
-            }
-        }
-
-        ImGui::EndMenu();
-    }
-
-    ImGui::EndMainMenuBar();
-
-    // ---------------- Popups (open + render) ----------------
-
-    if (open_host_gametable)
-        ImGui::OpenPopup("Host GameTable");
-    if (ImGui::IsPopupOpen("Host GameTable"))
-        game_table_manager.hostGameTablePopUp(); // NEW (Create/Load tabs + network + username)
-
-    if (connect_to_gametable)
-        ImGui::OpenPopup("ConnectToGameTable");
-    if (ImGui::IsPopupOpen("ConnectToGameTable"))
-        game_table_manager.connectToGameTablePopUp(); // you already have this popup
-
-    if (close_current_gametable)
-        ImGui::OpenPopup("CloseGameTable");
-    if (ImGui::IsPopupOpen("CloseGameTable"))
-        game_table_manager.closeGameTablePopUp(); // existing
-
-    if (open_network_center)
-        ImGui::OpenPopup("Network Center");
-    if (ImGui::IsPopupOpen("Network Center"))
-        game_table_manager.networkCenterPopUp(); // NEW unified network panel
-
-    if (open_create_board)
-        ImGui::OpenPopup("CreateBoard");
-    if (ImGui::IsPopupOpen("CreateBoard"))
-        game_table_manager.createBoardPopUp(); // existing (good as-is)
-
-    if (load_active_board)
-        ImGui::OpenPopup("LoadBoard");
-    if (ImGui::IsPopupOpen("LoadBoard"))
-        game_table_manager.loadBoardPopUp(); // existing
-
-    if (close_current_board)
-        ImGui::OpenPopup("CloseBoard");
-    if (ImGui::IsPopupOpen("CloseBoard"))
-        game_table_manager.closeBoardPopUp();
-
-    if (guide)
-        ImGui::OpenPopup("Guide");
-    if (ImGui::IsPopupOpen("Guide"))
-        game_table_manager.guidePopUp();
-
-    if (about)
-        ImGui::OpenPopup("About");
-    if (ImGui::IsPopupOpen("About"))
-        game_table_manager.aboutPopUp();
-}

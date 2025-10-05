@@ -7,6 +7,8 @@
 #include "Message.h"
 #include "UPnPManager.h"
 #include "Serializer.h"
+#include "DebugConsole.h"
+#include "Logger.h"
 
 NetworkManager::NetworkManager(flecs::world ecs) :
     ecs(ecs), peer_role(Role::NONE)
@@ -24,6 +26,19 @@ void NetworkManager::setup(std::weak_ptr<BoardManager> board_manager, std::weak_
 
     signalingClient = std::make_shared<SignalingClient>(weak_from_this());
     signalingServer = std::make_shared<SignalingServer>(weak_from_this());
+
+    DebugConsole::setLocalTunnelHandlers(
+        [this]() -> std::string
+        {
+            auto ip = NetworkUtilities::getLocalIPv4Address();
+            Logger::instance().log("localtunnel", Logger::Level::Debug, "Starting with runic-" + ip + ":" + std::to_string(port));
+            return NetworkUtilities::startLocalTunnel("runic-" + ip, port);
+        },
+        [this]()
+        {
+            NetworkUtilities::stopLocalTunnel();
+            Logger::instance().log("localtunnel", Logger::Level::Info, "Stop requested");
+        });
 }
 
 NetworkManager::~NetworkManager()
@@ -659,9 +674,12 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 }
 
 // In NetworkManager.cpp
-void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload) {
-    for (auto& [pid, link] : peers) {
-        if (!link) continue;
+void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
+{
+    for (auto& [pid, link] : peers)
+    {
+        if (!link)
+            continue;
         // build final buffer [u8 type][u32 size][bytes...] or your framing
         std::vector<uint8_t> frame;
         frame.push_back((uint8_t)t);
@@ -671,18 +689,20 @@ void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<u
     }
 }
 
-void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload) {
-    for (auto& pid : peers_) {
+void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
+{
+    for (auto& pid : peers_)
+    {
         auto it = peers.find(pid);
-        if (it == peers.end() || !it->second) continue;
+        if (it == peers.end() || !it->second)
+            continue;
         std::vector<uint8_t> frame;
         frame.push_back((uint8_t)t);
         Serializer::serializeInt(frame, (int)payload.size());
         frame.insert(frame.end(), payload.begin(), payload.end());
-        it->second->sendOn(msg::dc::name::Chat,frame);
+        it->second->sendOn(msg::dc::name::Chat, frame);
     }
 }
-
 
 // ----------- Broadcast wrappers -----------
 

@@ -53,6 +53,7 @@ target_include_directories(RunicVTT PRIVATE
     include/renderer
     include/network
     include/note_editor
+    include/debug
     dependencies/GLEW/include
     dependencies/OpenSSL/include
     vendor/imgui

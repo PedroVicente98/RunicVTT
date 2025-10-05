@@ -1,6 +1,8 @@
 #include "ApplicationHandler.h"
 #include "PathManager.h"
 #include "UPnPManager.h"
+#include "DebugConsole.h"
+#include "Logger.h"
 
 GLFWwindow* initializeOpenGLContext()
 {
@@ -83,6 +85,12 @@ void setWindowIcon(GLFWwindow* window, std::filesystem::path iconFolderPath)
 
 int main()
 {
+    // Capture cout/cerr → "main" channel
+    DebugConsole::bootstrapStdCapture();
+    // Optional: grow in-memory ring buffer (default ~4000 lines)
+    Logger::instance().setChannelCapacity(4000);
+
+
     GLFWwindow* window = initializeOpenGLContext();
     if (!window)
     {
@@ -93,6 +101,11 @@ int main()
 
     auto iconFolderPath = PathManager::getResPath();
     setWindowIcon(window, iconFolderPath);
+
+    // before CreateProcessA
+    auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();
+    _putenv_s("NODE_PATH", nodeModules.c_str());
+    // Node reads NODE_PATH on startup; with lpEnvironment == nullptr, it inherits this env
 
     std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
     std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory");
