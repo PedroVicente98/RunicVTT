@@ -3,6 +3,20 @@
 #include "UPnPManager.h"
 #include "DebugConsole.h"
 #include "Logger.h"
+#include "FirewallUtils.h"
+
+namespace ShutdownUtils
+{
+    inline void ArmDeadManKill(unsigned timeoutMs)
+    {
+        std::thread([timeoutMs]()
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));
+                        TerminateProcess(GetCurrentProcess(), 0); // hard kill (OS reclaims everything)
+                    })
+            .detach();
+    }
+} // namespace ShutdownUtils
 
 GLFWwindow* initializeOpenGLContext()
 {
@@ -83,13 +97,26 @@ void setWindowIcon(GLFWwindow* window, std::filesystem::path iconFolderPath)
     stbi_image_free(icons[3].pixels);
 }
 
+static std::string getSelfPath()
+{
+    wchar_t buf[MAX_PATH];
+    GetModuleFileNameW(nullptr, buf, MAX_PATH);
+    std::wstring ws(buf);
+    return std::string(ws.begin(), ws.end());
+}
+
 int main()
 {
-    // Capture cout/cerr → "main" channel
     DebugConsole::bootstrapStdCapture();
-    // Optional: grow in-memory ring buffer (default ~4000 lines)
     Logger::instance().setChannelCapacity(4000);
+    auto runic_exe = getSelfPath();
+    auto node_exe = PathManager::getNodeExePath().string();
+    auto runic_firewall_rule_name = "RunicVTT Inbound TCP (Any)";
+    auto node_firewall_rule_name = "RunicVTT LocalTunnel(Any TCP)";
 
+    FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
+    FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
+    //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
 
     GLFWwindow* window = initializeOpenGLContext();
     if (!window)
@@ -105,12 +132,23 @@ int main()
     // before CreateProcessA
     auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();
     _putenv_s("NODE_PATH", nodeModules.c_str());
-    // Node reads NODE_PATH on startup; with lpEnvironment == nullptr, it inherits this env
+    if (const char* np = std::getenv("NODE_PATH"))
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Success, std::string("Parent NODE_PATH=") + np);
+    }
+    else
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error, "Parent NODE_PATH is not set");
+    }
 
     std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
     std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory");
     ApplicationHandler app(window, map_directory, marker_directory);
     app.run();
-    
+
+    FirewallUtils::removeRuleElevated(runic_firewall_rule_name);
+    FirewallUtils::removeRuleElevated(node_firewall_rule_name);
+
+    ShutdownUtils::ArmDeadManKill(2000); // 2s grace
     return 0;
 }

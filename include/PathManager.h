@@ -97,7 +97,7 @@ public:
 
     static fs::path getLocalTunnelControllerPath()
     {
-        return getExternalPath() / "lt-controller.js";
+        return getExternalPath() / "lt-controller.cjs";
     }
     static fs::path getUpnpcExePath()
     {

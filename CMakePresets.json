@@ -80,8 +80,7 @@
   "buildPresets": [
     { "name": "build-debug",  "configurePreset": "debug"  },
     { "name": "build-release","configurePreset": "release" },
-    { "name": "build-dist",   "configurePreset": "dist"    },
-    { "name": "build-generic","configurePreset": "ninja-generic" }
+    { "name": "build-dist",   "configurePreset": "dist"    }
   ],
 
   "testPresets": [

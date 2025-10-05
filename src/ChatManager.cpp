@@ -466,13 +466,13 @@ void ChatManager::render() {
 
     // Layout: left fixed width panel, right expands
     const float leftW = 260.0f;
-    ImGui::BeginChild("Left", ImVec2(leftW, 0), true);
+    ImGui::BeginChild("Left", ImVec2(leftW, 0), true, ImGuiWindowFlags_NoScrollbar);
     renderLeftPanel(leftW);
     ImGui::EndChild();
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Right", ImVec2(0, 0), true);
+    ImGui::BeginChild("Right", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar);
     renderRightPanel(leftW);
     ImGui::EndChild();
 
@@ -608,6 +608,7 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/) {
             sendTextToThread(th->id, text);
             input_.fill('\0');
             followScroll_ = true;
+            focusInput_ = true;
         }
     }
     ImGui::SameLine();

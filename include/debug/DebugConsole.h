@@ -203,13 +203,13 @@ private:
             {
                 auto url = ltStart_();
                 if (!url.empty())
-                    Logger::instance().log("localtunnel", "Started: " + url);
+                    Logger::instance().log("localtunnel", Logger::Level::Success, "Started: " + url);
                 else
-                    Logger::instance().log("localtunnel", "Failed to start LT");
+                    Logger::instance().log("localtunnel", Logger::Level::Error, "Failed to start LT");
             }
             else
             {
-                Logger::instance().log("localtunnel", "Start handler not set");
+                Logger::instance().log("localtunnel",Logger::Level::Error, "Start handler not set");
             }
         }
         ImGui::SameLine();
@@ -269,7 +269,10 @@ private:
             {
                 if (e.tsStr.empty())
                     e.tsStr = Logger::formatTs(e.tsMs);
-                ImGui::TextColored(col, "[%s] %s", e.tsStr.c_str(), e.text.c_str());
+                ImGui::PushStyleColor(ImGuiCol_Text, colorForLevel_(e.level)); // if you color by level
+                ImGui::TextWrapped("%s", e.text.c_str());                 // wraps at window edge
+                ImGui::PopStyleColor();
+
             }
             else
             {

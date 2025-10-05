@@ -34,14 +34,19 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 add_executable(RunicVTT ${SOURCES})
-# Always build without console window on Windows:
+
 if (WIN32)
   if (MSVC)
-    # GUI subsystem, but still call main() as entry
-    target_link_options(RunicVTT PRIVATE /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup)
+    target_link_options(RunicVTT PRIVATE "/MANIFESTUAC:level='requireAdministrator' uiAccess='false'")
+    target_link_options(RunicVTT PRIVATE
+      $<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>
+      $<$<NOT:$<CONFIG:Debug>>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
+    )
   elseif (MINGW)
-    # MinGW/GCC equivalent
-    target_link_options(RunicVTT PRIVATE -mwindows)
+    target_link_options(RunicVTT PRIVATE
+      $<$<CONFIG:Debug>:-mconsole>
+      $<$<NOT:$<CONFIG:Debug>>:-mwindows>
+    )
   endif()
 endif()
 

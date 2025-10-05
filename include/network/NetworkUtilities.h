@@ -21,6 +21,8 @@
 #include <chrono>
 #include <cstdlib> // for _putenv_s
 
+#include "Logger.h"
+
 class NetworkUtilities
 {
 public:
@@ -308,7 +310,7 @@ private:
     inline static std::mutex urlMutex;
     inline static std::condition_variable urlCv;
 
-// ================== LocalTunnel (Windows-only, header-only) ==================
+    // ================== LocalTunnel (Windows-only, header-only) ==================
 private:
     // Process & pipes
     inline static HANDLE ltProc = nullptr;
@@ -461,24 +463,59 @@ public:
         running.store(true, std::memory_order_relaxed);
 
         assignToJob(ltProc);
-
-        // Reader thread: read one JSON line with {"event":"ready","url":...}
         std::thread([rd = ltStdoutRd]()
                     {
             std::string buf; buf.reserve(4096);
             constexpr DWORD CHUNK = 1024;
             char tmp[CHUNK + 1];
 
-            auto parseLine = [](const std::string& line) -> std::string {
-                // very tiny JSON extraction: look for "event":"ready" + extract url
-                if (line.find("\"event\":\"ready\"") == std::string::npos) return {};
-                auto u = line.find("\"url\"");
-                if (u == std::string::npos) return {};
-                u = line.find('"', u + 4); // first quote after "url"
-                if (u == std::string::npos) return {};
-                auto v = line.find('"', u + 1);
-                if (v == std::string::npos) return {};
-                return line.substr(u + 1, v - (u + 1));
+            auto trimCR = [](std::string& s) {
+                if (!s.empty() && s.back() == '\r') s.pop_back(); // handle CRLF
+            };
+
+            auto handleJsonLine = [](const std::string& line) {
+                auto findField = [&](const char* key)->std::string {
+                    auto kpos = line.find(std::string("\"")+key+"\"");
+                    if (kpos == std::string::npos) return {};
+                    auto colon = line.find(':', kpos);
+                    if (colon == std::string::npos) return {};
+                    auto q1 = line.find('"', colon + 1);
+                    if (q1 == std::string::npos) return {};
+                    auto q2 = line.find('"', q1 + 1);
+                    if (q2 == std::string::npos) return {};
+                    return line.substr(q1 + 1, q2 - (q1 + 1));
+                };
+
+                const auto ev  = findField("event");
+                const auto url = findField("url");
+                const auto msg = findField("message");
+
+                if (ev.empty()) {
+                    Logger::instance().log("localtunnel", Logger::Level::Debug, "LT raw: " + line);
+                    return;
+                }
+
+                if (ev == "boot") {
+                    Logger::instance().log("localtunnel", Logger::Level::Debug, "LT boot: " + line);
+                } else if (ev == "require_ok") {
+                    Logger::instance().log("localtunnel", Logger::Level::Success, "LT require('localtunnel') OK");
+                } else if (ev == "require_err") {
+                    Logger::instance().log("localtunnel", Logger::Level::Error, "LT require error: " + msg);
+                } else if (ev == "ready") {
+                    Logger::instance().log("localtunnel", Logger::Level::Success, "LT ready: " + url);
+                    {
+                        std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
+                        if (NetworkUtilities::localTunnelUrl.empty())
+                            NetworkUtilities::localTunnelUrl = url;
+                    }
+                    NetworkUtilities::urlCv.notify_all();
+                } else if (ev == "error") {
+                    Logger::instance().log("localtunnel", Logger::Level::Error, "LT error: " + msg);
+                } else if (ev == "closed") {
+                    Logger::instance().log("localtunnel", Logger::Level::Warn, "LT closed");
+                } else {
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "LT: " + line);
+                }
             };
 
             while (NetworkUtilities::running.load(std::memory_order_relaxed)) {
@@ -488,27 +525,70 @@ public:
                 tmp[got] = '\0';
                 buf.append(tmp, got);
 
-                // process complete lines
                 size_t pos = 0;
                 while (true) {
                     size_t nl = buf.find('\n', pos);
                     if (nl == std::string::npos) break;
                     std::string line = buf.substr(pos, nl - pos);
+                    trimCR(line);
                     pos = nl + 1;
 
-                    if (auto url = parseLine(line); !url.empty()) {
-                        {
-                            std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
-                            if (NetworkUtilities::localTunnelUrl.empty())
-                                NetworkUtilities::localTunnelUrl = std::move(url);
-                        }
-                        NetworkUtilities::urlCv.notify_all();
+                    if (!line.empty()) {
+                        handleJsonLine(line);
                     }
                 }
                 if (pos > 0) buf.erase(0, pos);
             }
             NetworkUtilities::urlCv.notify_all(); })
             .detach();
+
+        // Reader thread: read one JSON line with {"event":"ready","url":...}
+        //std::thread([rd = ltStdoutRd]()
+        //            {
+        //    std::string buf; buf.reserve(4096);
+        //    constexpr DWORD CHUNK = 1024;
+        //    char tmp[CHUNK + 1];
+
+        //    auto parseLine = [](const std::string& line) -> std::string {
+        //        // very tiny JSON extraction: look for "event":"ready" + extract url
+        //        if (line.find("\"event\":\"ready\"") == std::string::npos) return {};
+        //        auto u = line.find("\"url\"");
+        //        if (u == std::string::npos) return {};
+        //        u = line.find('"', u + 4); // first quote after "url"
+        //        if (u == std::string::npos) return {};
+        //        auto v = line.find('"', u + 1);
+        //        if (v == std::string::npos) return {};
+        //        return line.substr(u + 1, v - (u + 1));
+        //    };
+
+        //    while (NetworkUtilities::running.load(std::memory_order_relaxed)) {
+        //        DWORD got = 0;
+        //        BOOL ok = ReadFile(rd, tmp, CHUNK, &got, nullptr);
+        //        if (!ok || got == 0) break;
+        //        tmp[got] = '\0';
+        //        buf.append(tmp, got);
+
+        //        // process complete lines
+        //        size_t pos = 0;
+        //        while (true) {
+        //            size_t nl = buf.find('\n', pos);
+        //            if (nl == std::string::npos) break;
+        //            std::string line = buf.substr(pos, nl - pos);
+        //            pos = nl + 1;
+
+        //            if (auto url = parseLine(line); !url.empty()) {
+        //                {
+        //                    std::lock_guard<std::mutex> lk(NetworkUtilities::urlMutex);
+        //                    if (NetworkUtilities::localTunnelUrl.empty())
+        //                        NetworkUtilities::localTunnelUrl = std::move(url);
+        //                }
+        //                NetworkUtilities::urlCv.notify_all();
+        //            }
+        //        }
+        //        if (pos > 0) buf.erase(0, pos);
+        //    }
+        //    NetworkUtilities::urlCv.notify_all(); })
+        //    .detach();
 
         // Wait up to 15s for URL or process exit
         std::unique_lock<std::mutex> lk(urlMutex);
@@ -571,6 +651,4 @@ public:
         return localTunnelUrl;
     }
     // ================== /LocalTunnel ==================
-
-
 };
