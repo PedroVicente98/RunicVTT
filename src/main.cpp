@@ -18,7 +18,7 @@ namespace ShutdownUtils
     }
 } // namespace ShutdownUtils
 
-GLFWwindow* initializeOpenGLContext()
+GLFWwindow* initializeGLFWContext()
 {
     if (!glfwInit())
     {
@@ -118,16 +118,17 @@ int main()
     FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
     //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
 
-    GLFWwindow* window = initializeOpenGLContext();
+    PathManager::ensureDirectories();
+
+    GLFWwindow* window = initializeGLFWContext();
     if (!window)
     {
         return -1; // Falha na inicialização
     }
-
-    PathManager::ensureDirectories();
-
     auto iconFolderPath = PathManager::getResPath();
     setWindowIcon(window, iconFolderPath);
+
+    glfwPollEvents();
 
     // before CreateProcessA
     auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();
