@@ -237,6 +237,34 @@ void SignalingServer::broadcastShutdown()
 
 void SignalingServer::disconnectAllClients()
 {
+    // Move out both maps to avoid erase while inside callbacks
+    auto auth = std::move(authClients_);
+    auto pend = std::move(pendingClients_);
+    authClients_.clear();
+    pendingClients_.clear();
+
+    auto closer = [](auto& map) {
+        for (auto& [id, ws] : map) {
+            if (!ws) continue;
+            try {
+                ws->onOpen(nullptr);
+                ws->onMessage(nullptr);
+                ws->onClosed(nullptr);
+                ws->onError(nullptr);
+                ws->close();
+            } catch (...) {
+                Logger::instance().log("main", Logger::Level::Warn, "WS close failed for " + id);
+            }
+        }
+        map.clear();
+    };
+
+    closer(auth);
+    closer(pend);
+}
+
+/*void SignalingServer::disconnectAllClients()
+{
     for (auto& [id, ws] : authClients_)
     {
         if (ws)
@@ -266,7 +294,7 @@ void SignalingServer::disconnectAllClients()
         }
     }
     pendingClients_.clear();
-}
+}*/
 
 //void SignalingServer::prunePending() {
 //    if (pendingTimeout_.count() <= 0) return;
