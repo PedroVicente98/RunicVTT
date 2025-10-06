@@ -26,6 +26,60 @@
 class NetworkUtilities
 {
 public:
+    // Safe closers for libdatachannel things:
+    static void safeCloseDataChannel(const std::shared_ptr<rtc::DataChannel>& dc) {
+        if (!dc) return;
+        try {
+            dc->onOpen(nullptr);
+            dc->onMessage(nullptr);
+            dc->onBufferedAmountLow(nullptr);
+            dc->onClosed(nullptr);
+            dc->onError(nullptr);
+            dc->close();
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[DC close] ") + e.what());
+            pushStatusToast("DataChannel close error", ImGuiToaster::Level::Error, 5.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[DC close] unknown");
+            pushStatusToast("DataChannel close error (unknown)", ImGuiToaster::Level::Error, 5.0f);
+        }
+    }
+    
+    static void safeClosePeerConnection(const std::shared_ptr<rtc::PeerConnection>& pc) {
+        if (!pc) return;
+        try {
+            pc->onStateChange(nullptr);
+            pc->onGatheringStateChange(nullptr);
+            pc->onLocalDescription(nullptr);
+            pc->onDataChannel(nullptr);
+            pc->onTrack(nullptr);
+            pc->close();
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[PC close] ") + e.what());
+            pushStatusToast("PeerConnection close error", ImGuiToaster::Level::Error, 5.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[PC close] unknown");
+            pushStatusToast("PeerConnection close error (unknown)", ImGuiToaster::Level::Error, 5.0f);
+        }
+    }
+    
+    static void safeCloseWebSocket(const std::shared_ptr<rtc::WebSocket>& ws) {
+        if (!ws) return;
+        try {
+            ws->onOpen(nullptr);
+            ws->onMessage(nullptr);
+            ws->onClosed(nullptr);
+            ws->onError(nullptr);
+            ws->close();
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[WS close] ") + e.what());
+            pushStatusToast("WebSocket close error", ImGuiToaster::Level::Error, 5.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[WS close] unknown");
+            pushStatusToast("WebSocket close error (unknown)", ImGuiToaster::Level::Error, 5.0f);
+        }
+    }
+
     static std::string runCommand(const std::string& cmd)
     {
         std::array<char, 128> buffer;
