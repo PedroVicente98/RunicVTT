@@ -475,6 +475,74 @@ std::string NetworkManager::displayNameFor(const std::string& id) const
 
 bool NetworkManager::disconectFromPeers()
 {
+    // Move out to avoid mutation during destruction
+    std::unordered_map<std::string, std::shared_ptr<PeerLink>> moved = std::move(peers);
+    peers.clear();
+
+    for (auto& [pid, link] : moved) {
+        if (!link) continue;
+        try {
+            link->close();
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[disconnectFromPeers] ") + e.what());
+            pushStatusToast("Peer disconnect error", ImGuiToaster::Level::Error, 5.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[disconnectFromPeers] unknown");
+            pushStatusToast("Peer disconnect error (unknown)", ImGuiToaster::Level::Error, 5.0f);
+        }
+    }
+    moved.clear();
+
+    if (signalingClient) {
+        safeCloseWebSocket(signalingClient);
+        signalingClient.reset();
+    }
+
+    peer_role = Role::NONE;
+    return true;
+}
+
+bool NetworkManager::disconnectAllPeers()
+{
+    if (signalingServer) {
+        signalingServer->broadcastShutdown();
+    }
+
+    // Move out
+    std::unordered_map<std::string, std::shared_ptr<PeerLink>> moved = std::move(peers);
+    peers.clear();
+
+    for (auto& [pid, link] : moved) {
+        if (!link) continue;
+        try {
+            link->close();
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[disconnectAllPeers] ") + e.what());
+            pushStatusToast("Peer disconnect error", ImGuiToaster::Level::Error, 5.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[disconnectAllPeers] unknown");
+            pushStatusToast("Peer disconnect error (unknown)", ImGuiToaster::Level::Error, 5.0f);
+        }
+    }
+    moved.clear();
+
+    if (signalingServer) {
+        signalingServer->disconnectAllClients(); // see below
+        try { signalingServer->stop(); } catch (...) {}
+        signalingServer.reset();
+    }
+
+    if (signalingClient) {
+        NetworkUtilities::safeCloseWebSocket(signalingClient);
+        signalingClient.reset();
+    }
+
+    peer_role = Role::NONE;
+    return true;
+}
+
+/*bool NetworkManager::disconectFromPeers()
+{
     // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
     for (auto& [pid, link] : peers)
     {
@@ -551,7 +619,7 @@ bool NetworkManager::disconnectAllPeers()
     peer_role = Role::NONE;
     return true;
 }
-
+*/
 void NetworkManager::broadcastPeerDisconnect(const std::string& targetId)
 {
     if (!signalingClient)
