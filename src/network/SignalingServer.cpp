@@ -4,6 +4,7 @@
 #include "NetworkManager.h"
 #include <nlohmann/json.hpp>
 #include "Message.h"
+#include "Logger.h"
 
 using json = nlohmann::json;
 using Clock = std::chrono::steady_clock;

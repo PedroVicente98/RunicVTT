@@ -64,7 +64,7 @@ private:
     std::shared_ptr<rtc::PeerConnection> pc;
     //std::shared_ptr<rtc::DataChannel> dc;
     std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> dcs_;
-
+    std::atomic<bool> closing_{false};
     std::weak_ptr<NetworkManager> network_manager;
 
     std::atomic<rtc::PeerConnection::State> lastState_{rtc::PeerConnection::State::New};

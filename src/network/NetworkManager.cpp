@@ -494,7 +494,7 @@ bool NetworkManager::disconectFromPeers()
     moved.clear();
 
     if (signalingClient) {
-        safeCloseWebSocket(signalingClient);
+        signalingClient->close();
         signalingClient.reset();
     }
 
@@ -508,7 +508,6 @@ bool NetworkManager::disconnectAllPeers()
         signalingServer->broadcastShutdown();
     }
 
-    // Move out
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> moved = std::move(peers);
     peers.clear();
 
@@ -527,13 +526,13 @@ bool NetworkManager::disconnectAllPeers()
     moved.clear();
 
     if (signalingServer) {
-        signalingServer->disconnectAllClients(); // see below
+        signalingServer->disconnectAllClients(); 
         try { signalingServer->stop(); } catch (...) {}
         signalingServer.reset();
     }
 
     if (signalingClient) {
-        NetworkUtilities::safeCloseWebSocket(signalingClient);
+        signalingClient->close();
         signalingClient.reset();
     }
 

@@ -288,15 +288,17 @@ void SignalingClient::onMessage(const std::string& msg)
 
 void SignalingClient::close()
 {
-    if (ws)
-    {
-        try
-        {
-            ws->close();
-        }
-        catch (...)
-        {
-        }
-        ws.reset();
-    }
+    //if (ws)
+    //{
+    //    try
+    //    {
+    //        ws->close();
+    //    }
+    //    catch (...)
+    //    {
+    //    }
+    //    ws.reset();
+    //}
+    NetworkUtilities::safeCloseWebSocket(ws);
+    ws.reset();
 }

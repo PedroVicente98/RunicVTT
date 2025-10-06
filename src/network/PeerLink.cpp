@@ -1,6 +1,8 @@
 #include "PeerLink.h"
 #include "NetworkManager.h"
 #include "Message.h"
+#include "Logger.h"
+#include "NetworkUtilities.h"
 
 PeerLink::PeerLink(const std::string& id, std::weak_ptr<NetworkManager> parent) :
     peerId(id), network_manager(parent)
@@ -322,7 +324,6 @@ void PeerLink::close()
 
     Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() begin #" + std::to_string(seq));
 
-    // 1) Detach callbacks FIRST to stop further invocations
     try {
         for (auto& [label, ch] : dcs_) {
             if (!ch) continue;
@@ -343,23 +344,16 @@ void PeerLink::close()
         // ignore
     }
 
-    // 2) Move out containers so we do not destroy while in the map and
-    //    to avoid any re-entrant callbacks that try to touch dcs_
     std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> movedDcs;
-    movedDcs.swap(dcs_); // dcs_ now empty
+    movedDcs.swap(dcs_); 
 
-    // 3) Now close the moved channels safely
     for (auto& kv : movedDcs) {
         NetworkUtilities::safeCloseDataChannel(kv.second);
     }
     movedDcs.clear();
 
-    // 4) Close PC last
     NetworkUtilities::safeClosePeerConnection(pc);
     pc.reset();
-
-    // 5) DO NOT call back into NetworkManager to erase here.
-    //    Let NetworkManager own the container and erase after calling link->close()
 
     Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() end #" + std::to_string(seq));
 }
