@@ -347,7 +347,77 @@ void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open)
 }
 
 ////OPERATIONS------------------------------------------------------------------
+// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
+std::size_t NetworkManager::removeDisconnectedPeers()
+{
+    std::vector<std::string> toErase;
+    std::vector<std::shared_ptr<PeerLink>> toClose;
+    toErase.reserve(peers.size());
+    toClose.reserve(peers.size());
+
+    // 1) Decide who to remove; DO NOT mutate the map yet.
+    for (auto const& [pid, link] : peers)
+    {
+        const bool shouldRemove = (!link) || link->isClosedOrFailed();
+        if (shouldRemove)
+        {
+            toErase.push_back(pid);
+            if (link) toClose.push_back(link);
+        }
+    }
+
+    // 2) Erase all selected entries from the map (no destructors called yet for links we retained).
+    for (auto const& pid : toErase)
+        peers.erase(pid);
+
+    // 3) Close outside the map to avoid re-entrancy/races.
+    for (auto& link : toClose)
+    {
+        try {
+            link->close(); // should be idempotent and NOT call back into NM
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[removeDisconnectedPeers] ") + e.what());
+            //pushStatusToast("Peer close error", ImGuiToaster::Level::Error, 4.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[removeDisconnectedPeers] unknown exception");
+            //pushStatusToast("Peer close error (unknown)", ImGuiToaster::Level::Error, 4.0f);
+        }
+    }
+
+    return toErase.size();
+}
+
 bool NetworkManager::removePeer(std::string peerId)
+{
+    // 1) Find, move the link out, erase entry first.
+    std::shared_ptr<PeerLink> link;
+    if (auto it = peers.find(peerId); it != peers.end())
+    {
+        link = std::move(it->second);
+        peers.erase(it);
+    }
+    else
+    {
+        return false;
+    }
+
+    // 2) Close outside the map.
+    if (link)
+    {
+        try {
+            link->close(); // safe: detach callbacks first, idempotent
+        } catch (const std::exception& e) {
+            Logger::instance().log("main", Logger::Level::Error, std::string("[removePeer] ") + e.what());
+            //pushStatusToast("Peer close error", ImGuiToaster::Level::Error, 4.0f);
+        } catch (...) {
+            Logger::instance().log("main", Logger::Level::Error, "[removePeer] unknown exception");
+            //pushStatusToast("Peer close error (unknown)", ImGuiToaster::Level::Error, 4.0f);
+        }
+    }
+    return true;
+}
+
+/*bool NetworkManager::removePeer(std::string peerId)
 {
     auto it = peers.find(peerId);
     if (it == peers.end())
@@ -399,7 +469,7 @@ std::size_t NetworkManager::removeDisconnectedPeers()
     }
     return removed;
 }
-
+*/
 //CALLBACKS --------------------------------------------------------------------
 // NetworkManager.cpp
 std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peerId)
