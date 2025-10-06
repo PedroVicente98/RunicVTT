@@ -252,17 +252,13 @@ int ApplicationHandler::run()
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
-            //game_table_manager.processSentMessages();
             game_table_manager.processReceivedGameMessages();
 
             DebugConsole::Render();
             DebugConsole::RunActiveDebugToggles();
 
-            //handleToasterDebug();
-
             renderDockSpace();
             renderMainMenuBar();
-
             renderMapFBO(va, ib, shader, grid_shader, renderer);
             renderActiveGametable();
             toaster_->Render();
@@ -286,8 +282,7 @@ int ApplicationHandler::run()
         map_directory->stopMonitoring();
         marker_directory->stopMonitoring();
     }
-    /*if (ConsoleUtils::IsConsoleOpen())
-        ConsoleUtils::CloseConsole();*/
+  
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
@@ -341,7 +336,7 @@ void ApplicationHandler::renderMapFBO(VertexArray& va, IndexBuffer& ib, Shader& 
 
 void ApplicationHandler::renderActiveGametable()
 {
-    if (game_table_manager.isGameTableActive() || game_table_manager.isConnected())
+    if (game_table_manager.isGameTableActive())
     {
 
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoScrollbar;
@@ -443,18 +438,18 @@ void ApplicationHandler::renderMainMenuBar()
     if (ImGui::BeginMenu("Game Table"))
     {
         if (ImGui::MenuItem("Host..."))
-        { // NEW: replaces Create/Open/Network
+        {
             open_host_gametable = true;
         }
         if (ImGui::MenuItem("Connect..."))
-        { // players joining
+        { 
             connect_to_gametable = true;
         }
 
         if (game_table_manager.isGameTableActive())
         {
             if (ImGui::MenuItem("Save"))
-            { // existing logic
+            {
                 game_table_manager.saveGameTable();
             }
             if (ImGui::MenuItem("Close"))
@@ -466,13 +461,12 @@ void ApplicationHandler::renderMainMenuBar()
     }
     bool showNetwork = (game_table_manager.network_manager && game_table_manager.network_manager->getPeerRole() != Role::NONE);
     // ---------------- Network ----------------
-    //if (game_table_manager.isGameTableActive()) {
     if (showNetwork)
     {
         if (ImGui::BeginMenu("Network"))
         {
             if (ImGui::MenuItem("Network Center"))
-            { // NEW: replaces Connection Info + Open/Close network
+            { 
                 open_network_center = true;
             }
             ImGui::EndMenu();
@@ -488,6 +482,10 @@ void ApplicationHandler::renderMainMenuBar()
             {
                 open_create_board = true;
             }
+            if (ImGui::MenuItem("Open"))
+            {
+                load_active_board = true;
+            }
             if (game_table_manager.board_manager->isBoardActive())
             {
                 if (ImGui::MenuItem("Save"))
@@ -500,10 +498,7 @@ void ApplicationHandler::renderMainMenuBar()
                     close_current_board = true;
                 }
             }
-            if (ImGui::MenuItem("Open"))
-            {
-                load_active_board = true;
-            }
+            
             ImGui::EndMenu();
         }
     }

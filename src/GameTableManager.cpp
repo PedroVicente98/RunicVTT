@@ -1309,6 +1309,27 @@ void GameTableManager::aboutPopUp()
     }
 }
 
+void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
+{
+    chat_manager->render();
+    if (board_manager->isBoardActive())
+    {
+        if (board_manager->isEditWindowOpen())
+        {
+            board_manager->renderEditWindow();
+        }
+        else
+        {
+            board_manager->setShowEditWindow(false);
+        }
+
+        //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
+        board_manager->marker_directory->renderDirectory();
+        //}
+        board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
+    }
+}
+
 //RENDER =========================================================================================================================================================
 //
 //// Call this each frame (after BeginFrame, before EndFrame)
@@ -1353,27 +1374,6 @@ void GameTableManager::aboutPopUp()
 //        pos.y += 36.f; // spacing between toasts
 //    }
 //}
-
-void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
-{
-    chat_manager->render();
-    if (board_manager->isBoardActive())
-    {
-        if (board_manager->isEditWindowOpen())
-        {
-            board_manager->renderEditWindow();
-        }
-        else
-        {
-            board_manager->setShowEditWindow(false);
-        }
-
-        //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
-        board_manager->marker_directory->renderDirectory();
-        //}
-        board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
-    }
-}
 
 //
 //void GameTableManager::connectToGameTablePopUp()
