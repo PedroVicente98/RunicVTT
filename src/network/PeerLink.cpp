@@ -278,7 +278,7 @@ bool PeerLink::isPcConnectedOnly() const
     return pc && pc->state() == rtc::PeerConnection::State::Connected;
 }
 
-void PeerLink::close()
+/*void PeerLink::close()
 {
     // Close datachannel first
     for (auto& [label, ch] : dcs_)
@@ -309,6 +309,59 @@ void PeerLink::close()
     pc.reset();
     if (auto nm = network_manager.lock())
         nm->removePeer(peerId);
+}*/
+void PeerLink::close()
+{
+    static std::atomic<uint64_t> guardSeq{0};
+    const uint64_t seq = ++guardSeq;
+
+    if (closing_.exchange(true)) {
+        Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() re-entry ignored");
+        return;
+    }
+
+    Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() begin #" + std::to_string(seq));
+
+    // 1) Detach callbacks FIRST to stop further invocations
+    try {
+        for (auto& [label, ch] : dcs_) {
+            if (!ch) continue;
+            ch->onOpen(nullptr);
+            ch->onMessage(nullptr);
+            ch->onBufferedAmountLow(nullptr);
+            ch->onClosed(nullptr);
+            ch->onError(nullptr);
+        }
+        if (pc) {
+            pc->onStateChange(nullptr);
+            pc->onGatheringStateChange(nullptr);
+            pc->onLocalDescription(nullptr);
+            pc->onDataChannel(nullptr);
+            pc->onTrack(nullptr);
+        }
+    } catch (...) {
+        // ignore
+    }
+
+    // 2) Move out containers so we do not destroy while in the map and
+    //    to avoid any re-entrant callbacks that try to touch dcs_
+    std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> movedDcs;
+    movedDcs.swap(dcs_); // dcs_ now empty
+
+    // 3) Now close the moved channels safely
+    for (auto& kv : movedDcs) {
+        safeCloseDataChannel(kv.second);
+    }
+    movedDcs.clear();
+
+    // 4) Close PC last
+    safeClosePeerConnection(pc);
+    pc.reset();
+
+    // 5) DO NOT call back into NetworkManager to erase here.
+    //    Let NetworkManager own the container and erase after calling link->close()
+
+    Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() end #" + std::to_string(seq));
 }
 
 rtc::PeerConnection::State PeerLink::pcState() const
