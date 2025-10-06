@@ -350,12 +350,12 @@ void PeerLink::close()
 
     // 3) Now close the moved channels safely
     for (auto& kv : movedDcs) {
-        safeCloseDataChannel(kv.second);
+        NetworkUtilities::safeCloseDataChannel(kv.second);
     }
     movedDcs.clear();
 
     // 4) Close PC last
-    safeClosePeerConnection(pc);
+    NetworkUtilities::safeClosePeerConnection(pc);
     pc.reset();
 
     // 5) DO NOT call back into NetworkManager to erase here.
