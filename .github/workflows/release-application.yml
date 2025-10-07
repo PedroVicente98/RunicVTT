@@ -69,12 +69,17 @@ jobs:
           name: release-assets
           path: ./to-release
   
-      - name: Set up GitHub CLI
-        uses: actions/setup-gh@v4
+      - name: Ensure gh CLI is available
+        run: |
+          if ! command -v gh >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y gh
+          fi
+          gh --version
   
       - name: Create or update GitHub Release and upload assets
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # gh reads GH_TOKEN
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
           if [ -z "$TAG" ]; then
@@ -91,4 +96,4 @@ jobs:
             gh release create "$TAG" --generate-notes ./to-release/* \
             || gh release upload "$TAG" ./to-release/* --clobber
           fi
-
+  
