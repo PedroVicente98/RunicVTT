@@ -569,7 +569,8 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 
 //-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
-{ //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
+{ 
+    //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& [pid, link] : peers)
     {
         if (!link)
@@ -1105,9 +1106,9 @@ std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t board
 
 // ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
 //-{check}wrong logic below
-/*
+
 bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-{
+{//{check}-wrong logic
     if (img.empty())
         return false;
 
@@ -1148,7 +1149,7 @@ bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, 
 }
 
 bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-{-wrong logic
+{//{check}-wrong logic
     if (img.empty())
         return false;
 
@@ -1203,7 +1204,7 @@ void NetworkManager::broadcastFrame(const std::vector<unsigned char>& frame, con
         sendGameTo(pid, frame);
     }
 }
-*/
+
 /*bool NetworkManager::disconectFromPeers()
 {
     // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
