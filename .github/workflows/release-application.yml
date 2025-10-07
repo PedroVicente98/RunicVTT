@@ -69,6 +69,7 @@ jobs:
           # target_commitish: ${{ github.event.inputs.target }}
           generate_release_notes: true
           files: |
-            to-release/**
+            to-release/*.zip
+            to-release/*.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
