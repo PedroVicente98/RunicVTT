@@ -569,7 +569,7 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 
 //-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
-{ --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
+{ //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& [pid, link] : peers)
     {
         if (!link)
@@ -584,7 +584,7 @@ void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<u
 }
 
 void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
-{ --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
+{//{check} --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& pid : peers_)
     {
         auto it = peers.find(pid);
@@ -601,7 +601,7 @@ void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, 
 // ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
 
 void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
-{--USE THIS METHOD
+{//{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -610,7 +610,7 @@ void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
 }
 
 void NetworkManager::broadcastBoard(const flecs::entity& board)
-{--USE THIS METHOD
+{//{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -619,7 +619,7 @@ void NetworkManager::broadcastBoard(const flecs::entity& board)
 }
 
 void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& marker)
-{--USE THIS METHOD
+{//{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -628,7 +628,7 @@ void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& mark
 }
 
 void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
-{--USE THIS METHOD
+{//{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -925,7 +925,7 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
 
 //-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
 void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
-{--USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
+{//--{check}USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
     if (peer_role != Role::GAMEMASTER)
         return;
 
@@ -1104,7 +1104,7 @@ std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t board
 }
 
 // ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
--wrong logic below
+//-{check}wrong logic below
 /*
 bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
 {
