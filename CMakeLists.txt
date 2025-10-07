@@ -195,6 +195,13 @@ install(TARGETS RunicVTT
 install(DIRECTORY res/ DESTINATION res)
 install(DIRECTORY external/ DESTINATION external)
 
+# Install OpenSSL runtime DLLs so CPack includes them
+install(FILES
+  ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
+  ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
+  DESTINATION .
+)
+
 # ----------------------
 # CPack Configuration
 # ----------------------
@@ -206,6 +213,12 @@ set(CPACK_PACKAGE_VENDOR "Pedro Vicente dos Santos")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "RunicVTT - Virtual Tabletop")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "pedrovicente45@outlook.com")
+
+# Put the ZIP/EXE in a predictable place for CI to pick up:
+set(CPACK_PACKAGE_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
+# Nice, stable filenames like: RunicVTT-0.9.1-win64.zip
+set(CPACK_SYSTEM_NAME "win64")  
+set(CPACK_PACKAGE_FILE_NAME "RunicVTT-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}")
 
 # Default install directory (Program Files on Windows)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
@@ -233,40 +246,3 @@ set(CPACK_NSIS_DELETE_ICONS_EXTRA
 
 # Include CPack (must be last!)
 include(CPack)
-
-
-
-
-## ----------------------
-# CPACK Installer
-# ----------------------
-# in clude(InstallRequiredSystemLibraries)
-
-#s et(CPACK_PACKAGE_NAME "RunicVTT")
-#se t(CPACK_PACKAGE_VERSION "1.0.0")
-#s et(CPACK_PACKAGE_VENDOR "Runic")
-#se t(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Runic Virtual Tabletop Application")
-#se t(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
-
-#s et(CPACK_GENERATOR "NSIS")
-
-# Shortcut on desktop
-#s et(CPACK_NSIS_CREATE_ICONS_EXTRA
-#  "CreateShortCut \\\"$DESKTOP\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
-#)
-
-# Install binary
-#in stall(TARGETS RunicVTT DESTINATION .)
-
-# Install resources
-# in stall(DIRECTORY ${CMAKE_SOURCE_DIR}/res DESTINATION res)
-#ins tall(DIRECTORY ${CMAKE_SOURCE_DIR}/external DESTINATION external)
-
-# Install OpenSSL DLLs
-# i nstall(FILES
- #   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
- #   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
- #   DESTINATION .
-#)
-
-# i nclude(CPack)
