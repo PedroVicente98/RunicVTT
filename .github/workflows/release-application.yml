@@ -61,32 +61,34 @@ jobs:
   release:
     runs-on: ubuntu-latest
     needs: build-windows
-
+  
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: release-assets
           path: ./to-release
-
-      - name: Install GitHub CLI
-        uses: cli/cli-action@v2
-
+  
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh@v4
+  
       - name: Create or update GitHub Release and upload assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Determine tag: from push or workflow_dispatch input
           TAG="${GITHUB_REF#refs/tags/}"
           if [ -z "$TAG" ]; then
             TAG="${{ github.event.inputs.version }}"
             TARGET="${{ github.event.inputs.target }}"
             if [ -n "$TARGET" ]; then
-              gh release create "$TAG" --target "$TARGET" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+              gh release create "$TAG" --target "$TARGET" --generate-notes ./to-release/* \
+              || gh release upload "$TAG" ./to-release/* --clobber
             else
-              gh release create "$TAG" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+              gh release create "$TAG" --generate-notes ./to-release/* \
+              || gh release upload "$TAG" ./to-release/* --clobber
             fi
           else
-            # Tag push: try create; if exists, upload/clobber
-            gh release create "$TAG" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+            gh release create "$TAG" --generate-notes ./to-release/* \
+            || gh release upload "$TAG" ./to-release/* --clobber
           fi
+
