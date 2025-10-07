@@ -116,20 +116,6 @@ void NetworkManager::startServer(std::string internal_ip_address, unsigned short
     startServer(ConnectionType::LOCALTUNNEL, port, /*tryUpnp=*/false);
 }
 
-//
-//void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
-//{
-//	peer_role = Role::GAMEMASTER;
-//
-//	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
-//	//auto internalIP = UPnPManager::getLocalIPv4Address();
-//	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
-//		bool open_port_foward_tip = true;
-//		ShowPortForwardingHelpPopup(&open_port_foward_tip);
-//	}*/
-//	signalingServer->start(port);
-//	auto status = signalingClient->connect(local_tunnel_url, port);
-//}
 
 void NetworkManager::closeServer()
 {
@@ -165,6 +151,7 @@ bool NetworkManager::connectToPeer(const std::string& connectionString)
     return signalingClient->connect(server, port); // your old method
 }
 
+//INFORMATION AND PARSE OPERATIONS
 std::string NetworkManager::getLocalIPAddress()
 {
     if (local_ip_address == "")
@@ -216,9 +203,7 @@ std::string NetworkManager::getLocalTunnelURL()
     return NetworkUtilities::getLocalTunnelUrl();
 }
 
-void NetworkManager::parseConnectionString(std::string connection_string,
-                                           std::string& server, unsigned short& port,
-                                           std::string& password)
+void NetworkManager::parseConnectionString(std::string connection_string, std::string& server, unsigned short& port, std::string& password)
 {
     server.clear();
     password.clear();
@@ -267,6 +252,7 @@ void NetworkManager::setNetworkPassword(const char* password)
     network_password[sizeof(network_password) - 1] = '\0';
 }
 
+//SINGLE POPUP RENDER FOR PORT FOWARD HELPER (MOVE TO WIKI)
 void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open)
 {
     if (*p_open)
@@ -346,7 +332,8 @@ void NetworkManager::ShowPortForwardingHelpPopup(bool* p_open)
     }
 }
 
-////OPERATIONS------------------------------------------------------------------
+//PEER DISCONNECT OPERATIONS------------------------------------------------------------------
+
 // Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
 std::size_t NetworkManager::removeDisconnectedPeers()
 {
@@ -362,7 +349,7 @@ std::size_t NetworkManager::removeDisconnectedPeers()
         if (shouldRemove)
         {
             toErase.push_back(pid);
-            if (link) toClose.push_back(link);
+            if (link) toClose.emplace_back(link);
         }
     }
 
@@ -417,61 +404,7 @@ bool NetworkManager::removePeer(std::string peerId)
     return true;
 }
 
-/*bool NetworkManager::removePeer(std::string peerId)
-{
-    auto it = peers.find(peerId);
-    if (it == peers.end())
-        return false;
-    if (auto& link = it->second)
-    {
-        try
-        {
-            link->close(); // ensure pc/dc closed
-        }
-        catch (...)
-        {
-            // swallow â€” safe cleanup path
-        }
-    }
-    peers.erase(it);
-    return true;
-}
-
-// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
-std::size_t NetworkManager::removeDisconnectedPeers()
-{
-    std::size_t removed = 0;
-    for (auto it = peers.begin(); it != peers.end();)
-    {
-        const bool shouldRemove =
-            !it->second ||
-            it->second->isClosedOrFailed(); // helper on PeerLink below
-
-        if (shouldRemove)
-        {
-            if (it->second)
-            {
-                try
-                {
-                    it->second->close();
-                }
-                catch (...)
-                {
-                }
-            }
-            it = peers.erase(it);
-            ++removed;
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    return removed;
-}
-*/
-//CALLBACKS --------------------------------------------------------------------
-// NetworkManager.cpp
+// PEER INSERT METHOD AND LOCAL CALLBACKS --------------------------------------------------------------------
 std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peerId)
 {
     if (auto it = peers.find(peerId); it != peers.end())
@@ -509,7 +442,7 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
         signalingClient->send(j.dump());
 }
 
-// NetworkManager.cpp
+//NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
 void NetworkManager::setMyIdentity(std::string myId, std::string username)
 {
     if (myId.empty())
@@ -610,85 +543,7 @@ bool NetworkManager::disconnectAllPeers()
     return true;
 }
 
-/*bool NetworkManager::disconectFromPeers()
-{
-    // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
 
-    // Close signaling client (playerâ€™s WS)
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    // Weâ€™re no longer connected
-    peer_role = Role::NONE;
-    return true;
-}
-
-bool NetworkManager::disconnectAllPeers()
-{
-    // 1) Broadcast a shutdown message (optional, but nice UX)
-    if (signalingServer)
-    {
-        signalingServer->broadcastShutdown(); // 1) tell everyone
-    }
-
-    // 2) Close all peer links locally
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
-
-    // 3) Disconnect all WS clients and stop the server
-    if (signalingServer)
-    {
-        signalingServer->disconnectAllClients();
-        try
-        {
-            signalingServer->stop();
-        }
-        catch (...)
-        {
-        }
-        signalingServer.reset();
-    }
-
-    // 4) If GM also had a self client (loopback to its own server), close it too
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    peer_role = Role::NONE;
-    return true;
-}
-*/
 void NetworkManager::broadcastPeerDisconnect(const std::string& targetId)
 {
     if (!signalingClient)
@@ -697,104 +552,6 @@ void NetworkManager::broadcastPeerDisconnect(const std::string& targetId)
     signalingClient->send(j.dump());
 }
 
-bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-{
-    if (img.empty())
-        return false;
-
-    // BEGIN: DCType::CreateEntity
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
-        Serializer::serializeUInt64(b, markerId);
-        Serializer::serializeString(b, name);
-        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    // CHUNKS: DCType::Image
-    uint64_t offset = 0;
-    while (offset < img.size())
-    {
-        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-        Serializer::serializeUInt64(b, markerId);
-        Serializer::serializeUInt64(b, offset);
-        Serializer::serializeInt(b, n);
-        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-        offset += n;
-    }
-
-    // COMMIT: DCType::CommitMarker
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
-        Serializer::serializeUInt64(b, markerId);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    return true;
-}
-
-bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-{
-    if (img.empty())
-        return false;
-
-    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
-        Serializer::serializeUInt64(b, boardId);
-        Serializer::serializeString(b, name);
-        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    // CHUNKS: DCType::Image (same as marker)
-    uint64_t offset = 0;
-    while (offset < img.size())
-    {
-        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-        Serializer::serializeUInt64(b, boardId);
-        Serializer::serializeUInt64(b, offset);
-        Serializer::serializeInt(b, n);
-        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-        offset += n;
-    }
-
-    // COMMIT: DCType::CommitBoard
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
-        Serializer::serializeUInt64(b, boardId);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    return true;
-}
-
-// ---------- send primitives ----------
-void NetworkManager::sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes)
-{
-    auto it = peers.find(peerId);
-    if (it == peers.end() || !it->second)
-        return;
-    it->second->sendGame(bytes);
-}
-
-void NetworkManager::broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds)
-{
-    for (auto& pid : toPeerIds)
-    {
-        sendGameTo(pid, frame);
-    }
-}
 
 std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 {
@@ -810,9 +567,9 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
     return ids;
 }
 
-// In NetworkManager.cpp
+//-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
-{
+{ --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& [pid, link] : peers)
     {
         if (!link)
@@ -827,7 +584,7 @@ void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<u
 }
 
 void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
-{
+{ --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& pid : peers_)
     {
         auto it = peers.find(pid);
@@ -841,10 +598,10 @@ void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, 
     }
 }
 
-// ----------- Broadcast wrappers -----------
+// ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
 
 void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
-{
+{--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -853,7 +610,7 @@ void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
 }
 
 void NetworkManager::broadcastBoard(const flecs::entity& board)
-{
+{--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -862,7 +619,7 @@ void NetworkManager::broadcastBoard(const flecs::entity& board)
 }
 
 void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& marker)
-{
+{--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -871,7 +628,7 @@ void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& mark
 }
 
 void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
-{
+{--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -879,8 +636,7 @@ void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
     }
 }
 
-// ---------- public API ----------
-
+// ---------- MESSAGE SENDERS --------------------------------------------------------------------------------
 void NetworkManager::sendGameTable(const flecs::entity& gameTable, const std::vector<std::string>& toPeerIds)
 {
     auto gtId = gameTable.get<Identifier>()->id;
@@ -949,6 +705,7 @@ void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const s
     broadcastFrame(frame, toPeerIds);
 }
 
+//ON PEER RECEIVING MESSAGE-----------------------------------------------------------
 void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b)
 {
     size_t off = 0;
@@ -1013,6 +770,7 @@ void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vect
     }
 }
 
+//---Message Received Handlers--------------------------------------------------------------------------------
 // DCType::Snapshot_GameTable (100)
 void NetworkManager::handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off)
 {
@@ -1023,7 +781,7 @@ void NetworkManager::handleGameTableSnapshot(const std::vector<uint8_t>& b, size
     inboundGame_.push(std::move(m));
 }
 
-// DCType::Snapshot_Board (101) -- NewBoard - Check for Existing Board in entities
+// DCType::Snapshot_Board (101) -- NewBoard - (TODO)Check for Existing Board in entities
 void NetworkManager::handleBoardMeta(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::BoardMeta bm;
@@ -1109,6 +867,7 @@ void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off
     p.received += static_cast<uint64_t>(len);
 }
 
+// DCType::CommitBoard
 void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
 {
     uint64_t boardId = Serializer::deserializeUInt64(b, off);
@@ -1134,6 +893,7 @@ void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& of
     }
 }
 
+// DCType::CommitMarker
 void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off)
 {
     uint64_t boardId = Serializer::deserializeUInt64(b, off);
@@ -1163,8 +923,9 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
     }
 }
 
+//-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
 void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
-{
+{--USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
     if (peer_role != Role::GAMEMASTER)
         return;
 
@@ -1223,7 +984,7 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     link->markBootstrapSent();
 }
 
-// ---------- frame builders ----------
+// ---------- GAME FRAME BUILDERS ----------
 std::vector<unsigned char> NetworkManager::buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name)
 {
     std::vector<unsigned char> b;
@@ -1341,3 +1102,253 @@ std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t board
     Serializer::serializeUInt64(b, markerId);
     return b;
 }
+
+// ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
+-wrong logic below
+/*
+bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
+{
+    if (img.empty())
+        return false;
+
+    // BEGIN: DCType::CreateEntity
+    {
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
+        Serializer::serializeUInt64(b, markerId);
+        Serializer::serializeString(b, name);
+        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+    }
+
+    // CHUNKS: DCType::Image
+    uint64_t offset = 0;
+    while (offset < img.size())
+    {
+        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
+        Serializer::serializeUInt64(b, markerId);
+        Serializer::serializeUInt64(b, offset);
+        Serializer::serializeInt(b, n);
+        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+        offset += n;
+    }
+
+    // COMMIT: DCType::CommitMarker
+    {
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
+        Serializer::serializeUInt64(b, markerId);
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+    }
+
+    return true;
+}
+
+bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
+{-wrong logic
+    if (img.empty())
+        return false;
+
+    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
+    {
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
+        Serializer::serializeUInt64(b, boardId);
+        Serializer::serializeString(b, name);
+        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+    }
+
+    // CHUNKS: DCType::Image (same as marker)
+    uint64_t offset = 0;
+    while (offset < img.size())
+    {
+        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
+        Serializer::serializeUInt64(b, boardId);
+        Serializer::serializeUInt64(b, offset);
+        Serializer::serializeInt(b, n);
+        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+        offset += n;
+    }
+
+    // COMMIT: DCType::CommitBoard
+    {
+        std::vector<uint8_t> b;
+        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
+        Serializer::serializeUInt64(b, boardId);
+        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+    }
+
+    return true;
+}
+
+void NetworkManager::sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end() || !it->second)
+        return;
+    it->second->sendGame(bytes);
+}
+
+void NetworkManager::broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds)
+{
+    for (auto& pid : toPeerIds)
+    {
+        sendGameTo(pid, frame);
+    }
+}
+*/
+/*bool NetworkManager::disconectFromPeers()
+{
+    // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
+    for (auto& [pid, link] : peers)
+    {
+        if (link)
+        {
+            try
+            {
+                link->close();
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+    peers.clear();
+
+    // Close signaling client (playerâ€™s WS)
+    if (signalingClient)
+    {
+        signalingClient->close();
+        signalingClient.reset();
+    }
+
+    // Weâ€™re no longer connected
+    peer_role = Role::NONE;
+    return true;
+}
+
+bool NetworkManager::disconnectAllPeers()
+{
+    // 1) Broadcast a shutdown message (optional, but nice UX)
+    if (signalingServer)
+    {
+        signalingServer->broadcastShutdown(); // 1) tell everyone
+    }
+
+    // 2) Close all peer links locally
+    for (auto& [pid, link] : peers)
+    {
+        if (link)
+        {
+            try
+            {
+                link->close();
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+    peers.clear();
+
+    // 3) Disconnect all WS clients and stop the server
+    if (signalingServer)
+    {
+        signalingServer->disconnectAllClients();
+        try
+        {
+            signalingServer->stop();
+        }
+        catch (...)
+        {
+        }
+        signalingServer.reset();
+    }
+
+    // 4) If GM also had a self client (loopback to its own server), close it too
+    if (signalingClient)
+    {
+        signalingClient->close();
+        signalingClient.reset();
+    }
+
+    peer_role = Role::NONE;
+    return true;
+}
+*/
+
+/*bool NetworkManager::removePeer(std::string peerId)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end())
+        return false;
+    if (auto& link = it->second)
+    {
+        try
+        {
+            link->close(); // ensure pc/dc closed
+        }
+        catch (...)
+        {
+            // swallow â€” safe cleanup path
+        }
+    }
+    peers.erase(it);
+    return true;
+}
+
+// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
+std::size_t NetworkManager::removeDisconnectedPeers()
+{
+    std::size_t removed = 0;
+    for (auto it = peers.begin(); it != peers.end();)
+    {
+        const bool shouldRemove =
+            !it->second ||
+            it->second->isClosedOrFailed(); // helper on PeerLink below
+
+        if (shouldRemove)
+        {
+            if (it->second)
+            {
+                try
+                {
+                    it->second->close();
+                }
+                catch (...)
+                {
+                }
+            }
+            it = peers.erase(it);
+            ++removed;
+        }
+        else
+        {
+            ++it;
+        }
+    }
+    return removed;
+}
+*/
+
+//
+//void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
+//{
+//	peer_role = Role::GAMEMASTER;
+//
+//	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
+//	//auto internalIP = UPnPManager::getLocalIPv4Address();
+//	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
+//		bool open_port_foward_tip = true;
+//		ShowPortForwardingHelpPopup(&open_port_foward_tip);
+//	}*/
+//	signalingServer->start(port);
+//	auto status = signalingClient->connect(local_tunnel_url, port);
+//}
