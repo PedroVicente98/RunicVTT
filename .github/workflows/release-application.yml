@@ -1,11 +1,21 @@
-name: Build & Release (Windows)
+name: Build & Package (Windows)
 
 on:
   push:
-    tags: ['v*']   # cria release quando você pushar tag vX.Y.Z
+    tags: ['v*']                 # e.g. v1.2.3
+  #workflow_dispatch:
+#    inputs:
+ #     version:
+  #      description: 'Version tag (e.g. v1.2.3)'
+  #      required: true
+  #      default: 'v0.0.0-dev'
+   #   target:
+  #      description: 'Git ref to tag on (branch or SHA). Empty = default branch HEAD'
+  #      required: false
+##        default: ''
 
 permissions:
-  contents: write  # necessário para criar release e anexar assets
+  contents: write
 
 jobs:
   build-windows:
@@ -14,61 +24,35 @@ jobs:
       BUILD_TYPE: Release
       GENERATOR: Visual Studio 17 2022
       ARCH: x64
-      APP_NAME: ${{ github.event.repository.name }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive   # se você usa submodules
+          submodules: recursive
 
-      - name: Add MSBuild to PATH (opcional)
-        uses: microsoft/setup-msbuild@v2
+      # Optional: NSIS for .exe installer (CPack still makes ZIP if NSIS missing)
+      - name: Install NSIS
+        run: choco install nsis -y
+        shell: pwsh
 
-      # Configure com o mesmo gerador do seu Visual Studio
       - name: CMake Configure
         run: cmake -S . -B build -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
       - name: CMake Build
         run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
 
-      # (Opcional) rode testes se tiver
-      # - name: CTest
-      #   run: ctest --test-dir build -C ${{ env.BUILD_TYPE }} --output-on-failure
-
-      # Copie DLLs e arquivos necessários para ficar realmente "portable"
-      # Ajuste os caminhos conforme seu projeto (ex.: assets, configs, shaders, etc.)
-      - name: Prepare portable folder
+      - name: Run CPack (ZIP + NSIS)
         shell: pwsh
         run: |
-          $binRoot = "build\\${{ env.BUILD_TYPE }}"
-          if (!(Test-Path $binRoot)) { $binRoot = "build" } # fallback se não houver subpasta por config
-          New-Item -ItemType Directory -Path dist | Out-Null
-          $tag  = "${{ github.ref_name }}"
-          $out  = "dist\\${{ env.APP_NAME }}-$tag-win64-portable"
-          Copy-Item "$binRoot\\*" "$out" -Recurse -Force
-          # EXEMPLOS de cópias adicionais (descomente e ajuste):
-          # Copy-Item "third_party\\some.dll" "$out" -Force
-          # Copy-Item "assets\\*" "$out\\assets" -Recurse -Force
-          # Copiar .pdb (se quiser distribuir símbolos):
-          # Copy-Item "$binRoot\\*.pdb" "$out" -Force
+          # Ensure dist/ exists; CPack writes there because CPACK_PACKAGE_DIRECTORY is set in CMakeLists
+          New-Item -ItemType Directory -Path dist -ErrorAction SilentlyContinue | Out-Null
+          # Run the package target (multi-config generators need --config)
+          cmake --build build --config ${{ env.BUILD_TYPE }} --target package
+          Write-Host "Produced packages:"
+          Get-ChildItem -Recurse -File dist | ForEach-Object { Write-Host " - $($_.FullName)" }
 
-      - name: ZIP portable
-        shell: pwsh
-        run: |
-          $tag = "${{ github.ref_name }}"
-          Compress-Archive -Path "dist\\${{ env.APP_NAME }}-$tag-win64-portable\\*" -DestinationPath "dist\\${{ env.APP_NAME }}-$tag-win64-portable.zip"
-
-      # ZIP do código-fonte da tag (se quiser além do "Source code" automático do GitHub)
-      - name: ZIP source
-        shell: bash
-        run: |
-          tag="${GITHUB_REF#refs/tags/}"
-          name="${{ github.event.repository.name }}"
-          mkdir -p dist
-          git archive --format=zip --output="dist/${name}-${tag}-source.zip" "$tag"
-
-      - name: Upload artifacts (para o job de release)
+      - name: Upload artifacts (packages)
         uses: actions/upload-artifact@v4
         with:
           name: release-assets
@@ -88,9 +72,21 @@ jobs:
       - name: Install GitHub CLI
         uses: cli/cli-action@v2
 
-      - name: Create GitHub Release (auto notes) + upload assets
+      - name: Create or update GitHub Release and upload assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          # Determine tag: from push or workflow_dispatch input
           TAG="${GITHUB_REF#refs/tags/}"
-          gh release create "$TAG" --generate-notes ./to-release/*
+          if [ -z "$TAG" ]; then
+            TAG="${{ github.event.inputs.version }}"
+            TARGET="${{ github.event.inputs.target }}"
+            if [ -n "$TARGET" ]; then
+              gh release create "$TAG" --target "$TARGET" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+            else
+              gh release create "$TAG" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+            fi
+          else
+            # Tag push: try create; if exists, upload/clobber
+            gh release create "$TAG" --generate-notes ./to-release/* || gh release upload "$TAG" ./to-release/* --clobber
+          fi
