@@ -2,7 +2,7 @@
  * MD4C: Markdown parser for C
  * (http://github.com/mity/md4c)
  *
- * Copyright (c) 2016-2024 Martin Mit�
+ * Copyright (c) 2016-2024 Martin Mitáš
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -27,7 +27,8 @@
 #define MD4C_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #if defined MD4C_USE_UTF16
@@ -36,22 +37,22 @@ extern "C" {
      * including this header in your code. */
 #ifdef _WIN32
 #include <windows.h>
-    typedef WCHAR       MD_CHAR;
+    typedef WCHAR MD_CHAR;
 #else
 #error MD4C_USE_UTF16 is only supported on Windows.
 #endif
 #else
-    typedef char            MD_CHAR;
+typedef char MD_CHAR;
 #endif
 
     typedef unsigned MD_SIZE;
     typedef unsigned MD_OFFSET;
 
-
     /* Block represents a part of document hierarchy structure like a paragraph
      * or list item.
      */
-    typedef enum MD_BLOCKTYPE {
+    typedef enum MD_BLOCKTYPE
+    {
         /* <body>...</body> */
         MD_BLOCK_DOC = 0,
 
@@ -105,7 +106,8 @@ extern "C" {
     /* Span represents an in-line piece of a document which should be rendered with
      * the same font, color and other attributes. A sequence of spans forms a block
      * like paragraph or list item. */
-    typedef enum MD_SPANTYPE {
+    typedef enum MD_SPANTYPE
+    {
         /* <em>...</em> */
         MD_SPAN_EM,
 
@@ -149,7 +151,8 @@ extern "C" {
     } MD_SPANTYPE;
 
     /* Text is the actual textual contents of span. */
-    typedef enum MD_TEXTTYPE {
+    typedef enum MD_TEXTTYPE
+    {
         /* Normal text. */
         MD_TEXT_NORMAL = 0,
 
@@ -160,8 +163,8 @@ extern "C" {
         /* Line breaks.
          * Note these are not sent from blocks with verbatim output (MD_BLOCK_CODE
          * or MD_BLOCK_HTML). In such cases, '\n' is part of the text itself. */
-        MD_TEXT_BR,         /* <br> (hard break) */
-        MD_TEXT_SOFTBR,     /* '\n' in source text where it is not semantically meaningful (soft break) */
+        MD_TEXT_BR,     /* <br> (hard break) */
+        MD_TEXT_SOFTBR, /* '\n' in source text where it is not semantically meaningful (soft break) */
 
         /* Entity.
          * (a) Named entity, e.g. &nbsp;
@@ -191,15 +194,14 @@ extern "C" {
         MD_TEXT_LATEXMATH
     } MD_TEXTTYPE;
 
-
     /* Alignment enumeration. */
-    typedef enum MD_ALIGN {
-        MD_ALIGN_DEFAULT = 0,   /* When unspecified. */
+    typedef enum MD_ALIGN
+    {
+        MD_ALIGN_DEFAULT = 0, /* When unspecified. */
         MD_ALIGN_LEFT,
         MD_ALIGN_CENTER,
         MD_ALIGN_RIGHT
     } MD_ALIGN;
-
 
     /* String attribute.
      *
@@ -228,73 +230,83 @@ extern "C" {
      *     substrings can appear. This could change only of the specification
      *     changes.
      */
-    typedef struct MD_ATTRIBUTE {
+    typedef struct MD_ATTRIBUTE
+    {
         const MD_CHAR* text;
         MD_SIZE size;
         const MD_TEXTTYPE* substr_types;
         const MD_OFFSET* substr_offsets;
     } MD_ATTRIBUTE;
 
-
     /* Detailed info for MD_BLOCK_UL. */
-    typedef struct MD_BLOCK_UL_DETAIL {
-        int is_tight;           /* Non-zero if tight list, zero if loose. */
-        MD_CHAR mark;           /* Item bullet character in MarkDown source of the list, e.g. '-', '+', '*'. */
+    typedef struct MD_BLOCK_UL_DETAIL
+    {
+        int is_tight; /* Non-zero if tight list, zero if loose. */
+        MD_CHAR mark; /* Item bullet character in MarkDown source of the list, e.g. '-', '+', '*'. */
     } MD_BLOCK_UL_DETAIL;
 
     /* Detailed info for MD_BLOCK_OL. */
-    typedef struct MD_BLOCK_OL_DETAIL {
+    typedef struct MD_BLOCK_OL_DETAIL
+    {
         unsigned start;         /* Start index of the ordered list. */
         int is_tight;           /* Non-zero if tight list, zero if loose. */
         MD_CHAR mark_delimiter; /* Character delimiting the item marks in MarkDown source, e.g. '.' or ')' */
     } MD_BLOCK_OL_DETAIL;
 
     /* Detailed info for MD_BLOCK_LI. */
-    typedef struct MD_BLOCK_LI_DETAIL {
-        int is_task;            /* Can be non-zero only with MD_FLAG_TASKLISTS */
-        MD_CHAR task_mark;      /* If is_task, then one of 'x', 'X' or ' '. Undefined otherwise. */
-        MD_OFFSET task_mark_offset;  /* If is_task, then offset in the input of the char between '[' and ']'. */
+    typedef struct MD_BLOCK_LI_DETAIL
+    {
+        int is_task;                /* Can be non-zero only with MD_FLAG_TASKLISTS */
+        MD_CHAR task_mark;          /* If is_task, then one of 'x', 'X' or ' '. Undefined otherwise. */
+        MD_OFFSET task_mark_offset; /* If is_task, then offset in the input of the char between '[' and ']'. */
     } MD_BLOCK_LI_DETAIL;
 
     /* Detailed info for MD_BLOCK_H. */
-    typedef struct MD_BLOCK_H_DETAIL {
-        unsigned level;         /* Header level (1 - 6) */
+    typedef struct MD_BLOCK_H_DETAIL
+    {
+        unsigned level; /* Header level (1 - 6) */
     } MD_BLOCK_H_DETAIL;
 
     /* Detailed info for MD_BLOCK_CODE. */
-    typedef struct MD_BLOCK_CODE_DETAIL {
+    typedef struct MD_BLOCK_CODE_DETAIL
+    {
         MD_ATTRIBUTE info;
         MD_ATTRIBUTE lang;
-        MD_CHAR fence_char;     /* The character used for fenced code block; or zero for indented code block. */
+        MD_CHAR fence_char; /* The character used for fenced code block; or zero for indented code block. */
     } MD_BLOCK_CODE_DETAIL;
 
     /* Detailed info for MD_BLOCK_TABLE. */
-    typedef struct MD_BLOCK_TABLE_DETAIL {
-        unsigned col_count;         /* Count of columns in the table. */
-        unsigned head_row_count;    /* Count of rows in the table header (currently always 1) */
-        unsigned body_row_count;    /* Count of rows in the table body */
+    typedef struct MD_BLOCK_TABLE_DETAIL
+    {
+        unsigned col_count;      /* Count of columns in the table. */
+        unsigned head_row_count; /* Count of rows in the table header (currently always 1) */
+        unsigned body_row_count; /* Count of rows in the table body */
     } MD_BLOCK_TABLE_DETAIL;
 
     /* Detailed info for MD_BLOCK_TH and MD_BLOCK_TD. */
-    typedef struct MD_BLOCK_TD_DETAIL {
+    typedef struct MD_BLOCK_TD_DETAIL
+    {
         MD_ALIGN align;
     } MD_BLOCK_TD_DETAIL;
 
     /* Detailed info for MD_SPAN_A. */
-    typedef struct MD_SPAN_A_DETAIL {
+    typedef struct MD_SPAN_A_DETAIL
+    {
         MD_ATTRIBUTE href;
         MD_ATTRIBUTE title;
-        int is_autolink;            /* nonzero if this is an autolink */
+        int is_autolink; /* nonzero if this is an autolink */
     } MD_SPAN_A_DETAIL;
 
     /* Detailed info for MD_SPAN_IMG. */
-    typedef struct MD_SPAN_IMG_DETAIL {
+    typedef struct MD_SPAN_IMG_DETAIL
+    {
         MD_ATTRIBUTE src;
         MD_ATTRIBUTE title;
     } MD_SPAN_IMG_DETAIL;
 
     /* Detailed info for MD_SPAN_WIKILINK. */
-    typedef struct MD_SPAN_WIKILINK {
+    typedef struct MD_SPAN_WIKILINK
+    {
         MD_ATTRIBUTE target;
     } MD_SPAN_WIKILINK_DETAIL;
 
@@ -303,26 +315,26 @@ extern "C" {
      * By default (when MD_PARSER::flags == 0), we follow CommonMark specification.
      * The following flags may allow some extensions or deviations from it.
      */
-#define MD_FLAG_COLLAPSEWHITESPACE          0x0001  /* In MD_TEXT_NORMAL, collapse non-trivial whitespace into single ' ' */
-#define MD_FLAG_PERMISSIVEATXHEADERS        0x0002  /* Do not require space in ATX headers ( ###header ) */
-#define MD_FLAG_PERMISSIVEURLAUTOLINKS      0x0004  /* Recognize URLs as autolinks even without '<', '>' */
-#define MD_FLAG_PERMISSIVEEMAILAUTOLINKS    0x0008  /* Recognize e-mails as autolinks even without '<', '>' and 'mailto:' */
-#define MD_FLAG_NOINDENTEDCODEBLOCKS        0x0010  /* Disable indented code blocks. (Only fenced code works.) */
-#define MD_FLAG_NOHTMLBLOCKS                0x0020  /* Disable raw HTML blocks. */
-#define MD_FLAG_NOHTMLSPANS                 0x0040  /* Disable raw HTML (inline). */
-#define MD_FLAG_TABLES                      0x0100  /* Enable tables extension. */
-#define MD_FLAG_STRIKETHROUGH               0x0200  /* Enable strikethrough extension. */
-#define MD_FLAG_PERMISSIVEWWWAUTOLINKS      0x0400  /* Enable WWW autolinks (even without any scheme prefix, if they begin with 'www.') */
-#define MD_FLAG_TASKLISTS                   0x0800  /* Enable task list extension. */
-#define MD_FLAG_LATEXMATHSPANS              0x1000  /* Enable $ and $$ containing LaTeX equations. */
-#define MD_FLAG_WIKILINKS                   0x2000  /* Enable wiki links extension. */
-#define MD_FLAG_UNDERLINE                   0x4000  /* Enable underline extension (and disables '_' for normal emphasis). */
-#define MD_FLAG_HARD_SOFT_BREAKS            0x8000  /* Force all soft breaks to act as hard breaks. */
+#define MD_FLAG_COLLAPSEWHITESPACE 0x0001       /* In MD_TEXT_NORMAL, collapse non-trivial whitespace into single ' ' */
+#define MD_FLAG_PERMISSIVEATXHEADERS 0x0002     /* Do not require space in ATX headers ( ###header ) */
+#define MD_FLAG_PERMISSIVEURLAUTOLINKS 0x0004   /* Recognize URLs as autolinks even without '<', '>' */
+#define MD_FLAG_PERMISSIVEEMAILAUTOLINKS 0x0008 /* Recognize e-mails as autolinks even without '<', '>' and 'mailto:' */
+#define MD_FLAG_NOINDENTEDCODEBLOCKS 0x0010     /* Disable indented code blocks. (Only fenced code works.) */
+#define MD_FLAG_NOHTMLBLOCKS 0x0020             /* Disable raw HTML blocks. */
+#define MD_FLAG_NOHTMLSPANS 0x0040              /* Disable raw HTML (inline). */
+#define MD_FLAG_TABLES 0x0100                   /* Enable tables extension. */
+#define MD_FLAG_STRIKETHROUGH 0x0200            /* Enable strikethrough extension. */
+#define MD_FLAG_PERMISSIVEWWWAUTOLINKS 0x0400   /* Enable WWW autolinks (even without any scheme prefix, if they begin with 'www.') */
+#define MD_FLAG_TASKLISTS 0x0800                /* Enable task list extension. */
+#define MD_FLAG_LATEXMATHSPANS 0x1000           /* Enable $ and $$ containing LaTeX equations. */
+#define MD_FLAG_WIKILINKS 0x2000                /* Enable wiki links extension. */
+#define MD_FLAG_UNDERLINE 0x4000                /* Enable underline extension (and disables '_' for normal emphasis). */
+#define MD_FLAG_HARD_SOFT_BREAKS 0x8000         /* Force all soft breaks to act as hard breaks. */
 
-#define MD_FLAG_PERMISSIVEAUTOLINKS         (MD_FLAG_PERMISSIVEEMAILAUTOLINKS | MD_FLAG_PERMISSIVEURLAUTOLINKS | MD_FLAG_PERMISSIVEWWWAUTOLINKS)
-#define MD_FLAG_NOHTML                      (MD_FLAG_NOHTMLBLOCKS | MD_FLAG_NOHTMLSPANS)
+#define MD_FLAG_PERMISSIVEAUTOLINKS (MD_FLAG_PERMISSIVEEMAILAUTOLINKS | MD_FLAG_PERMISSIVEURLAUTOLINKS | MD_FLAG_PERMISSIVEWWWAUTOLINKS)
+#define MD_FLAG_NOHTML (MD_FLAG_NOHTMLBLOCKS | MD_FLAG_NOHTMLSPANS)
 
-     /* Convenient sets of flags corresponding to well-known Markdown dialects.
+    /* Convenient sets of flags corresponding to well-known Markdown dialects.
       *
       * Note we may only support subset of features of the referred dialect.
       * The constant just enables those extensions which bring us as close as
@@ -331,12 +343,13 @@ extern "C" {
       * ABI compatibility note: Meaning of these can change in time as new
       * extensions, bringing the dialect closer to the original, are implemented.
       */
-#define MD_DIALECT_COMMONMARK               0
-#define MD_DIALECT_GITHUB                   (MD_FLAG_PERMISSIVEAUTOLINKS | MD_FLAG_TABLES | MD_FLAG_STRIKETHROUGH | MD_FLAG_TASKLISTS)
+#define MD_DIALECT_COMMONMARK 0
+#define MD_DIALECT_GITHUB (MD_FLAG_PERMISSIVEAUTOLINKS | MD_FLAG_TABLES | MD_FLAG_STRIKETHROUGH | MD_FLAG_TASKLISTS)
 
-      /* Parser structure.
+    /* Parser structure.
        */
-    typedef struct MD_PARSER {
+    typedef struct MD_PARSER
+    {
         /* Reserved. Set to zero.
          */
         unsigned abi_version;
@@ -382,11 +395,9 @@ extern "C" {
         void (*syntax)(void);
     } MD_PARSER;
 
-
     /* For backward compatibility. Do not use in new code.
      */
     typedef MD_PARSER MD_RENDERER;
-
 
     /* Parse the Markdown document stored in the string 'text' of size 'size'.
      * The parser provides callbacks to be called during the parsing so the
@@ -399,9 +410,8 @@ extern "C" {
      */
     int md_parse(const MD_CHAR* text, MD_SIZE size, const MD_PARSER* parser, void* userdata);
 
-
 #ifdef __cplusplus
-}  /* extern "C" { */
+} /* extern "C" { */
 #endif
 
-#endif  /* MD4C_H */
+#endif /* MD4C_H */

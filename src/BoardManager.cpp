@@ -1,4 +1,4 @@
-#include <GL/glew.h> 
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "BoardManager.h"
 
@@ -14,15 +14,16 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "Components.h"
 #include <filesystem>
-#include <random>    // For random number generation
-#include <atomic>    // For atomic counter
-#include <cstdint>   // For uint64_t and UINT64_MAX
+#include <random>  // For random number generation
+#include <atomic>  // For atomic counter
+#include <cstdint> // For uint64_t and UINT64_MAX
 #include "Serializer.h"
+#include "NetworkManager.h"
 
-BoardManager::BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory)
-    : ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({ 0,0 }), mouse_start_world_pos({0,0}), mouse_current_world_pos({0,0}), marker_directory(marker_directory), map_directory(map_directory)/*, network_manager(network_manager)*/ {
-    
-    
+BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
+    ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
+{
+
     std::filesystem::path map_path = std::filesystem::path(map_directory->directoryPath);
     std::filesystem::path base_path = map_path.parent_path();
     std::filesystem::path marker_directory_path = base_path / "Markers";
@@ -31,7 +32,7 @@ BoardManager::BoardManager(flecs::world ecs, std::shared_ptr<NetworkManager> net
     marker_directory->directoryPath = marker_directory_path.string();
     marker_directory->startMonitoring();
     marker_directory->generateTextureIDs();
- }
+}
 
 BoardManager::~BoardManager()
 {
@@ -42,22 +43,22 @@ bool BoardManager::isBoardActive()
     return active_board.is_valid();
 }
 
-void BoardManager::closeBoard() {
+void BoardManager::closeBoard()
+{
     active_board = flecs::entity();
 }
 
 flecs::entity BoardManager::createBoard(std::string board_name, std::string map_image_path, GLuint texture_id, glm::vec2 size)
-{   
+{
     //Texture texture = Texture(map_image_path);
     auto board = ecs.entity()
-        .set(Identifier{ generateUniqueId() })
-        .set(Board{ board_name })
-        .set(Panning{false})
-        .set(Grid{ {0,0}, 50.0f, false, false, false, 0.5f })
-        .set(TextureComponent{ texture_id, map_image_path, size})
-        .set(Size{ size.x, size.y });
+                     .set(Identifier{generateUniqueId()})
+                     .set(Board{board_name})
+                     .set(Panning{false})
+                     .set(Grid{{0, 0}, 50.0f, false, false, false, 0.5f})
+                     .set(TextureComponent{texture_id, map_image_path, size})
+                     .set(Size{size.x, size.y});
     active_board = board;
-
 
     return board;
 }
@@ -67,20 +68,16 @@ void BoardManager::setActiveBoard(flecs::entity board_entity)
     active_board = board_entity;
 }
 
-void BoardManager::renderToolbar(const ImVec2& window_position) {
+void BoardManager::renderToolbar(const ImVec2& window_position)
+{
 
     // These flags are suitable for a child window embedded directly within another window.
     // ImGuiWindowFlags_NoMove and ImGuiWindowFlags_NoCollapse are crucial for a fixed toolbar.
     // ImGuiWindowFlags_NoTitleBar also makes sense for a seamlessly embedded toolbar.
     // ImGuiWindowFlags_NoBackground is often used so the child doesn't draw its own opaque background,
     // allowing the parent's background to show through, or you draw a custom background within the child.
-    ImGuiWindowFlags toolbar_child_flags = ImGuiWindowFlags_NoCollapse
-        | ImGuiWindowFlags_NoDocking // No docking for a child is standard
-        | ImGuiWindowFlags_NoMove
-        | ImGuiWindowFlags_NoResize
-        | ImGuiWindowFlags_NoScrollbar
-        | ImGuiWindowFlags_NoTitleBar
-        | ImGuiWindowFlags_AlwaysAutoResize
+    ImGuiWindowFlags toolbar_child_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking // No docking for a child is standard
+                                           | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize
         /*| ImGuiWindowFlags_NoBackground*/; // Often desired for embedded toolbars
 
     // Position the cursor within the parent window (MapWindow in this case)
@@ -103,37 +100,49 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
 
     // Tool: Move
     ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? activeColor : defaultColor);
-    if (ImGui::Button("Move Tool", ImVec2(80, 40))) {
+    if (ImGui::Button("Move Tool", ImVec2(80, 40)))
+    {
         currentTool = Tool::MOVE;
     }
     ImGui::PopStyleColor();
     ImGui::SameLine(); // Ensure buttons are on the same row
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] NetworkManager Expired");
 
-    //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+    if (nm->getPeerRole() == Role::GAMEMASTER)
+    {
         // Tool: Fog
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
-    if (ImGui::Button("Fog Tool", ImVec2(80, 40))) {
-        currentTool = Tool::FOG;
-    }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
+        if (ImGui::Button("Fog Tool", ImVec2(80, 40)))
+        {
+            currentTool = Tool::FOG;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
 
-    // Tool: Select
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
-    if (ImGui::Button("Select Tool", ImVec2(80, 40))) {
-        currentTool = Tool::SELECT;
+        // Tool: Select
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
+        if (ImGui::Button("Select Tool", ImVec2(80, 40)))
+        {
+            currentTool = Tool::SELECT;
+        }
+        ImGui::PopStyleColor();
+        ImGui::SameLine(); // Ensure buttons are on the same row
     }
-    ImGui::PopStyleColor();
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    //}
 
-    if (ImGui::Button("Reset Camera", ImVec2(90, 40))) {
+    if (ImGui::Button("Reset Camera", ImVec2(90, 40)))
+    {
         resetCamera();
     }
-    
-    ImGui::SameLine(); // Ensure buttons are on the same row
-    if (ImGui::Button("Config Grid", ImVec2(90, 40))) {
-        showGridSettings = !showGridSettings;
+
+    if (nm->getPeerRole() == Role::GAMEMASTER)
+    {
+        ImGui::SameLine(); // Ensure buttons are on the same row
+        if (ImGui::Button("Config Grid", ImVec2(90, 40)))
+        {
+            showGridSettings = !showGridSettings;
+        }
     }
 
     // Pop the toolbar's background color
@@ -143,12 +152,13 @@ void BoardManager::renderToolbar(const ImVec2& window_position) {
     ImGui::EndChild();
 
     renderGridWindow();
-
 }
 
-void BoardManager::renderGridWindow() {
+void BoardManager::renderGridWindow()
+{
     // Check if the window should be shown
-    if (!showGridSettings) {
+    if (!showGridSettings)
+    {
         return;
     }
 
@@ -159,12 +169,13 @@ void BoardManager::renderGridWindow() {
     ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
     auto grid_hovered = ImGui::IsWindowHovered();
     setIsNonMapWindowHovered(grid_hovered);
-   
+
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
     auto grid = active_board.get_mut<Grid>();
 
-    if (grid) {
+    if (grid)
+    {
         // --- BOOLEAN CHECKBOXES ---
         ImGui::Checkbox("Visible", &grid->visible);
         ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
@@ -173,59 +184,72 @@ void BoardManager::renderGridWindow() {
         // --- FLOAT SLIDERS ---
         ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
         ImGui::SameLine();
-        if (ImGui::Button("-")) {
+        if (ImGui::Button("-"))
+        {
             grid->cell_size = grid->cell_size - 0.01f;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+")) {
+        if (ImGui::Button("+"))
+        {
             grid->cell_size = grid->cell_size + 0.01f;
         }
         // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
         ImGui::Text("Grid Offset");
         ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
         ImGui::SameLine();
-        if (ImGui::Button("-")) {
+        if (ImGui::Button("-"))
+        {
             grid->offset.x = grid->offset.x - 0.01f;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+")) {
+        if (ImGui::Button("+"))
+        {
             grid->offset.x = grid->offset.x + 0.01f;
         }
         ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
         ImGui::SameLine();
-        if (ImGui::Button("-")) {
+        if (ImGui::Button("-"))
+        {
             grid->offset.y = grid->offset.y - 0.01f;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+")) {
+        if (ImGui::Button("+"))
+        {
             grid->offset.y = grid->offset.y + 0.01f;
         }
 
         // Button to reset the offset
-        if (ImGui::Button("Reset Offset")) {
+        if (ImGui::Button("Reset Offset"))
+        {
             grid->offset = glm::vec2(0.0f);
         }
         // Button to reset the offset
-        if (ImGui::Button("Reset Offset")) {
+        if (ImGui::Button("Reset Offset"))
+        {
             grid->offset = glm::vec2(0.0f);
         }
-
     }
-    else {
+    else
+    {
         ImGui::Text("Active board entity does not have a Grid component.");
     }
 
     ImGui::End();
 }
-void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader &grid_shader, Renderer& renderer) {
-    
+void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
+{
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
+
     const TextureComponent* texture = active_board.get<TextureComponent>();
-    if (texture->textureID != 0) {
+    if (texture->textureID != 0)
+    {
         const Board* board = active_board.get<Board>();
         const Grid* grid = active_board.get<Grid>();
         const Size* size = active_board.get<Size>();
 
-        glm::mat4 viewMatrix = camera.getViewMatrix();  // Obtém a matriz de visualização da câmera (pan/zoom)
+        glm::mat4 viewMatrix = camera.getViewMatrix(); // ObtÃ©m a matriz de visualizaÃ§Ã£o da cÃ¢mera (pan/zoom)
         glm::mat4 projection = camera.getProjectionMatrix();
         glm::mat4 board_model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
         board_model = glm::scale(board_model, glm::vec3(size->width, size->height, 1.0f));
@@ -239,15 +263,15 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         shader.SetUniform1i("u_Texture", 0);
         shader.Unbind();
 
-
-        GLCall(glActiveTexture(GL_TEXTURE0)); 
+        GLCall(glActiveTexture(GL_TEXTURE0));
         GLCall(glBindTexture(GL_TEXTURE_2D, texture->textureID));
 
         renderer.Draw(va, ib, shader);
 
-
-        if (grid) {
-            if (grid->visible) {
+        if (grid)
+        {
+            if (grid->visible)
+            {
                 grid_shader.Bind();
                 grid_shader.SetUniformMat4f("projection", projection);
                 grid_shader.SetUniformMat4f("view", viewMatrix);
@@ -262,10 +286,9 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
             }
         }
 
-
         ecs.defer_begin(); // Start deferring modifications
-        active_board.children([&](flecs::entity child) {
-            //if (child.has<MarkerComponent>()) {
+        active_board.children([&](flecs::entity child)
+                              {
             if (child.has<MarkerComponent>()) {
                 const TextureComponent* texture_marker = child.get<TextureComponent>();
                 if (texture_marker->textureID != 0) {
@@ -279,12 +302,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     //glm::mat4 mvp = projection * viewMatrix * marker_model; //Calculate Screen Position(Can use method to standize it, but alter to return the MVP
                     float alpha = 1.0f;
                     if (!visibility_marker->isVisible) {
-                        //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                        if (nm->getPeerRole() == Role::GAMEMASTER)
+                        {
                             alpha = 0.5f;
-                        //}
-                        //else {
-                            //alpha = 0.0f;
-                        //}
+                        }
+                        else {
+                            alpha = 0.0f;
+                        }
                     }
 
                     shader.Bind();
@@ -314,13 +338,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
                 float alpha = 1.0f;
                 if (!visibility_marker->isVisible) {
-                    //if (network_manager->getPeerRole() == Role::GAMEMASTER) {
+                    if (nm->getPeerRole() == Role::GAMEMASTER) {
                         alpha = 0.3f;
-                    //}
-                    //else
-                    //{
-                        //alpha = 0.0f;
-                    //}
+                    }
+                    else
+                    {
+                        alpha = 0.0f;
+                    }
                 }
 
                 shader.Bind();
@@ -333,41 +357,49 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
 
                 renderer.Draw(va, ib, shader);
 
-            }
-        });
+            } });
         ecs.defer_end();
     }
-
 }
 
-
-flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size) {
+flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuint textureId, glm::vec2 position, glm::vec2 size)
+{
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
 
     flecs::entity marker = ecs.entity()
-        .set(Identifier{ generateUniqueId() })
-        .set(Position{ (int)position.x, (int)position.y }) //World Position
-        .set(Size{ size.x , size.y })
-        .set(TextureComponent{ textureId , imageFilePath, size })
-        .set(Visibility{ true })
-        .set(Moving{ false });
+                               .set(Identifier{generateUniqueId()})
+                               .set(Position{(int)position.x, (int)position.y}) //World Position
+                               .set(Size{size.x, size.y})
+                               .set(TextureComponent{textureId, imageFilePath, size})
+                               .set(Visibility{true})
+                               .set(MarkerComponent{"", false, false})
+                               .set(Moving{false});
 
-    marker.add<MarkerComponent>();
+    //marker.add<MarkerComponent>();
     marker.add(flecs::ChildOf, active_board);
 
-    //auto message = network_manager->buildCreateMarkerMessage(marker);
-    //network_manager->queueMessage(message);
+    /*auto message = nm->buildCreateMarkerMessage(marker);
+    nm->queueMessage(message);*/
+
     return marker;
 }
 
-void BoardManager::deleteMarker(flecs::entity markerEntity) {
+void BoardManager::deleteMarker(flecs::entity markerEntity)
+{
     markerEntity.destruct();
 }
 
+void BoardManager::handleMarkerDragging(glm::vec2 world_position)
+{
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
 
-void BoardManager::handleMarkerDragging(glm::vec2 world_position) {
-    //mousePos(Screen Position) use screenToWorldPosition(mousePos)  position(World Position) 
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position) {
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position)
+             {
         if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
             glm::vec2 start_world_position = mouse_start_world_pos;
             glm::vec2 delta = world_position - start_world_position;
@@ -375,47 +407,48 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position) {
             position.y += delta.y;
             mouse_start_world_pos = world_position;
 
-            //auto message = network_manager->buildUpdateMarkerMessage(entity);
-            //network_manager->queueMessage(message);
-        }
-     });
+            //auto message = nm->buildUpdateMarkerMessage(entity);
+            //nm->queueMessage(message);
+        } });
     ecs.defer_end();
 }
 
 // Generates a unique 64-bit ID
-uint64_t BoardManager::generateUniqueId() {
+uint64_t BoardManager::generateUniqueId()
+{
     static std::atomic<uint64_t> counter{0};            // Atomic counter for thread safety
     static std::mt19937_64 rng(std::random_device{}()); // Random number generator
     static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
 
-    uint64_t random_part = dist(rng);                   // Generate a random 64-bit number
-    uint64_t unique_id = (random_part & 0xFFFFFFFFFFFF0000) | (counter++ & 0xFFFF);  // Combine random and counter
+    uint64_t random_part = dist(rng);                                               // Generate a random 64-bit number
+    uint64_t unique_id = (random_part & 0xFFFFFFFFFFFF0000) | (counter++ & 0xFFFF); // Combine random and counter
 
     return unique_id;
 }
 
 // Finds an entity by its Identifier component with the specified ID
-flecs::entity BoardManager::findEntityById(uint64_t target_id) {
+flecs::entity BoardManager::findEntityById(uint64_t target_id)
+{
     flecs::entity result;
 
     // Iterate over all entities with Identifier component
-    ecs.each<Identifier>([&](flecs::entity e, Identifier& identifier) {
+    ecs.each<Identifier>([&](flecs::entity e, Identifier& identifier)
+                         {
         if (identifier.id == target_id) {
             result = e;  // Store matching entity
-        }
-    });
+        } });
 
-    return result;  // Returns the found entity, or an empty entity if not found
+    return result; // Returns the found entity, or an empty entity if not found
 }
 
-
-
-bool BoardManager::isMouseOverMarker(glm::vec2 world_position) {
+bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
+{
     bool hovered = false;
-    
+
     // Query all markers that are children of the active board and have MarkerComponent
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving) {
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving)
+             {
 
         if (entity.has(flecs::ChildOf, active_board)) {
             bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
@@ -428,20 +461,21 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position) {
                 moving.isDragging = true;
                 hovered = true;           // Mark as hovered
             }
-        }
-    });
+        } });
     ecs.defer_end();
 
     return hovered;
 }
 
-
-void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
-    mouse_start_world_pos = mousePos;  // Captura a posição inicial do mouse
+void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
+{
+    mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
     mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
-    if (currentTool == Tool::MOVE) {
-        if (draggingMap) {
-            active_board.set<Panning>({ true });
+    if (currentTool == Tool::MOVE)
+    {
+        if (draggingMap)
+        {
+            active_board.set<Panning>({true});
         }
     }
     else if (currentTool == Tool::FOG)
@@ -450,40 +484,45 @@ void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap) {
     }
 }
 
-void BoardManager::endMouseDrag() {
-    active_board.set<Panning>({ false });
+void BoardManager::endMouseDrag()
+{
+    active_board.set<Panning>({false});
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving)
+             {
         if (entity.has(flecs::ChildOf, active_board)) {
             moving.isDragging = false;
-        }
-    });
+        } });
     ecs.defer_end();
     is_creating_fog = false;
 }
 
-bool BoardManager::isPanning() {
+bool BoardManager::isPanning()
+{
     const Panning* panning = active_board.get<Panning>();
     return panning->isPanning;
 }
 
-bool BoardManager::isDraggingMarker() {
+bool BoardManager::isDraggingMarker()
+{
     bool isDragginMarker = false;
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving) {
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving)
+             {
         if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
             isDragginMarker =  true;
-        }
-    });
+        } });
     ecs.defer_end();
     return isDragginMarker;
 }
 
-glm::vec2 BoardManager::getMouseStartPosition() const {
+glm::vec2 BoardManager::getMouseStartPosition() const
+{
     return mouse_start_world_pos;
 }
 
-void BoardManager::panBoard(glm::vec2 current_mouse_fbo_pos) {
+void BoardManager::panBoard(glm::vec2 current_mouse_fbo_pos)
+{
     glm::vec2 delta_screen = mouse_start_screen_pos - current_mouse_fbo_pos;
     float world_scale_factor = camera.getZoom();
     glm::vec2 delta_world = delta_screen / world_scale_factor;
@@ -491,62 +530,73 @@ void BoardManager::panBoard(glm::vec2 current_mouse_fbo_pos) {
     mouse_start_screen_pos = current_mouse_fbo_pos;
 }
 
-
-void BoardManager::resetCamera() {
+void BoardManager::resetCamera()
+{
     camera.setPosition(glm::vec2(0.0f, 0.0f));
     camera.setZoom(1.0f);
 }
 
-void BoardManager::deleteFogOfWar(flecs::entity fogEntity) {
+void BoardManager::deleteFogOfWar(flecs::entity fogEntity)
+{
     fogEntity.destruct();
 }
 
-flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size) {
+flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size)
+{
     auto fog = ecs.entity()
-        .set(Identifier{ generateUniqueId() })
-        .set(Position{ (int)startPos.x, (int)startPos.y })
-        .set(Size{ size.x, size.y })
-        .set(Visibility{ true });
+                   .set(Identifier{generateUniqueId()})
+                   .set(Position{(int)startPos.x, (int)startPos.y})
+                   .set(Size{size.x, size.y})
+                   .set(Visibility{true});
 
     fog.add<FogOfWar>();
     fog.add(flecs::ChildOf, active_board);
     return fog;
 }
 
-void BoardManager::handleFogCreation(glm::vec2 end_world_position) {
+void BoardManager::handleFogCreation(glm::vec2 end_world_position)
+{
     glm::vec2 start_world_position = getMouseStartPosition();
 
     // Calculate size
-    glm::vec2 size = end_world_position - start_world_position;//glm::abs(end_world_position - start_world_position);  // Make sure size is positive
+    glm::vec2 size = end_world_position - start_world_position; //glm::abs(end_world_position - start_world_position);  // Make sure size is positive
     glm::vec2 corrected_start_position;
-    if (size.x < 0) {
+    if (size.x < 0)
+    {
         corrected_start_position.x = end_world_position.x + glm::abs(size.x) / 2;
     }
-    else {
-        corrected_start_position.x = start_world_position.x + size.x/2;
+    else
+    {
+        corrected_start_position.x = start_world_position.x + size.x / 2;
     }
-    if (size.y < 0) {
+    if (size.y < 0)
+    {
         corrected_start_position.y = end_world_position.y + glm::abs(size.y) / 2;
     }
-    else {
+    else
+    {
         corrected_start_position.y = start_world_position.y + size.y / 2;
     }
     createFogOfWar(corrected_start_position, glm::abs(size));
 }
 
-Tool BoardManager::getCurrentTool() const {
+Tool BoardManager::getCurrentTool() const
+{
     return currentTool;
 }
 
-void BoardManager::setCurrentTool(Tool newTool) {
+void BoardManager::setCurrentTool(Tool newTool)
+{
     currentTool = newTool;
 }
 
-flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
+flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
+{
 
     auto entity_at_mouse = flecs::entity();
-    ecs.defer_begin();    
-    ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size) {
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size)
+             {
         
         glm::vec2 world_position = mouse_position;
         
@@ -561,8 +611,7 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
             if (withinXBounds && withinYBounds) {
                 entity_at_mouse = entity;
             }
-        }
-    });
+        } });
     ecs.defer_end();
     return entity_at_mouse;
 }
@@ -624,39 +673,45 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position) {
 //    return raw_world_pos; // Return original if no grid type matches
 //}
 
-
 //Save and Load Board --------------------------------------------------------------------
 
-void BoardManager::saveActiveBoard(std::filesystem::path& filePath) {
-    if (!active_board.is_alive()) {
+void BoardManager::saveActiveBoard(std::filesystem::path& filePath)
+{
+    if (!active_board.is_alive())
+    {
         std::cerr << "No active board to save." << std::endl;
         return;
     }
     auto board = active_board.get<Board>();
-    if (!std::filesystem::exists(filePath)) {
+    if (!std::filesystem::exists(filePath))
+    {
         std::filesystem::create_directory(filePath);
     }
 
     auto board_file_path = filePath / (board->board_name + ".runic");
 
-    std::vector<unsigned char> buffer;
+    std::vector<uint8_t> buffer;
     Serializer::serializeBoardEntity(buffer, active_board, ecs);
 
     std::ofstream outFile(board_file_path, std::ios::binary);
-    if (outFile) {
+    if (outFile)
+    {
         outFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         outFile.close();
         std::cout << "Board saved successfully to " << filePath << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to save board to " << filePath << std::endl;
     }
 }
 
-void BoardManager::loadActiveBoard(const std::string& filePath) {
+void BoardManager::loadActiveBoard(const std::string& filePath)
+{
     std::ifstream inFile(filePath, std::ios::binary);
-    if (inFile) {
-        std::vector<unsigned char> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
+    if (inFile)
+    {
+        std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
         inFile.close();
 
         size_t offset = 0;
@@ -667,33 +722,38 @@ void BoardManager::loadActiveBoard(const std::string& filePath) {
         texture->size = map_image.size;
 
         ecs.defer_begin();
-        active_board.children([&](flecs::entity child) {
+        active_board.children([&](flecs::entity child)
+                              {
             if (child.has<MarkerComponent>()) {
                 auto child_texture = child.get_mut<TextureComponent>();
                 auto marker_image = marker_directory->getImageByPath(child_texture->image_path);
                 child_texture->textureID = marker_image.textureID;
                 child_texture->size = marker_image.size;
-            }
-        });
+            } });
         ecs.defer_end();
 
         std::cout << "Board loaded successfully from " << filePath << std::endl;
     }
-    else {
+    else
+    {
         std::cerr << "Failed to load board from " << filePath << std::endl;
     }
 }
 
-flecs::entity BoardManager::getActiveBoard() const {
+flecs::entity BoardManager::getActiveBoard() const
+{
     return active_board;
 }
 
-bool BoardManager::isEditWindowOpen() const {
+bool BoardManager::isEditWindowOpen() const
+{
     return showEditWindow;
 }
 
-void BoardManager::renderEditWindow() {
-    if (!showEditWindow) return;  // If the window is closed, skip rendering it
+void BoardManager::renderEditWindow()
+{
+    if (!showEditWindow)
+        return; // If the window is closed, skip rendering it
     bool is_hovered = false;
     // Get the current mouse position to set the window position
     ImVec2 mousePos = ImGui::GetMousePos();
@@ -701,25 +761,29 @@ void BoardManager::renderEditWindow() {
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
     auto edit_window_hover = ImGui::IsWindowHovered();
-    if (edit_window_hover) {
+    if (edit_window_hover)
+    {
         setIsNonMapWindowHovered(true);
     }
 
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
-    if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>()) {
-        auto size = edit_window_entity.get_mut<Size>();  // Mutable access to the size
-        auto visibility = edit_window_entity.get_mut<Visibility>();  // Mutable access to the visibility
+    if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>())
+    {
+        auto size = edit_window_entity.get_mut<Size>();             // Mutable access to the size
+        auto visibility = edit_window_entity.get_mut<Visibility>(); // Mutable access to the visibility
 
         ImGui::BeginGroup();
-        if (ImGui::Button("+ Size")) {
+        if (ImGui::Button("+ Size"))
+        {
             size->width = size->width * 1.1;
-            size->height = size->height * 1.1;  // Adjust height proportionally to the width
+            size->height = size->height * 1.1; // Adjust height proportionally to the width
         }
         ImGui::SameLine();
-        if (ImGui::Button("- Size")) {
+        if (ImGui::Button("- Size"))
+        {
             size->width = size->width * 0.90;
-            size->height = size->height * 0.90;  // Adjust height proportionally to the width
+            size->height = size->height * 0.90; // Adjust height proportionally to the width
         }
 
         ImGui::EndGroup();
@@ -729,46 +793,98 @@ void BoardManager::renderEditWindow() {
         ImGui::Separator();
 
         // Button to delete the entity (with a confirmation popup)
-        if (ImGui::Button("Delete")) {
+        if (ImGui::Button("Delete"))
+        {
             ImGui::OpenPopup("Confirm Delete");
         }
         // Confirm delete popup
-        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize)) {
+        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
             ImGui::Text("Are you sure you want to delete this entity?");
             ImGui::Separator();
 
-            if (ImGui::Button("Yes", ImVec2(120, 0))) {
-                if (edit_window_entity.is_alive()) {
-                    edit_window_entity.destruct();  // Delete the entity
+            if (ImGui::Button("Yes", ImVec2(120, 0)))
+            {
+                if (edit_window_entity.is_alive())
+                {
+                    edit_window_entity.destruct(); // Delete the entity
                     showEditWindow = false;
                 }
-                ImGui::CloseCurrentPopup();  // Close the popup after deletion
+                ImGui::CloseCurrentPopup(); // Close the popup after deletion
             }
             ImGui::SameLine();
-            if (ImGui::Button("No", ImVec2(120, 0))) {
-                ImGui::CloseCurrentPopup();  // Close the popup without deletion
+            if (ImGui::Button("No", ImVec2(120, 0)))
+            {
+                ImGui::CloseCurrentPopup(); // Close the popup without deletion
             }
             ImGui::EndPopup();
         }
-    } else {
+    }
+    else
+    {
         ImGui::Text("Invalid entity or missing components!");
     }
 
     ImGui::End();
     ImGui::PopStyleColor(); // Restore the original background color
-   
-    if (!is_hovered and ImGui::IsMouseClicked(ImGuiMouseButton_Left)) {
+
+    if (!is_hovered and ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    {
         showEditWindow = false;
     }
 
-    if (!showEditWindow) {
+    if (!showEditWindow)
+    {
         edit_window_entity = flecs::entity();
     }
     //close edit window when clicking outside it
 }
 
+BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t sizeBytes)
+{
+    if (!bytes || sizeBytes == 0)
+    {
+        std::cerr << "LoadTextureFromMemory: empty buffer\n";
+        return BoardImageData{};
+    }
 
+    // stb_image: ensure vertical flip matches your expectations
+    stbi_set_flip_vertically_on_load(0);
 
+    int width = 0, height = 0, nrChannels = 0;
+    uint8_t* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
+    if (!data)
+    {
+        std::cerr << "LoadTextureFromMemory: decode failed\n";
+        return BoardImageData{};
+    }
+
+    GLuint tex = 0;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    stbi_image_free(data);
+    return BoardImageData(tex, glm::vec2(width, height), /*path*/ "");
+}
+
+flecs::entity BoardManager::findBoardById(uint64_t boardId)
+{
+    flecs::entity result;
+    ecs.each([&](flecs::entity e, const Board&, const Identifier& id)
+             {
+		if (e.is_valid() && id.id == boardId) {
+			result = e;
+		} });
+    return result; // will be invalid if not found
+}
 
 //glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
 //    // Step 1: Get the combined MVP matrix
@@ -789,12 +905,12 @@ void BoardManager::renderEditWindow() {
 //    return screen_position;
 //}
 //
-//void BoardManager::sendEntityUpdate(flecs::entity entity, MessageType message_type) 
+//void BoardManager::sendEntityUpdate(flecs::entity entity, MessageType message_type)
 //{
 //    if (message_type == MessageType::MarkerUpdate) {
 //        Message markerMessage;
 //        markerMessage.type = MessageType::MarkerUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //        auto pos =  entity.get<Position>();
 //        auto size =  entity.get<Size>();
 //        auto texture =  entity.get<TextureComponent>();
@@ -810,12 +926,12 @@ void BoardManager::renderEditWindow() {
 //        markerMessage.payload = buffer;
 //        // Queue the message for the network manager
 //        network_manager->queueMessage(markerMessage);
-//    } 
+//    }
 //    else if (message_type == MessageType::FogUpdate)
 //    {
 //        Message fogMessage;
 //        fogMessage.type = MessageType::FogUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();
@@ -834,7 +950,7 @@ void BoardManager::renderEditWindow() {
 //    {
 //        Message markerMessage;
 //        markerMessage.type = MessageType::MarkerUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();
 //        auto texture = entity.get<TextureComponent>();
@@ -856,7 +972,7 @@ void BoardManager::renderEditWindow() {
 //    {
 //        Message fogMessage;
 //        fogMessage.type = MessageType::FogUpdate;
-//        std::vector<unsigned char> buffer;
+//        std::vector<uint8_t> buffer;
 //
 //        auto pos = entity.get<Position>();
 //        auto size = entity.get<Size>();
@@ -876,7 +992,7 @@ void BoardManager::renderEditWindow() {
 //glm::vec2 BoardManager::screenToWorldPosition(glm::vec2 screen_position) {
 //
 //    glm::vec2 relative_screen_position = { screen_position.x - camera.getWindowPosition().x, screen_position.y - camera.getWindowPosition().y};
-//    
+//
 //    // Get the view matrix (which handles panning and zoom)
 //    glm::mat4 view_matrix = camera.getViewMatrix();
 //

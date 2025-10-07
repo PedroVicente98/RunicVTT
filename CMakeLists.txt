@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 
 find_package(Git REQUIRED)
 execute_process(
@@ -33,14 +33,22 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     vendor/imgui/*.cpp
 )
 
-list(REMOVE_ITEM SOURCES
-    ${CMAKE_SOURCE_DIR}/src/Application_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
-    ${CMAKE_SOURCE_DIR}/src/NetworkManager_OLD.cpp # REMOVE AT RELEASE :) I MIGHT FORGOR
-    ${CMAKE_SOURCE_DIR}/include/NetworkManager_OLD.h
-)
-
-
 add_executable(RunicVTT ${SOURCES})
+
+if (WIN32)
+  if (MSVC)
+    target_link_options(RunicVTT PRIVATE "/MANIFESTUAC:level='requireAdministrator' uiAccess='false'")
+    target_link_options(RunicVTT PRIVATE
+      $<$<CONFIG:Debug>:/SUBSYSTEM:CONSOLE>
+      $<$<NOT:$<CONFIG:Debug>>:/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup>
+    )
+  elseif (MINGW)
+    target_link_options(RunicVTT PRIVATE
+      $<$<CONFIG:Debug>:-mconsole>
+      $<$<NOT:$<CONFIG:Debug>>:-mwindows>
+    )
+  endif()
+endif()
 
 # ----------------------
 # Include Directories
@@ -50,6 +58,7 @@ target_include_directories(RunicVTT PRIVATE
     include/renderer
     include/network
     include/note_editor
+    include/debug
     dependencies/GLEW/include
     dependencies/OpenSSL/include
     vendor/imgui
@@ -74,7 +83,7 @@ target_link_libraries(RunicVTT PRIVATE
     "${OPENSSL_SSL_LIBRARY}"
     "${OPENSSL_CRYPTO_LIBRARY}"
 )
-target_link_libraries(RunicVTT PRIVATE winhttp ws2_32)
+target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 ) #Shell32 Ole32
 # ----------------------
 # nlohhmann json
 # ----------------------

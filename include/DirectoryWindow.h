@@ -12,32 +12,35 @@
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
-
-
-class DirectoryWindow {
+class DirectoryWindow
+{
 public:
-    DirectoryWindow(std::string directoryPath, std::string directoryName) {
+    DirectoryWindow(std::string directoryPath, std::string directoryName)
+    {
         this->directoryPath = directoryPath;
         this->directoryName = directoryName;
     }
 
-    struct ImageData {
+    struct ImageData
+    {
         GLuint textureID;
         glm::vec2 size;
         std::string filename;
     };
 
     // Function to truncate a string if it exceeds a certain length
-    std::string TruncateString(const std::string& str, size_t maxLength) {
-        if (str.length() > maxLength) {
+    std::string TruncateString(const std::string& str, size_t maxLength)
+    {
+        if (str.length() > maxLength)
+        {
             return str.substr(0, maxLength) + "...";
         }
         return str;
-
     }
 
     // Function to generate the texture IDs
-    void generateTextureIDs() {
+    void generateTextureIDs()
+    {
         // Wait for the monitoring thread to finish one full loop
         //{
         //    std::shared_lock<std::shared_mutex> lock(imagesMutex);  // Shared lock: waits if the thread is still writing
@@ -49,7 +52,8 @@ public:
         //    }
         //}
 
-        while (true) {
+        while (true)
+        {
             {
                 std::shared_lock<std::shared_mutex> lock(imagesMutex);
                 if (first_scan_done)
@@ -59,22 +63,26 @@ public:
         }
 
         // Now generate textures
-        std::unique_lock<std::shared_mutex> lock(imagesMutex);  // Unique lock to write (generate textures)
-        for (auto& image : images) {
-            if (image.textureID == 0) {
+        std::unique_lock<std::shared_mutex> lock(imagesMutex); // Unique lock to write (generate textures)
+        for (auto& image : images)
+        {
+            if (image.textureID == 0)
+            {
                 std::string path_file = directoryPath + "\\" + image.filename;
                 image = LoadTextureFromFile(path_file.c_str());
             }
         }
     }
 
-    void renderDirectory(bool is_map_directory = false) {
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse ;
-        if (is_map_directory == true) {
+    void renderDirectory(bool is_map_directory = false)
+    {
+        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
+        if (is_map_directory == true)
+        {
             window_flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
         }
-        
-        ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x*0.1, ImGui::GetIO().DisplaySize.y*0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
+
+        ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x * 0.1, ImGui::GetIO().DisplaySize.y * 0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
         ImGui::Begin(directoryName.c_str(), NULL, window_flags);
         ImGui::Text("Path: %s", directoryPath.c_str());
         ImGui::Separator();
@@ -89,39 +97,48 @@ public:
         {
 
             std::shared_lock<std::shared_mutex> lock(imagesMutex);
-            for (auto& image : images) {
-                if (count % columns != 0) ImGui::SameLine();
-                std::string path_file = directoryPath +"\\" + image.filename.c_str();
-                if (image.textureID == 0) {
+            for (auto& image : images)
+            {
+                if (count % columns != 0)
+                    ImGui::SameLine();
+                std::string path_file = directoryPath + "\\" + image.filename.c_str();
+                if (image.textureID == 0)
+                {
                     image = LoadTextureFromFile(path_file.c_str());
                 }
 
                 ImGui::BeginGroup();
                 ImGui::PushID(count);
 
-                if (is_map_directory == false) {
+                if (is_map_directory == false)
+                {
                     // Add drag-and-drop functionality for marker images
-                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
+                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize)))
+                    {
                         selected_image = image;
                         std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
                         ImGui::OpenPopup("Image Popup");
                     }
 
                     // Begin the drag source for the markers
-                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID)) {
-                        ImGui::SetDragDropPayload("MARKER_IMAGE", &image, sizeof(image));  // Attach the marker image payload
-                        ImGui::Text("Drag Marker: %s", image.filename.c_str());  // Tooltip while dragging
+                    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+                    {
+                        ImGui::SetDragDropPayload("MARKER_IMAGE", &image, sizeof(image)); // Attach the marker image payload
+                        ImGui::Text("Drag Marker: %s", image.filename.c_str());           // Tooltip while dragging
                         ImGui::EndDragDropSource();
                     }
                 }
-                else {
-                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize))) {
+                else
+                {
+                    if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize)))
+                    {
                         selected_image = image;
                         std::cout << "Selected Image: " << image.filename << " | " << image.textureID << std::endl;
                         ImGui::OpenPopup("Image Popup");
                     }
 
-                    if (ImGui::BeginPopup("Image Popup")) {
+                    if (ImGui::BeginPopup("Image Popup"))
+                    {
                         ImGui::Text("File: %s", image.filename.c_str());
                         ImGui::EndPopup();
                     }
@@ -135,90 +152,109 @@ public:
         ImGui::End();
     }
 
-    // Método genérico para retornar a imagem selecionada
-    ImageData getSelectedImage() const {
+    // MÃ©todo genÃ©rico para retornar a imagem selecionada
+    ImageData getSelectedImage() const
+    {
         return selected_image;
     }
 
-    // Método para limpar a imagem selecionada
-    void clearSelectedImage() {
-        selected_image = { 0,  glm::vec2() ,"" };  // Limpa a seleção
+    // MÃ©todo para limpar a imagem selecionada
+    void clearSelectedImage()
+    {
+        selected_image = {0, glm::vec2(), ""}; // Limpa a seleÃ§Ã£o
     }
 
-
-    void startMonitoring() {
+    void startMonitoring()
+    {
         monitorThread = std::thread(&DirectoryWindow::monitorDirectory, this, directoryPath);
     }
 
-    void stopMonitoring() {
+    void stopMonitoring()
+    {
         running = false;
-        if (monitorThread.joinable()) {
+        if (monitorThread.joinable())
+        {
             monitorThread.join();
         }
     }
 
-    ~DirectoryWindow() {
+    ~DirectoryWindow()
+    {
         stopMonitoring();
     }
 
-
-    ImageData getImageByPath(const std::string& file_name) {
-        auto it = std::find_if(images.begin(), images.end(), [&](const ImageData& image) {
+    ImageData getImageByPath(const std::string& file_name)
+    {
+        auto it = std::find_if(images.begin(), images.end(), [&](const ImageData& image)
+                               {
             // Check if image.filename is a substring at the end of file_name
             if (file_name.size() >= image.filename.size()) {
                 return file_name.compare(file_name.size() - image.filename.size(), image.filename.size(), image.filename) == 0;
             }
-            return false;
-            });
+            return false; });
 
-        if (it != images.end()) {
+        if (it != images.end())
+        {
             return *it;
         }
-        else {
+        else
+        {
             throw std::runtime_error("Image not found: " + file_name);
         }
     }
 
     std::string directoryPath;
     std::string directoryName;
+
 private:
-    ImageData selected_image = { 0, glm::vec2() , "" };  // Armazena a imagem selecionada
+    ImageData selected_image = {0, glm::vec2(), ""}; // Armazena a imagem selecionada
     std::vector<ImageData> images;
     std::thread monitorThread;
     bool running = true;
     std::shared_mutex imagesMutex;
-    bool first_scan_done = false;  // Flag to track when the first scan is complete
+    bool first_scan_done = false; // Flag to track when the first scan is complete
 
     // Function to find an ImageData by filename
-    std::vector<ImageData>::iterator findImageByFilename(std::vector<ImageData>& images, const std::string& filename) {
-        return std::find_if(images.begin(), images.end(), [&filename](const ImageData& image) { return image.filename == filename; });
+    std::vector<ImageData>::iterator findImageByFilename(std::vector<ImageData>& images, const std::string& filename)
+    {
+        return std::find_if(images.begin(), images.end(), [&filename](const ImageData& image)
+                            { return image.filename == filename; });
     }
 
-    void monitorDirectory(const std::string& path) {
+    void monitorDirectory(const std::string& path)
+    {
         std::vector<std::string> knownFiles;
         std::vector<ImageData> updatedImages;
         std::vector<ImageData> newImages;
 
-        while (running) {
+        while (running)
+        {
             std::vector<std::string> currentFiles;
-            try {
-                for (const auto& entry : std::filesystem::directory_iterator(path)) {
-                   if (entry.is_regular_file()) {
+            try
+            {
+                for (const auto& entry : std::filesystem::directory_iterator(path))
+                {
+                    if (entry.is_regular_file())
+                    {
                         currentFiles.push_back(entry.path().filename().string());
                     }
                 }
             }
 
-            catch (const std::filesystem::filesystem_error& e) {
+            catch (const std::filesystem::filesystem_error& e)
+            {
                 std::cerr << "Filesystem error: " << e.what() << std::endl;
             }
 
-            if (currentFiles != knownFiles) {
+            if (currentFiles != knownFiles)
+            {
 
                 std::unique_lock<std::shared_mutex> lock(imagesMutex); // Ensure thread-safe access to images
-                
-                for (auto it = knownFiles.begin(); it != knownFiles.end();) {
-                    if (std::find(currentFiles.begin(),currentFiles.end(),*it) == currentFiles.end()) {
+
+                for (auto it = knownFiles.begin(); it != knownFiles.end();)
+                {
+                    if (std::find(currentFiles.begin(), currentFiles.end(), *it) == currentFiles.end())
+                    {
                         std::string removed_filename = *it;
                         auto image_it = findImageByFilename(images, removed_filename);
                         glDeleteTextures(1, &image_it->textureID);
@@ -229,28 +265,28 @@ private:
 
                 // Add new images
                 newImages.clear();
-                for (const auto& filename : currentFiles) {
+                for (const auto& filename : currentFiles)
+                {
                     auto it = findImageByFilename(images, filename);
-                    if (it == images.end()) {
+                    if (it == images.end())
+                    {
                         // Simulate loading a new texture (replace with actual loading code)
-                        std::string path_file = path +"\\" + filename.c_str();
-                        newImages.push_back({ 0, glm::vec2() ,filename });
+                        std::string path_file = path + "\\" + filename.c_str();
+                        newImages.push_back({0, glm::vec2(), filename});
                     }
                 }
                 knownFiles = std::move(currentFiles);
 
                 images.insert(images.end(), newImages.begin(), newImages.end());
-                
-               
             }
-
 
             first_scan_done = true;
             std::this_thread::sleep_for(std::chrono::seconds(2)); // Check every 2 seconds
         }
     }
 
-    ImageData LoadTextureFromFile(const char* path) {
+    ImageData LoadTextureFromFile(const char* path)
+    {
 
         // Record the start time using std::chrono::high_resolution_clock
         //std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
@@ -258,7 +294,8 @@ private:
         int width, height, nrChannels;
         unsigned char* data = stbi_load(path, &width, &height, &nrChannels, 4);
         stbi_set_flip_vertically_on_load(0); // Flip images vertically if needed
-        if (!data) {
+        if (!data)
+        {
             std::cerr << "Failed to load texture: " << path << std::endl;
             return ImageData(0, glm::vec2(), "");
         }
@@ -288,9 +325,7 @@ private:
 
         return ImageData(textureID[0], glm::vec2(width, height), path);
     }
-
 };
-
 
 //std::vector<ImageData> LoadImagesFromDirectory(const std::string& path) {
 //    directoryPath = path;
@@ -324,7 +359,6 @@ private:
 
 //    return images;
 //}
-
 
 //
 // Include necessary headers
