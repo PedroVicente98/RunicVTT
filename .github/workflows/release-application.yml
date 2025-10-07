@@ -1,8 +1,8 @@
-name: Build & Release (Windows)
+name: Build & Package (Windows)
 
 on:
   push:
-    tags: ['v*']                # e.g. v1.2.3
+    tags: ['v*']                 # e.g. v1.2.3
 
 permissions:
   contents: write
@@ -12,6 +12,8 @@ jobs:
     runs-on: windows-latest
     env:
       BUILD_TYPE: Release
+      GENERATOR: Visual Studio 17 2022
+      ARCH: x64
 
     steps:
       - name: Checkout
@@ -19,34 +21,28 @@ jobs:
         with:
           submodules: recursive
 
-      # Optional: NSIS for installer. If missing, CPack still makes ZIP.
+      # Optional: NSIS for .exe installer (CPack still makes ZIP if NSIS missing)
       - name: Install NSIS
-        shell: pwsh
         run: choco install nsis -y
+        shell: pwsh
 
-      - name: Configure (preset or manual)
-        run: cmake --preset dist
-        # If you don't use presets, do:
-        # run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+      - name: CMake Configure
+        run: cmake -S . -B build -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
-      - name: Build
-        run: cmake --build --preset build-dist --target ALL_BUILD --config Release --parallel
-        # If no preset:
-        # run: cmake --build build --config Release --parallel
+      - name: CMake Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
 
-      - name: CPack (ZIP/NSIS)
+      - name: Run CPack (ZIP + NSIS)
         shell: pwsh
         run: |
-          # Make sure your CMakeLists sets:
-          #   set(CPACK_PACKAGE_DIRECTORY "${{ github.workspace }}/dist")
+          # Ensure dist/ exists; CPack writes there because CPACK_PACKAGE_DIRECTORY is set in CMakeLists
           New-Item -ItemType Directory -Path dist -ErrorAction SilentlyContinue | Out-Null
-          cmake --build --preset build-dist --target package --config Release
-          # If no preset:
-          # cmake --build build --config Release --target package
-          Write-Host "Packages produced:"
-          Get-ChildItem -Recurse -File dist | ForEach-Object { $_.FullName }
+          # Run the package target (multi-config generators need --config)
+          cmake --build build --config ${{ env.BUILD_TYPE }} --target package
+          Write-Host "Produced packages:"
+          Get-ChildItem -Recurse -File dist | ForEach-Object { Write-Host " - $($_.FullName)" }
 
-      - name: Upload packages as artifact
+      - name: Upload artifacts (packages)
         uses: actions/upload-artifact@v4
         with:
           name: release-assets
