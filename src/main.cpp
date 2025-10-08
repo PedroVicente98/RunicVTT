@@ -127,11 +127,30 @@ int main()
     glfwPollEvents();
 
 
-    FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
-    FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
+    //FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
+    //FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
     //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
-
-    // before CreateProcessA
+    {
+        const std::string rule1 = runic_firewall_rule_name;
+        const std::string exe1  = runic_exe;
+        const std::string rule2 = node_firewall_rule_name;
+        const std::string exe2  = node_exe;
+    
+        std::thread([rule1, exe1, rule2, exe2]() {
+            try {
+                FirewallUtils::addInboundAnyTcpForExe(rule1, exe1, /*privateOnly*/ false);
+            } catch (...) {
+                // swallow or log
+            }
+            try {
+                FirewallUtils::addInboundAnyTcpForExe(rule2, exe2, /*privateOnly*/ false);
+            } catch (...) {
+                // swallow or log
+            }
+            // thread exits automatically
+        }).detach();
+    }
+        // before CreateProcessA
     auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();
     _putenv_s("NODE_PATH", nodeModules.c_str());
     if (const char* np = std::getenv("NODE_PATH"))
