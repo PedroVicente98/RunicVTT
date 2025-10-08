@@ -173,7 +173,6 @@ public:
 
     void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer); // Render board elements (map, markers, fog)
     void renderToolbar(const ImVec2& window_position);
-
     void resetCamera();
 
     // Marker interactions
@@ -182,6 +181,7 @@ public:
     void handleMarkerDragging(glm::vec2 mousePos);
     bool isMouseOverMarker(glm::vec2 mousePos);
 
+    glm::vec2 computeMarkerDrawSize_ARFit(const TextureComponent& tex, float basePx, float scale);
     // Fog of War interactions
     flecs::entity createFogOfWar(glm::vec2 startPos, glm::vec2 size);
     void deleteFogOfWar(flecs::entity fogEntity);
