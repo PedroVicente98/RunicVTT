@@ -4,6 +4,8 @@
 #include "DebugConsole.h"
 #include "Logger.h"
 #include "DebugActions.h"
+#include "FirewallUtils.h"
+#include "AssetIO.h"
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
     marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(ecs, map_directory, marker_directoryry), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
@@ -143,7 +145,13 @@ int ApplicationHandler::run()
 
     // Force the window to maximize
     glfwMaximizeWindow(window);
+    //auto runic_exe = PathManager::getSelfPath();
+    //auto node_exe = PathManager::getNodeExePath().string();
+    //auto runic_firewall_rule_name = "RunicVTT Inbound TCP (Any)";
+    //auto node_firewall_rule_name = "RunicVTT LocalTunnel(Any TCP)";
 
+    //FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
+    //FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
     std::cout << glGetString(GL_VERSION) << std::endl;
     { //Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -429,6 +437,8 @@ void ApplicationHandler::renderMainMenuBar()
     bool close_current_board = false;
     bool load_active_board = false;
 
+    bool open_remove_assets = false;
+
     bool about = false;
     bool guide = false;
 
@@ -525,7 +535,52 @@ void ApplicationHandler::renderMainMenuBar()
 
     ImGui::EndMainMenuBar();
 
+    // In your main menu render
+    if (ImGui::BeginMainMenuBar())
+    {
+        if (ImGui::BeginMenu("Assets"))
+        {
+            if (ImGui::MenuItem("Add Marker (from file)"))
+            {
+                std::filesystem::path dst;
+                std::string err;
+                if (!AssetIO::importFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
+                {
+                    // toast/log error if needed
+                    std::cerr << "Import marker failed: " << err << "\n";
+                    toaster_->Push(ImGuiToaster::Level::Good, "Imported Marker Successfully!!");
+                }
+                else
+                {
+                    toaster_->Push(ImGuiToaster::Level::Error, "Delete failed: " + err);
+                }
+            }
+            if (ImGui::MenuItem("Add Map (from file)"))
+            {
+                std::filesystem::path dst;
+                std::string err;
+                if (!AssetIO::importFromPicker(AssetIO::AssetKind::Map, &dst, &err))
+                {
+                    std::cerr << "Import map failed: " << err << "\n";
+                }
+            }
+            if (ImGui::MenuItem("Remove Assets..."))
+            {
+                open_remove_assets = true;
+
+            }
+            ImGui::EndMenu();
+        }
+        ImGui::EndMainMenuBar();
+    }
+    
+
     // ---------------- Popups (open + render) ----------------
+
+    if (open_remove_assets)
+        ImGui::OpenPopup("DeleteAssets");
+    if (ImGui::IsPopupOpen("DeleteAssets"))
+        AssetIO::openDeleteAssetPopUp(toaster_);
 
     if (open_host_gametable)
         ImGui::OpenPopup("Host GameTable");
