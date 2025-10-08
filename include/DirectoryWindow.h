@@ -12,13 +12,18 @@
 //#define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
+class enum DirectoryKind {
+    MARKER = 1,
+    MAP = 2
+}
 class DirectoryWindow
 {
 public:
-    DirectoryWindow(std::string directoryPath, std::string directoryName)
+    DirectoryWindow(std::string directoryPath, std::string directoryName, DirectoryKind kind_)
     {
         this->directoryPath = directoryPath;
         this->directoryName = directoryName;
+        this->kind_ = kind_;
     }
 
     struct ImageData
@@ -74,10 +79,10 @@ public:
         }
     }
 
-    void renderDirectory(bool is_map_directory = false)
+    void renderDirectory()
     {
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;
-        if (is_map_directory == true)
+        if (kind_ == DirectoryKind::MAP)
         {
             window_flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;
         }
@@ -85,9 +90,42 @@ public:
         ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x * 0.1, ImGui::GetIO().DisplaySize.y * 0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));
         ImGui::Begin(directoryName.c_str(), NULL, window_flags);
         ImGui::Text("Path: %s", directoryPath.c_str());
+
+         // --- Fixed header (no scrolling) ---
+        if (kind_ == DirectoryKind::MARKER)
+        {
+            float minScale = 0.10f, maxScale = 10.0f;
+            ImGui::Separator();
+            ImGui::TextUnformatted("Default Marker Size Scale");
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+            if (ImGui::SliderFloat("##marker_size_slider", &global_size_slider, minScale, maxScale, "x%.2f"))
+            {
+                // Clamp just in case
+                if (global_size_slider < minScale) global_size_slider = minScale;
+                if (global_size_slider > maxScale) global_size_slider = maxScale;
+            }
+        }
+
         ImGui::Separator();
 
-        const float imageSize = 128.0f;
+
+        float imageSize = 128.0f;
+        float minScale = 25.0f, maxScale = 1080.0f;
+        ImGui::Separator();
+        ImGui::TextUnformatted("Directory Thumb Pixel Size");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);
+        if (ImGui::SliderFloat("##image_size_slider", &imageSize, minScale, maxScale, "x%.2f"))
+        {
+            // Clamp just in case
+            if (imageSize < minScale) imageSize = minScale;
+            if (imageSize > maxScale) imageSize = maxScale;
+        }
+        
+        ImGui::Separator();
+        
+        ImGui::BeginChild("DirectoryScrollRegion", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
         float window_width = ImGui::GetWindowWidth();
         ImVec2 content_region = ImGui::GetContentRegionAvail();
         int columns = (int)(content_region.x / imageSize);
@@ -110,7 +148,7 @@ public:
                 ImGui::BeginGroup();
                 ImGui::PushID(count);
 
-                if (is_map_directory == false)
+                if (kind_ == DirectoryKind::MAP)
                 {
                     // Add drag-and-drop functionality for marker images
                     if (ImGui::ImageButton((void*)(intptr_t)image.textureID, ImVec2(imageSize, imageSize)))
@@ -149,6 +187,7 @@ public:
                 count++;
             }
         }
+        ImGui::EndChild();
         ImGui::End();
     }
 
@@ -203,6 +242,12 @@ public:
         }
     }
 
+
+    float getGlobalSizeSlider()
+    {
+        return global_size_slider;
+    }
+
     std::string directoryPath;
     std::string directoryName;
 
@@ -213,7 +258,8 @@ private:
     bool running = true;
     std::shared_mutex imagesMutex;
     bool first_scan_done = false; // Flag to track when the first scan is complete
-
+    DirectoryKind kind_;
+    float global_size_slider = 1.0f; 
     // Function to find an ImageData by filename
     std::vector<ImageData>::iterator findImageByFilename(std::vector<ImageData>& images, const std::string& filename)
     {
