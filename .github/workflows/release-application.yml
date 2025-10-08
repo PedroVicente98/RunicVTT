@@ -26,21 +26,67 @@ jobs:
         run: choco install nsis -y
         shell: pwsh
 
-      - name: CMake Configure
-        run: cmake -S . -B build -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-
-      - name: CMake Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
-
-      - name: Run CPack (ZIP + NSIS)
+      - name: Ensure signtool is available
+        id: signtool
         shell: pwsh
         run: |
-          # Ensure dist/ exists; CPack writes there because CPACK_PACKAGE_DIRECTORY is set in CMakeLists
-          New-Item -ItemType Directory -Path dist -ErrorAction SilentlyContinue | Out-Null
-          # Run the package target (multi-config generators need --config)
-          cmake --build build --config ${{ env.BUILD_TYPE }} --target package
-          Write-Host "Produced packages:"
-          Get-ChildItem -Recurse -File dist | ForEach-Object { Write-Host " - $($_.FullName)" }
+          function Find-SignTool {
+            $candidates = @(
+              'C:\Program Files (x86)\Windows Kits\10\bin',
+              'C:\Program Files\Windows Kits\10\bin'
+            )
+            foreach ($root in $candidates) {
+              if (Test-Path $root) {
+                Get-ChildItem $root -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+                  Sort-Object FullName -Descending | Select-Object -First 1
+              }
+            }
+          }
+
+          $sig = Find-SignTool
+          if (-not $sig) {
+            Write-Host "signtool not found; installing Windows 10 SDK via Chocolatey..."
+            choco install windows-sdk-10-version-2004-all -y
+            # Fallback package names if needed:
+            # choco install windows-sdk-10.0 -y
+            # choco install windows-sdk-10-version-1809-all -y
+            $sig = Find-SignTool
+          }
+
+          if ($sig) {
+            "SIGNTOOL=$($sig.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Found signtool at $($sig.FullName)"
+          } else {
+            Write-Host "WARNING: signtool still not found; builds will skip code signing."
+          }
+
+      # Rehydrate your PFX from a base64 secret into a temporary path
+      - name: Write PFX from secret
+        if: env.SIGNTOOL != ''
+        shell: pwsh
+        run: |
+          $bytes = [Convert]::FromBase64String("${{ secrets.SIGN_PFX_B64 }}")
+          $pfxPath = Join-Path $env:RUNNER_TEMP "RunicVTT.pfx"
+          [IO.File]::WriteAllBytes($pfxPath, $bytes)
+          "SIGN_PFX=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "SIGN_PWD=${{ secrets.SIGN_PWD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+     # - name: CMake Configure
+     #   run: cmake -S . -B build -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: CMake Configure
+        run: >
+          cmake -S . -B out/build/release -G "Ninja"
+          -DCMAKE_BUILD_TYPE=Release
+          -DSIGNTOOL="${{ env.SIGNTOOL }}"
+          -DSIGNING_PFX="${{ env.SIGN_PFX }}"
+          -DSIGNING_PWD="${{ env.SIGN_PWD }}"
+        shell: pwsh
+        
+      - name: CMake Build
+        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
+        shell: pwsh
+
 
       - name: Upload artifacts (packages)
         uses: actions/upload-artifact@v4
@@ -63,10 +109,6 @@ jobs:
       - name: Create/Update GitHub Release (auto notes) and upload assets
         uses: softprops/action-gh-release@v2
         with:
-          # For tag pushes, action reads the tag from the ref automatically.
-          # For manual runs, uncomment these two lines:
-          # tag_name: ${{ github.event.inputs.version }}
-          # target_commitish: ${{ github.event.inputs.target }}
           generate_release_notes: true
           files: |
             to-release/*.zip
