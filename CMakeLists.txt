@@ -287,7 +287,36 @@ endif()
 
 include(CPack)
 
+# --- Always run CPack after building RunicVTT ---
 add_custom_command(TARGET RunicVTT POST_BUILD
   COMMAND "${CMAKE_CPACK_COMMAND}" -C $<CONFIG>
   COMMENT "Running CPack to generate packages (ZIP/NSIS)"
 )
+
+# --- If NSIS is available and signtool creds are set, sign the NSIS installer ---
+if (WIN32 AND MSVC
+    AND MAKENSIS_EXECUTABLE
+    AND DEFINED SIGNTOOL AND SIGNTOOL
+    AND DEFINED SIGNING_PFX AND EXISTS "${SIGNING_PFX}"
+    AND DEFINED SIGNING_PWD AND NOT "${SIGNING_PWD}" STREQUAL "")
+  add_custom_command(TARGET RunicVTT POST_BUILD
+    COMMAND powershell -NoProfile -ExecutionPolicy Bypass -Command
+      " $inst='${CPACK_PACKAGE_DIRECTORY}\\${CPACK_PACKAGE_FILE_NAME}.exe';
+        if (Test-Path $inst) {
+          & '${SIGNTOOL}' sign `
+             /fd SHA256 `
+             /tr 'http://timestamp.sectigo.com' `
+             /td SHA256 `
+             /f '${SIGNING_PFX}' `
+             /p '${SIGNING_PWD}' `
+             $inst
+        } else {
+          Write-Host 'No NSIS installer to sign (ZIP-only build).'
+        }"
+    COMMENT "Signing NSIS installer (if present)"
+    VERBATIM
+  )
+else()
+  message(STATUS "[signing] Skipping installer signing (NSIS or signtool missing).")
+endif()
+
