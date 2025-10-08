@@ -143,8 +143,8 @@ int main()
         Logger::instance().log("localtunnel", Logger::Level::Error, "Parent NODE_PATH is not set");
     }
 
-    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
-    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory");
+    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory", DirectoryKind::MAP);
+    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory", DirectoryKind::MARKER);
     ApplicationHandler app(window, map_directory, marker_directory);
     app.run();
 
