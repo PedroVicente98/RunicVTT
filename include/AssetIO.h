@@ -246,8 +246,55 @@ namespace AssetIO
         return v;
     }
 
-    // Delete asset (safely ensure it's inside folder)
+
     inline bool deleteAsset(AssetKind kind, const std::filesystem::path& file,
+                            std::string* outError = nullptr)
+    {
+        std::error_code ec;
+    
+        // Resolve and validate root
+        auto root = std::filesystem::weakly_canonical(assetsDir(kind), ec);
+        if (ec || root.empty() || !std::filesystem::exists(root) || !std::filesystem::is_directory(root)) {
+            if (outError) *outError = "Invalid assets root";
+            return false;
+        }
+    
+        // Resolve the target (weakly_canonical lets non-existing leaf still resolve)
+        auto target = std::filesystem::weakly_canonical(file, ec);
+        if (ec || target.empty()) {
+            if (outError) *outError = "Path canonicalization failed";
+            return false;
+        }
+    
+        // Safety: target must be under root (and on same root/drive)
+        // lexically_relative returns a path that does not start with ".." if target is inside root.
+        auto rel = target.lexically_relative(root);
+        if (rel.empty() || rel.native().starts_with("..") || rel.is_absolute()) {
+            if (outError) *outError = "Refusing to delete outside assets dir";
+            return false;
+        }
+    
+        // Validate file
+        if (!std::filesystem::exists(target)) {
+            if (outError) *outError = "File not found";
+            return false;
+        }
+        if (!std::filesystem::is_regular_file(target)) {
+            if (outError) *outError = "Not a file";
+            return false;
+        }
+    
+        // Delete
+        std::filesystem::remove(target, ec);
+        if (ec) {
+            if (outError) *outError = "Delete failed: " + ec.message();
+            return false;
+        }
+        return true;
+    }
+
+    // Delete asset (safely ensure it's inside folder)
+    /*inline bool deleteAsset(AssetKind kind, const std::filesystem::path& file,
                             std::string* outError = nullptr)
     {
         std::error_code ec;
@@ -289,7 +336,7 @@ namespace AssetIO
             return false;
         }
         return true;
-    }
+    }*/
 
     inline void openDeleteAssetPopUp(std::weak_ptr<ImGuiToaster> toaster_)
     {
@@ -306,11 +353,13 @@ namespace AssetIO
             auto assets = listAssets(kind);
             ImGui::Separator();
             ImGui::BeginChild("assets_scroll", ImVec2(500, 300), true);
+            bool deletedThisFrame = false;
             for (auto& p : assets)
             {
                 auto fname = p.filename().string();
                 ImGui::TextUnformatted(fname.c_str());
                 ImGui::SameLine();
+                ImGui::PushID(fname.c_str());
                 if (ImGui::SmallButton(("Delete##" + fname).c_str()))
                 {
                     std::string err;
@@ -322,10 +371,13 @@ namespace AssetIO
                     }
                     else
                     {
+                        deletedThisFrame = true;
                         if (auto t = toaster_.lock(); t)
                             t->Push(ImGuiToaster::Level::Good, "Image Imported Successfully!!");
                     }
                 }
+                ImGui::PopID();
+                if (deletedThisFrame) break;
             }
             ImGui::EndChild();
             ImGui::Separator();
