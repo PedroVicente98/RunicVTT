@@ -52,32 +52,33 @@ public:
     // --- USER-ACCESSIBLE FOLDERS ---
     static fs::path getRootDirectory()
     {
-        return baseDocumentsPath;
+        return getExecutableRoot();
+        //return baseDocumentsPath;
     }
 
     static fs::path getMapsPath()
     {
-        return baseDocumentsPath / "Maps";
+        return getExecutableRoot() / "Maps";
     }
 
     static fs::path getMarkersPath()
     {
-        return baseDocumentsPath / "Markers";
+        return getExecutableRoot() / "Markers";
     }
 
     static fs::path getNotesPath()
     {
-        return baseDocumentsPath / "Notes";
+        return getExecutableRoot() / "Notes";
     }
 
     static fs::path getGameTablesPath()
     {
-        return baseDocumentsPath / "GameTables";
+        return getExecutableRoot() / "GameTables";
     }
 
     static fs::path getConfigPath()
     {
-        return baseDocumentsPath / "Config";
+        return getExecutableRoot() / "Config";
     }
 
     // --- APP/INSTALLATION-LOCAL FOLDERS ---

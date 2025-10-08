@@ -159,6 +159,7 @@ void BoardManager::renderGridWindow()
     // Check if the window should be shown
     if (!showGridSettings)
     {
+        setIsNonMapWindowHovered(false);
         return;
     }
 
@@ -236,6 +237,20 @@ void BoardManager::renderGridWindow()
 
     ImGui::End();
 }
+
+glm::vec2 BoardManager::computeMarkerDrawSize_ARFit(const TextureComponent& tex, float basePx /*e.g., 50.0f*/, float scale /*slider, default 1.0f*/)
+{
+    const glm::vec2 texPx = tex.size; // original pixels stored in your TextureComponent
+    if (texPx.x <= 0.0f || texPx.y <= 0.0f)
+    {
+        const float box = basePx * scale;
+        return {box, box};
+    }
+    const float box = basePx * scale;
+    const float s = std::min(box / texPx.x, box / texPx.y);
+    return texPx * s; // scaled to fit inside the box, AR preserved
+}
+
 void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
     auto nm = network_manager.lock();
@@ -337,6 +352,14 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                 fog_model = glm::scale(fog_model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
                 float alpha = 1.0f;
+                if (nm->getPeerRole() == Role::GAMEMASTER)
+                {
+                    alpha = 0.3f;
+                }
+                else
+                {
+                    alpha = 0.0f;
+                }
                 if (!visibility_marker->isVisible) {
                     if (nm->getPeerRole() == Role::GAMEMASTER) {
                         alpha = 0.3f;
@@ -344,6 +367,13 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     else
                     {
                         alpha = 0.0f;
+                    }
+                }
+                else
+                {
+                    if (nm->getPeerRole() == Role::GAMEMASTER)
+                    {
+                        alpha = 0.6f;
                     }
                 }
 
@@ -368,11 +398,16 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
     if (!nm)
         throw std::exception("[BoardManager] Network Manager expired!!");
 
+    auto markerBasePx = 50.0f;
+    auto markerScale = 1.0f;
+    auto texture_marker = TextureComponent{textureId, imageFilePath, size};
+    const glm::vec2 drawSz = computeMarkerDrawSize_ARFit(texture_marker, markerBasePx, markerScale);
+
     flecs::entity marker = ecs.entity()
                                .set(Identifier{generateUniqueId()})
                                .set(Position{(int)position.x, (int)position.y}) //World Position
-                               .set(Size{size.x, size.y})
-                               .set(TextureComponent{textureId, imageFilePath, size})
+                               .set(Size{drawSz.x, drawSz.y})
+                               .set(texture_marker)
                                .set(Visibility{true})
                                .set(MarkerComponent{"", false, false})
                                .set(Moving{false});
@@ -753,7 +788,10 @@ bool BoardManager::isEditWindowOpen() const
 void BoardManager::renderEditWindow()
 {
     if (!showEditWindow)
+    {
+        setIsNonMapWindowHovered(false);
         return; // If the window is closed, skip rendering it
+    }
     bool is_hovered = false;
     // Get the current mouse position to set the window position
     ImVec2 mousePos = ImGui::GetMousePos();
@@ -768,6 +806,7 @@ void BoardManager::renderEditWindow()
 
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
+    auto is_popup_open = false;
     if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>())
     {
         auto size = edit_window_entity.get_mut<Size>();             // Mutable access to the size
@@ -793,32 +832,36 @@ void BoardManager::renderEditWindow()
         ImGui::Separator();
 
         // Button to delete the entity (with a confirmation popup)
+        
         if (ImGui::Button("Delete"))
         {
             ImGui::OpenPopup("Confirm Delete");
+            is_popup_open = true;
         }
-        // Confirm delete popup
-        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            ImGui::Text("Are you sure you want to delete this entity?");
-            ImGui::Separator();
 
-            if (ImGui::Button("Yes", ImVec2(120, 0)))
+        if (ImGui::IsPopupOpen("Confirm Delete"))
+            is_popup_open = true;
+            if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                if (edit_window_entity.is_alive())
+                ImGui::Text("Are you sure you want to delete this entity?");
+                ImGui::Separator();
+
+                if (ImGui::Button("Yes", ImVec2(120, 0)))
                 {
-                    edit_window_entity.destruct(); // Delete the entity
-                    showEditWindow = false;
+                    if (edit_window_entity.is_alive())
+                    {
+                        edit_window_entity.destruct(); // Delete the entity
+                        showEditWindow = false;
+                    }
+                    ImGui::CloseCurrentPopup(); // Close the popup after deletion
                 }
-                ImGui::CloseCurrentPopup(); // Close the popup after deletion
+                ImGui::SameLine();
+                if (ImGui::Button("No", ImVec2(120, 0)))
+                {
+                    ImGui::CloseCurrentPopup(); // Close the popup without deletion
+                }
+                ImGui::EndPopup();
             }
-            ImGui::SameLine();
-            if (ImGui::Button("No", ImVec2(120, 0)))
-            {
-                ImGui::CloseCurrentPopup(); // Close the popup without deletion
-            }
-            ImGui::EndPopup();
-        }
     }
     else
     {
@@ -828,7 +871,7 @@ void BoardManager::renderEditWindow()
     ImGui::End();
     ImGui::PopStyleColor(); // Restore the original background color
 
-    if (!is_hovered and ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    if (!is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !is_popup_open)
     {
         showEditWindow = false;
     }

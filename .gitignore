@@ -6,3 +6,8 @@ nbproject/
 bin/
 out/
 dist/
+Config/
+Maps/
+Markers/
+GameTables/
+Notes/

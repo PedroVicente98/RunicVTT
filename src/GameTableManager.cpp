@@ -1323,9 +1323,10 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
             board_manager->setShowEditWindow(false);
         }
 
-        //if (network_manager.getPeerRole() == Role::GAMEMASTER) {
-        board_manager->marker_directory->renderDirectory();
-        //}
+        if (network_manager->getPeerRole() == Role::GAMEMASTER)
+        {
+            board_manager->marker_directory->renderDirectory();
+        }
         board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
     }
 }
