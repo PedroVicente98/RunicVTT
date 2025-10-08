@@ -68,9 +68,11 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
             std::cout << "ERROR LOADING IMAGES" << std::endl;
         }
         ecs.defer_end();
+        toaster_->Push(ImGuiToaster::Level::Good, "GameTable '" + game_table_name + "' Saved Successfuly!!");
     }
     else
     {
+        toaster_->Push(ImGuiToaster::Level::Error, "Failed Saving GameTable!!!");
         std::cerr << "Failed to load GameTable from " << game_table_file_path.string() << std::endl;
     }
 }
@@ -444,7 +446,7 @@ void GameTableManager::createBoardPopUp()
 
         ImGui::NextColumn();
         ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
-        map_directory->renderDirectory(true);
+        map_directory->renderDirectory();
 
         ImGui::Columns(1);
         // Optionally show transient "Saved!"

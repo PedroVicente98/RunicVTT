@@ -71,28 +71,14 @@ void BoardManager::setActiveBoard(flecs::entity board_entity)
 void BoardManager::renderToolbar(const ImVec2& window_position)
 {
 
-    // These flags are suitable for a child window embedded directly within another window.
-    // ImGuiWindowFlags_NoMove and ImGuiWindowFlags_NoCollapse are crucial for a fixed toolbar.
-    // ImGuiWindowFlags_NoTitleBar also makes sense for a seamlessly embedded toolbar.
-    // ImGuiWindowFlags_NoBackground is often used so the child doesn't draw its own opaque background,
-    // allowing the parent's background to show through, or you draw a custom background within the child.
     ImGuiWindowFlags toolbar_child_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking // No docking for a child is standard
-                                           | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize
-        /*| ImGuiWindowFlags_NoBackground*/; // Often desired for embedded toolbars
+                                           | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize;
 
-    // Position the cursor within the parent window (MapWindow in this case)
-    // before starting the child window. This is how you control the child's position.
     ImGui::SetCursorPos(window_position);
 
-    // Set the toolbar's actual size (0,0 means auto-size based on content)
     ImVec2 toolbar_size = ImVec2(0, 0); // Auto-size to content
 
-    // Begin the child window. It needs a unique ID.
-    // The 'false' indicates no border for the child window itself.
     ImGui::BeginChild("ToolbarChild", toolbar_size, false, toolbar_child_flags);
-
-    // Push the desired background color for the toolbar's *content area*.
-    // This is distinct from the child window's overall background if NoBackground is used.
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f));
 
     ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
@@ -131,9 +117,14 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
         ImGui::SameLine(); // Ensure buttons are on the same row
     }
 
-    if (ImGui::Button("Reset Camera", ImVec2(90, 40)))
+  /*  if (ImGui::Button("Reset Camera", ImVec2(90, 40)))
     {
         resetCamera();
+    }*/
+
+    if (ImGui::Button("Camera Settings", ImVec2(100, 40)))
+    {
+        showCameraSettings = true;
     }
 
     if (nm->getPeerRole() == Role::GAMEMASTER)
@@ -152,6 +143,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     ImGui::EndChild();
 
     renderGridWindow();
+    renderCameraWindow();
 }
 
 void BoardManager::renderGridWindow()
@@ -398,8 +390,7 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
     if (!nm)
         throw std::exception("[BoardManager] Network Manager expired!!");
 
-    auto markerBasePx = 50.0f;
-    auto markerScale = 1.0f;
+    auto markerScale = marker_directory->getGlobalSizeSlider();
     auto texture_marker = TextureComponent{textureId, imageFilePath, size};
     const glm::vec2 drawSz = computeMarkerDrawSize_ARFit(texture_marker, markerBasePx, markerScale);
 
@@ -832,7 +823,7 @@ void BoardManager::renderEditWindow()
         ImGui::Separator();
 
         // Button to delete the entity (with a confirmation popup)
-        
+
         if (ImGui::Button("Delete"))
         {
             ImGui::OpenPopup("Confirm Delete");
@@ -841,27 +832,27 @@ void BoardManager::renderEditWindow()
 
         if (ImGui::IsPopupOpen("Confirm Delete"))
             is_popup_open = true;
-            if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-            {
-                ImGui::Text("Are you sure you want to delete this entity?");
-                ImGui::Separator();
+        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::Text("Are you sure you want to delete this entity?");
+            ImGui::Separator();
 
-                if (ImGui::Button("Yes", ImVec2(120, 0)))
+            if (ImGui::Button("Yes", ImVec2(120, 0)))
+            {
+                if (edit_window_entity.is_alive())
                 {
-                    if (edit_window_entity.is_alive())
-                    {
-                        edit_window_entity.destruct(); // Delete the entity
-                        showEditWindow = false;
-                    }
-                    ImGui::CloseCurrentPopup(); // Close the popup after deletion
+                    edit_window_entity.destruct(); // Delete the entity
+                    showEditWindow = false;
                 }
-                ImGui::SameLine();
-                if (ImGui::Button("No", ImVec2(120, 0)))
-                {
-                    ImGui::CloseCurrentPopup(); // Close the popup without deletion
-                }
-                ImGui::EndPopup();
+                ImGui::CloseCurrentPopup(); // Close the popup after deletion
             }
+            ImGui::SameLine();
+            if (ImGui::Button("No", ImVec2(120, 0)))
+            {
+                ImGui::CloseCurrentPopup(); // Close the popup without deletion
+            }
+            ImGui::EndPopup();
+        }
     }
     else
     {
@@ -881,6 +872,48 @@ void BoardManager::renderEditWindow()
         edit_window_entity = flecs::entity();
     }
     //close edit window when clicking outside it
+}
+
+void BoardManager::renderCameraWindow()
+{
+    // Check if the window should be shown
+    if (!showCameraSettings)
+    {
+        setIsNonMapWindowHovered(false);
+        return;
+    }
+
+    // Begin the ImGui window
+    auto mouse_pos = ImGui::GetMousePos();
+    ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
+    ImGui::Begin("Camera", &showCameraSettings, ImGuiWindowFlags_AlwaysAutoResize);
+    auto grid_hovered = ImGui::IsWindowHovered();
+    setIsNonMapWindowHovered(grid_hovered);
+    ImGui::PopStyleColor();
+    auto zoom = camera.getZoom();
+
+    ImGui::Text("Zoom Buttons");
+    if (ImGui::Button("-"))
+    {
+        zoom = zoom - 0.01f;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("+"))
+    {
+        zoom = zoom + 0.01f;
+    }
+
+    ImGui::Separator();
+    ImGui::SliderFloat("Zoom Slider", &zoom, 0.1f, 10.0f);
+    camera.setZoom(zoom);
+    ImGui::Separator();
+    if (ImGui::Button("Reset Camera"))
+    {
+        resetCamera();
+    }
+    
+    ImGui::End();
 }
 
 BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t sizeBytes)
