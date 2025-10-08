@@ -235,8 +235,6 @@ install(FILES
   DESTINATION bin
 )
 
-#set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/cmake/strip_dev_headers.cmake") #THIS DONT WORK
-
 # ----------------------
 # CPack
 # ----------------------
@@ -267,8 +265,6 @@ set(CPACK_NSIS_CREATE_ICONS_EXTRA
 set(CPACK_NSIS_DELETE_ICONS_EXTRA
     "Delete \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\""
 )
-
-
 
 # ---- Conditional NSIS detection ----
 find_program(MAKENSIS_EXECUTABLE NAMES makensis
