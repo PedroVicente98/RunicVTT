@@ -274,7 +274,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
         shader.SetUniformMat4f("view", viewMatrix);
         shader.SetUniformMat4f("model", board_model);
         shader.SetUniform1f("u_Alpha", 1.0f);
-        shader.SetUniform1f("u_UseTexture", 1);
+        shader.SetUniform1i("u_UseTexture", 1);
         shader.SetUniform1i("u_Texture", 0);
         shader.Unbind();
 
