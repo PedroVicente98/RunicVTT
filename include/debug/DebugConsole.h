@@ -305,7 +305,7 @@ private:
     }
 
 private:
-    inline static bool visible_ = true;
+    inline static bool visible_ = false;
     inline static std::string activeChannel_ = "main";
     inline static bool autoScroll_ = true;
 

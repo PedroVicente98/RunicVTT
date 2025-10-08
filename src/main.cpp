@@ -114,10 +114,6 @@ int main()
     auto runic_firewall_rule_name = "RunicVTT Inbound TCP (Any)";
     auto node_firewall_rule_name = "RunicVTT LocalTunnel(Any TCP)";
 
-    FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
-    FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
-    //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
-
     PathManager::ensureDirectories();
 
     GLFWwindow* window = initializeGLFWContext();
@@ -129,6 +125,11 @@ int main()
     setWindowIcon(window, iconFolderPath);
 
     glfwPollEvents();
+
+
+    FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
+    FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
+    //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
 
     // before CreateProcessA
     auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();

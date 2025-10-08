@@ -1,0 +1,7 @@
+ C:\Users\pedro.santos\Downloads\external\node\node.exe .\node_modules\localtunnel\bin\client -h
+
+
+.\node.exe .\node_modules\localtunnel\bin\client -p 7777
+
+
+https://loca.lt/mytunnelpassword

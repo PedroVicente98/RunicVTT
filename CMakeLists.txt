@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 find_package(Git REQUIRED)
 execute_process(
@@ -83,7 +83,7 @@ target_link_libraries(RunicVTT PRIVATE
     "${OPENSSL_SSL_LIBRARY}"
     "${OPENSSL_CRYPTO_LIBRARY}"
 )
-target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 ) #Shell32 Ole32
+target_link_libraries(RunicVTT PRIVATE winhttp ws2_32 ole32 urlmon shell32) 
 # ----------------------
 # nlohhmann json
 # ----------------------
@@ -113,7 +113,7 @@ set(NO_TESTS ON CACHE BOOL "Disable libdatachannel tests build" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "Disable GLFW documentation" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "Disable GLFW test programs" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Disable GLFW example programs" FORCE)
-set(GLFW_INSTALL OFF CACHE BOOL "Disable GLFW installation target" FORCE) # To prevent install rules
+set(GLFW_INSTALL ON CACHE BOOL "Disable GLFW installation target" FORCE) # To prevent install rules
 
 # Precise disabling for Flecs, based on its options
 set(FLECS_TESTS OFF CACHE BOOL "Build flecs tests" FORCE)
@@ -144,6 +144,15 @@ target_link_libraries(RunicVTT PRIVATE opengl32)
 add_subdirectory(vendor/flecs)
 target_link_libraries(RunicVTT PRIVATE flecs::flecs_static)
 
+
+# ----------------------
+# Post Build: Copy GLFW DLL
+# ----------------------
+add_custom_command(TARGET RunicVTT POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+          "$<TARGET_FILE:glfw>" "$<TARGET_FILE_DIR:RunicVTT>"
+  COMMENT "Copying glfw runtime next to RunicVTT"
+)
 
 # ----------------------
 # Post Build: Copy OpenSSL DLLs
@@ -188,61 +197,79 @@ add_custom_command(TARGET RunicVTT POST_BUILD
 # ----------------------
 # Install the main executable (to Program Files/RunicVTT)
 install(TARGETS RunicVTT
-    RUNTIME DESTINATION .
+    RUNTIME DESTINATION bin
 )
 
 # Install resources (if you have folders like res/ and external/)
 install(DIRECTORY res/ DESTINATION res)
 install(DIRECTORY external/ DESTINATION external)
+# MiniUPnPc tool (if you ship it)
+install(FILES ${CMAKE_SOURCE_DIR}/dependencies/miniupnpc/upnpc-static.exe DESTINATION bin)
+
+install(CODE
+  "file(INSTALL DESTINATION \"\${CMAKE_INSTALL_PREFIX}/bin\" TYPE FILE FILES \"$<TARGET_FILE:glfw>\")"
+)
 
 # Install OpenSSL runtime DLLs so CPack includes them
 install(FILES
   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libssl-3-x64.dll
   ${CMAKE_SOURCE_DIR}/dependencies/OpenSSL/bin/libcrypto-3-x64.dll
-  DESTINATION .
+  DESTINATION bin
 )
 
+set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/cmake/strip_dev_headers.cmake")
+
 # ----------------------
-# CPack Configuration
+# CPack
 # ----------------------
 include(InstallRequiredSystemLibraries)
 
-# Package metadata
 set(CPACK_PACKAGE_NAME "RunicVTT")
 set(CPACK_PACKAGE_VENDOR "Pedro Vicente dos Santos")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "RunicVTT - Virtual Tabletop")
 set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
 set(CPACK_PACKAGE_CONTACT "pedrovicente45@outlook.com")
 
-# Put the ZIP/EXE in a predictable place for CI to pick up:
+# Where packages go
 set(CPACK_PACKAGE_DIRECTORY "${CMAKE_SOURCE_DIR}/dist")
-# Nice, stable filenames like: RunicVTT-0.9.1-win64.zip
-set(CPACK_SYSTEM_NAME "win64")  
+set(CPACK_SYSTEM_NAME "win64")
 set(CPACK_PACKAGE_FILE_NAME "RunicVTT-${CPACK_PACKAGE_VERSION}-${CPACK_SYSTEM_NAME}")
-
-# Default install directory (Program Files on Windows)
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "RunicVTT")
 
-# Generators: create both ZIP and NSIS installer
-set(CPACK_GENERATOR "ZIP;NSIS")
-
-# NSIS-specific settings
+# NSIS shortcut to exe inside bin/
 set(CPACK_NSIS_DISPLAY_NAME "RunicVTT")
 set(CPACK_NSIS_HELP_LINK "https://github.com/PedroVicente98/RunicVTT")
 set(CPACK_NSIS_URL_INFO_ABOUT "https://github.com/PedroVicente98")
 set(CPACK_NSIS_CONTACT "pedrovicente45@outlook.com")
-
-# Add uninstaller entry in Control Panel
 set(CPACK_NSIS_MODIFY_PATH ON)
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
-
-# Create Start Menu shortcut
 set(CPACK_NSIS_CREATE_ICONS_EXTRA
-    "CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\RunicVTT.exe\\\""
+    "CreateShortCut \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\" \\\"$INSTDIR\\\\bin\\\\RunicVTT.exe\\\""
 )
 set(CPACK_NSIS_DELETE_ICONS_EXTRA
     "Delete \\\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\RunicVTT.lnk\\\""
 )
 
-# Include CPack (must be last!)
+
+
+# ---- Conditional NSIS detection ----
+find_program(MAKENSIS_EXECUTABLE NAMES makensis
+  HINTS "$ENV{NSIS_HOME}" "${CMAKE_SOURCE_DIR}/tools/nsis" "${CMAKE_SOURCE_DIR}/tools/nsis/Bin"
+  PATH_SUFFIXES Bin bin
+)
+
+if (MAKENSIS_EXECUTABLE)
+  message(STATUS "NSIS found: ${MAKENSIS_EXECUTABLE}")
+  set(CPACK_GENERATOR "ZIP;NSIS")
+  set(CPACK_NSIS_EXECUTABLE "${MAKENSIS_EXECUTABLE}")
+else()
+  message(WARNING "NSIS not found. CPack will only generate ZIP packages.")
+  set(CPACK_GENERATOR "ZIP")
+endif()
+
 include(CPack)
+
+add_custom_command(TARGET RunicVTT POST_BUILD
+  COMMAND "${CMAKE_CPACK_COMMAND}" -C $<CONFIG>
+  COMMENT "Running CPack to generate packages (ZIP/NSIS)"
+)

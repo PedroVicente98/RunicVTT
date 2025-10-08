@@ -172,7 +172,7 @@ public:
 
     void setToaster(std::shared_ptr<ImGuiToaster> t)
     {
-        toaster_ = std::move(t);
+        toaster_ = t;
     }
     // Unified push (replaces your old pushStatusToast)
     void pushStatusToast(const std::string& msg, ImGuiToaster::Level lvl, float durationSec = 5.0f)
