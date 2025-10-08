@@ -806,6 +806,7 @@ void BoardManager::renderEditWindow()
 
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
+    auto is_popup_open = false;
     if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>())
     {
         auto size = edit_window_entity.get_mut<Size>();             // Mutable access to the size
@@ -831,32 +832,36 @@ void BoardManager::renderEditWindow()
         ImGui::Separator();
 
         // Button to delete the entity (with a confirmation popup)
+        
         if (ImGui::Button("Delete"))
         {
             ImGui::OpenPopup("Confirm Delete");
+            is_popup_open = true;
         }
-        // Confirm delete popup
-        if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            ImGui::Text("Are you sure you want to delete this entity?");
-            ImGui::Separator();
 
-            if (ImGui::Button("Yes", ImVec2(120, 0)))
+        if (ImGui::IsPopupOpen("Confirm Delete"))
+            is_popup_open = true;
+            if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
             {
-                if (edit_window_entity.is_alive())
+                ImGui::Text("Are you sure you want to delete this entity?");
+                ImGui::Separator();
+
+                if (ImGui::Button("Yes", ImVec2(120, 0)))
                 {
-                    edit_window_entity.destruct(); // Delete the entity
-                    showEditWindow = false;
+                    if (edit_window_entity.is_alive())
+                    {
+                        edit_window_entity.destruct(); // Delete the entity
+                        showEditWindow = false;
+                    }
+                    ImGui::CloseCurrentPopup(); // Close the popup after deletion
                 }
-                ImGui::CloseCurrentPopup(); // Close the popup after deletion
+                ImGui::SameLine();
+                if (ImGui::Button("No", ImVec2(120, 0)))
+                {
+                    ImGui::CloseCurrentPopup(); // Close the popup without deletion
+                }
+                ImGui::EndPopup();
             }
-            ImGui::SameLine();
-            if (ImGui::Button("No", ImVec2(120, 0)))
-            {
-                ImGui::CloseCurrentPopup(); // Close the popup without deletion
-            }
-            ImGui::EndPopup();
-        }
     }
     else
     {
@@ -866,7 +871,7 @@ void BoardManager::renderEditWindow()
     ImGui::End();
     ImGui::PopStyleColor(); // Restore the original background color
 
-    if (!is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsPopupOpen("Confirm Delete"))
+    if (!is_hovered && ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !is_popup_open)
     {
         showEditWindow = false;
     }
