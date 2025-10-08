@@ -192,6 +192,24 @@ add_custom_command(TARGET RunicVTT POST_BUILD
         "$<TARGET_FILE_DIR:RunicVTT>/res"
 )
 
+# after add_executable(RunicVTT ...)
+if (WIN32 AND MSVC
+    AND DEFINED SIGNTOOL AND SIGNTOOL
+    AND DEFINED SIGNING_PFX AND EXISTS "${SIGNING_PFX}"
+    AND DEFINED SIGNING_PWD AND NOT "${SIGNING_PWD}" STREQUAL "")
+  add_custom_command(TARGET RunicVTT POST_BUILD
+    COMMAND "${SIGNTOOL}" sign
+            /fd SHA256 /tr "http://timestamp.sectigo.com" /td SHA256
+            /f "${SIGNING_PFX}" /p "${SIGNING_PWD}"
+            "$<TARGET_FILE:RunicVTT>"
+    COMMENT "Code-signing RunicVTT.exe"
+    VERBATIM)
+endif()
+
+# ---------------------------------------
+# ---------CPACK CONFIGURATION-----------
+# ---------------------------------------
+
 # ----------------------
 # Install Rules
 # ----------------------
@@ -217,7 +235,7 @@ install(FILES
   DESTINATION bin
 )
 
-set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/cmake/strip_dev_headers.cmake")
+#set(CPACK_INSTALL_SCRIPT "${CMAKE_SOURCE_DIR}/cmake/strip_dev_headers.cmake") #THIS DONT WORK
 
 # ----------------------
 # CPack
