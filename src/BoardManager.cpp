@@ -332,7 +332,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                     shader.SetUniformMat4f("model", marker_model);
                     shader.SetUniform1f("u_Alpha", alpha);
                     shader.SetUniform1i("u_Texture", 0);
-                    shader.SetUniform1f("u_UseTexture", 1);
+                    shader.SetUniform1i("u_UseTexture", 1);
                     shader.Unbind();
 
                     GLCall(glActiveTexture(GL_TEXTURE0));
