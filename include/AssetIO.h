@@ -373,7 +373,7 @@ namespace AssetIO
                     {
                         deletedThisFrame = true;
                         if (auto t = toaster_.lock(); t)
-                            t->Push(ImGuiToaster::Level::Good, "Image Imported Successfully!!");
+                            t->Push(ImGuiToaster::Level::Good, "Image Deleted Successfully!!");
                     }
                 }
                 ImGui::PopID();

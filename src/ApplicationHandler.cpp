@@ -523,11 +523,11 @@ void ApplicationHandler::renderMainMenuBar()
             {
                 // toast/log error if needed
                 std::cerr << "Import marker failed: " << err << "\n";
-                toaster_->Push(ImGuiToaster::Level::Good, "Imported Marker Successfully!!");
+                toaster_->Push(ImGuiToaster::Level::Error, "Imported Marker ERROR: " + err);
             }
             else
             {
-                toaster_->Push(ImGuiToaster::Level::Error, "Delete failed: " + err);
+                toaster_->Push(ImGuiToaster::Level::Good, "Imported Marker Successfully!!" + err);
             }
         }
         if (ImGui::MenuItem("Add Map (from file)"))
@@ -536,7 +536,13 @@ void ApplicationHandler::renderMainMenuBar()
             std::string err;
             if (!AssetIO::importFromPicker(AssetIO::AssetKind::Map, &dst, &err))
             {
+                // toast/log error if needed
                 std::cerr << "Import map failed: " << err << "\n";
+                toaster_->Push(ImGuiToaster::Level::Error, "Imported Map ERROR: " + err);
+            }
+            else
+            {
+                toaster_->Push(ImGuiToaster::Level::Good, "Imported Map Successfully!!" + err);
             }
         }
         if (ImGui::MenuItem("Remove Assets..."))
