@@ -71,26 +71,57 @@ void BoardManager::setActiveBoard(flecs::entity board_entity)
 void BoardManager::renderToolbar(const ImVec2& window_position)
 {
 
-    ImGuiWindowFlags toolbar_child_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking // No docking for a child is standard
-                                           | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize;
+    ImGuiWindowFlags toolbar_child_flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize;
+
+    auto panel_color = ImVec4(0.18f, 0.22f, 0.27f, 1.00f); // toolbar panel
+    auto bg_color = ImVec4(0.12f, 0.14f, 0.17f, 1.00f);
+    auto old_bg_color = ImVec4(0.2f, 0.3f, 0.4f, 1.0f);
+
+    auto green_light_color = ImVec4(0.55f, 0.95f, 0.65f, 1.00f);
+    auto green_mid_color = ImVec4(0.20f, 0.75f, 0.35f, 1.00f);
+    auto green_dark_color = ImVec4(0.12f, 0.45f, 0.22f, 1.00f);
+    auto mint_color = ImVec4(0.50f, 0.95f, 0.85f, 1.00f);
+
+    auto blue_light_color = ImVec4(0.55f, 0.75f, 1.00f, 1.00f);
+    auto blue_mid_color = ImVec4(0.28f, 0.50f, 0.92f, 1.00f);
+    auto blue_dark_color = ImVec4(0.15f, 0.30f, 0.55f, 1.00f);
+
+    auto purple_color = ImVec4(0.70f, 0.45f, 0.95f, 1.00f);
+    auto violet_color = ImVec4(0.55f, 0.35f, 0.85f, 1.00f);
+    auto mid_purple_color = ImVec4(0.45f, 0.28f, 0.70f, 1.00f);
+
+    auto orange_color = ImVec4(0.98f, 0.60f, 0.20f, 1.00f);
+    auto amber_color = ImVec4(1.00f, 0.78f, 0.25f, 1.00f);
+    auto yellow_color = ImVec4(0.95f, 0.90f, 0.30f, 1.00f);
+
+    auto button_toggled_color = amber_color;
+    auto button_toggled_hover = orange_color;
+    auto button_toggled_active = yellow_color;
+
+    auto button_untoggled_color = blue_mid_color;
+    auto button_untoggled_hover = blue_light_color;
+    auto button_untoggled_active = yellow_color;
+
+    auto button_popup_color = green_dark_color;
+    auto button_popup_hover = green_mid_color;
+    auto button_popup_active = mint_color;
 
     ImGui::SetCursorPos(window_position);
 
     ImVec2 toolbar_size = ImVec2(0, 0); // Auto-size to content
 
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, panel_color);
     ImGui::BeginChild("ToolbarChild", toolbar_size, false, toolbar_child_flags);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f));
-
-    ImVec4 defaultColor = ImGui::GetStyleColorVec4(ImGuiCol_Button);
-    ImVec4 activeColor = ImVec4(0.7f, 0.7f, 1.0f, 1.0f); // A custom color to highlight the active tool
 
     // Tool: Move
-    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? activeColor : defaultColor);
-    if (ImGui::Button("Move Tool", ImVec2(80, 40)))
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? button_toggled_color : button_untoggled_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::MOVE ? button_toggled_hover : button_untoggled_hover);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::MOVE ? button_toggled_active : button_untoggled_active);
+    if (ImGui::Button("Move Tool", ImVec2(100, 40)))
     {
         currentTool = Tool::MOVE;
     }
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(3);
     ImGui::SameLine(); // Ensure buttons are on the same row
     auto nm = network_manager.lock();
     if (!nm)
@@ -99,46 +130,51 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     if (nm->getPeerRole() == Role::GAMEMASTER)
     {
         // Tool: Fog
-        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? activeColor : defaultColor);
-        if (ImGui::Button("Fog Tool", ImVec2(80, 40)))
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? button_toggled_color : button_untoggled_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::FOG ? button_toggled_hover : button_untoggled_hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::FOG ? button_toggled_active : button_untoggled_active);
+        if (ImGui::Button("Fog Tool", ImVec2(100, 40)))
         {
             currentTool = Tool::FOG;
         }
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(3);
         ImGui::SameLine(); // Ensure buttons are on the same row
 
         // Tool: Select
-        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? activeColor : defaultColor);
-        if (ImGui::Button("Select Tool", ImVec2(80, 40)))
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? button_toggled_color : button_untoggled_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::SELECT ? button_toggled_hover : button_untoggled_hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::SELECT ? button_toggled_active : button_untoggled_active);
+        if (ImGui::Button("Select Tool", ImVec2(100, 40)))
         {
             currentTool = Tool::SELECT;
         }
-        ImGui::PopStyleColor();
+        ImGui::PopStyleColor(3);
         ImGui::SameLine(); // Ensure buttons are on the same row
     }
 
-  /*  if (ImGui::Button("Reset Camera", ImVec2(90, 40)))
-    {
-        resetCamera();
-    }*/
-
-    if (ImGui::Button("Camera Settings", ImVec2(100, 40)))
+    ImGui::PushStyleColor(ImGuiCol_Button, button_popup_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_popup_hover);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
+    if (ImGui::Button("Camera Settings", ImVec2(110, 40)))
     {
         showCameraSettings = true;
     }
-
+    ImGui::PopStyleColor(3);
     if (nm->getPeerRole() == Role::GAMEMASTER)
     {
         ImGui::SameLine(); // Ensure buttons are on the same row
-        if (ImGui::Button("Config Grid", ImVec2(90, 40)))
+        ImGui::PushStyleColor(ImGuiCol_Button, button_popup_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_popup_hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
+        if (ImGui::Button("Grid Settings", ImVec2(110, 40)))
         {
             showGridSettings = !showGridSettings;
         }
+        ImGui::PopStyleColor(3);
     }
 
     // Pop the toolbar's background color
     ImGui::PopStyleColor();
-
     // End the child window
     ImGui::EndChild();
 
@@ -912,7 +948,7 @@ void BoardManager::renderCameraWindow()
     {
         resetCamera();
     }
-    
+
     ImGui::End();
 }
 

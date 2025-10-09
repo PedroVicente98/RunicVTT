@@ -9,7 +9,6 @@ GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWi
 {
 
     chat_manager = std::make_shared<ChatManager>(network_manager);
-    network_manager->setup(board_manager, weak_from_this());
 
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
     map_directory->directoryName = "MapDiretory";
@@ -20,6 +19,11 @@ GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWi
 
 GameTableManager::~GameTableManager()
 {
+}
+
+void GameTableManager::setup()
+{
+    network_manager->setup(board_manager, weak_from_this());
 }
 
 void GameTableManager::saveGameTable()
