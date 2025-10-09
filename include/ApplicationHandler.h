@@ -90,7 +90,7 @@ private:
 
     //DEBUG STUFF --------------------------------------
 
-    bool g_draw_debug_circle = true;
+    bool g_draw_debug_circle = false;
     void DrawDebugCircle(ImVec2 coords, bool is_relative_to_window, ImU32 color, float radius = 10.0f)
     {
         ImDrawList* draw_list = ImGui::GetForegroundDrawList();

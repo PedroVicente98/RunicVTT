@@ -465,14 +465,14 @@ void ChatManager::render() {
     chatWindowFocused_ = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow);
 
     // Layout: left fixed width panel, right expands
-    const float leftW = 260.0f;
-    ImGui::BeginChild("Left", ImVec2(leftW, 0), true, ImGuiWindowFlags_NoScrollbar);
+    const float leftW = 200.0f;
+    ImGui::BeginChild("Left", ImVec2(leftW, 0), true);
     renderLeftPanel(leftW);
     ImGui::EndChild();
 
     ImGui::SameLine();
 
-    ImGui::BeginChild("Right", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar);
+    ImGui::BeginChild("Right", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize);
     renderRightPanel(leftW);
     ImGui::EndChild();
 
@@ -481,12 +481,12 @@ void ChatManager::render() {
 
 void ChatManager::renderLeftPanel(float width) {
     // Top actions: Create/Delete buttons
-    if (ImGui::Button("New Thread")) openCreatePopup_ = true;
+    if (ImGui::Button("New Chat")) openCreatePopup_ = true;
     ImGui::SameLine();
-    if (ImGui::Button("Delete Thread")) openDeletePopup_ = true;
+    if (ImGui::Button("Delete Chat")) openDeletePopup_ = true;
 
     ImGui::Separator();
-    ImGui::TextUnformatted("Threads");
+    ImGui::TextUnformatted("Chat Groups");
     ImGui::Separator();
 
     // Sort by displayName for stable UI (General first)
@@ -552,24 +552,10 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/) {
     auto* th = getThread(activeThreadId_);
     if (!th) th = getThread(generalThreadId_);
 
-    // Fixed layout: we allocate three vertical slices:
-    // 1) Top area: small row for "Go to bottom" placeholder (always same height)
-    // 2) Scrollable messages
-    // 3) Footer with input/send/roll
     const float headerRowH = ImGui::GetFrameHeightWithSpacing();
     const float footerRowH = ImGui::GetFrameHeightWithSpacing()*2.0f;
 
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    // Slice #1: Header row (fixed)
-    ImGui::BeginChild("HeaderRow", ImVec2(0, headerRowH), false);
-    // Align "Go to bottom" to the right; render enabled only when not following
-    ImGui::SameLine(ImGui::GetContentRegionAvail().x - 120.0f); // reserve right space
-    ImGui::BeginDisabled(followScroll_);
-    if (ImGui::Button("Go to bottom")) followScroll_ = true;
-    ImGui::EndDisabled();
-    ImGui::EndChild();
-
-    // Slice #2: Messages scroll
     ImGui::BeginChild("Messages", ImVec2(0, avail.y - headerRowH - footerRowH), true, ImGuiWindowFlags_HorizontalScrollbar);
     if (th) {
         // if user scrolls up, disable follow
@@ -596,9 +582,9 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/) {
     }
     ImGui::EndChild();
 
-    // Slice #3: Footer (fixed height)
-    ImGui::BeginChild("Footer", ImVec2(0, footerRowH), false);
-    // Input line + Send + Roll button + (optional) participants/label
+    ImGui::BeginChild("Footer", ImVec2(0, footerRowH), false, ImGuiWindowFlags_AlwaysAutoResize);
+    
+
     if (focusInput_) { ImGui::SetKeyboardFocusHere(); focusInput_ = false; }
 
     ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AllowTabInput;
@@ -620,6 +606,11 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/) {
             followScroll_ = true;
         }
     }
+    //ImGui::NewLine(); 
+    ImGui::BeginDisabled(followScroll_);
+    if (ImGui::Button("Go to bottom"))
+        followScroll_ = true;
+    ImGui::EndDisabled();
     ImGui::SameLine();
     if (ImGui::Button("Roll Dice")) {
         openDicePopup_ = true;
