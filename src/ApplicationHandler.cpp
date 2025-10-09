@@ -12,6 +12,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
 {
     ImGuiToaster::Config cfg;
     this->toaster_ = std::make_shared<ImGuiToaster>(cfg);
+    game_table_manager.setup();
     game_table_manager.setToaster(toaster_);
 
     ecs.component<Position>();         // .member<float>("x").member<float>("y");

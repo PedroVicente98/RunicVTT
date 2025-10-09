@@ -20,7 +20,7 @@ public:
     bool isBoardActive();
     bool isGameTableActive();
     //bool isConnectionActive();
-
+    void setup();
     bool isConnected() const;
 
     void processReceivedGameMessages();
