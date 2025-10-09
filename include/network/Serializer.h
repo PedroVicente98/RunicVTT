@@ -72,12 +72,13 @@ public:
 // Serialize and Deserialize MarkerEntity
 inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
+    auto identifier = entity.get<Identifier>();
     auto position = entity.get<Position>();
     auto size = entity.get<Size>();
     auto texture = entity.get<TextureComponent>();
     auto visibility = entity.get<Visibility>();
     auto moving = entity.get<Moving>();
-    auto identifier = entity.get<Identifier>();
+    //auto marker_component = entity.get<MarkerComponent>();
 
     serializeUInt64(buffer, identifier->id);
     serializePosition(buffer, position);
@@ -85,6 +86,7 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
     serializeMoving(buffer, moving);
     serializeVisibility(buffer, visibility);
     serializeTextureComponent(buffer, texture);
+    //serializeMarkerComponent(buffer, marker_component);
 }
 
 inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
@@ -96,13 +98,14 @@ inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsig
     auto moving = deserializeMoving(buffer, offset);
     auto visibility = deserializeVisibility(buffer, offset);
     auto texture = deserializeTextureComponent(buffer, offset);
-
+    //auto marker_component = deserializeMarkerComponent(buffer, offset);
     auto marker = ecs.entity()
                       .set<Identifier>({marker_id})
                       .set<Position>(position)
                       .set<Size>(size)
                       .set<Moving>(moving)
                       .set<Visibility>(visibility)
+                      //.set<MarkerComponent>(marker_component)
                       .set<TextureComponent>({0, texture.image_path, texture.size});
 
     return marker;
@@ -111,10 +114,10 @@ inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsig
 // Serialize and Deserialize FogEntity
 inline void Serializer::serializeFogEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
+    auto identifier = entity.get<Identifier>();
     auto position = entity.get<Position>();
     auto size = entity.get<Size>();
     auto visibility = entity.get<Visibility>();
-    auto identifier = entity.get<Identifier>();
 
     serializeUInt64(buffer, identifier->id);
     serializePosition(buffer, position);
@@ -183,18 +186,16 @@ inline flecs::entity Serializer::deserializeGameTableEntity(const std::vector<un
 
 inline void Serializer::serializeBoardEntity(std::vector<unsigned char>& buffer, const flecs::entity entity, flecs::world& ecs)
 {
+    auto identifier = entity.get<Identifier>();
     auto boardData = entity.get<Board>();
     auto panning = entity.get<Panning>();
-    auto position = entity.get<Position>();
     auto grid = entity.get<Grid>();
     auto texture = entity.get<TextureComponent>();
     auto size = entity.get<Size>();
-    auto identifier = entity.get<Identifier>();
 
     Serializer::serializeUInt64(buffer, identifier->id);
     Serializer::serializeBoard(buffer, boardData);
     Serializer::serializePanning(buffer, panning);
-    Serializer::serializePosition(buffer, position);
     Serializer::serializeGrid(buffer, grid);
     Serializer::serializeTextureComponent(buffer, texture);
     Serializer::serializeSize(buffer, size);
@@ -241,7 +242,6 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
     uint64_t board_id = Serializer::deserializeUInt64(buffer, offset);
     auto boardData = Serializer::deserializeBoard(buffer, offset);
     auto panning = Serializer::deserializePanning(buffer, offset);
-    auto position = Serializer::deserializePosition(buffer, offset);
     auto grid = Serializer::deserializeGrid(buffer, offset);
     auto texture = Serializer::deserializeTextureComponent(buffer, offset);
     auto size = Serializer::deserializeSize(buffer, offset);
@@ -250,7 +250,6 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
                         .set<Identifier>({board_id})
                         .set<Board>(boardData)
                         .set<Panning>(panning)
-                        .set<Position>(position)
                         .set<Grid>(grid)
                         .set<TextureComponent>({0, texture.image_path, texture.size})
                         .set<Size>(size);

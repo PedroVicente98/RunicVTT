@@ -269,7 +269,7 @@ namespace AssetIO
         // Safety: target must be under root (and on same root/drive)
         // lexically_relative returns a path that does not start with ".." if target is inside root.
         auto rel = target.lexically_relative(root);
-        if (rel.empty() || rel.native().starts_with("..") || rel.is_absolute()) {
+        if (rel.empty() || rel.native().starts_with(L"..") || rel.is_absolute()) {
             if (outError) *outError = "Refusing to delete outside assets dir";
             return false;
         }
@@ -373,7 +373,7 @@ namespace AssetIO
                     {
                         deletedThisFrame = true;
                         if (auto t = toaster_.lock(); t)
-                            t->Push(ImGuiToaster::Level::Good, "Image Imported Successfully!!");
+                            t->Push(ImGuiToaster::Level::Good, "Image Deleted Successfully!!");
                     }
                 }
                 ImGui::PopID();

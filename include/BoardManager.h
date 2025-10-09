@@ -202,6 +202,7 @@ public:
     void setActiveBoard(flecs::entity board_entity);
     bool isEditWindowOpen() const;
     void renderEditWindow();
+    void renderCameraWindow();
     void startMouseDrag(glm::vec2 mousePos, bool draggingMarker);
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
@@ -264,6 +265,8 @@ private:
     bool is_non_map_window_hovered = false;
     bool showEditWindow = false;
     bool showGridSettings = false;
+    bool showCameraSettings = false;
+    float markerBasePx = 50.0f;
     flecs::entity edit_window_entity = flecs::entity();
     std::weak_ptr<NetworkManager> network_manager;
     //glm::vec2 mouseStartPos;

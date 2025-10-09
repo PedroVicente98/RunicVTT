@@ -129,7 +129,6 @@ void ApplicationHandler::DeleteMapFBO()
     }
     map_fbo->width = 0;
     map_fbo->height = 0;
-
 }
 
 int ApplicationHandler::run()
@@ -251,6 +250,10 @@ int ApplicationHandler::run()
         {
             /* Poll for and process events */
             glfwPollEvents();
+            marker_directory->applyPendingAssetChanges();
+            map_directory->applyPendingAssetChanges();
+            game_table_manager.processReceivedGameMessages();
+
             /* Render here */
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
             GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
@@ -259,8 +262,6 @@ int ApplicationHandler::run()
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-
-            game_table_manager.processReceivedGameMessages();
 
             DebugConsole::Render();
             DebugConsole::RunActiveDebugToggles();
@@ -271,7 +272,6 @@ int ApplicationHandler::run()
             renderActiveGametable();
             toaster_->Render();
 
-            // Rendering
             //ImGui::ShowMetricsWindow();
             ImGui::Render();
             ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -290,7 +290,7 @@ int ApplicationHandler::run()
         map_directory->stopMonitoring();
         marker_directory->stopMonitoring();
     }
-  
+
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
@@ -452,7 +452,7 @@ void ApplicationHandler::renderMainMenuBar()
             open_host_gametable = true;
         }
         if (ImGui::MenuItem("Connect..."))
-        { 
+        {
             connect_to_gametable = true;
         }
 
@@ -476,7 +476,7 @@ void ApplicationHandler::renderMainMenuBar()
         if (ImGui::BeginMenu("Network"))
         {
             if (ImGui::MenuItem("Network Center"))
-            { 
+            {
                 open_network_center = true;
             }
             ImGui::EndMenu();
@@ -508,10 +508,50 @@ void ApplicationHandler::renderMainMenuBar()
                     close_current_board = true;
                 }
             }
-            
+
             ImGui::EndMenu();
         }
     }
+
+    if (ImGui::BeginMenu("Assets"))
+    {
+        if (ImGui::MenuItem("Add Marker (from file)"))
+        {
+            std::filesystem::path dst;
+            std::string err;
+            if (!AssetIO::importFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
+            {
+                // toast/log error if needed
+                std::cerr << "Import marker failed: " << err << "\n";
+                toaster_->Push(ImGuiToaster::Level::Error, "Imported Marker ERROR: " + err);
+            }
+            else
+            {
+                toaster_->Push(ImGuiToaster::Level::Good, "Imported Marker Successfully!!" + err);
+            }
+        }
+        if (ImGui::MenuItem("Add Map (from file)"))
+        {
+            std::filesystem::path dst;
+            std::string err;
+            if (!AssetIO::importFromPicker(AssetIO::AssetKind::Map, &dst, &err))
+            {
+                // toast/log error if needed
+                std::cerr << "Import map failed: " << err << "\n";
+                toaster_->Push(ImGuiToaster::Level::Error, "Imported Map ERROR: " + err);
+            }
+            else
+            {
+                toaster_->Push(ImGuiToaster::Level::Good, "Imported Map Successfully!!" + err);
+            }
+        }
+        if (ImGui::MenuItem("Remove Assets..."))
+        {
+            open_remove_assets = true;
+        }
+        ImGui::EndMenu();
+    }
+
     if (ImGui::BeginMenu("Help"))
     {
         if (ImGui::MenuItem("Guide"))
@@ -534,46 +574,6 @@ void ApplicationHandler::renderMainMenuBar()
     }
 
     ImGui::EndMainMenuBar();
-
-    // In your main menu render
-    if (ImGui::BeginMainMenuBar())
-    {
-        if (ImGui::BeginMenu("Assets"))
-        {
-            if (ImGui::MenuItem("Add Marker (from file)"))
-            {
-                std::filesystem::path dst;
-                std::string err;
-                if (!AssetIO::importFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
-                {
-                    // toast/log error if needed
-                    std::cerr << "Import marker failed: " << err << "\n";
-                    toaster_->Push(ImGuiToaster::Level::Good, "Imported Marker Successfully!!");
-                }
-                else
-                {
-                    toaster_->Push(ImGuiToaster::Level::Error, "Delete failed: " + err);
-                }
-            }
-            if (ImGui::MenuItem("Add Map (from file)"))
-            {
-                std::filesystem::path dst;
-                std::string err;
-                if (!AssetIO::importFromPicker(AssetIO::AssetKind::Map, &dst, &err))
-                {
-                    std::cerr << "Import map failed: " << err << "\n";
-                }
-            }
-            if (ImGui::MenuItem("Remove Assets..."))
-            {
-                open_remove_assets = true;
-
-            }
-            ImGui::EndMenu();
-        }
-        ImGui::EndMainMenuBar();
-    }
-    
 
     // ---------------- Popups (open + render) ----------------
 
@@ -627,8 +627,6 @@ void ApplicationHandler::renderMainMenuBar()
     if (ImGui::IsPopupOpen("About"))
         game_table_manager.aboutPopUp();
 }
-
-
 
 //
 //void ApplicationHandler::renderMainMenuBar() {
