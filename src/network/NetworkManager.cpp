@@ -946,8 +946,10 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     auto gm = gametable_manager.lock();
     auto bm = board_manager.lock();
     if (!gm)
+        return;
         throw std::exception("[NetworkManager] GametableManager Expired!!");
     if (!bm)
+        return;
         throw std::exception("[NetworkManager] BoardManager Expired!!");
 
     auto it = peers.find(peerId);

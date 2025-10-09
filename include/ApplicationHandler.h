@@ -80,7 +80,7 @@ private:
     std::shared_ptr<MapFBO> map_fbo;
     GLFWwindow* window;
     flecs::world ecs;
-    GameTableManager game_table_manager;
+    std::shared_ptr<GameTableManager> game_table_manager;
     std::shared_ptr<DirectoryWindow> map_directory;
     std::shared_ptr<DirectoryWindow> marker_directory;
     bool g_dockspace_initialized = false;
@@ -109,8 +109,6 @@ private:
 
         draw_list->AddCircleFilled(final_screen_pos, radius, color, 16);
     }
-
-
 
     //void handleToasterDebug()
     //{
