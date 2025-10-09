@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          lfs: true
 
       # Optional: NSIS for .exe installer (CPack still makes ZIP if NSIS missing)
       - name: Install NSIS
@@ -76,17 +77,16 @@ jobs:
 
       - name: CMake Configure
         run: >
-          cmake -S . -B out/build/release -G "Ninja"
-          -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B out/build/ -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }
+          -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
           -DSIGNTOOL="${{ env.SIGNTOOL }}"
           -DSIGNING_PFX="${{ env.SIGN_PFX }}"
           -DSIGNING_PWD="${{ env.SIGN_PWD }}"
         shell: pwsh
-        
-      - name: CMake Build
-        run: cmake --build build --config ${{ env.BUILD_TYPE }} --parallel
-        shell: pwsh
 
+      - name: CMake Build
+        run: cmake --build out/build/ --parallel
+        shell: pwsh
 
       - name: Upload artifacts (packages)
         uses: actions/upload-artifact@v4
