@@ -77,7 +77,7 @@ jobs:
 
       - name: CMake Configure
         run: >
-          cmake -S . -B out/build/ -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }
+          cmake -S . -B out/build/ -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }}
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
           -DSIGNTOOL="${{ env.SIGNTOOL }}"
           -DSIGNING_PFX="${{ env.SIGN_PFX }}"
