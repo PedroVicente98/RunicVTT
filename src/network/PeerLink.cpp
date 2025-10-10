@@ -121,23 +121,20 @@ void PeerLink::setupCallbacks()
         lastState_ = s;
         lastStateAt_ = std::chrono::seconds().count();
         std::cout << "[PeerLink] State(" << peerId << "): " << (int)s << "at " << lastStateAt_ << "\n";
-       
-        if (auto nm = network_manager.lock()) {
-            using L = ImGuiToaster::Level;
-            const char* stateStr =
-                s == rtc::PeerConnection::State::Connected    ? "Connected" :
-                s == rtc::PeerConnection::State::Connecting   ? "Connecting" :
-                s == rtc::PeerConnection::State::Disconnected ? "Disconnected" :
-                s == rtc::PeerConnection::State::Failed       ? "Failed" :
-                s == rtc::PeerConnection::State::Closed       ? "Closed" : "New";
-            L lvl =
-                s == rtc::PeerConnection::State::Connected    ? L::Good :
-                s == rtc::PeerConnection::State::Connecting   ? L::Warning :
-                s == rtc::PeerConnection::State::Disconnected ? L::Error :
-                s == rtc::PeerConnection::State::Failed       ? L::Error :
-                s == rtc::PeerConnection::State::Closed       ? L::Warning : L::Info;
-            nm->pushStatusToast(std::string("[Peer] ") + peerId + " " + stateStr, lvl);
-        } });
+
+        if (s == rtc::PeerConnection::State::Closed || s == rtc::PeerConnection::State::Failed) {
+            if (auto nm = network_manager.lock()) {
+                msg::NetEvent ev{msg::NetEvent::Type::PcOpen, id, label};
+                nm->events_.push(std::move(ev));
+            } 
+        }
+        if (s == rtc::PeerConnection::State::Connected) {
+            if (auto nm = network_manager.lock()) {
+                msg::NetEvent ev{msg::NetEvent::Type::PcClosed, id, label};
+                nm->events_.push(std::move(ev));
+            } 
+        }
+    });
 
     pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc)
                            {
