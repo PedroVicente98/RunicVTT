@@ -109,6 +109,108 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
     pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
 }
 
+//RECONNECT
+bool NetworkManager::reconnectPeer(const std::string& peerId)
+{
+    // 0) Check we know this peer
+    auto it = peers.find(peerId);
+    if (it == peers.end())
+        return false;
+
+    Logger::instance().log("main", Logger::Level::Warn, "[NM] Reconnect requested for peer " + peerId);
+
+    // 1) Quiesce & close the old link (don’t let callbacks call back into NM anymore)
+    if (it->second) {
+        try {
+            //it->second->quiesce();   // (no-op if you don’t have it; just stops callbacks)
+            it->second->close();     // your safe-close (swallow exceptions inside)
+        } catch (...) {
+            // swallow
+        }
+    }
+
+    // 2) Replace with a fresh link object (same peerId)
+    auto fresh = replaceWithFreshLink_(peerId);
+    if (!fresh) {
+        Logger::instance().log("main", Logger::Level::Error, "[NM] Reconnect failed: could not create PeerLink");
+        return false;
+    }
+    peers[peerId] = fresh; //maybe use swap?
+
+    // 3) If you are the side that normally *offers* (e.g. GM), create DCs now then create & send offer
+    if (peer_role == Role::GAMEMASTER) {
+        createChannelsIfOfferer_(fresh);     // create game/chat/notes DCs; attach handlers
+        createOfferAndSend_(peerId, fresh);  // hook to your signaling send
+    } else {
+        // Player side: wait for offer from the server/GM.
+        // Make sure PeerConnection has onDataChannel callback attached inside PeerLink setup.
+        Logger::instance().log("main", Logger::Level::Info, "[NM] Waiting for remote offer from " + peerId);
+    }
+
+    return true;
+}
+
+// --- helpers ---------------------------------------------------------
+
+std::shared_ptr<PeerLink> NetworkManager::replaceWithFreshLink_(const std::string& peerId)
+{
+    // Build a new PeerLink (this constructs a new rtc::PeerConnection and wires PC-level callbacks)
+    auto link = std::make_shared<PeerLink>(peerId, weak_from_this());
+
+    // If your PeerLink exposes a “pc” and “onDataChannel” wiring internally, you’re done.
+    // Otherwise ensure PeerLink sets pc->onDataChannel to call link->attachChannelHandlers().
+
+    return link;
+}
+
+void NetworkManager::createChannelsIfOfferer_(const std::shared_ptr<PeerLink>& link)
+{
+    // Offerer creates DCs *before* creating the SDP offer so they’re negotiated and will open automatically.
+    // You already have attachChannelHandlers on PeerLink – reuse it.
+
+    auto pc = link->getPeerConnection(); // whatever getter you have
+    if (!pc) return;
+
+    // Create “game” channel
+    auto dcGame = pc->createDataChannel(msg::dc::name::Game);
+    link->attachChannelHandlers(dcGame, msg::dc::name::Game);
+
+    // Create “chat” channel
+    auto dcChat = pc->createDataChannel(msg::dc::name::Chat);
+    link->attachChannelHandlers(dcChat, msg::dc::name::Chat);
+
+    // Create “notes” channel (if you use it)
+    auto dcNotes = pc->createDataChannel(msg::dc::name::Notes);
+    link->attachChannelHandlers(dcNotes, msg::dc::name::Notes);
+}
+
+void NetworkManager::createOfferAndSend_(const std::string& peerId, const std::shared_ptr<PeerLink>& link)
+{
+    auto pc = link->getPeerConnection();
+    if (!pc) return;
+
+    // Hook local description/candidates → send via your signaling client
+    pc->onLocalDescription([this, peerId](const rtc::Description& desc) {
+        // Send “offer” JSON to peer via your signaling client
+        // e.g. signalingClient->sendOffer(peerId, desc.sdp(), desc.typeString());
+        Logger::instance().log("main", Logger::Level::Debug, "[NM] Sending offer to " + peerId);
+        if (signalingClient) signalingClient->sendOffer(peerId, std::string(desc)); // adapt to your API
+    });
+
+    pc->onLocalCandidate([this, peerId](const rtc::Candidate& cand) {
+        if (signalingClient) signalingClient->sendCandidate(peerId, cand); // adapt to your API
+    });
+
+    // Trigger offer creation
+    try {
+        pc->setLocalDescription(); // libdatachannel: generates an offer and fires onLocalDescription
+    } catch (const std::exception& e) {
+        Logger::instance().log("main", Logger::Level::Error,
+            std::string("[NM] setLocalDescription(offer) failed: ") + e.what());
+    }
+}
+
+
 // Keep your old method (back-compat). Default it to LocalTunnel behavior.
 void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
 {
