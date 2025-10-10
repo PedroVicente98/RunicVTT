@@ -121,6 +121,10 @@ public:
     bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
     void broadcastPeerDisconnect(const std::string& targetId);
+    // Single-shot reconnect of one peer. Returns true if we kicked off a rebuild.
+    bool reconnectPeer(const std::string& peerId);
+
+
 
     // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
@@ -233,6 +237,11 @@ private:
     std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
 
     std::vector<std::string> getConnectedPeerIds() const;
+
+    // Helpers used by reconnectPeer (thin wrappers around what you already have)
+    std::shared_ptr<PeerLink> replaceWithFreshLink_(const std::string& peerId);
+    void createOfferAndSend_(const std::string& peerId, const std::shared_ptr<PeerLink>& link);
+    void createChannelsIfOfferer_(const std::shared_ptr<PeerLink>& link);
 
     std::string myClientId_;
     std::string myUsername_;
