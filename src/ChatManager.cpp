@@ -413,6 +413,43 @@ void ChatManager::tryHandleSlashCommand(uint64_t threadId, const std::string& in
 }
 
 // ---- public helpers ----
+
+// ----- Rename (local change + network UPDATE) -----
+void ChatManager::renameThread(uint64_t threadId, const std::string& newName)
+{
+    if (!hasCurrent()) return;
+    auto it = threads_.find(threadId);
+    if (it == threads_.end()) return;
+
+    it->second.displayName = newName;
+    emitThreadUpdate(it->second);
+}
+
+// ----- Set participants (local change + network UPDATE) -----
+// NOTE: we keep the same threadId (stable identity). Deterministic IDs are for creation only.
+void ChatManager::setThreadParticipants(uint64_t threadId, std::set<std::string> parts)
+{
+    if (!hasCurrent()) return;
+    auto it = threads_.find(threadId);
+    if (it == threads_.end()) return;
+    if (threadId == generalThreadId_) return; // General is implicit, no participant list
+
+    it->second.participants = std::move(parts);
+    emitThreadUpdate(it->second);
+}
+// ----- Delete (local + network DELETE) -----
+void ChatManager::deleteThread(uint64_t threadId)
+{
+    if (!hasCurrent()) return;
+    if (threadId == generalThreadId_) return;
+
+    // local first
+    threads_.erase(threadId);
+    if (activeThreadId_ == threadId) activeThreadId_ = generalThreadId_;
+
+    emitThreadDelete(threadId);
+}
+
 uint64_t ChatManager::ensureThreadByParticipants(const std::set<std::string>& participants,
                                                  const std::string& displayName) {
     if (!hasCurrent()) return 0;
@@ -455,6 +492,194 @@ void ChatManager::sendTextToThread(uint64_t threadId, const std::string& text) {
     const uint64_t ts = (uint64_t)nowSec();
     emitChatMessageFrame(threadId, uname, text, ts);
     pushMessageLocal(threadId, "me", uname, text, (double)ts, /*incoming*/false);
+}
+
+
+// ---- Network ----
+// ----- High-level apply (used by GameTableManager -> processReceivedMessages) -----
+void ChatManager::applyReady(const msg::ReadyMessage& m)
+{
+    if (!m.bytes || m.bytes->empty()) return; // expecting payload in bytes
+    const auto& b = *m.bytes;
+    size_t off = 0;
+
+    switch (m.kind)
+    {
+        case msg::DCType::ChatThreadCreate:
+        {
+            if (!hasCurrent()) return;
+            const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+            if (tableId != currentTableId_) return;
+
+            ChatThreadModel th;
+            th.id          = Serializer::deserializeUInt64(b, off);
+            th.displayName = Serializer::deserializeString(b, off);
+
+            const int pc = Serializer::deserializeInt(b, off);
+            for (int i = 0; i < pc; ++i)
+                th.participants.insert(Serializer::deserializeString(b, off));
+
+            // General (empty participants) or group (non-empty):
+            auto it = threads_.find(th.id);
+            if (it == threads_.end())
+            {
+                threads_.emplace(th.id, std::move(th));
+            }
+            else
+            {
+                it->second.displayName  = th.displayName;
+                it->second.participants = std::move(th.participants);
+            }
+            ensureGeneral();
+            break;
+        }
+
+        case msg::DCType::ChatThreadUpdate:
+        {
+            if (!hasCurrent()) return;
+            const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+            if (tableId != currentTableId_) return;
+
+            const uint64_t threadId = Serializer::deserializeUInt64(b, off);
+            std::string displayName = Serializer::deserializeString(b, off);
+            const int pc = Serializer::deserializeInt(b, off);
+            std::set<std::string> parts;
+            for (int i = 0; i < pc; ++i)
+                parts.insert(Serializer::deserializeString(b, off));
+
+            auto it = threads_.find(threadId);
+            if (it == threads_.end())
+            {
+                ChatThreadModel tmp;
+                tmp.id = threadId;
+                tmp.displayName = std::move(displayName);
+                tmp.participants = std::move(parts);
+                threads_.emplace(threadId, std::move(tmp));
+            }
+            else
+            {
+                it->second.displayName  = std::move(displayName);
+                it->second.participants = std::move(parts);
+            }
+            ensureGeneral();
+            break;
+        }
+
+        case msg::DCType::ChatThreadDelete:
+        {
+            if (!hasCurrent()) return;
+            const uint64_t tableId  = Serializer::deserializeUInt64(b, off);
+            if (tableId != currentTableId_) return;
+
+            const uint64_t threadId = Serializer::deserializeUInt64(b, off);
+            if (threadId == generalThreadId_) return; // never delete General
+            threads_.erase(threadId);
+            if (activeThreadId_ == threadId) activeThreadId_ = generalThreadId_;
+            break;
+        }
+
+        case msg::DCType::ChatMessage:
+        {
+            if (!hasCurrent()) return;
+
+            const uint64_t tableId  = Serializer::deserializeUInt64(b, off);
+            const uint64_t threadId = Serializer::deserializeUInt64(b, off);
+            const uint64_t ts       = Serializer::deserializeUInt64(b, off);
+            const std::string username = Serializer::deserializeString(b, off);
+            const std::string text     = Serializer::deserializeString(b, off);
+
+            if (tableId != currentTableId_) return;
+
+            // Append (creates placeholder thread if unknown)
+            pushMessageLocal(threadId, /*fromId*/"", username, text, (double)ts, /*incoming*/true);
+            break;
+        }
+
+        default:
+            // ignore other kinds
+            break;
+    }
+}
+
+
+// ----- Emits (binary frames) -----
+// Choose broadcast vs targeted by "participants empty? => General => broadcast"
+void ChatManager::emitThreadCreate(const ChatThreadModel& th)
+{
+    auto nm = network_.lock(); if (!nm || !hasCurrent()) return;
+
+    std::vector<uint8_t> buf;
+    Serializer::serializeUInt64(buf, currentTableId_);
+    Serializer::serializeUInt64(buf, th.id);
+    Serializer::serializeString(buf, th.displayName);
+    Serializer::serializeInt(buf, (int)th.participants.size());
+    for (auto& p : th.participants) Serializer::serializeString(buf, p);
+
+    if (th.participants.empty())
+        nm->broadcastChatThreadFrame(msg::DCType::ChatThreadCreate, buf);
+    else
+        nm->sendChatThreadFrameTo(th.participants, msg::DCType::ChatThreadCreate, buf);
+}
+
+void ChatManager::emitThreadUpdate(const ChatThreadModel& th)
+{
+    auto nm = network_.lock(); if (!nm || !hasCurrent()) return;
+
+    std::vector<uint8_t> buf;
+    Serializer::serializeUInt64(buf, currentTableId_);
+    Serializer::serializeUInt64(buf, th.id);
+    Serializer::serializeString(buf, th.displayName);
+    Serializer::serializeInt(buf, (int)th.participants.size());
+    for (auto& p : th.participants) Serializer::serializeString(buf, p);
+
+    if (th.participants.empty())
+        nm->broadcastChatThreadFrame(msg::DCType::ChatThreadUpdate, buf);
+    else
+        nm->sendChatThreadFrameTo(th.participants, msg::DCType::ChatThreadUpdate, buf);
+}
+
+void ChatManager::emitThreadDelete(uint64_t threadId)
+{
+    auto nm = network_.lock(); if (!nm || !hasCurrent()) return;
+    if (threadId == generalThreadId_) return;
+
+    // Decide recipients: thread may still be in map to fetch participants
+    std::set<std::string> targets;
+    if (auto it = threads_.find(threadId); it != threads_.end())
+        targets = it->second.participants; // may be empty (broadcast) but usually group
+
+    std::vector<uint8_t> buf;
+    Serializer::serializeUInt64(buf, currentTableId_);
+    Serializer::serializeUInt64(buf, threadId);
+
+    if (targets.empty())
+        nm->broadcastChatThreadFrame(msg::DCType::ChatThreadDelete, buf);
+    else
+        nm->sendChatThreadFrameTo(targets, msg::DCType::ChatThreadDelete, buf);
+}
+
+void ChatManager::emitChatMessageFrame(uint64_t threadId,
+                                       const std::string& username,
+                                       const std::string& text,
+                                       uint64_t ts)
+{
+    auto nm = network_.lock(); if (!nm || !hasCurrent()) return;
+
+    // Figure recipients: General=broadcast; group=participants
+    const ChatThreadModel* th = nullptr;
+    if (auto it = threads_.find(threadId); it != threads_.end()) th = &it->second;
+
+    std::vector<uint8_t> buf;
+    Serializer::serializeUInt64(buf, currentTableId_);
+    Serializer::serializeUInt64(buf, threadId);
+    Serializer::serializeUInt64(buf, ts);
+    Serializer::serializeString(buf, username);
+    Serializer::serializeString(buf, text);
+
+    if (!th || th->participants.empty())
+        nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
+    else
+        nm->sendChatThreadFrameTo(th->participants, msg::DCType::ChatMessage, buf);
 }
 
 // ---- UI ----
@@ -1312,3 +1537,4 @@ void ChatManager::sendTextToThread(uint64_t threadId, const std::string& text)
     th->messages.push_back(std::move(m));
 }
 */
+
