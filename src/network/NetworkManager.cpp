@@ -739,8 +739,7 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
     {
         size_t chunk = std::min<size_t>(kChunk, img.size() - off);
         auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
-        for (auto& pid : toPeerIds)
-            sendGameTo(pid, frame);
+        broadcastFrame(frame, toPeerIds);
         off += chunk;
     }
 
@@ -1008,9 +1007,17 @@ void NetworkManager::drainEvents()
                 {
                     bootstrapPeerIfReady(pid);
                 }
+                catch (const std::exception& e)
+                {
+                    const std::string msg = std::string("Error bootstrapping peer: ") + e.what();
+                    Logger::instance().log("main", Logger::Level::Error, msg);
+                    toaster_->Push(ImGuiToaster::Level::Error, msg, 5.0f);
+                }
                 catch (...)
                 {
-                    toaster_->Push(ImGuiToaster::Level::Error, "Error Bootstrapping Peer!!", 3.0f);
+                    const char* msg = "Error bootstrapping peer: unknown exception";
+                    Logger::instance().log("main", Logger::Level::Error, msg);
+                    toaster_->Push(ImGuiToaster::Level::Error, msg, 5.0f);
                 }
             }
         }

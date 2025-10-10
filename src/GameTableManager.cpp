@@ -160,13 +160,14 @@ void GameTableManager::processReceivedMessages()
                     texSize = image.size;
                 }
                 const auto& mm = *m.markerMeta;
-                auto marker = board_manager->createMarker(
-                    /*imageFilePath*/ "", tex,
-                    {(float)mm.pos.x, (float)mm.pos.y},
-                    texSize);
-                marker.set(Identifier{mm.markerId});
-                marker.set(mm.vis);
-                marker.set(mm.mov);
+                flecs::entity marker = ecs.entity()
+                                           .set(Identifier{mm.markerId})
+                                           .set(Position{(int)mm.pos.x, (int)mm.pos.y}) //World Position
+                                           .set(Size{texSize.x, texSize.y})
+                                           .set(TextureComponent{tex, "", texSize})
+                                           .set(Visibility{mm.vis})
+                                           .set(MarkerComponent{"", false, false})
+                                           .set(Moving{mm.mov});
                 marker.add(flecs::ChildOf, boardEnt);
                 break;
             }
@@ -179,26 +180,16 @@ void GameTableManager::processReceivedMessages()
                 if (!boardEnt.is_valid())
                     break;
 
-                auto fog = board_manager->createFogOfWar(
-                    {(float)m.pos->x, (float)m.pos->y},
-                    {m.size->width, m.size->height});
-                fog.set(Identifier{*m.fogId});
-                fog.set(*m.vis);
+                auto fog = ecs.entity()
+                               .set(Identifier{*m.fogId})
+                               .set(Position{m.pos->x, m.pos->y})
+                               .set(Size{m.size->width, m.size->height})
+                               .set(Visibility{*m.vis});
+
+                fog.add<FogOfWar>();
                 fog.add(flecs::ChildOf, boardEnt);
                 break;
             }
-
-         /*
-            case msg::DCType::ImageChunk: //USED?
-            {
-                break;
-            }
-            case msg::DCType::MarkerCreate: //USED?
-            {
-                break;
-            }
-
-            */
 
             case msg::DCType::FogUpdate:
             {
@@ -1386,7 +1377,10 @@ void GameTableManager::aboutPopUp()
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
-    chat_manager->render();
+    if (isGameTableActive())
+    {
+        chat_manager->render();
+    }
     if (board_manager->isBoardActive())
     {
         if (board_manager->isEditWindowOpen())
