@@ -163,7 +163,7 @@ public:
     void startRawDrainWorker();
     void stopRawDrainWorker();
 
-    void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    //void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
     //void onDcChatBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
     //void onDcNotesBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
 
@@ -179,7 +179,7 @@ public:
     void broadcastFog(uint64_t boardId, const flecs::entity& fog);
 
     void sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes);
-    void broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds);
+    void broadcastGameFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds);
 
     void sendGameTable(const flecs::entity& gameTable, const std::vector<std::string>& toPeerIds);
     void sendBoard(const flecs::entity& board, const std::vector<std::string>& toPeerIds);

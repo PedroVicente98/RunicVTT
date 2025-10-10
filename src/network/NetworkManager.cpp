@@ -692,7 +692,7 @@ void NetworkManager::sendGameTable(const flecs::entity& gameTable, const std::ve
     auto gtId = gameTable.get<Identifier>()->id;
     auto gt = *gameTable.get<GameTable>();
     auto frame = buildSnapshotGameTableFrame(gtId, gt.gameTableName);
-    broadcastFrame(frame, toPeerIds);
+    broadcastGameFrame(frame, toPeerIds);
 }
 
 void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std::string>& toPeerIds)
@@ -703,7 +703,7 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 
     // 1) meta
     auto meta = buildSnapshotBoardFrame(board, static_cast<uint64_t>(img.size()));
-    broadcastFrame(meta, toPeerIds);
+    broadcastGameFrame(meta, toPeerIds);
 
     // 2) image chunks (ownerKind=0 for board)
     uint64_t bid = board.get<Identifier>()->id;
@@ -719,7 +719,7 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 
     // 3) commit
     auto commit = buildCommitBoardFrame(bid);
-    broadcastFrame(commit, toPeerIds);
+    broadcastGameFrame(commit, toPeerIds);
 }
 
 void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)
@@ -730,7 +730,7 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
 
     // 1) meta
     auto meta = buildCreateMarkerFrame(boardId, marker, static_cast<uint64_t>(img.size()));
-    broadcastFrame(meta, toPeerIds);
+    broadcastGameFrame(meta, toPeerIds);
 
     // 2) image chunks (ownerKind=1 for marker)
     uint64_t mid = marker.get<Identifier>()->id;
@@ -739,19 +739,19 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
     {
         size_t chunk = std::min<size_t>(kChunk, img.size() - off);
         auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
-        broadcastFrame(frame, toPeerIds);
+        broadcastGameFrame(frame, toPeerIds);
         off += chunk;
     }
 
     // 3) commit
     auto commit = buildCommitMarkerFrame(boardId, mid);
-    broadcastFrame(commit, toPeerIds);
+    broadcastGameFrame(commit, toPeerIds);
 }
 
 void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds)
 {
     auto frame = buildFogCreateFrame(boardId, fog);
-    broadcastFrame(frame, toPeerIds);
+    broadcastGameFrame(frame, toPeerIds);
 }
 
 //ON PEER RECEIVING MESSAGE-----------------------------------------------------------
@@ -1108,41 +1108,93 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
     }
 }
 
-void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+// NetworkManager.cpp
+void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
+                                         const std::vector<uint8_t>& b)
 {
     size_t off = 0;
     while (off < b.size())
     {
         if (!ensureRemaining(b, off, 1))
             break;
-
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
 
         switch (type)
         {
-            case msg::DCType::ChatMessage:
-                //handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
-                break;
-
             case msg::DCType::ChatThreadCreate:
-                //handleBoardMeta(b, off); // fills imagesRx_
+            {
+                msg::ReadyMessage r;
+                r.kind = type;
+                r.fromPeer = fromPeer;
+                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+                r.tableId = tableId;
+                r.threadId = Serializer::deserializeUInt64(b, off);
+                r.name = Serializer::deserializeString(b, off); // displayName
+                {
+                    const int pc = Serializer::deserializeInt(b, off);
+                    std::set<std::string> parts;
+                    for (int i = 0; i < pc; ++i)
+                        parts.insert(Serializer::deserializeString(b, off));
+                    r.participants = std::move(parts);
+                }
+                inboundGame_.push(std::move(r));
                 break;
-
-            case msg::DCType::ChatThreadDelete:
-                //handleMarkerMeta(b, off); // fills imagesRx_
-                break;
+            }
 
             case msg::DCType::ChatThreadUpdate:
-                //handleFogCreate(b, off); // pushes ReadyMessage
+            {
+                msg::ReadyMessage r;
+                r.kind = type;
+                r.fromPeer = fromPeer;
+                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+                r.tableId = tableId;
+                r.threadId = Serializer::deserializeUInt64(b, off);
+                r.name = Serializer::deserializeString(b, off); // displayName
+                {
+                    const int pc = Serializer::deserializeInt(b, off);
+                    std::set<std::string> parts;
+                    for (int i = 0; i < pc; ++i)
+                        parts.insert(Serializer::deserializeString(b, off));
+                    r.participants = std::move(parts);
+                }
+                inboundGame_.push(std::move(r));
                 break;
+            }
+
+            case msg::DCType::ChatThreadDelete:
+            {
+                msg::ReadyMessage r;
+                r.kind = type;
+                r.fromPeer = fromPeer;
+                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+                r.tableId = tableId;
+                r.threadId = Serializer::deserializeUInt64(b, off);
+                inboundGame_.push(std::move(r));
+                break;
+            }
+
+            case msg::DCType::ChatMessage:
+            {
+                msg::ReadyMessage r;
+                r.kind = type;
+                r.fromPeer = fromPeer;
+                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
+                r.tableId = tableId;
+                r.threadId = Serializer::deserializeUInt64(b, off);
+                r.ts = Serializer::deserializeUInt64(b, off);
+                r.name = Serializer::deserializeString(b, off); // username
+                r.text = Serializer::deserializeString(b, off); // message text
+                inboundGame_.push(std::move(r));
+                break;
+            }
 
             default:
-                // unknown / out-of-sync: stop this buffer
-                return;
+                return; // stop this buffer if unknown/out-of-sync
         }
     }
 }
+
 
 void NetworkManager::decodeRawNotesBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
 {
@@ -1495,7 +1547,7 @@ void NetworkManager::sendGameTo(const std::string& peerId, const std::vector<uns
     it->second->sendGame(bytes);
 }
 
-void NetworkManager::broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds)
+void NetworkManager::broadcastGameFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds)
 {
     for (auto& pid : toPeerIds)
     {

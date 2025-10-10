@@ -84,6 +84,12 @@ namespace msg
         std::optional<std::vector<uint8_t>> bytes;
         std::optional<BoardMeta> boardMeta;
         std::optional<MarkerMeta> markerMeta;
+
+        std::optional<uint64_t> threadId;
+        std::optional<uint64_t> ts;
+        std::optional<std::string> text;                   // chat text
+        std::optional<std::set<std::string>> participants; // thread participants
+
     };
 
     struct NetEvent

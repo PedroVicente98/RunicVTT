@@ -15,27 +15,35 @@ class NetworkManager; // fwd
 class PeerLink;       // fwd
 
 // ---- Chat model ----
-struct ChatMessageModel {
-    enum class Kind { TEXT, IMAGE, LINK };
-    Kind        kind = Kind::TEXT;
-    std::string senderId;   // peer id or "me" (optional)
-    std::string username;   // display label (sent on wire in message frame)
-    std::string content;    // text / url
-    double      ts = 0.0;   // seconds
+struct ChatMessageModel
+{
+    enum class Kind
+    {
+        TEXT,
+        IMAGE,
+        LINK
+    };
+    Kind kind = Kind::TEXT;
+    std::string senderId; // peer id or "me" (optional)
+    std::string username; // display label (sent on wire in message frame)
+    std::string content;  // text / url
+    double ts = 0.0;      // seconds
 };
 
-struct ChatThreadModel {
-    uint64_t                    id = 0;            // 1 reserved for General
-    std::string                 displayName;       // "General (N)" or custom
-    std::set<std::string>      participants;      // empty means "General"/broadcast
-    std::deque<ChatMessageModel> messages;        // local history (not part of snapshot)
+struct ChatThreadModel
+{
+    uint64_t id = 0;                       // 1 reserved for General
+    std::string displayName;               // "General (N)" or custom
+    std::set<std::string> participants;    // empty means "General"/broadcast
+    std::deque<ChatMessageModel> messages; // local history (not part of snapshot)
 
     // UX-only (not persisted/snapshotted)
-    uint32_t                    unread = 0;
+    uint32_t unread = 0;
 };
 
 // Pure UI+logic+wire sync manager
-class ChatManager : public std::enable_shared_from_this<ChatManager> {
+class ChatManager : public std::enable_shared_from_this<ChatManager>
+{
 public:
     explicit ChatManager(std::weak_ptr<NetworkManager> nm);
 
@@ -50,30 +58,32 @@ public:
     bool saveCurrent();
     bool loadCurrent();
 
-    // GameTable snapshot (META ONLY: threads + participants + displayName)
-    void writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const;
-    void readThreadsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off);
+    void applyReady(const msg::ReadyMessage&);
 
-    // Inbound (binary DC frames)
-    void onChatThreadCreateFrame(const std::vector<uint8_t>& b, size_t& off);
-    void onChatThreadUpdateFrame(const std::vector<uint8_t>& b, size_t& off);
-    void onChatThreadDeleteFrame(const std::vector<uint8_t>& b, size_t& off);
-    void onIncomingChatFrame    (const std::vector<uint8_t>& b, size_t& off);
-
+    void renameThread(uint64_t threadId, const std::string& newName);
+    void setThreadParticipants(uint64_t threadId, std::set<std::string> parts);
+    void deleteThread(uint64_t threadId);
     // UI render (call every frame in main render loop)
     void render();
 
     // External helpers
     void refreshGeneralParticipants(const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& peers);
-    uint64_t ensureThreadByParticipants(const std::set<std::string>& participants,
-                                        const std::string& displayName);
+    uint64_t ensureThreadByParticipants(const std::set<std::string>& participants, const std::string& displayName);
     void sendTextToThread(uint64_t threadId, const std::string& text);
+    void sendSnapshotTo(const std::string& peerId);
+
+    void pushMessageLocal(uint64_t threadId, const std::string& fromId, const std::string& username, const std::string& text, double ts, bool incoming);
+
+    static constexpr uint64_t generalThreadId_ = 1;
+    uint64_t currentTableId_ = 0;
+    std::string currentTableName_;
+
+    ChatThreadModel* getThread(uint64_t id);
 
 private:
     // utils
     std::filesystem::path chatFilePathFor(uint64_t tableId, const std::string& name) const;
     void ensureGeneral();
-    ChatThreadModel* getThread(uint64_t id);
     uint64_t findThreadByParticipants(const std::set<std::string>& parts) const;
     uint64_t makeDeterministicThreadId(const std::set<std::string>& parts);
     static ChatMessageModel::Kind classifyMessage(const std::string& s);
@@ -83,8 +93,7 @@ private:
     void emitThreadCreate(const ChatThreadModel& th);
     void emitThreadUpdate(const ChatThreadModel& th);
     void emitThreadDelete(uint64_t threadId);
-    void emitChatMessageFrame(uint64_t threadId, const std::string& username,
-                              const std::string& text, uint64_t ts);
+    void emitChatMessageFrame(uint64_t threadId, const std::string& username, const std::string& text, uint64_t ts);
 
     // UI sub-parts
     void renderLeftPanel(float width);
@@ -95,41 +104,36 @@ private:
 
     // UI helpers
     void markThreadRead(uint64_t threadId);
-    void pushMessageLocal(uint64_t threadId, const std::string& fromId,
-                          const std::string& username, const std::string& text, double ts, bool incoming);
+
     void tryHandleSlashCommand(uint64_t threadId, const std::string& text);
 
-private:
     // wiring
     std::weak_ptr<NetworkManager> network_;
-    uint64_t      currentTableId_ = 0;
-    std::string   currentTableName_;
 
     // data
     std::unordered_map<uint64_t, ChatThreadModel> threads_;
-    uint64_t      activeThreadId_ = 0;
-    static constexpr uint64_t generalThreadId_ = 1;
+    uint64_t activeThreadId_ = 0;
 
     // UI state
     std::array<char, 512> input_{};
-    bool          focusInput_     = false;
-    bool          followScroll_   = true;   // auto-stick to bottom if true
-    bool          chatWindowFocused_ = false;
+    bool focusInput_ = false;
+    bool followScroll_ = true; // auto-stick to bottom if true
+    bool chatWindowFocused_ = false;
 
     // Popups
-    bool          openCreatePopup_ = false;
-    bool          openDeletePopup_ = false;
-    bool          openDicePopup_   = false;
+    bool openCreatePopup_ = false;
+    bool openDeletePopup_ = false;
+    bool openDicePopup_ = false;
 
     // Create popup state
     std::array<char, 128> newThreadName_{};
     std::set<std::string> newThreadSel_;
 
     // Dice popup state
-    int           diceN_ = 1;
-    int           diceSides_ = 20;
-    int           diceMod_ = 0;
-    bool          diceModPerDie_ = false;
+    int diceN_ = 1;
+    int diceSides_ = 20;
+    int diceMod_ = 0;
+    bool diceModPerDie_ = false;
 };
 
 /*

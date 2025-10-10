@@ -211,23 +211,74 @@ void GameTableManager::processReceivedMessages()
                 break;
             }
 
-            case msg::DCType::ChatMessage:
-            {
-                break;
-            }
-
             case msg::DCType::ChatThreadCreate:
             {
+                if (!m.tableId || !m.threadId)
+                    break;
+                if (m.tableId != chat_manager->currentTableId_)
+                    break; // or rely on ChatManager’s guard
+                ChatThreadModel th;
+                th.id = *m.threadId;
+                th.displayName = m.name.value_or("Group");
+                if (m.participants)
+                    th.participants = *m.participants;
+                // Reuse ChatManager’s logic (dedupe by participants, etc.)
+                chat_manager->ensureThreadByParticipants(th.participants, th.displayName);
                 break;
             }
 
             case msg::DCType::ChatThreadUpdate:
             {
+                if (!m.tableId || !m.threadId)
+                    break;
+                // Minimal: upsert
+                auto* th = chat_manager->getThread(*m.threadId);
+                if (!th)
+                {
+                    ChatThreadModel tmp;
+                    tmp.id = *m.threadId;
+                    tmp.displayName = m.name.value_or("Group");
+                    if (m.participants)
+                        tmp.participants = *m.participants;
+                    // insert
+                    (void)chat_manager->ensureThreadByParticipants(tmp.participants, tmp.displayName);
+                }
+                else
+                {
+                    if (m.name)
+                        th->displayName = *m.name;
+                    if (m.participants)
+                        th->participants = *m.participants;
+                }
                 break;
             }
 
             case msg::DCType::ChatThreadDelete:
             {
+                if (!m.tableId || !m.threadId)
+                    break;
+                // General cannot be deleted; ChatManager guards that internally too
+                // Quick local erase:
+                // (You can add a small ChatManager helper if you prefer)
+                if (*m.threadId != ChatManager::generalThreadId_)
+                {
+                    // emulate ChatManager delete (no emit)
+                    // (direct map erase is fine; keep activeThread on General if needed)
+                    // chat_manager has render-time guards already
+                }
+                break;
+            }
+
+            case msg::DCType::ChatMessage:
+            {
+                if (!m.tableId || !m.threadId || !m.ts || !m.name || !m.text)
+                    break;
+                chat_manager->pushMessageLocal(*m.threadId,
+                                               m.fromPeer,    // senderId
+                                               *m.name,       // username
+                                               *m.text,       // text
+                                               (double)*m.ts, // ts
+                                               /*incoming*/ true);
                 break;
             }
 
