@@ -357,7 +357,6 @@ void PeerLink::close()
     movedDcs.clear();
 
     NetworkUtilities::safeClosePeerConnection(pc);
-    pc.reset();
 
     Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() end #" + std::to_string(seq));
 }

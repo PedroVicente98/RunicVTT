@@ -536,7 +536,6 @@ bool NetworkManager::disconectFromPeers()
     if (signalingClient)
     {
         signalingClient->close();
-        signalingClient.reset();
     }
 
     peer_role = Role::NONE;
@@ -584,13 +583,11 @@ bool NetworkManager::disconnectAllPeers()
         catch (...)
         {
         }
-        signalingServer.reset();
     }
 
     if (signalingClient)
     {
         signalingClient->close();
-        signalingClient.reset();
     }
 
     peer_role = Role::NONE;
@@ -1236,11 +1233,13 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     auto gm = gametable_manager.lock();
     auto bm = board_manager.lock();
     if (!gm)
-        return;
-    throw std::exception("[NetworkManager] GametableManager Expired!!");
+    {
+        throw std::exception("[NetworkManager] GametableManager Expired!!");
+    }
     if (!bm)
-        return;
-    throw std::exception("[NetworkManager] BoardManager Expired!!");
+    {
+        throw std::exception("[NetworkManager] BoardManager Expired!!");
+    }
 
     auto it = peers.find(peerId);
     if (it == peers.end() || !it->second)
