@@ -1094,8 +1094,39 @@ void NetworkManager::drainEvents()
             {
                 it->second->setOpen(ev.label, false);
                 it->second->markBootstrapReset();
+                reconnectPeer(ev.peerId);
             }
         }
+        else if (ev.type == msg::NetEvent::Type::PcClosed)
+        {
+            auto it = peers.find(ev.peerId);
+            if (it != peers.end() && it->second)
+            {
+                reconnectPeer(ev.peerId);
+            }
+        }
+        else if (ev.type == msg::NetEvent::Type::PcOpen)
+        {
+            pushStatusToast(std::string("[Peer] ") + ev.peerId + " Connected", ImGuiToaster::Level::Good);
+        }
+
+        
+        /*if (auto nm = network_manager.lock()) {
+            using L = ImGuiToaster::Level;
+            const char* stateStr =
+                s == rtc::PeerConnection::State::Connected    ? "Connected" :
+                s == rtc::PeerConnection::State::Connecting   ? "Connecting" :
+                s == rtc::PeerConnection::State::Disconnected ? "Disconnected" :
+                s == rtc::PeerConnection::State::Failed       ? "Failed" :
+                s == rtc::PeerConnection::State::Closed       ? "Closed" : "New";
+            L lvl =
+                s == rtc::PeerConnection::State::Connected    ? L::Good :
+                s == rtc::PeerConnection::State::Connecting   ? L::Warning :
+                s == rtc::PeerConnection::State::Disconnected ? L::Error :
+                s == rtc::PeerConnection::State::Failed       ? L::Error :
+                s == rtc::PeerConnection::State::Closed       ? L::Warning : L::Info;
+            nm->pushStatusToast(std::string("[Peer] ") + peerId + " " + stateStr, lvl);
+        } */
     }
 
     // If GM: check if any peer is now fully open → bootstrap once
