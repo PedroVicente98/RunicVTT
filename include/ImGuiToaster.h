@@ -67,7 +67,7 @@ public:
     explicit ImGuiToaster(const Config& cfg) :
         cfg_(cfg) {}
 
-    void Push(Level lvl, const std::string& msg, float durationSec = 5.0f)
+    void Push(Level lvl, const std::string& msg, float durationSec = 4.0f)
     {
         using clock = std::chrono::steady_clock;
         Toast t;

@@ -17,13 +17,13 @@ GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWi
     map_directory->generateTextureIDs();
 }
 
-GameTableManager::~GameTableManager()
-{
-}
-
 void GameTableManager::setup()
 {
     network_manager->setup(board_manager, weak_from_this());
+}
+
+GameTableManager::~GameTableManager()
+{
 }
 
 void GameTableManager::saveGameTable()
@@ -91,21 +91,18 @@ bool GameTableManager::isGameTableActive()
     return active_game_table.is_valid();
 }
 
-//bool GameTableManager::isConnectionActive() {
-//    return network_manager.isConnectionOpen();
-//}
-//
 bool GameTableManager::isConnected() const
 {
     return network_manager->isConnected();
 }
 
-void GameTableManager::processReceivedGameMessages()
+void GameTableManager::processReceivedMessages()
 {
-
     constexpr int kMaxPerFrame = 32; // avoid long stalls
-    int processed = 0;
 
+    network_manager->drainInboundRaw(kMaxPerFrame);
+    network_manager->drainEvents();
+    int processed = 0;
     msg::ReadyMessage m;
     while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m))
     {
@@ -188,6 +185,78 @@ void GameTableManager::processReceivedGameMessages()
                 fog.set(Identifier{*m.fogId});
                 fog.set(*m.vis);
                 fog.add(flecs::ChildOf, boardEnt);
+                break;
+            }
+
+         /*
+            case msg::DCType::ImageChunk: //USED?
+            {
+                break;
+            }
+            case msg::DCType::MarkerCreate: //USED?
+            {
+                break;
+            }
+
+            */
+
+            case msg::DCType::FogUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::FogDelete:
+            {
+                break;
+            }
+
+            case msg::DCType::MarkerUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::MarkerDelete:
+            {
+                break;
+            }
+
+            case msg::DCType::ChatMessage:
+            {
+                break;
+            }
+
+            case msg::DCType::ChatThreadCreate:
+            {
+                break;
+            }
+
+            case msg::DCType::ChatThreadUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::ChatThreadDelete:
+            {
+                break;
+            }
+
+            case msg::DCType::GridUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::NoteCreate:
+            {
+                break;
+            }
+
+            case msg::DCType::NoteUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::NoteDelete:
+            {
                 break;
             }
 
@@ -1040,7 +1109,7 @@ void GameTableManager::hostGameTablePopUp()
                     memset(buffer, 0, sizeof(buffer));
                     memset(username_buffer, 0, sizeof(username_buffer));
                     memset(pass_buffer, 0, sizeof(pass_buffer));
-                    memset(port_buffer, 0, sizeof(port_buffer));
+                    //memset(port_buffer, 0, sizeof(port_buffer));
                     tryUpnp = false;
 
                     ImGui::CloseCurrentPopup();
@@ -1151,7 +1220,7 @@ void GameTableManager::hostGameTablePopUp()
                     memset(buffer, 0, sizeof(buffer));
                     memset(username_buffer, 0, sizeof(username_buffer));
                     memset(pass_buffer, 0, sizeof(pass_buffer));
-                    memset(port_buffer, 0, sizeof(port_buffer));
+                    //memset(port_buffer, 0, sizeof(port_buffer));
                     tryUpnp = false;
 
                     ImGui::CloseCurrentPopup();

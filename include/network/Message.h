@@ -66,7 +66,7 @@ namespace msg
         Size size{};
     };
 
-    // Single â€œreadyâ€ container with tag + optionals (only 1 engaged)
+    // Single ready container with tag + optionals (only 1 engaged)
     struct ReadyMessage
     {
         DCType kind;
@@ -84,6 +84,29 @@ namespace msg
         std::optional<std::vector<uint8_t>> bytes;
         std::optional<BoardMeta> boardMeta;
         std::optional<MarkerMeta> markerMeta;
+    };
+
+    struct NetEvent
+    {
+        enum class Type
+        {
+            DcOpen,
+            DcClosed,
+            PcOpen,
+            PcClosed,
+            ClientOpen,
+            ClientClosed
+        };
+        Type type;
+        std::string peerId;
+        std::string label;
+    };
+
+    struct InboundRaw
+    {
+        std::string fromPeer;
+        std::string label;
+        std::vector<uint8_t> bytes;
     };
 
     // ---------- Common JSON keys (shared) ----------

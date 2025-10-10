@@ -25,6 +25,8 @@ public:
     void send(const std::string& msg);
     bool sendOn(const std::string& label, const std::vector<uint8_t>& bytes);
     bool sendGame(const std::vector<uint8_t>& bytes);
+    bool sendChat(const std::vector<uint8_t>& bytes);
+    bool sendNote(const std::vector<uint8_t>& bytes);
 
     void setDisplayName(std::string n);
     const std::string& displayName() const;
@@ -47,6 +49,9 @@ public:
     bool isConnected() const; // PC connected + *at least* Intent channel open
     bool isPcConnectedOnly() const;
     static constexpr size_t kMaxBufferedBytes = 5 /*MB*/ * 1024 * 1024; //(tune as you like)
+    void setOpen(std::string label, bool open) {
+        dcOpen_[label] = open;
+    }
 
     bool allRequiredOpen() const;
     bool bootstrapSent() const
@@ -56,6 +61,10 @@ public:
     void markBootstrapSent()
     {
         bootstrapSent_ = true;
+    }
+    void markBootstrapReset()
+    {
+        bootstrapSent_ = false;
     }
 
 private:
@@ -68,7 +77,7 @@ private:
     std::weak_ptr<NetworkManager> network_manager;
 
     std::atomic<rtc::PeerConnection::State> lastState_{rtc::PeerConnection::State::New};
-    std::atomic<double> lastStateAt_{0.0}; // seconds since app start
+    std::atomic<double> lastStateAt_{0.0};
 
     std::atomic<bool> remoteDescSet_{false};
     std::vector<rtc::Candidate> pendingRemoteCandidates_;

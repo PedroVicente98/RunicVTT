@@ -165,7 +165,7 @@ enum class Tool
 //MARKER - Toggle Marker Visibility? MIGHT NOT BE NECESSARY
 //SELECT - Select Marker/Fog, opening an edit window(change size, visibility, and delete)
 
-class BoardManager
+class BoardManager : std::enable_shared_from_this<BoardManager>
 {
 public:
     BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);

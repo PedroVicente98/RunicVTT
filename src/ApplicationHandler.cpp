@@ -244,7 +244,7 @@ int ApplicationHandler::run()
             glfwPollEvents();
             marker_directory->applyPendingAssetChanges();
             map_directory->applyPendingAssetChanges();
-            game_table_manager->processReceivedGameMessages();
+            game_table_manager->processReceivedMessages();
 
             /* Render here */
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));

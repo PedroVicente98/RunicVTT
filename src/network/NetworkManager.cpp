@@ -116,7 +116,6 @@ void NetworkManager::startServer(std::string internal_ip_address, unsigned short
     startServer(ConnectionType::LOCALTUNNEL, port, /*tryUpnp=*/false);
 }
 
-
 void NetworkManager::closeServer()
 {
     if (signalingServer.get() != nullptr)
@@ -129,8 +128,28 @@ void NetworkManager::closeServer()
 
 bool NetworkManager::isConnected()
 {
-
+    for (auto& [peerId, link] : peers)
+    {
+        if (link && link->isConnected())
+            return true;
+    }
     return false;
+}
+bool NetworkManager::isHosting() const
+{
+    return signalingServer && signalingServer->isRunning(); // if you expose isRunning()
+}
+bool NetworkManager::hasAnyPeer() const
+{
+    return !peers.empty();
+}
+int NetworkManager::connectedPeerCount() const
+{
+    int n = 0;
+    for (auto& [id, link] : peers)
+        if (link && link->isConnected())
+            ++n;
+    return n;
 }
 
 bool NetworkManager::connectToPeer(const std::string& connectionString)
@@ -349,7 +368,8 @@ std::size_t NetworkManager::removeDisconnectedPeers()
         if (shouldRemove)
         {
             toErase.push_back(pid);
-            if (link) toClose.emplace_back(link);
+            if (link)
+                toClose.emplace_back(link);
         }
     }
 
@@ -360,12 +380,17 @@ std::size_t NetworkManager::removeDisconnectedPeers()
     // 3) Close outside the map to avoid re-entrancy/races.
     for (auto& link : toClose)
     {
-        try {
+        try
+        {
             link->close(); // should be idempotent and NOT call back into NM
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             Logger::instance().log("main", Logger::Level::Error, std::string("[removeDisconnectedPeers] ") + e.what());
             //pushStatusToast("Peer close error", ImGuiToaster::Level::Error, 4.0f);
-        } catch (...) {
+        }
+        catch (...)
+        {
             Logger::instance().log("main", Logger::Level::Error, "[removeDisconnectedPeers] unknown exception");
             //pushStatusToast("Peer close error (unknown)", ImGuiToaster::Level::Error, 4.0f);
         }
@@ -391,12 +416,17 @@ bool NetworkManager::removePeer(std::string peerId)
     // 2) Close outside the map.
     if (link)
     {
-        try {
+        try
+        {
             link->close(); // safe: detach callbacks first, idempotent
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             Logger::instance().log("main", Logger::Level::Error, std::string("[removePeer] ") + e.what());
             //pushStatusToast("Peer close error", ImGuiToaster::Level::Error, 4.0f);
-        } catch (...) {
+        }
+        catch (...)
+        {
             Logger::instance().log("main", Logger::Level::Error, "[removePeer] unknown exception");
             //pushStatusToast("Peer close error (unknown)", ImGuiToaster::Level::Error, 4.0f);
         }
@@ -482,21 +512,29 @@ bool NetworkManager::disconectFromPeers()
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> moved = std::move(peers);
     peers.clear();
 
-    for (auto& [pid, link] : moved) {
-        if (!link) continue;
-        try {
+    for (auto& [pid, link] : moved)
+    {
+        if (!link)
+            continue;
+        try
+        {
             link->close();
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             Logger::instance().log("main", Logger::Level::Error, std::string("[disconnectFromPeers] ") + e.what());
             pushStatusToast("Peer disconnect error", ImGuiToaster::Level::Error, 5.0f);
-        } catch (...) {
+        }
+        catch (...)
+        {
             Logger::instance().log("main", Logger::Level::Error, "[disconnectFromPeers] unknown");
             pushStatusToast("Peer disconnect error (unknown)", ImGuiToaster::Level::Error, 5.0f);
         }
     }
     moved.clear();
 
-    if (signalingClient) {
+    if (signalingClient)
+    {
         signalingClient->close();
         signalingClient.reset();
     }
@@ -507,34 +545,50 @@ bool NetworkManager::disconectFromPeers()
 
 bool NetworkManager::disconnectAllPeers()
 {
-    if (signalingServer) {
+    if (signalingServer)
+    {
         signalingServer->broadcastShutdown();
     }
 
     std::unordered_map<std::string, std::shared_ptr<PeerLink>> moved = std::move(peers);
     peers.clear();
 
-    for (auto& [pid, link] : moved) {
-        if (!link) continue;
-        try {
+    for (auto& [pid, link] : moved)
+    {
+        if (!link)
+            continue;
+        try
+        {
             link->close();
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             Logger::instance().log("main", Logger::Level::Error, std::string("[disconnectAllPeers] ") + e.what());
             pushStatusToast("Peer disconnect error", ImGuiToaster::Level::Error, 5.0f);
-        } catch (...) {
+        }
+        catch (...)
+        {
             Logger::instance().log("main", Logger::Level::Error, "[disconnectAllPeers] unknown");
             pushStatusToast("Peer disconnect error (unknown)", ImGuiToaster::Level::Error, 5.0f);
         }
     }
     moved.clear();
 
-    if (signalingServer) {
-        signalingServer->disconnectAllClients(); 
-        try { signalingServer->stop(); } catch (...) {}
+    if (signalingServer)
+    {
+        signalingServer->disconnectAllClients();
+        try
+        {
+            signalingServer->stop();
+        }
+        catch (...)
+        {
+        }
         signalingServer.reset();
     }
 
-    if (signalingClient) {
+    if (signalingClient)
+    {
         signalingClient->close();
         signalingClient.reset();
     }
@@ -543,7 +597,6 @@ bool NetworkManager::disconnectAllPeers()
     return true;
 }
 
-
 void NetworkManager::broadcastPeerDisconnect(const std::string& targetId)
 {
     if (!signalingClient)
@@ -551,7 +604,6 @@ void NetworkManager::broadcastPeerDisconnect(const std::string& targetId)
     auto j = msg::makePeerDisconnect(targetId, /*broadcast*/ true);
     signalingClient->send(j.dump());
 }
-
 
 std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 {
@@ -569,7 +621,7 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
 
 //-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
-{ 
+{
     //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& [pid, link] : peers)
     {
@@ -585,7 +637,7 @@ void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<u
 }
 
 void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
-{//{check} --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
+{ //{check} --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
     for (auto& pid : peers_)
     {
         auto it = peers.find(pid);
@@ -602,7 +654,7 @@ void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, 
 // ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
 
 void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
-{//{check}--USE THIS METHOD
+{ //{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -611,7 +663,7 @@ void NetworkManager::broadcastGameTable(const flecs::entity& gameTable)
 }
 
 void NetworkManager::broadcastBoard(const flecs::entity& board)
-{//{check}--USE THIS METHOD
+{ //{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -620,7 +672,7 @@ void NetworkManager::broadcastBoard(const flecs::entity& board)
 }
 
 void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& marker)
-{//{check}--USE THIS METHOD
+{ //{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -629,7 +681,7 @@ void NetworkManager::broadcastMarker(uint64_t boardId, const flecs::entity& mark
 }
 
 void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
-{//{check}--USE THIS METHOD
+{ //{check}--USE THIS METHOD
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
     {
@@ -707,69 +759,69 @@ void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const s
 }
 
 //ON PEER RECEIVING MESSAGE-----------------------------------------------------------
-void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b)
-{
-    size_t off = 0;
-    while (off < b.size())
-    {
-        // Need at least one byte for the type
-        if (!ensureRemaining(b, off, 1))
-        {
-            break;
-        }
-
-        auto type = static_cast<msg::DCType>(b[off]);
-        off += 1;
-
-        switch (type)
-        {
-                // -------- SNAPSHOT / BOARD ----------
-            case msg::DCType::Snapshot_Board:
-                handleBoardMeta(b, off);
-                break;
-
-                // -------- CREATE MARKER (META) ----------
-            case msg::DCType::MarkerCreate:
-                handleMarkerMeta(b, off);
-                break;
-
-                // -------- FOG CREATE (NO IMAGE) ----------
-            case msg::DCType::FogCreate:
-                handleFogCreate(b, off);
-                break;
-
-                // -------- IMAGE CHUNK (BOARD or MARKER) ----------
-            case msg::DCType::ImageChunk:
-                handleImageChunk(b, off);
-                break;
-
-                // -------- COMMIT BOARD ----------
-            case msg::DCType::CommitBoard:
-                handleCommitBoard(b, off);
-                break;
-
-                // -------- COMMIT MARKER ----------
-            case msg::DCType::CommitMarker:
-                handleCommitMarker(b, off);
-                break;
-
-                // -------- BOARD OPERATONS - AFTER ENTITIY CREATION ----------
-            case msg::DCType::MarkerUpdate:
-                //handlemarkermove(b, off);
-                break;
-
-            case msg::DCType::GridUpdate:
-                //handlegridupdate(b, off);
-                break;
-
-            case msg::DCType::FogUpdate:
-                //handleFogUpdate(b, off);
-                break;
-            default:
-                return;
-        }
-    }
-}
+//void NetworkManager::onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b)
+//{
+//    size_t off = 0;
+//    while (off < b.size())
+//    {
+//        // Need at least one byte for the type
+//        if (!ensureRemaining(b, off, 1))
+//        {
+//            break;
+//        }
+//
+//        auto type = static_cast<msg::DCType>(b[off]);
+//        off += 1;
+//
+//        switch (type)
+//        {
+//                // -------- SNAPSHOT / BOARD ----------
+//            case msg::DCType::Snapshot_Board:
+//                handleBoardMeta(b, off);
+//                break;
+//
+//                // -------- CREATE MARKER (META) ----------
+//            case msg::DCType::MarkerCreate:
+//                handleMarkerMeta(b, off);
+//                break;
+//
+//                // -------- FOG CREATE (NO IMAGE) ----------
+//            case msg::DCType::FogCreate:
+//                handleFogCreate(b, off);
+//                break;
+//
+//                // -------- IMAGE CHUNK (BOARD or MARKER) ----------
+//            case msg::DCType::ImageChunk:
+//                handleImageChunk(b, off);
+//                break;
+//
+//                // -------- COMMIT BOARD ----------
+//            case msg::DCType::CommitBoard:
+//                handleCommitBoard(b, off);
+//                break;
+//
+//                // -------- COMMIT MARKER ----------
+//            case msg::DCType::CommitMarker:
+//                handleCommitMarker(b, off);
+//                break;
+//
+//                // -------- BOARD OPERATONS - AFTER ENTITIY CREATION ----------
+//            case msg::DCType::MarkerUpdate:
+//                //handlemarkermove(b, off);
+//                break;
+//
+//            case msg::DCType::GridUpdate:
+//                //handlegridupdate(b, off);
+//                break;
+//
+//            case msg::DCType::FogUpdate:
+//                //handleFogUpdate(b, off);
+//                break;
+//            default:
+//                return;
+//        }
+//    }
+//}
 
 //---Message Received Handlers--------------------------------------------------------------------------------
 // DCType::Snapshot_GameTable (100)
@@ -924,22 +976,260 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
     }
 }
 
-//-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
-void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
-{//--{check}USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
-    if (peer_role != Role::GAMEMASTER)
-        return;
-
-    auto it = peers.find(peerId);
-    if (it == peers.end() || !it->second)
-        return;
-    auto& link = it->second;
-
-    if (link->allRequiredOpen())
+void NetworkManager::drainEvents()
+{
+    msg::NetEvent ev;
+    while (events_.try_pop(ev))
     {
-        bootstrapPeerIfReady(peerId);
+        if (ev.type == msg::NetEvent::Type::DcOpen)
+        {
+            auto it = peers.find(ev.peerId);
+            if (it != peers.end() && it->second)
+            {
+                it->second->setOpen(ev.label, true);
+            }
+        }
+        else if (ev.type == msg::NetEvent::Type::DcClosed)
+        {
+            auto it = peers.find(ev.peerId);
+            if (it != peers.end() && it->second)
+            {
+                it->second->setOpen(ev.label, false);
+                it->second->markBootstrapReset();
+            }
+        }
+    }
+
+    // If GM: check if any peer is now fully open → bootstrap once
+    if (peer_role == Role::GAMEMASTER)
+    {
+        for (auto& [pid, link] : peers)
+        {
+            if (link && link->allRequiredOpen() && !link->bootstrapSent())
+            {
+                try
+                {
+                    bootstrapPeerIfReady(pid);
+                }
+                catch (...)
+                {
+                    toaster_->Push(ImGuiToaster::Level::Error, "Error Bootstrapping Peer!!", 3.0f);
+                }
+            }
+        }
     }
 }
+
+void NetworkManager::drainInboundRaw(int maxPerTick)
+{
+    int processed = 0;
+    msg::InboundRaw r;
+    while (processed < maxPerTick && inboundRaw_.try_pop(r))
+    {
+        try
+        {
+            if (r.label == msg::dc::name::Game)
+            {
+                decodeRawGameBuffer(r.fromPeer, r.bytes);
+            }
+            else if (r.label == msg::dc::name::Chat)
+            {
+                decodeRawChatBuffer(r.fromPeer, r.bytes);
+            }
+            else if (r.label == msg::dc::name::Notes)
+            {
+                decodeRawNotesBuffer(r.fromPeer, r.bytes);
+            }
+        }
+        catch (...)
+        {
+            // swallow & optionally push a toaster
+        }
+        ++processed;
+    }
+}
+
+void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
+    size_t off = 0;
+    while (off < b.size())
+    {
+        if (!ensureRemaining(b, off, 1))
+            break;
+
+        auto type = static_cast<msg::DCType>(b[off]);
+        off += 1;
+
+        switch (type)
+        {
+            case msg::DCType::Snapshot_GameTable:
+                handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                break;
+
+            case msg::DCType::Snapshot_Board:
+                handleBoardMeta(b, off); // fills imagesRx_
+                break;
+
+            case msg::DCType::MarkerCreate:
+                handleMarkerMeta(b, off); // fills imagesRx_
+                break;
+
+            case msg::DCType::FogCreate:
+                handleFogCreate(b, off); // pushes ReadyMessage
+                break;
+
+            case msg::DCType::ImageChunk:
+                handleImageChunk(b, off); // fills buffers
+                break;
+
+            case msg::DCType::CommitBoard:
+                handleCommitBoard(b, off); // pushes ReadyMessage
+                break;
+
+            case msg::DCType::CommitMarker:
+                handleCommitMarker(b, off); // pushes ReadyMessage
+                break;
+
+            case msg::DCType::MarkerUpdate:
+                // handleMarkerUpdate(b, off);     // later
+                return; // or break; depends on your framing
+            case msg::DCType::GridUpdate:
+                // handleGridUpdate(b, off);       // later
+                return;
+
+            default:
+                // unknown / out-of-sync: stop this buffer
+                return;
+        }
+    }
+}
+
+void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
+    size_t off = 0;
+    while (off < b.size())
+    {
+        if (!ensureRemaining(b, off, 1))
+            break;
+
+        auto type = static_cast<msg::DCType>(b[off]);
+        off += 1;
+
+        switch (type)
+        {
+            case msg::DCType::ChatMessage:
+                //handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                break;
+
+            case msg::DCType::ChatThreadCreate:
+                //handleBoardMeta(b, off); // fills imagesRx_
+                break;
+
+            case msg::DCType::ChatThreadDelete:
+                //handleMarkerMeta(b, off); // fills imagesRx_
+                break;
+
+            case msg::DCType::ChatThreadUpdate:
+                //handleFogCreate(b, off); // pushes ReadyMessage
+                break;
+
+            default:
+                // unknown / out-of-sync: stop this buffer
+                return;
+        }
+    }
+}
+
+void NetworkManager::decodeRawNotesBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
+    size_t off = 0;
+    while (off < b.size())
+    {
+        if (!ensureRemaining(b, off, 1))
+            break;
+
+        auto type = static_cast<msg::DCType>(b[off]);
+        off += 1;
+
+        switch (type)
+        {
+            case msg::DCType::NoteCreate:
+                //handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                break;
+
+            case msg::DCType::NoteUpdate:
+                //handleBoardMeta(b, off); // fills imagesRx_
+                break;
+
+            case msg::DCType::NoteDelete:
+                //handleMarkerMeta(b, off); // fills imagesRx_
+                break;
+            default:
+                // unknown / out-of-sync: stop this buffer
+                return;
+        }
+    }
+}
+void NetworkManager::startRawDrainWorker()
+{
+    bool expected = false;
+    if (!rawWorkerRunning_.compare_exchange_strong(expected, true))
+        return; // already running
+
+    rawWorkerStop_.store(false);
+    rawWorker_ = std::thread([this]()
+                             {
+        for (;;) {
+            if (rawWorkerStop_.load())
+                break;
+
+            msg::InboundRaw r;
+            if (inboundRaw_.try_pop(r)) {
+                try {
+                    if (r.label == msg::dc::name::Game) {
+                        decodeRawGameBuffer(r.fromPeer, r.bytes);
+                    } else if (r.label == msg::dc::name::Chat) {
+                        decodeRawChatBuffer(r.fromPeer, r.bytes);
+                    } else if (r.label == msg::dc::name::Notes) {
+                        decodeRawNotesBuffer(r.fromPeer, r.bytes);
+                    }
+                } catch (...) {
+                    // swallow
+                }
+                continue;
+            }
+
+            // nothing in queue: sleep briefly to avoid busy spin
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        } });
+}
+
+void NetworkManager::stopRawDrainWorker()
+{
+    if (!rawWorkerRunning_.load())
+        return;
+    rawWorkerStop_.store(true);
+    if (rawWorker_.joinable())
+        rawWorker_.join();
+    rawWorkerRunning_.store(false);
+}
+
+//-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
+//void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
+//{//--{check}USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
+//    if (peer_role != Role::GAMEMASTER)
+//        return;
+//
+//    auto it = peers.find(peerId);
+//    if (it == peers.end() || !it->second)
+//        return;
+//    auto& link = it->second;
+//
+//    if (link->allRequiredOpen())
+//    {
+//        bootstrapPeerIfReady(peerId);
+//    }
+//}
 
 void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
 {
@@ -947,10 +1237,10 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     auto bm = board_manager.lock();
     if (!gm)
         return;
-        throw std::exception("[NetworkManager] GametableManager Expired!!");
+    throw std::exception("[NetworkManager] GametableManager Expired!!");
     if (!bm)
         return;
-        throw std::exception("[NetworkManager] BoardManager Expired!!");
+    throw std::exception("[NetworkManager] BoardManager Expired!!");
 
     auto it = peers.find(peerId);
     if (it == peers.end() || !it->second)
@@ -1110,7 +1400,7 @@ std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t board
 //-{check}wrong logic below
 
 bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-{//{check}-wrong logic
+{ //{check}-wrong logic
     if (img.empty())
         return false;
 
@@ -1151,7 +1441,7 @@ bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, 
 }
 
 bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-{//{check}-wrong logic
+{ //{check}-wrong logic
     if (img.empty())
         return false;
 

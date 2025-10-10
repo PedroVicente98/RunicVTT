@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 #include "Message.h"
 #include "Logger.h"
+#include "NetworkUtilities.h"
 
 using json = nlohmann::json;
 using Clock = std::chrono::steady_clock;
@@ -57,6 +58,7 @@ void SignalingServer::start(unsigned short port)
             authClients_.erase(clientId);
             }); });
 
+    is_running = true;
     std::cout << "[SignalingServer] Listening at ws://0.0.0.0:" << port << "\n";
 }
 
@@ -66,9 +68,18 @@ void SignalingServer::stop()
     {
         server->stop();
         server.reset();
+        is_running = false;
+    }
+    for (auto [id, ws] : pendingClients_)
+    {
+        NetworkUtilities::safeCloseWebSocket(ws);
+    }
+
+    for (auto [id, ws] : authClients_)
+    {
+        NetworkUtilities::safeCloseWebSocket(ws);
     }
     pendingClients_.clear();
-    //pendingSince_.clear();
     authClients_.clear();
 }
 
@@ -244,16 +255,22 @@ void SignalingServer::disconnectAllClients()
     authClients_.clear();
     pendingClients_.clear();
 
-    auto closer = [](auto& map) {
-        for (auto& [id, ws] : map) {
-            if (!ws) continue;
-            try {
+    auto closer = [](auto& map)
+    {
+        for (auto& [id, ws] : map)
+        {
+            if (!ws)
+                continue;
+            try
+            {
                 ws->onOpen(nullptr);
                 ws->onMessage(nullptr);
                 ws->onClosed(nullptr);
                 ws->onError(nullptr);
                 ws->close();
-            } catch (...) {
+            }
+            catch (...)
+            {
                 Logger::instance().log("main", Logger::Level::Warn, "WS close failed for " + id);
             }
         }

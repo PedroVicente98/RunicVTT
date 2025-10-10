@@ -23,7 +23,7 @@ public:
     void setup();
     bool isConnected() const;
 
-    void processReceivedGameMessages();
+    void processReceivedMessages();
 
     void hostGameTablePopUp();
     void networkCenterPopUp();

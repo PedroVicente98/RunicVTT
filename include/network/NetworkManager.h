@@ -74,6 +74,9 @@ public:
 
     // if not, call this from main thread; otherwise add a mutex)
     bool isConnected();
+    bool isHosting() const;
+    bool hasAnyPeer() const;
+    int connectedPeerCount() const;
 
     void allowPort(unsigned int port);
     void disallowPort(unsigned short port);
@@ -146,7 +149,23 @@ public:
         return inboundGame_.try_pop(out);
     }
 
+    bool tryPopRawMessage(msg::InboundRaw& out)
+    {
+        return inboundRaw_.try_pop(out);
+    }
+
+    void drainEvents();
+    void drainInboundRaw(int maxPerTick);
+    void decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    void decodeRawChatBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    void decodeRawNotesBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+
+    void startRawDrainWorker();
+    void stopRawDrainWorker();
+
     void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    //void onDcChatBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    //void onDcNotesBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
 
     bool sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name);
     bool sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name);
@@ -181,7 +200,17 @@ public:
             toaster_->Push(lvl, msg, durationSec);
     }
 
+    MessageQueue<msg::NetEvent> events_;
+    MessageQueue<msg::InboundRaw> inboundRaw_;
+
 private:
+    std::unordered_map<uint64_t, PendingImage> imagesRx_;
+    MessageQueue<msg::ReadyMessage> inboundGame_;
+    // optional background raw-drain worker
+    std::atomic<bool> rawWorkerRunning_{false};
+    std::atomic<bool> rawWorkerStop_{false};
+    std::thread rawWorker_;
+
     std::shared_ptr<ImGuiToaster> toaster_;
 
     static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
@@ -204,10 +233,6 @@ private:
     std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
 
     std::vector<std::string> getConnectedPeerIds() const;
-
-    std::unordered_map<uint64_t, PendingImage> imagesRx_;
-
-    MessageQueue<msg::ReadyMessage> inboundGame_;
 
     std::string myClientId_;
     std::string myUsername_;
