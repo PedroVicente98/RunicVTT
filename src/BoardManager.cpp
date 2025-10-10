@@ -651,7 +651,7 @@ void BoardManager::setCurrentTool(Tool newTool)
 {
     currentTool = newTool;
 }
-
+/*
 flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
 {
 
@@ -676,6 +676,54 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
         } });
     ecs.defer_end();
     return entity_at_mouse;
+}
+*/
+flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
+{
+    flecs::entity best{};
+    bool bestIsMarker = false;
+    float bestArea = std::numeric_limits<float>::infinity();
+
+    // We're only reading; deferring isn't needed, but keeping your pattern:
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity e, const Position& pos, const Size& sz)
+    {
+        // Must belong to the active board
+        if (!e.has(flecs::ChildOf, active_board))
+            return;
+
+        // Point-in-AABB check (centered entity with half extents)
+        const float hx = sz.width  * 0.5f;
+        const float hy = sz.height * 0.5f;
+        const bool inX = (mouse_position.x >= (pos.x - hx)) && (mouse_position.x <= (pos.x + hx));
+        const bool inY = (mouse_position.y >= (pos.y - hy)) && (mouse_position.y <= (pos.y + hy));
+        if (!inX || !inY) return;
+
+        const bool isMarker = e.has<MarkerComponent>();
+        // Only Marker and FogOfWar are relevant; ignore other types if you want:
+        // (If you want Fog only as alternative, check `e.has<FogOfWar>()` here.)
+        const float area = std::max(0.0f, sz.width) * std::max(0.0f, sz.height);
+
+        // Decide priority:
+        bool better = false;
+        if (!best.is_valid()) {
+            better = true; // first hit
+        } else if (isMarker && !bestIsMarker) {
+            better = true; // markers beat non-markers
+        } else if (isMarker == bestIsMarker) {
+            // same type -> smaller area wins
+            if (area < bestArea) better = true;
+        }
+
+        if (better) {
+            best = e;
+            bestIsMarker = isMarker;
+            bestArea = area;
+        }
+    });
+    ecs.defer_end();
+
+    return best;
 }
 
 //GRID
