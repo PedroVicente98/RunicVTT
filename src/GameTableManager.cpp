@@ -159,6 +159,7 @@ void GameTableManager::processReceivedMessages()
 
                 GLuint tex = 0;
                 glm::vec2 texSize{m.markerMeta->size.width, m.markerMeta->size.height};
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + m.bytes->size());
                 if (m.bytes && !m.bytes->empty())
                 {
                     auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),

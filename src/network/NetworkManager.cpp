@@ -1017,11 +1017,16 @@ void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off
     uint64_t off64 = Serializer::deserializeUInt64(b, off);
     int len = Serializer::deserializeInt(b, off);
 
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Kind: " + (kind == msg::ImageOwnerKind::Board) ? "Board" : "Marker");
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Byte Offset: " + std::to_string(off64));
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Len: " + std::to_string(len));
+
     auto it = imagesRx_.find(id);
     if (it == imagesRx_.end())
         return; // unknown; drop
-
     auto& p = it->second;
+    Logger::instance().log("localtunnel", Logger::Level::Info, "imagesRx_ Found");
     if (p.kind != kind || p.total == 0)
         return;
     // bounds check

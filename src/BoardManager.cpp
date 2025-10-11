@@ -297,14 +297,7 @@ void BoardManager::renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader,
                 fog_model = glm::scale(fog_model, glm::vec3(size_marker->width, size_marker->height, 1.0f));
 
                 float alpha = 1.0f;
-                if (nm->getPeerRole() == Role::GAMEMASTER)
-                {
-                    alpha = 0.3f;
-                }
-                else
-                {
-                    alpha = 0.0f;
-                }
+              
                 if (!visibility_marker->isVisible) {
                     if (nm->getPeerRole() == Role::GAMEMASTER) {
                         alpha = 0.3f;
