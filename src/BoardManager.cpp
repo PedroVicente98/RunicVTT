@@ -1073,8 +1073,9 @@ flecs::entity BoardManager::findBoardById(uint64_t boardId)
     Logger::instance().log("localtunnel", Logger::Level::Info, "Board Name:  " + b.board_name);
 		if (e.is_valid() && id.id == boardId) {
 			result = e;
+            Logger::instance().log("localtunnel", Logger::Level::Info, "Found Board By ID!! " + boardId);
 		} });
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Found Board By ID!! " + boardId);
+
     return result; // will be invalid if not found
 }
 

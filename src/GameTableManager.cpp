@@ -136,10 +136,15 @@ void GameTableManager::processReceivedMessages()
                 }
 
                 const auto& bm = *m.boardMeta;
-                auto board = board_manager->createBoard(bm.boardName, /*map path*/ "", tex, texSize);
-                board.set(Identifier{bm.boardId});
-                board.set(bm.pan);
-                board.set(bm.grid);
+                auto board = ecs.entity()
+                                 .set(Identifier{bm.boardId})
+                                 .set(Board{bm.boardName})
+                                 .set(Panning{false})
+                                 .set(Grid{bm.grid})
+                                 .set(TextureComponent{tex, "", texSize})
+                                 .set(Size{texSize.x, texSize.y});
+
+                board_manager->setActiveBoard(board);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "Board Created!!");
                 break;
             }
