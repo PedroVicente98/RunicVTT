@@ -39,7 +39,7 @@ namespace msg
         ChatThreadDelete = 202,
         ChatMessage = 203
     };
-    std::string DCtypeString(DCType type)
+    inline std::string DCtypeString(DCType type)
     {
         std::string type_str;
         switch (type)
