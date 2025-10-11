@@ -816,6 +816,7 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 {
     // read board image (from TextureComponent.image_path)
     auto tex = board.get<TextureComponent>();
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Path: " + tex->image_path);
     std::vector<unsigned char> img = tex ? readFileBytes(tex->image_path) : std::vector<unsigned char>{};
 
     // 1) meta
@@ -829,8 +830,7 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
     {
         size_t chunk = std::min<size_t>(kChunk, img.size() - off);
         auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
-        for (auto& pid : toPeerIds)
-            sendGameTo(pid, frame);
+        broadcastGameFrame(frame, toPeerIds);
         off += chunk;
     }
 
@@ -842,9 +842,14 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)
 {
     // read marker image (from TextureComponent.image_path)
-    auto tex = marker.get<TextureComponent>();
-    std::vector<unsigned char> img = tex ? readFileBytes(tex->image_path) : std::vector<unsigned char>{};
+    auto marker_folder = PathManager::getMarkersPath(); //check ig
+    const TextureComponent* tex = marker.get<TextureComponent>();
+    auto marker_path = marker_folder / tex->image_path;
 
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Path: " + tex->image_path);
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Path Processed: " + marker_path.string());
+    std::vector<unsigned char> img = tex ? readFileBytes(marker_path.string()) : std::vector<unsigned char>{};
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + img.size());
     // 1) meta
     auto meta = buildCreateMarkerFrame(boardId, marker, static_cast<uint64_t>(img.size()));
     broadcastGameFrame(meta, toPeerIds);
@@ -856,6 +861,7 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
     {
         size_t chunk = std::min<size_t>(kChunk, img.size() - off);
         auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
+        Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + img.size());
         broadcastGameFrame(frame, toPeerIds);
         off += chunk;
     }

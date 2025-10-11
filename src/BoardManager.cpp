@@ -349,7 +349,6 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
                                .set(MarkerComponent{"", false, false})
                                .set(Moving{false});
 
-    //marker.add<MarkerComponent>();
     marker.add(flecs::ChildOf, active_board);
 
     /*auto message = nm->buildCreateMarkerMessage(marker);
