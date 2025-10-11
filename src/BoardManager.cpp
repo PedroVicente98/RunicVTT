@@ -1067,13 +1067,14 @@ void BoardManager::renderGridWindow()
 
 flecs::entity BoardManager::findBoardById(uint64_t boardId)
 {
+    std::cout << "Find Board By Id: " << boardId << "\n";
     flecs::entity result;
     ecs.each([&](flecs::entity e, const Board& b, const Identifier& id)
              {
     Logger::instance().log("localtunnel", Logger::Level::Info, "Board Name:  " + b.board_name);
 		if (e.is_valid() && id.id == boardId) {
 			result = e;
-            Logger::instance().log("localtunnel", Logger::Level::Info, "Found Board By ID!! " + boardId);
+            Logger::instance().log("localtunnel", Logger::Level::Info, "Found Board By ID!!");
 		} });
 
     return result; // will be invalid if not found
