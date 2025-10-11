@@ -39,6 +39,74 @@ namespace msg
         ChatThreadDelete = 202,
         ChatMessage = 203
     };
+    std::string DCtypeString(DCType type)
+    {
+        std::string type_str;
+        switch (type)
+        {
+            case msg::DCType::Snapshot_GameTable:
+                type_str = "Snapshot_GameTable";
+                break;
+            case msg::DCType::Snapshot_Board:
+                type_str = "Snapshot_Board";
+                break;
+            case msg::DCType::CommitMarker:
+                type_str = "CommitMarker";
+                break;
+            case msg::DCType::CommitBoard:
+                type_str = "CommitBoard";
+                break;
+            case msg::DCType::ImageChunk:
+                type_str = "ImageChunk";
+                break;
+            case msg::DCType::MarkerCreate:
+                type_str = "MarkerCreate";
+                break;
+            case msg::DCType::MarkerUpdate:
+                type_str = "MarkerUpdate";
+                break;
+            case msg::DCType::MarkerDelete:
+                type_str = "MarkerDelete";
+                break;
+            case msg::DCType::FogCreate:
+                type_str = "FogCreate";
+                break;
+            case msg::DCType::FogUpdate:
+                type_str = "FogUpdate";
+                break;
+            case msg::DCType::FogDelete:
+                type_str = "FogDelete";
+                break;
+            case msg::DCType::GridUpdate:
+                type_str = "GridUpdate";
+                break;
+            case msg::DCType::NoteCreate:
+                type_str = "NoteCreate";
+                break;
+            case msg::DCType::NoteUpdate:
+                type_str = "NoteUpdate";
+                break;
+            case msg::DCType::NoteDelete:
+                type_str = "NoteDelete";
+                break;
+            case msg::DCType::ChatThreadCreate:
+                type_str = "ChatThreadCreate";
+                break;
+            case msg::DCType::ChatThreadUpdate:
+                type_str = "ChatThreadUpdate";
+                break;
+            case msg::DCType::ChatThreadDelete:
+                type_str = "ChatThreadDelete";
+                break;
+            case msg::DCType::ChatMessage:
+                type_str = "ChatMessage";
+                break;
+            default:
+                type_str = "UnkownType";
+                break;
+        }
+        return type_str;
+    }
 
     enum class ImageOwnerKind : uint8_t
     {
@@ -89,7 +157,6 @@ namespace msg
         std::optional<uint64_t> ts;
         std::optional<std::string> text;                   // chat text
         std::optional<std::set<std::string>> participants; // thread participants
-
     };
 
     struct NetEvent

@@ -19,6 +19,7 @@
 #include <cstdint> // For uint64_t and UINT64_MAX
 #include "Serializer.h"
 #include "NetworkManager.h"
+#include "Logger.h"
 
 BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
     ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
@@ -1067,11 +1068,13 @@ void BoardManager::renderGridWindow()
 flecs::entity BoardManager::findBoardById(uint64_t boardId)
 {
     flecs::entity result;
-    ecs.each([&](flecs::entity e, const Board&, const Identifier& id)
+    ecs.each([&](flecs::entity e, const Board& b, const Identifier& id)
              {
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Name:  " + b.board_name);
 		if (e.is_valid() && id.id == boardId) {
 			result = e;
 		} });
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Found Board By ID!! " + boardId);
     return result; // will be invalid if not found
 }
 

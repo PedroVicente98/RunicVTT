@@ -1124,7 +1124,6 @@ void NetworkManager::drainEvents()
         {
             pushStatusToast(std::string("[Peer] ") + ev.peerId + " Connected", ImGuiToaster::Level::Good);
         }
-   
     }
 
     // If GM: check if any peer is now fully open → bootstrap once
@@ -1195,45 +1194,55 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
 
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
         switch (type)
         {
             case msg::DCType::Snapshot_GameTable:
                 handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_GameTable Handled!!");
                 break;
 
             case msg::DCType::Snapshot_Board:
                 handleBoardMeta(b, off); // fills imagesRx_
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_Board Handled!!");
                 break;
 
             case msg::DCType::MarkerCreate:
                 handleMarkerMeta(b, off); // fills imagesRx_
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerCreate Handled!!");
                 break;
 
             case msg::DCType::FogCreate:
                 handleFogCreate(b, off); // pushes ReadyMessage
+                Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
                 break;
 
             case msg::DCType::ImageChunk:
                 handleImageChunk(b, off); // fills buffers
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ImageChunk Handled!!");
                 break;
 
             case msg::DCType::CommitBoard:
                 handleCommitBoard(b, off); // pushes ReadyMessage
+                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitBoard Handled!!");
                 break;
 
             case msg::DCType::CommitMarker:
                 handleCommitMarker(b, off); // pushes ReadyMessage
+                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitMarker Handled!!");
                 break;
 
             case msg::DCType::MarkerUpdate:
-                // handleMarkerUpdate(b, off);     // later
+                //handleMarkerUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
                 return; // or break; depends on your framing
             case msg::DCType::GridUpdate:
-                // handleGridUpdate(b, off);       // later
+                //handleGridUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
                 return;
 
             default:
-                // unknown / out-of-sync: stop this buffer
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
                 return;
         }
     }
@@ -1250,7 +1259,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
             break;
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
-
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
         switch (type)
         {
             case msg::DCType::ChatThreadCreate:
@@ -1270,6 +1279,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                     r.participants = std::move(parts);
                 }
                 inboundGame_.push(std::move(r));
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadCreate Handled!!");
                 break;
             }
 
@@ -1290,6 +1300,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                     r.participants = std::move(parts);
                 }
                 inboundGame_.push(std::move(r));
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadUpdate Handled!!");
                 break;
             }
 
@@ -1302,6 +1313,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                 r.tableId = tableId;
                 r.threadId = Serializer::deserializeUInt64(b, off);
                 inboundGame_.push(std::move(r));
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadDelete Handled!!");
                 break;
             }
 
@@ -1317,10 +1329,12 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                 r.name = Serializer::deserializeString(b, off); // username
                 r.text = Serializer::deserializeString(b, off); // message text
                 inboundGame_.push(std::move(r));
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatMessage Handled!!");
                 break;
             }
 
             default:
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
                 return; // stop this buffer if unknown/out-of-sync
         }
     }
@@ -1337,21 +1351,26 @@ void NetworkManager::decodeRawNotesBuffer(const std::string& fromPeer, const std
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
 
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
         switch (type)
         {
             case msg::DCType::NoteCreate:
                 //handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                Logger::instance().log("localtunnel", Logger::Level::Info, "NoteCreate Handled!!");
                 break;
 
             case msg::DCType::NoteUpdate:
                 //handleBoardMeta(b, off); // fills imagesRx_
+                Logger::instance().log("localtunnel", Logger::Level::Info, "NoteUpdate Handled!!");
                 break;
 
             case msg::DCType::NoteDelete:
                 //handleMarkerMeta(b, off); // fills imagesRx_
+                Logger::instance().log("localtunnel", Logger::Level::Info, "NoteDelete Handled!!");
                 break;
             default:
                 // unknown / out-of-sync: stop this buffer
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
                 return;
         }
     }
@@ -1419,6 +1438,7 @@ void NetworkManager::stopRawDrainWorker()
 
 void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
 {
+    Logger::instance().log("localtunnel", Logger::Level::Info, "BeginBoostrap");
     auto gm = gametable_manager.lock();
     auto bm = board_manager.lock();
     if (!gm)
@@ -1436,10 +1456,10 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     auto& link = it->second;
     if (link->bootstrapSent())
         return; // one-shot per connection
-
     if (gm->active_game_table.is_valid() && gm->active_game_table.has<GameTable>())
     {
         sendGameTable(gm->active_game_table, {peerId});
+        Logger::instance().log("localtunnel", Logger::Level::Info, "SentGameTable");
     }
 
     if (bm->isBoardActive())
@@ -1448,6 +1468,7 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
         if (boardEnt.is_valid() && boardEnt.has<Board>())
         {
             sendBoard(boardEnt, {peerId}); // this sends meta + image chunks + commit
+            Logger::instance().log("localtunnel", Logger::Level::Info, "SentBoard");
         }
 
         boardEnt.children([&](flecs::entity child)
@@ -1455,10 +1476,12 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
 			if (child.has<MarkerComponent>()) {
 				uint64_t bid = boardEnt.get<Identifier>()->id;
 				sendMarker(bid, child, { peerId });
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentMarker");
 			}
 			else if (child.has<FogOfWar>()) {
 				uint64_t bid = boardEnt.get<Identifier>()->id;
 				sendFog(bid, child, { peerId });
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentFog");
 			} });
     }
 

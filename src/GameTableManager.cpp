@@ -3,7 +3,7 @@
 #include "Serializer.h"
 #include "SignalingServer.h"
 #include "UPnPManager.h"
-
+#include "Logger.h"
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
     ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory))
 {
@@ -117,6 +117,7 @@ void GameTableManager::processReceivedMessages()
                                         .set(Identifier{*m.tableId});
                 game_table_name = *m.name;
                 chat_manager->setActiveGameTable(*m.tableId, *m.name);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "GameTable Created!!");
                 break;
             }
 
@@ -139,6 +140,7 @@ void GameTableManager::processReceivedMessages()
                 board.set(Identifier{bm.boardId});
                 board.set(bm.pan);
                 board.set(bm.grid);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Board Created!!");
                 break;
             }
 
@@ -158,6 +160,7 @@ void GameTableManager::processReceivedMessages()
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Created: " + tex);
                 }
                 const auto& mm = *m.markerMeta;
                 flecs::entity marker = ecs.entity()
@@ -169,6 +172,7 @@ void GameTableManager::processReceivedMessages()
                                            .set(MarkerComponent{"", false, false})
                                            .set(Moving{mm.mov});
                 marker.add(flecs::ChildOf, boardEnt);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Created");
                 break;
             }
 
@@ -188,6 +192,7 @@ void GameTableManager::processReceivedMessages()
 
                 fog.add<FogOfWar>();
                 fog.add(flecs::ChildOf, boardEnt);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Fog Created");
                 break;
             }
 
