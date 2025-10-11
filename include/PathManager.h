@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 #include <cstdlib>
+#include <cctype>
+
 //#include <shlobj.h>   // for SHGetKnownFolderPath
 //#include <ShlObj_core.h>   // or <ShlObj.h>
 //#include <KnownFolders.h>
@@ -138,5 +140,58 @@ public:
         createIfNotExists(getNotesPath());
         createIfNotExists(getConfigPath());
         createIfNotExists(getGameTablesPath());
+    }
+
+    //helpers
+    static bool hasDirSep(const std::string& s)
+    {
+        return s.find('\\') != std::string::npos || s.find('/') != std::string::npos;
+    }
+
+    static bool isUNC(const std::string& s)
+    {
+        // \\server\share or //server/share
+        return (s.rfind("\\\\", 0) == 0) || (s.rfind("//", 0) == 0);
+    }
+
+    static bool isDriveAbsolute(const std::string& s)
+    {
+        // C:\foo or C:/foo
+        return s.size() > 2 && std::isalpha(static_cast<unsigned char>(s[0])) && s[1] == ':' && (s[2] == '\\' || s[2] == '/');
+    }
+
+    static bool isDriveRelative(const std::string& s)
+    {
+        // C:foo (relative to current dir on drive C)
+        return s.size() > 1 && std::isalpha(static_cast<unsigned char>(s[0])) && s[1] == ':' && (s.size() == 2 || (s[2] != '\\' && s[2] != '/'));
+    }
+
+    static bool isAbsolutePath(const std::string& s)
+    {
+        // std::filesystem covers POSIX abspaths; supplement for Windows special cases
+        std::filesystem::path p(s);
+        if (p.is_absolute())
+            return true; // works for POSIX and many Windows cases
+        if (isUNC(s) || isDriveAbsolute(s))
+            return true;
+        return false;
+    }
+
+    static bool isPathLike(const std::string& s)
+    {
+        // Treat anything with directory separators OR absolute/UNC/drive-relative prefixes as a path
+        if (isAbsolutePath(s))
+            return true;
+        if (isDriveRelative(s))
+            return true; // still a path, just not absolute
+        if (hasDirSep(s))
+            return true; // e.g. "markers/goblin.png"
+        return false;
+    }
+
+    static bool isFilenameOnly(const std::string& s)
+    {
+        // No separators, no drive/UNC prefixes => just a filename, like "goblin.png"
+        return !isPathLike(s);
     }
 };

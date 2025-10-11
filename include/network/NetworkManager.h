@@ -17,6 +17,8 @@
 #include "Message.h"
 #include <fstream>
 #include "ImGuiToaster.h"
+#include "PathManager.h"
+#include "Logger.h"
 
 enum class Role
 {
@@ -123,8 +125,6 @@ public:
     void broadcastPeerDisconnect(const std::string& targetId);
     // Single-shot reconnect of one peer. Returns true if we kicked off a rebuild.
     /*bool reconnectPeer(const std::string& peerId);*/
-
-
 
     // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
@@ -292,6 +292,53 @@ private:
         }
         return buffer;
     }
+    //inline std::vector<unsigned char> readFileBytes(const std::string& path)
+    //{
+    //    namespace fs = std::filesystem;
+    //    std::error_code ec;
+
+    //    auto tryOpen = [](const fs::path& p) -> std::vector<unsigned char>
+    //    {
+    //        std::ifstream file(p, std::ios::binary);
+    //        if (!file)
+    //            return {};
+    //        file.seekg(0, std::ios::end);
+    //        size_t size = static_cast<size_t>(file.tellg());
+    //        file.seekg(0, std::ios::beg);
+    //        std::vector<unsigned char> buffer(size);
+    //        if (size > 0)
+    //            file.read(reinterpret_cast<char*>(buffer.data()), size);
+    //        return buffer;
+    //    };
+
+    //    fs::path p = path;
+    //    // 1) Direct (absolute or relative to CWD)
+    //    if (auto buf = tryOpen(p); !buf.empty())
+    //        return buf;
+
+    //    // 2) Resolve relative under known asset roots
+    //    std::vector<fs::path> roots = {
+    //        PathManager::getMapsPath(),
+    //        PathManager::getMarkersPath(),
+    //        fs::path("res"),   // if you ship a res/
+    //        fs::current_path() // last-ditch CWD
+    //    };
+
+    //    for (const auto& r : roots)
+    //    {
+    //        fs::path candidate = fs::weakly_canonical(r / p, ec);
+    //        if (ec)
+    //            continue;
+    //        if (auto buf = tryOpen(candidate); !buf.empty())
+    //        {
+    //            return buf;
+    //        }
+    //    }
+
+    //    // Log a helpful error once
+    //    Logger::instance().log("assets", Logger::Level::Error, "readFileBytes: cannot open '" + path + "' (tried known roots).");
+    //    return {};
+    //}
 };
 
 ////Operations

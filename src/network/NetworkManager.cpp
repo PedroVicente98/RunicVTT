@@ -841,15 +841,20 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 
 void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)
 {
-    // read marker image (from TextureComponent.image_path)
-    auto marker_folder = PathManager::getMarkersPath(); //check ig
     const TextureComponent* tex = marker.get<TextureComponent>();
-    auto marker_path = marker_folder / tex->image_path;
-
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Path: " + tex->image_path);
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Path Processed: " + marker_path.string());
-    std::vector<unsigned char> img = tex ? readFileBytes(marker_path.string()) : std::vector<unsigned char>{};
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + img.size());
+    auto image_path = tex->image_path;
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Path: " + image_path);
+    auto is_file_only = PathManager::isFilenameOnly(tex->image_path);
+    auto is_path_like = PathManager::isPathLike(tex->image_path);
+    if (is_file_only || !is_path_like)
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Path is FILE ONLY");
+        auto marker_folder = PathManager::getMarkersPath();
+        image_path = (marker_folder / tex->image_path).string();
+    }
+    std::vector<unsigned char> img = tex ? readFileBytes(image_path) : std::vector<unsigned char>{};
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Path Again: " + image_path);
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + std::to_string(img.size()));
     // 1) meta
     auto meta = buildCreateMarkerFrame(boardId, marker, static_cast<uint64_t>(img.size()));
     broadcastGameFrame(meta, toPeerIds);

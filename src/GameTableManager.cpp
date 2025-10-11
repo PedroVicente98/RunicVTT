@@ -172,7 +172,7 @@ void GameTableManager::processReceivedMessages()
                 flecs::entity marker = ecs.entity()
                                            .set(Identifier{mm.markerId})
                                            .set(Position{(int)mm.pos.x, (int)mm.pos.y}) //World Position
-                                           .set(Size{m.size->width, m.size->height})
+                                           .set(Size{mm.size.width, mm.size.height})
                                            .set(TextureComponent{tex, "", texSize})
                                            .set(Visibility{mm.vis})
                                            .set(MarkerComponent{"", false, false})
