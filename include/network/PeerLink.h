@@ -91,11 +91,11 @@ private:
     bool bootstrapSent_ = false;
     std::unordered_map<std::string, bool> dcOpen_;
 
-    // internal handler dispatch (called from each dc->onMessage)
-    void onIntentMessage(const std::vector<uint8_t>& bytes);
-    void onStateMessage(const std::vector<uint8_t>& bytes);
-    void onSnapshotMessage(const std::vector<uint8_t>& bytes);
-    void onChatMessage(const std::vector<uint8_t>& bytes);
+    //// internal handler dispatch (called from each dc->onMessage)
+    //void onIntentMessage(const std::vector<uint8_t>& bytes);
+    //void onStateMessage(const std::vector<uint8_t>& bytes);
+    //void onSnapshotMessage(const std::vector<uint8_t>& bytes);
+    //void onChatMessage(const std::vector<uint8_t>& bytes);
 
     void setupCallbacks(); // internal
 };
