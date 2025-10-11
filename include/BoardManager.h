@@ -246,6 +246,8 @@ public:
     };
     void setShowEditWindow(bool show, flecs::entity edit_entity = flecs::entity())
     {
+        if (showEditWindow && edit_window_entity.is_valid())
+            return;
         showEditWindow = show;
         edit_window_entity = edit_entity;
     };

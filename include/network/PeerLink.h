@@ -67,6 +67,11 @@ public:
         bootstrapSent_ = false;
     }
 
+    std::shared_ptr<rtc::PeerConnection> getPeerConnection()
+    {
+        return pc;
+    }
+
 private:
     std::string peerId;
     std::string displayName_;

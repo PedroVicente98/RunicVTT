@@ -124,13 +124,13 @@ void PeerLink::setupCallbacks()
 
         if (s == rtc::PeerConnection::State::Closed || s == rtc::PeerConnection::State::Failed) {
             if (auto nm = network_manager.lock()) {
-                msg::NetEvent ev{msg::NetEvent::Type::PcOpen, id, label};
+                msg::NetEvent ev{msg::NetEvent::Type::PcOpen, peerId, "PC"};
                 nm->events_.push(std::move(ev));
             } 
         }
         if (s == rtc::PeerConnection::State::Connected) {
             if (auto nm = network_manager.lock()) {
-                msg::NetEvent ev{msg::NetEvent::Type::PcClosed, id, label};
+                msg::NetEvent ev{msg::NetEvent::Type::PcClosed, peerId, "PC"};
                 nm->events_.push(std::move(ev));
             } 
         }

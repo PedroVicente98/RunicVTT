@@ -182,90 +182,6 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     renderCameraWindow();
 }
 
-void BoardManager::renderGridWindow()
-{
-    // Check if the window should be shown
-    if (!showGridSettings)
-    {
-        setIsNonMapWindowHovered(false);
-        return;
-    }
-
-    // Begin the ImGui window
-    auto mouse_pos = ImGui::GetMousePos();
-    ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
-    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
-    ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    auto grid_hovered = ImGui::IsWindowHovered();
-    setIsNonMapWindowHovered(grid_hovered);
-
-    ImGui::PopStyleColor();
-    // Get a mutable reference to the Grid component from the active board
-    auto grid = active_board.get_mut<Grid>();
-
-    if (grid)
-    {
-        // --- BOOLEAN CHECKBOXES ---
-        ImGui::Checkbox("Visible", &grid->visible);
-        ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
-        ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
-
-        // --- FLOAT SLIDERS ---
-        ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
-        ImGui::SameLine();
-        if (ImGui::Button("-"))
-        {
-            grid->cell_size = grid->cell_size - 0.01f;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("+"))
-        {
-            grid->cell_size = grid->cell_size + 0.01f;
-        }
-        // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
-        ImGui::Text("Grid Offset");
-        ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
-        ImGui::SameLine();
-        if (ImGui::Button("-"))
-        {
-            grid->offset.x = grid->offset.x - 0.01f;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("+"))
-        {
-            grid->offset.x = grid->offset.x + 0.01f;
-        }
-        ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
-        ImGui::SameLine();
-        if (ImGui::Button("-"))
-        {
-            grid->offset.y = grid->offset.y - 0.01f;
-        }
-        ImGui::SameLine();
-        if (ImGui::Button("+"))
-        {
-            grid->offset.y = grid->offset.y + 0.01f;
-        }
-
-        // Button to reset the offset
-        if (ImGui::Button("Reset Offset"))
-        {
-            grid->offset = glm::vec2(0.0f);
-        }
-        // Button to reset the offset
-        if (ImGui::Button("Reset Offset"))
-        {
-            grid->offset = glm::vec2(0.0f);
-        }
-    }
-    else
-    {
-        ImGui::Text("Active board entity does not have a Grid component.");
-    }
-
-    ImGui::End();
-}
-
 glm::vec2 BoardManager::computeMarkerDrawSize_ARFit(const TextureComponent& tex, float basePx /*e.g., 50.0f*/, float scale /*slider, default 1.0f*/)
 {
     const glm::vec2 texPx = tex.size; // original pixels stored in your TextureComponent
@@ -651,11 +567,37 @@ void BoardManager::setCurrentTool(Tool newTool)
 {
     currentTool = newTool;
 }
-/*
+
 flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
 {
 
     auto entity_at_mouse = flecs::entity();
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size)
+             {
+        const bool isMarker = entity.has<MarkerComponent>();
+        if (isMarker) {
+            glm::vec2 world_position = mouse_position;
+        
+            if (entity.has(flecs::ChildOf, active_board)) {
+
+                bool withinXBounds = (world_position.x >= (entity_pos.x - entity_size.width / 2)) &&
+                    (world_position.x <= (entity_pos.x + entity_size.width / 2));
+
+                bool withinYBounds = (world_position.y >= (entity_pos.y - entity_size.height / 2)) &&
+                    (world_position.y <= (entity_pos.y + entity_size.height / 2));
+
+                if (withinXBounds && withinYBounds) {
+                    entity_at_mouse = entity;
+                }
+            }
+
+        } });
+    ecs.defer_end();
+
+    if (entity_at_mouse.is_valid())
+        return entity_at_mouse;
+
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const Position& entity_pos, const Size& entity_size)
              {
@@ -677,54 +619,54 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
     ecs.defer_end();
     return entity_at_mouse;
 }
-*/
-flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
-{
-    flecs::entity best{};
-    bool bestIsMarker = false;
-    float bestArea = std::numeric_limits<float>::infinity();
 
-    // We're only reading; deferring isn't needed, but keeping your pattern:
-    ecs.defer_begin();
-    ecs.each([&](flecs::entity e, const Position& pos, const Size& sz)
-    {
-        // Must belong to the active board
-        if (!e.has(flecs::ChildOf, active_board))
-            return;
-
-        // Point-in-AABB check (centered entity with half extents)
-        const float hx = sz.width  * 0.5f;
-        const float hy = sz.height * 0.5f;
-        const bool inX = (mouse_position.x >= (pos.x - hx)) && (mouse_position.x <= (pos.x + hx));
-        const bool inY = (mouse_position.y >= (pos.y - hy)) && (mouse_position.y <= (pos.y + hy));
-        if (!inX || !inY) return;
-
-        const bool isMarker = e.has<MarkerComponent>();
-        // Only Marker and FogOfWar are relevant; ignore other types if you want:
-        // (If you want Fog only as alternative, check `e.has<FogOfWar>()` here.)
-        const float area = std::max(0.0f, sz.width) * std::max(0.0f, sz.height);
-
-        // Decide priority:
-        bool better = false;
-        if (!best.is_valid()) {
-            better = true; // first hit
-        } else if (isMarker && !bestIsMarker) {
-            better = true; // markers beat non-markers
-        } else if (isMarker == bestIsMarker) {
-            // same type -> smaller area wins
-            if (area < bestArea) better = true;
-        }
-
-        if (better) {
-            best = e;
-            bestIsMarker = isMarker;
-            bestArea = area;
-        }
-    });
-    ecs.defer_end();
-
-    return best;
-}
+//flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
+//{
+//    flecs::entity best{};
+//    bool bestIsMarker = false;
+//    float bestArea = std::numeric_limits<float>::infinity();
+//
+//    // We're only reading; deferring isn't needed, but keeping your pattern:
+//    ecs.defer_begin();
+//    ecs.each([&](flecs::entity e, const Position& pos, const Size& sz)
+//    {
+//        // Must belong to the active board
+//        if (!e.has(flecs::ChildOf, active_board))
+//            return;
+//
+//        // Point-in-AABB check (centered entity with half extents)
+//        const float hx = sz.width  * 0.5f;
+//        const float hy = sz.height * 0.5f;
+//        const bool inX = (mouse_position.x >= (pos.x - hx)) && (mouse_position.x <= (pos.x + hx));
+//        const bool inY = (mouse_position.y >= (pos.y - hy)) && (mouse_position.y <= (pos.y + hy));
+//        if (!inX || !inY) return;
+//
+//        const bool isMarker = e.has<MarkerComponent>();
+//        // Only Marker and FogOfWar are relevant; ignore other types if you want:
+//        // (If you want Fog only as alternative, check `e.has<FogOfWar>()` here.)
+//        const float area = std::max(0.0f, sz.width) * std::max(0.0f, sz.height);
+//
+//        // Decide priority:
+//        bool better = false;
+//        if (!best.is_valid()) {
+//            better = true; // first hit
+//        } else if (isMarker && !bestIsMarker) {
+//            better = true; // markers beat non-markers
+//        } else if (isMarker == bestIsMarker) {
+//            // same type -> smaller area wins
+//            if (area < bestArea) better = true;
+//        }
+//
+//        if (better) {
+//            best = e;
+//            bestIsMarker = isMarker;
+//            bestArea = area;
+//        }
+//    });
+//    ecs.defer_end();
+//
+//    return best;
+//}
 
 //GRID
 
@@ -973,7 +915,10 @@ void BoardManager::renderCameraWindow()
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Camera", &showCameraSettings, ImGuiWindowFlags_AlwaysAutoResize);
     auto grid_hovered = ImGui::IsWindowHovered();
-    setIsNonMapWindowHovered(grid_hovered);
+    if (grid_hovered)
+    {
+        setIsNonMapWindowHovered(true);
+    }
     ImGui::PopStyleColor();
     auto zoom = camera.getZoom();
 
@@ -1033,6 +978,90 @@ BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t 
 
     stbi_image_free(data);
     return BoardImageData(tex, glm::vec2(width, height), /*path*/ "");
+}
+
+void BoardManager::renderGridWindow()
+{
+    // Check if the window should be shown
+    if (!showGridSettings)
+    {
+        setIsNonMapWindowHovered(false);
+        return;
+    }
+
+    // Begin the ImGui window
+    auto mouse_pos = ImGui::GetMousePos();
+    ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
+    ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
+    auto grid_hovered = ImGui::IsWindowHovered();
+    setIsNonMapWindowHovered(true);
+
+    ImGui::PopStyleColor();
+    // Get a mutable reference to the Grid component from the active board
+    auto grid = active_board.get_mut<Grid>();
+
+    if (grid)
+    {
+        // --- BOOLEAN CHECKBOXES ---
+        ImGui::Checkbox("Visible", &grid->visible);
+        ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
+        ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
+
+        // --- FLOAT SLIDERS ---
+        ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("-"))
+        {
+            grid->cell_size = grid->cell_size - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+"))
+        {
+            grid->cell_size = grid->cell_size + 0.01f;
+        }
+        // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
+        ImGui::Text("Grid Offset");
+        ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("-"))
+        {
+            grid->offset.x = grid->offset.x - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+"))
+        {
+            grid->offset.x = grid->offset.x + 0.01f;
+        }
+        ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
+        ImGui::SameLine();
+        if (ImGui::Button("-"))
+        {
+            grid->offset.y = grid->offset.y - 0.01f;
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("+"))
+        {
+            grid->offset.y = grid->offset.y + 0.01f;
+        }
+
+        // Button to reset the offset
+        if (ImGui::Button("Reset Offset"))
+        {
+            grid->offset = glm::vec2(0.0f);
+        }
+        // Button to reset the offset
+        if (ImGui::Button("Reset Offset"))
+        {
+            grid->offset = glm::vec2(0.0f);
+        }
+    }
+    else
+    {
+        ImGui::Text("Active board entity does not have a Grid component.");
+    }
+
+    ImGui::End();
 }
 
 flecs::entity BoardManager::findBoardById(uint64_t boardId)

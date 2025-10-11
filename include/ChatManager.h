@@ -10,6 +10,7 @@
 #include <optional>
 #include <memory>
 #include <array>
+#include "Message.h"
 
 class NetworkManager; // fwd
 class PeerLink;       // fwd
@@ -58,7 +59,7 @@ public:
     bool saveCurrent();
     bool loadCurrent();
 
-    void applyReady(const msg::ReadyMessage&);
+    void applyReady(const msg::ReadyMessage& m);
 
     void renameThread(uint64_t threadId, const std::string& newName);
     void setThreadParticipants(uint64_t threadId, std::set<std::string> parts);
@@ -79,6 +80,12 @@ public:
     std::string currentTableName_;
 
     ChatThreadModel* getThread(uint64_t id);
+
+    // ---- inbound ----
+    void onChatThreadCreateFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onChatThreadUpdateFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onChatThreadDeleteFrame(const std::vector<uint8_t>& b, size_t& off);
+    void onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off);
 
 private:
     // utils
