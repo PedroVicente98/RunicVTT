@@ -205,21 +205,115 @@ void GameTableManager::processReceivedMessages()
 
             case msg::DCType::FogUpdate:
             {
+                if (!m.boardId || !m.fogId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity fogEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<FogOfWar>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.fogId) fogEnt = child;
+                        } });
+                if (!fogEnt.is_valid())
+                    break;
+
+                if (m.pos)
+                    fogEnt.set<Position>(*m.pos);
+                if (m.size)
+                    fogEnt.set<Size>(*m.size);
+                if (m.vis)
+                    fogEnt.set<Visibility>(*m.vis);
+                if (m.mov)
+                    fogEnt.set<Moving>(*m.mov); // if used
                 break;
             }
 
             case msg::DCType::FogDelete:
             {
+                if (!m.boardId || !m.fogId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity fogEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<FogOfWar>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.fogId) fogEnt = child;
+                    } });
+                if (fogEnt.is_valid())
+                    fogEnt.destruct();
                 break;
             }
 
             case msg::DCType::MarkerUpdate:
             {
+                if (!m.boardId || !m.markerId)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                // Find marker child by Identifier
+                flecs::entity markerEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                        if (child.has<MarkerComponent>()) {
+                            auto id = child.get<Identifier>()->id;
+                            if (id == *m.markerId) markerEnt = child;
+                        } });
+                if (!markerEnt.is_valid())
+                    break;
+
+                const bool isPlayerOp = m.isPlayerOp.value_or(false);
+
+                if (isPlayerOp)
+                {
+                    if (m.pos)
+                        markerEnt.set<Position>(*m.pos);
+                    if (m.mov)
+                        markerEnt.set<Moving>(*m.mov);
+                }
+                else
+                {
+                    if (m.pos)
+                        markerEnt.set<Position>(*m.pos);
+                    if (m.mov)
+                        markerEnt.set<Moving>(*m.mov);
+                    if (m.size)
+                        markerEnt.set<Size>(*m.size);
+                    if (m.vis)
+                        markerEnt.set<Visibility>(*m.vis);
+                    if (m.markerComp)
+                        markerEnt.set<MarkerComponent>(*m.markerComp);
+                }
                 break;
             }
 
             case msg::DCType::MarkerDelete:
             {
+                if (!m.boardId || !m.markerId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity markerEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<MarkerComponent>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.markerId) markerEnt = child;
+                    } });
+                if (markerEnt.is_valid())
+                    markerEnt.destruct();
                 break;
             }
 

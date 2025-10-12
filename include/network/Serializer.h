@@ -50,6 +50,9 @@ public:
     static void serializeGrid(std::vector<unsigned char>& buffer, const Grid* grid);
     static Grid deserializeGrid(const std::vector<unsigned char>& buffer, size_t& offset);
 
+    static void serializeMarkerComponent(std::vector<unsigned char>& buffer, const MarkerComponent* marker_component);
+    static MarkerComponent deserializeMarkerComponent(const std::vector<unsigned char>& buffer, size_t& offset);
+
     static void serializeBoard(std::vector<unsigned char>& buffer, const Board* board);
     static Board deserializeBoard(const std::vector<unsigned char>& buffer, size_t& offset);
 
@@ -78,7 +81,7 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
     auto texture = entity.get<TextureComponent>();
     auto visibility = entity.get<Visibility>();
     auto moving = entity.get<Moving>();
-    //auto marker_component = entity.get<MarkerComponent>();
+    auto marker_component = entity.get<MarkerComponent>();
 
     serializeUInt64(buffer, identifier->id);
     serializePosition(buffer, position);
@@ -86,7 +89,7 @@ inline void Serializer::serializeMarkerEntity(std::vector<unsigned char>& buffer
     serializeMoving(buffer, moving);
     serializeVisibility(buffer, visibility);
     serializeTextureComponent(buffer, texture);
-    //serializeMarkerComponent(buffer, marker_component);
+    serializeMarkerComponent(buffer, marker_component);
 }
 
 inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsigned char>& buffer, size_t& offset, flecs::world& ecs)
@@ -98,14 +101,14 @@ inline flecs::entity Serializer::deserializeMarkerEntity(const std::vector<unsig
     auto moving = deserializeMoving(buffer, offset);
     auto visibility = deserializeVisibility(buffer, offset);
     auto texture = deserializeTextureComponent(buffer, offset);
-    //auto marker_component = deserializeMarkerComponent(buffer, offset);
+    auto marker_component = deserializeMarkerComponent(buffer, offset);
     auto marker = ecs.entity()
                       .set<Identifier>({marker_id})
                       .set<Position>(position)
                       .set<Size>(size)
                       .set<Moving>(moving)
                       .set<Visibility>(visibility)
-                      //.set<MarkerComponent>(marker_component)
+                      .set<MarkerComponent>(marker_component)
                       .set<TextureComponent>({0, texture.image_path, texture.size});
 
     return marker;
@@ -276,6 +279,22 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
 }
 
 // Implementation
+inline void Serializer::serializeMarkerComponent(std::vector<unsigned char>& b, const MarkerComponent* marker_component)
+{
+    serializeString(b, marker_component->ownerPeerId);
+    serializeBool(b, marker_component->allowAllPlayersMove);
+    serializeBool(b, marker_component->locked);
+}
+
+inline MarkerComponent Serializer::deserializeMarkerComponent(const std::vector<unsigned char>& b, size_t& off)
+{
+    MarkerComponent marker_component{};
+    marker_component.ownerPeerId = deserializeString(b, off);
+    marker_component.allowAllPlayersMove = deserializeBool(b, off);
+    marker_component.locked = deserializeBool(b, off);
+    return marker_component;
+}
+
 inline void Serializer::serializeInt(std::vector<unsigned char>& buffer, int value)
 {
     buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(int));

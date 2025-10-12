@@ -26,6 +26,7 @@
 #include <functional> // std::hash
 #include <string>
 #include <thread>
+#include <unordered_map>
 
 BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
     ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
@@ -386,10 +387,30 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
             position.y += delta.y;
             mouse_start_world_pos = world_position;
 
-            //auto message = nm->buildUpdateMarkerMessage(entity); - 
-            //nm->queueMessage(message);
+            const auto id = entity.get<Identifier>()->id;
+            if (shouldSendMarkerMove(id))
+            {
+                nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
+            }
+
         } });
     ecs.defer_end();
+}
+
+bool BoardManager::shouldSendMarkerMove(uint64_t markerId) const
+{
+    using namespace std::chrono;
+    static std::unordered_map<uint64_t, steady_clock::time_point> lastSent;
+    static constexpr auto kMinInterval = milliseconds(33); // ~30 Hz. Use 50ms for ~20 Hz if you prefer.
+
+    const auto now = steady_clock::now();
+    auto it = lastSent.find(markerId);
+    if (it == lastSent.end() || (now - it->second) >= kMinInterval)
+    {
+        lastSent[markerId] = now;
+        return true; // allow this send
+    }
+    return false; // too soon, skip this tick
 }
 
 // Generates a unique 64-bit ID
@@ -498,6 +519,31 @@ flecs::entity BoardManager::findEntityById(uint64_t target_id)
 
     return result; // Returns the found entity, or an empty entity if not found
 }
+// BoardManager.cpp
+bool BoardManager::canMoveMarker(const MarkerComponent* mc) const
+{
+    if (!mc)
+        return false;
+
+    auto nm = network_manager.lock();
+    if (!nm)
+        return false;
+
+    const auto role = nm->getPeerRole(); // existing in your NM
+    if (role == Role::GAMEMASTER)
+        return true; // GM can always move
+
+    if (mc->locked)
+        return false; // hard lock blocks players
+    if (mc->allowAllPlayersMove)
+        return true; // GM allowed “all players move”
+
+    const std::string me = nm->getMyId();
+    if (mc->ownerPeerId.empty())
+        return false;
+
+    return (mc->ownerPeerId == me);
+}
 
 bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 {
@@ -516,8 +562,12 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
                 (world_position.y <= (markerPos.y + markerSize.height / 2));
          
             if (withinXBounds && withinYBounds) {
-                moving.isDragging = true;
-                hovered = true;           // Mark as hovered
+                 if (canMoveMarker(&marker)) {
+                    moving.isDragging = true;
+                    hovered = true;
+                 }
+                //moving.isDragging = true;
+                //hovered = true;           // Mark as hovered
             }
         } });
     ecs.defer_end();
@@ -545,11 +595,16 @@ void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
 void BoardManager::endMouseDrag()
 {
     active_board.set<Panning>({false});
+    auto nm = network_manager.lock();
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving)
              {
         if (entity.has(flecs::ChildOf, active_board)) {
             moving.isDragging = false;
+            if (nm && entity.has<Identifier>())
+            {
+                nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
+            }
         } });
     ecs.defer_end();
     is_creating_fog = false;
@@ -914,25 +969,65 @@ void BoardManager::renderEditWindow()
     auto is_popup_open = false;
     if (edit_window_entity.has<Size>() && edit_window_entity.has<Visibility>())
     {
+        auto nm = network_manager.lock();
+        auto boardEnt = getActiveBoard();
+
         auto size = edit_window_entity.get_mut<Size>();             // Mutable access to the size
         auto visibility = edit_window_entity.get_mut<Visibility>(); // Mutable access to the visibility
 
         ImGui::BeginGroup();
         if (ImGui::Button("+ Size"))
         {
-            size->width = size->width * 1.1;
-            size->height = size->height * 1.1; // Adjust height proportionally to the width
+            if (nm && boardEnt.is_valid())
+            {
+                size->width = size->width * 1.1;
+                size->height = size->height * 1.1; // Adjust height proportionally to the width
+                if (edit_window_entity.has<MarkerComponent>())
+                {
+                    nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+                else if (edit_window_entity.has<FogOfWar>())
+                {
+                    nm->broadcastFogUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+            }
         }
         ImGui::SameLine();
         if (ImGui::Button("- Size"))
         {
-            size->width = size->width * 0.90;
-            size->height = size->height * 0.90; // Adjust height proportionally to the width
+            if (nm && boardEnt.is_valid())
+            {
+                size->width = size->width * 0.90;
+                size->height = size->height * 0.90; // Adjust height proportionally to the width
+                if (edit_window_entity.has<MarkerComponent>())
+                {
+                    nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+                else if (edit_window_entity.has<FogOfWar>())
+                {
+                    nm->broadcastFogUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+            }
         }
 
         ImGui::EndGroup();
         // Checkbox for visibility change
-        ImGui::Checkbox("Visible", &visibility->isVisible);
+        auto vis_temp = visibility->isVisible;
+        if (ImGui::Checkbox("Visible", &vis_temp))
+        {
+            if (nm && boardEnt.is_valid())
+            {
+                visibility->isVisible = vis_temp;
+                if (edit_window_entity.has<MarkerComponent>())
+                {
+                    nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+                else if (edit_window_entity.has<FogOfWar>())
+                {
+                    nm->broadcastFogUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
+            }
+        }
 
         ImGui::Separator();
 
@@ -955,8 +1050,19 @@ void BoardManager::renderEditWindow()
             {
                 if (edit_window_entity.is_alive())
                 {
-                    edit_window_entity.destruct(); // Delete the entity
-                    showEditWindow = false;
+                    if (nm && boardEnt.is_valid())
+                    {
+                        edit_window_entity.destruct(); // Delete the entity
+                        showEditWindow = false;
+                        if (edit_window_entity.has<MarkerComponent>())
+                        {
+                            nm->broadcastMarkerDelete(boardEnt.get<Identifier>()->id, edit_window_entity);
+                        }
+                        else if (edit_window_entity.has<FogOfWar>())
+                        {
+                            nm->broadcastFogDelete(boardEnt.get<Identifier>()->id, edit_window_entity);
+                        }
+                    }
                 }
                 ImGui::CloseCurrentPopup(); // Close the popup after deletion
             }
@@ -971,6 +1077,40 @@ void BoardManager::renderEditWindow()
     else
     {
         ImGui::Text("Invalid entity or missing components!");
+    }
+    // --- Ownership (only for markers) ---
+    if (edit_window_entity.is_valid() && edit_window_entity.has<MarkerComponent>())
+    {
+        ImGui::Separator();
+        ImGui::TextUnformatted("Ownership");
+
+        auto mc = edit_window_entity.get_mut<MarkerComponent>();
+
+        static char ownerBuf[128] = {};
+        std::snprintf(ownerBuf, sizeof(ownerBuf), "%s", mc->ownerPeerId.c_str());
+        ImGui::InputText("Owner Peer Id", ownerBuf, IM_ARRAYSIZE(ownerBuf));
+
+        bool allowAll = mc->allowAllPlayersMove;
+        bool locked = mc->locked;
+
+        ImGui::Checkbox("Allow all players to move", &allowAll);
+        ImGui::Checkbox("Locked (players cannot move)", &locked);
+
+        if (ImGui::Button("Apply Ownership"))
+        {
+            // write back
+            mc->ownerPeerId = ownerBuf;
+            mc->allowAllPlayersMove = allowAll;
+            mc->locked = locked;
+
+            auto nm = network_manager.lock();
+            auto boardEnt = getActiveBoard();
+            // broadcast a full marker update (GM op)
+            if (nm && boardEnt.is_valid())
+            {
+                nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+            }
+        }
     }
 
     ImGui::End();

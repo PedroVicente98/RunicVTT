@@ -803,6 +803,85 @@ void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
     }
 }
 
+// ----------------------------
+// Broadcast wrappers
+// ----------------------------
+void NetworkManager::broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendMarkerUpdate(boardId, marker, ids);
+}
+
+void NetworkManager::broadcastMarkerDelete(uint64_t boardId, const flecs::entity& marker)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendMarkerDelete(boardId, marker, ids);
+}
+
+void NetworkManager::broadcastFogUpdate(uint64_t boardId, const flecs::entity& fog)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendFogUpdate(boardId, fog, ids);
+}
+
+void NetworkManager::broadcastFogDelete(uint64_t boardId, const flecs::entity& fog)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendFogDelete(boardId, fog, ids);
+}
+
+// ----------------------------
+// Directed send (core)
+// ----------------------------
+void NetworkManager::sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker,
+                                      const std::vector<std::string>& toPeerIds)
+{
+    if (!marker.is_valid() || !marker.has<Identifier>())
+        return;
+
+    // Player vs GM flag (receiver will enforce allowed fields accordingly)
+    const bool isPlayerOp = (getPeerRole() != Role::GAMEMASTER);
+
+    auto frame = buildMarkerUpdateFrame(boardId, marker, isPlayerOp);
+    broadcastGameFrame(frame, toPeerIds);
+}
+
+void NetworkManager::sendMarkerDelete(uint64_t boardId, const flecs::entity& marker,
+                                      const std::vector<std::string>& toPeerIds)
+{
+    if (!marker.is_valid() || !marker.has<Identifier>())
+        return;
+
+    const uint64_t mid = marker.get<Identifier>()->id;
+    auto frame = buildMarkerDeleteFrame(boardId, mid);
+    broadcastGameFrame(frame, toPeerIds);
+}
+
+void NetworkManager::sendFogUpdate(uint64_t boardId, const flecs::entity& fog,
+                                   const std::vector<std::string>& toPeerIds)
+{
+    if (!fog.is_valid() || !fog.has<Identifier>())
+        return;
+
+    auto frame = buildFogUpdateFrame(boardId, fog);
+    broadcastGameFrame(frame, toPeerIds);
+}
+
+void NetworkManager::sendFogDelete(uint64_t boardId, const flecs::entity& fog,
+                                   const std::vector<std::string>& toPeerIds)
+{
+    if (!fog.is_valid() || !fog.has<Identifier>())
+        return;
+
+    const uint64_t fid = fog.get<Identifier>()->id;
+    auto frame = buildFogDeleteFrame(boardId, fid);
+    broadcastGameFrame(frame, toPeerIds);
+}
+
 // ---------- MESSAGE SENDERS --------------------------------------------------------------------------------
 void NetworkManager::sendGameTable(const flecs::entity& gameTable, const std::vector<std::string>& toPeerIds)
 {
@@ -1113,6 +1192,57 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
         }
         imagesRx_.erase(it);
     }
+}
+
+// MarkerUpdate
+void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::MarkerUpdate;
+
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.markerId = Serializer::deserializeUInt64(b, off);
+    m.isPlayerOp = Serializer::deserializeBool(b, off);
+
+    m.pos = Serializer::deserializePosition(b, off);
+    m.size = Serializer::deserializeSize(b, off);
+    m.vis = Serializer::deserializeVisibility(b, off);
+    m.mov = Serializer::deserializeMoving(b, off);
+    m.markerComp = Serializer::deserializeMarkerComponent(b, off);
+
+    inboundGame_.push(std::move(m));
+}
+
+void NetworkManager::handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::MarkerDelete;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.markerId = Serializer::deserializeUInt64(b, off);
+    inboundGame_.push(std::move(m));
+}
+
+// FogUpdate
+void NetworkManager::handleFogUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::FogUpdate;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.fogId = Serializer::deserializeUInt64(b, off);
+    m.pos = Serializer::deserializePosition(b, off);
+    m.size = Serializer::deserializeSize(b, off);
+    m.vis = Serializer::deserializeVisibility(b, off);
+    m.mov = Serializer::deserializeMoving(b, off); // remove if you don’t use Moving on fog
+    inboundGame_.push(std::move(m));
+}
+
+void NetworkManager::handleFogDelete(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::FogDelete;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.fogId = Serializer::deserializeUInt64(b, off);
+    inboundGame_.push(std::move(m));
 }
 
 void NetworkManager::drainEvents()
@@ -1515,6 +1645,68 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
 }
 
 // ---------- GAME FRAME BUILDERS ----------
+// ---- MARKER UPDATE/DELETE ----
+std::vector<unsigned char> NetworkManager::buildMarkerUpdateFrame(
+    uint64_t boardId, const flecs::entity& marker, bool isPlayerOp)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::MarkerUpdate));
+    Serializer::serializeUInt64(b, boardId);
+
+    const auto id = marker.get<Identifier>()->id;
+    const auto pos = *marker.get<Position>();
+    const auto siz = *marker.get<Size>();
+    const auto vis = *marker.get<Visibility>();
+    const auto mov = *marker.get<Moving>();
+    const auto mc = *marker.get<MarkerComponent>();
+
+    Serializer::serializeUInt64(b, id);
+    Serializer::serializeBool(b, isPlayerOp);
+    Serializer::serializePosition(b, &pos);
+    Serializer::serializeSize(b, &siz);
+    Serializer::serializeVisibility(b, &vis);
+    Serializer::serializeMoving(b, &mov);
+    Serializer::serializeMarkerComponent(b, &mc);
+    return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildMarkerDeleteFrame(uint64_t boardId, uint64_t markerId)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::MarkerDelete));
+    Serializer::serializeUInt64(b, boardId);
+    Serializer::serializeUInt64(b, markerId);
+    return b;
+}
+
+// ---- FOG UPDATE/DELETE ----
+std::vector<unsigned char> NetworkManager::buildFogUpdateFrame(uint64_t boardId, const flecs::entity& fog)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::FogUpdate));
+    Serializer::serializeUInt64(b, boardId);
+
+    const auto id = fog.get<Identifier>()->id;
+    const auto pos = *fog.get<Position>();
+    const auto siz = *fog.get<Size>();
+    const auto vis = *fog.get<Visibility>();
+
+    Serializer::serializeUInt64(b, id);
+    Serializer::serializePosition(b, &pos);
+    Serializer::serializeSize(b, &siz);
+    Serializer::serializeVisibility(b, &vis);
+    return b;
+}
+
+std::vector<unsigned char> NetworkManager::buildFogDeleteFrame(uint64_t boardId, uint64_t fogId)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::FogDelete));
+    Serializer::serializeUInt64(b, boardId);
+    Serializer::serializeUInt64(b, fogId);
+    return b;
+}
+
 std::vector<unsigned char> NetworkManager::buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name)
 {
     std::vector<unsigned char> b;

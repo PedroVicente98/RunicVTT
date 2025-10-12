@@ -180,6 +180,7 @@ public:
     void deleteMarker(flecs::entity markerEntity);
     void handleMarkerDragging(glm::vec2 mousePos);
     bool isMouseOverMarker(glm::vec2 mousePos);
+    bool canMoveMarker(const MarkerComponent* mc) const;
 
     glm::vec2 computeMarkerDrawSize_ARFit(const TextureComponent& tex, float basePx, float scale);
     // Fog of War interactions
@@ -211,7 +212,7 @@ public:
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
 
     flecs::entity findBoardById(uint64_t boardId);
-
+    bool shouldSendMarkerMove(uint64_t markerId) const;
     // Generates a unique 64-bit ID
     uint64_t generateUniqueId();
     // Finds an entity by its Identifier component with the specified ID

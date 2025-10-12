@@ -135,6 +135,11 @@ public:
     {
         return myUsername_;
     };
+
+    std::string getMyId() const
+    {
+        return myClientId_;
+    };
     void setMyIdentity(std::string myId, std::string username);
     void upsertPeerIdentity(const std::string& id, const std::string& username);
     std::string displayNameFor(const std::string& id) const;
@@ -182,6 +187,16 @@ public:
     void broadcastMarker(uint64_t boardId, const flecs::entity& marker);
     void broadcastFog(uint64_t boardId, const flecs::entity& fog);
 
+    void broadcastFogUpdate(uint64_t boardId, const flecs::entity& fog);
+    void broadcastFogDelete(uint64_t boardId, const flecs::entity& fog);
+    void broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker);
+    void broadcastMarkerDelete(uint64_t boardId, const flecs::entity& marker);
+
+    void sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+    void sendMarkerDelete(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+    void sendFogUpdate(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
+    void sendFogDelete(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
+
     void sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes);
     void broadcastGameFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds);
 
@@ -227,6 +242,13 @@ private:
     void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
 
+    // MarkerUpdate
+    void handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off);
+    void handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off);
+    // FogUpdate
+    void handleFogUpdate(const std::vector<uint8_t>& b, size_t& off);
+    void handleFogDelete(const std::vector<uint8_t>& b, size_t& off);
+
     // frame builders
     std::vector<uint8_t> buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name);
     std::vector<uint8_t> buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal);
@@ -235,6 +257,13 @@ private:
     std::vector<uint8_t> buildImageChunkFrame(uint8_t ownerKind, uint64_t id, uint64_t offset, const uint8_t* data, size_t len);
     std::vector<uint8_t> buildCommitBoardFrame(uint64_t boardId);
     std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
+
+    // ---- MARKER UPDATE/DELETE ----
+    std::vector<unsigned char> buildMarkerUpdateFrame(uint64_t boardId, const flecs::entity& marker, bool isPlayerOp);
+    std::vector<unsigned char> buildMarkerDeleteFrame(uint64_t boardId, uint64_t markerId);
+    // ---- FOG UPDATE/DELETE ----
+    std::vector<unsigned char> buildFogUpdateFrame(uint64_t boardId, const flecs::entity& fog);
+    std::vector<unsigned char> buildFogDeleteFrame(uint64_t boardId, uint64_t fogId);
 
     std::vector<std::string> getConnectedPeerIds() const;
 

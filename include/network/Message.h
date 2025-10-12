@@ -142,8 +142,9 @@ namespace msg
 
         std::optional<uint64_t> tableId;
         std::optional<uint64_t> boardId;
-
+        std::optional<uint64_t> markerId;
         std::optional<uint64_t> fogId;
+
         std::optional<Position> pos;
         std::optional<Size> size;
         std::optional<Visibility> vis;
@@ -157,6 +158,10 @@ namespace msg
         std::optional<uint64_t> ts;
         std::optional<std::string> text;                   // chat text
         std::optional<std::set<std::string>> participants; // thread participants
+
+        std::optional<Moving> mov;
+        std::optional<MarkerComponent> markerComp;
+        std::optional<bool> isPlayerOp;
     };
 
     struct NetEvent
