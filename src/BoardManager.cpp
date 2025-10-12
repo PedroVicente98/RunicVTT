@@ -1090,18 +1090,13 @@ void BoardManager::renderEditWindow()
         std::snprintf(ownerBuf, sizeof(ownerBuf), "%s", mc->ownerPeerId.c_str());
         ImGui::InputText("Owner Peer Id", ownerBuf, IM_ARRAYSIZE(ownerBuf));
 
-        bool allowAll = mc->allowAllPlayersMove;
-        bool locked = mc->locked;
-
-        ImGui::Checkbox("Allow all players to move", &allowAll);
-        ImGui::Checkbox("Locked (players cannot move)", &locked);
+        ImGui::Checkbox("Allow all players to move", &mc->allowAllPlayersMove);
+        ImGui::Checkbox("Locked (players cannot move)", &mc->locked);
 
         if (ImGui::Button("Apply Ownership"))
         {
             // write back
             mc->ownerPeerId = ownerBuf;
-            mc->allowAllPlayersMove = allowAll;
-            mc->locked = locked;
 
             auto nm = network_manager.lock();
             auto boardEnt = getActiveBoard();
@@ -1111,6 +1106,10 @@ void BoardManager::renderEditWindow()
                 nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
             }
         }
+    }
+    else
+    {
+        ImGui::Text("Invalid entity or missing components!");
     }
 
     ImGui::End();

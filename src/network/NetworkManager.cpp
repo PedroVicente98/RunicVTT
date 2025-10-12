@@ -913,16 +913,18 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
     auto meta = buildSnapshotBoardFrame(board, static_cast<uint64_t>(img.size()));
     broadcastGameFrame(meta, toPeerIds);
 
-    // 2) image chunks (ownerKind=0 for board)
+    //// 2) image chunks (ownerKind=0 for board)
     uint64_t bid = board.get<Identifier>()->id;
-    uint64_t off = 0;
-    while (off < img.size())
-    {
-        size_t chunk = std::min<size_t>(kChunk, img.size() - off);
-        auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
-        broadcastGameFrame(frame, toPeerIds);
-        off += chunk;
-    }
+    sendImageChunks(msg::ImageOwnerKind::Board, bid, img, toPeerIds);
+
+    //uint64_t off = 0;
+    //while (off < img.size())
+    //{
+    //    size_t chunk = std::min<size_t>(kChunk, img.size() - off);
+    //    auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
+    //    broadcastGameFrame(frame, toPeerIds);
+    //    off += chunk;
+    //}
 
     // 3) commit
     auto commit = buildCommitBoardFrame(bid);
@@ -952,15 +954,16 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
 
     // 2) image chunks (ownerKind=1 for marker)
     uint64_t mid = marker.get<Identifier>()->id;
-    uint64_t off = 0;
-    while (off < img.size())
-    {
-        size_t chunk = std::min<size_t>(kChunk, img.size() - off);
-        auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
-        Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + img.size());
-        broadcastGameFrame(frame, toPeerIds);
-        off += chunk;
-    }
+    sendImageChunks(msg::ImageOwnerKind::Marker, mid, img, toPeerIds);
+    //uint64_t off = 0;
+    //while (off < img.size())
+    //{
+    //    size_t chunk = std::min<size_t>(kChunk, img.size() - off);
+    //    auto frame = buildImageChunkFrame(/*ownerKind=*/1, mid, off, img.data() + off, chunk);
+    //    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + img.size());
+    //    broadcastGameFrame(frame, toPeerIds);
+    //    off += chunk;
+    //}
 
     // 3) commit
     auto commit = buildCommitMarkerFrame(boardId, mid);
@@ -971,6 +974,48 @@ void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const s
 {
     auto frame = buildFogCreateFrame(boardId, fog);
     broadcastGameFrame(frame, toPeerIds);
+}
+
+// --- tuning ---
+static constexpr size_t kChunk = 8 * 1024; // smaller chunks are friendlier to SCTP
+static constexpr int kPaceEveryN = 48;     // crude pacing step
+static constexpr int kPaceMillis = 2;
+
+// Sends an entire image as ImageChunk frames (reliable/ordered DC).
+// kind: 0=Board, 1=Marker (msg::ImageOwnerKind)
+// id:   boardId when Board; markerId when Marker
+// toPeerIds: who to send to
+bool NetworkManager::sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds)
+{
+    Logger::instance().log("localtunnel", Logger::Level::Info,
+                           std::string("sendImageChunks: kind=") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker") +
+                               " id=" + std::to_string(id) + " bytes=" + std::to_string(img.size()));
+
+    size_t sent = 0;
+    int paced = 0;
+    while (sent < img.size())
+    {
+        const size_t chunk = std::min(kChunk, img.size() - sent);
+        const auto frame = buildImageChunkFrame(static_cast<uint8_t>(kind), id, sent, img.data() + sent, chunk);
+
+        // If you have per-peer send that returns bool, check and log
+        bool allOk = true;
+        for (auto& pid : toPeerIds)
+        {
+            sendGameTo(pid, frame); // if your API is void, keep it; otherwise log ok
+        }
+
+        // Fallback pacing (keeps buffers happy)
+        if ((++paced % kPaceEveryN) == 0)
+            std::this_thread::sleep_for(std::chrono::milliseconds(kPaceMillis));
+
+        sent += chunk;
+    }
+
+    Logger::instance().log("localtunnel", Logger::Level::Info,
+                           "sendImageChunks: done kind=" + std::string(kind == msg::ImageOwnerKind::Board ? "Board" : "Marker") +
+                               " id=" + std::to_string(id) + " total=" + std::to_string(img.size()));
+    return true;
 }
 
 //ON PEER RECEIVING MESSAGE-----------------------------------------------------------
@@ -1111,60 +1156,174 @@ void NetworkManager::handleFogCreate(const std::vector<uint8_t>& b, size_t& off)
 }
 
 // DCType::Image
+//void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off)
+//{
+//    auto kind = static_cast<msg::ImageOwnerKind>(b[off]);
+//    off += 1;
+//    uint64_t id = Serializer::deserializeUInt64(b, off);
+//    uint64_t off64 = Serializer::deserializeUInt64(b, off);
+//    int len = Serializer::deserializeInt(b, off);
+//
+//    Logger::instance().log("localtunnel", Logger::Level::Info, std::string("Image Chunk Kind: ") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker"));
+//    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
+//
+//    auto it = imagesRx_.find(id);
+//    if (it == imagesRx_.end())
+//        return; // unknown; drop
+//    auto& p = it->second;
+//    Logger::instance().log("localtunnel", Logger::Level::Info, "imagesRx_ Found");
+//    if (p.kind != kind || p.total == 0)
+//        return;
+//    // bounds check
+//    if (off64 + static_cast<uint64_t>(len) > p.total)
+//        return;
+//
+//    std::memcpy(p.buf.data() + off64, b.data() + off, static_cast<size_t>(len));
+//    off += static_cast<size_t>(len);
+//    p.received += static_cast<uint64_t>(len);
+//}
+
+// DCType::CommitBoard
+//void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
+//{
+//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
+//    auto it = imagesRx_.find(boardId);
+//    if (it == imagesRx_.end())
+//        return;
+//    auto& p = it->second;
+//    if (p.kind != msg::ImageOwnerKind::Board)
+//        return;
+//
+//    if (p.total == 0 || p.isComplete())
+//    {
+//        if (p.boardMeta)
+//        {
+//            msg::ReadyMessage m;
+//            m.kind = msg::DCType::CommitBoard;
+//            m.boardId = boardId;
+//            m.boardMeta = *p.boardMeta;
+//            m.bytes = std::move(p.buf); // image (may be empty)
+//            inboundGame_.push(std::move(m));
+//        }
+//        imagesRx_.erase(it);
+//    }
+//}
+
+// DCType::CommitMarker
+//void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off)
+//{
+//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
+//    uint64_t markerId = Serializer::deserializeUInt64(b, off);
+//
+//    auto it = imagesRx_.find(markerId);
+//    if (it == imagesRx_.end())
+//        return;
+//
+//    auto& p = it->second;
+//    if (p.kind != msg::ImageOwnerKind::Marker || p.boardId != boardId)
+//        return;
+//
+//    // marker image may be optional (total==0)
+//    if (p.total == 0 || p.isComplete())
+//    {
+//        if (p.markerMeta)
+//        {
+//            msg::ReadyMessage m;
+//            m.kind = msg::DCType::CommitMarker;
+//            m.boardId = boardId;
+//            m.markerMeta = *p.markerMeta;
+//            m.bytes = std::move(p.buf); // image (may be empty)
+//            inboundGame_.push(std::move(m));
+//        }
+//        imagesRx_.erase(it);
+//    }
+//}
+void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
+{
+    uint64_t boardId = Serializer::deserializeUInt64(b, off);
+
+    auto it = imagesRx_.find(boardId);
+    if (it == imagesRx_.end())
+    {
+        // Late/meta-less commit? Create a placeholder so tryFinalize can run if chunks arrive later.
+        PendingImage p;
+        p.kind = msg::ImageOwnerKind::Board;
+        p.id = boardId;
+        imagesRx_.emplace(boardId, std::move(p));
+        it = imagesRx_.find(boardId);
+    }
+
+    it->second.commitRequested = true;
+    tryFinalizeImage(msg::ImageOwnerKind::Board, boardId);
+}
+
 void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off)
 {
+    if (off + 1 > b.size())
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error, "ImageChunk: underrun(kind)");
+        return;
+    }
     auto kind = static_cast<msg::ImageOwnerKind>(b[off]);
     off += 1;
+
+    if (off + 8 + 8 + 4 > b.size())
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error, "ImageChunk: underrun(headers)");
+        return;
+    }
     uint64_t id = Serializer::deserializeUInt64(b, off);
     uint64_t off64 = Serializer::deserializeUInt64(b, off);
     int len = Serializer::deserializeInt(b, off);
 
-    Logger::instance().log("localtunnel", Logger::Level::Info, std::string("Image Chunk Kind: ") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker"));
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
+    if (len < 0 || off + static_cast<size_t>(len) > b.size())
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error,
+                               "ImageChunk: invalid len id=" + std::to_string(id) + " len=" + std::to_string(len));
+        return;
+    }
 
     auto it = imagesRx_.find(id);
     if (it == imagesRx_.end())
-        return; // unknown; drop
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Warn,
+                               "ImageChunk: unknown id=" + std::to_string(id));
+        off += static_cast<size_t>(len);
+        return;
+    }
+
     auto& p = it->second;
-    Logger::instance().log("localtunnel", Logger::Level::Info, "imagesRx_ Found");
     if (p.kind != kind || p.total == 0)
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Warn,
+                               "ImageChunk: kind/total mismatch id=" + std::to_string(id));
+        off += static_cast<size_t>(len);
         return;
-    // bounds check
+    }
+
     if (off64 + static_cast<uint64_t>(len) > p.total)
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error,
+                               "ImageChunk: out-of-bounds id=" + std::to_string(id) +
+                                   " off=" + std::to_string(off64) + " len=" + std::to_string(len) +
+                                   " total=" + std::to_string(p.total));
+        off += static_cast<size_t>(len);
         return;
+    }
 
     std::memcpy(p.buf.data() + off64, b.data() + off, static_cast<size_t>(len));
     off += static_cast<size_t>(len);
     p.received += static_cast<uint64_t>(len);
-}
 
-// DCType::CommitBoard
-void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
-{
-    uint64_t boardId = Serializer::deserializeUInt64(b, off);
-    auto it = imagesRx_.find(boardId);
-    if (it == imagesRx_.end())
-        return;
-    auto& p = it->second;
-    if (p.kind != msg::ImageOwnerKind::Board)
-        return;
-
-    if (p.total == 0 || p.isComplete())
+    // Occasional progress log (e.g., every ~1MB)
+    if ((p.received % (1u << 20)) < static_cast<uint64_t>(len))
     {
-        if (p.boardMeta)
-        {
-            msg::ReadyMessage m;
-            m.kind = msg::DCType::CommitBoard;
-            m.boardId = boardId;
-            m.boardMeta = *p.boardMeta;
-            m.bytes = std::move(p.buf); // image (may be empty)
-            inboundGame_.push(std::move(m));
-        }
-        imagesRx_.erase(it);
+        Logger::instance().log("localtunnel", Logger::Level::Info,
+                               "ImageChunk: id=" + std::to_string(id) + " " +
+                                   std::to_string(p.received) + "/" + std::to_string(p.total));
     }
 }
 
-// DCType::CommitMarker
 void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off)
 {
     uint64_t boardId = Serializer::deserializeUInt64(b, off);
@@ -1172,28 +1331,22 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
 
     auto it = imagesRx_.find(markerId);
     if (it == imagesRx_.end())
-        return;
-
-    auto& p = it->second;
-    if (p.kind != msg::ImageOwnerKind::Marker || p.boardId != boardId)
-        return;
-
-    // marker image may be optional (total==0)
-    if (p.total == 0 || p.isComplete())
     {
-        if (p.markerMeta)
-        {
-            msg::ReadyMessage m;
-            m.kind = msg::DCType::CommitMarker;
-            m.boardId = boardId;
-            m.markerMeta = *p.markerMeta;
-            m.bytes = std::move(p.buf); // image (may be empty)
-            inboundGame_.push(std::move(m));
-        }
-        imagesRx_.erase(it);
+        PendingImage p;
+        p.kind = msg::ImageOwnerKind::Marker;
+        p.id = markerId;
+        p.boardId = boardId;
+        imagesRx_.emplace(markerId, std::move(p));
+        it = imagesRx_.find(markerId);
     }
-}
+    else
+    {
+        it->second.boardId = boardId; // ensure it's set
+    }
 
+    it->second.commitRequested = true;
+    tryFinalizeImage(msg::ImageOwnerKind::Marker, markerId);
+}
 // MarkerUpdate
 void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off)
 {
@@ -1658,6 +1811,43 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
     }
 
     link->markBootstrapSent();
+}
+
+void NetworkManager::tryFinalizeImage(msg::ImageOwnerKind kind, uint64_t id)
+{
+    auto it = imagesRx_.find(id);
+    if (it == imagesRx_.end())
+        return;
+    auto& p = it->second;
+    if (!p.commitRequested || !p.isComplete())
+        return;
+
+    msg::ReadyMessage m;
+    if (kind == msg::ImageOwnerKind::Board)
+    {
+        if (!p.boardMeta)
+            return; // need meta
+        m.kind = msg::DCType::CommitBoard;
+        m.boardId = p.boardMeta->boardId;
+        m.boardMeta = p.boardMeta;
+    }
+    else
+    {
+        if (!p.markerMeta)
+            return; // need meta
+        m.kind = msg::DCType::CommitMarker;
+        m.boardId = p.boardId; // for markers we also stored the boardId
+        m.markerMeta = p.markerMeta;
+    }
+    m.bytes = std::move(p.buf);
+    inboundGame_.push(std::move(m));
+
+    Logger::instance().log("localtunnel", Logger::Level::Info,
+                           std::string("tryFinalizeImage: finalized ") +
+                               (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker") +
+                               " id=" + std::to_string(id));
+
+    imagesRx_.erase(it);
 }
 
 // ---------- GAME FRAME BUILDERS ----------

@@ -55,6 +55,8 @@ struct PendingImage
     uint64_t received = 0;
     std::vector<uint8_t> buf;
 
+    bool commitRequested = false;
+
     bool isComplete() const
     {
         return total == received && total > 0;
@@ -205,6 +207,8 @@ public:
     void sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
 
+    bool sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds);
+
     void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
     void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
 
@@ -251,6 +255,7 @@ private:
     void handleFogUpdate(const std::vector<uint8_t>& b, size_t& off);
     void handleFogDelete(const std::vector<uint8_t>& b, size_t& off);
 
+    void tryFinalizeImage(msg::ImageOwnerKind kind, uint64_t id);
     // frame builders
     std::vector<uint8_t> buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name);
     std::vector<uint8_t> buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal);
