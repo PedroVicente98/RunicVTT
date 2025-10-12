@@ -133,6 +133,7 @@ void GameTableManager::processReceivedMessages()
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Created: " + tex);
                 }
 
                 const auto& bm = *m.boardMeta;

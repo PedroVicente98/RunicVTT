@@ -21,6 +21,12 @@
 #include "NetworkManager.h"
 #include "Logger.h"
 
+#include <chrono>
+#include <cstdlib>    // getenv
+#include <functional> // std::hash
+#include <string>
+#include <thread>
+
 BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
     ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
 {
@@ -51,7 +57,9 @@ void BoardManager::closeBoard()
 
 flecs::entity BoardManager::createBoard(std::string board_name, std::string map_image_path, GLuint texture_id, glm::vec2 size)
 {
-    //Texture texture = Texture(map_image_path);
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
     auto board = ecs.entity()
                      .set(Identifier{generateUniqueId()})
                      .set(Board{board_name})
@@ -60,6 +68,7 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
                      .set(TextureComponent{texture_id, map_image_path, size})
                      .set(Size{size.x, size.y});
     active_board = board;
+    nm->broadcastBoard(board);
 
     return board;
 }
@@ -351,9 +360,8 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
 
     marker.add(flecs::ChildOf, active_board);
 
-    /*auto message = nm->buildCreateMarkerMessage(marker);
-    nm->queueMessage(message);*/
-
+    auto board_id = active_board.get<Identifier>()->id;
+    nm->broadcastMarker(board_id, marker);
     return marker;
 }
 
@@ -378,23 +386,102 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
             position.y += delta.y;
             mouse_start_world_pos = world_position;
 
-            //auto message = nm->buildUpdateMarkerMessage(entity);
+            //auto message = nm->buildUpdateMarkerMessage(entity); - 
             //nm->queueMessage(message);
         } });
     ecs.defer_end();
 }
 
 // Generates a unique 64-bit ID
+//uint64_t BoardManager::generateUniqueId()
+//{
+//    static std::atomic<uint64_t> counter{0};            // Atomic counter for thread safety
+//    static std::mt19937_64 rng(std::random_device{}()); // Random number generator
+//    static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
+//
+//    uint64_t random_part = dist(rng);                                               // Generate a random 64-bit number
+//    uint64_t unique_id = (random_part & 0xFFFFFFFFFFFF0000) | (counter++ & 0xFFFF); // Combine random and counter
+//
+//    return unique_id;
+//}
+
 uint64_t BoardManager::generateUniqueId()
 {
-    static std::atomic<uint64_t> counter{0};            // Atomic counter for thread safety
-    static std::mt19937_64 rng(std::random_device{}()); // Random number generator
-    static std::uniform_int_distribution<uint64_t> dist(1, UINT64_MAX);
+    // 64-bit Snowflake layout:
+    // [ 42 bits timestamp(ms since 2020-01-01 UTC) ][ 10 bits node ][ 12 bits sequence ]
+    static constexpr uint64_t TS_BITS = 42;
+    static constexpr uint64_t NODE_BITS = 10;
+    static constexpr uint64_t SEQ_BITS = 12;
 
-    uint64_t random_part = dist(rng);                                               // Generate a random 64-bit number
-    uint64_t unique_id = (random_part & 0xFFFFFFFFFFFF0000) | (counter++ & 0xFFFF); // Combine random and counter
+    static constexpr uint64_t TS_MASK = (1ULL << TS_BITS) - 1;
+    static constexpr uint64_t NODE_MASK = (1ULL << NODE_BITS) - 1;
+    static constexpr uint64_t SEQ_MASK = (1ULL << SEQ_BITS) - 1;
 
-    return unique_id;
+    // Custom epoch: 2020-01-01T00:00:00Z in UNIX ms
+    static constexpr int64_t EPOCH_MS = 1577836800000LL;
+
+    // Derive a stable 10-bit node id for this process/machine (once).
+    // Try COMPUTERNAME/HOSTNAME; fallback to random.
+    static const uint16_t NODE_ID = []() -> uint16_t
+    {
+        std::string basis;
+        if (const char* cn = std::getenv("COMPUTERNAME"); cn && *cn)
+            basis = cn;
+        else if (const char* hn = std::getenv("HOSTNAME"); hn && *hn)
+            basis = hn;
+        else
+        {
+            std::random_device rd;
+            basis = std::to_string(rd());
+        }
+        uint64_t h = std::hash<std::string>{}(basis);
+        // xor-fold a bit to mix high/low
+        h ^= (h >> 33) ^ (h >> 17) ^ (h >> 9);
+        return static_cast<uint16_t>(h) & NODE_MASK; // 10 bits
+    }();
+
+    // Per-process state
+    static std::atomic<uint64_t> lastMs{0};
+    static std::atomic<uint16_t> seq{0};
+
+    // Current ms since custom epoch
+    const auto nowEpoch = std::chrono::time_point_cast<std::chrono::milliseconds>(
+                              std::chrono::system_clock::now())
+                              .time_since_epoch()
+                              .count();
+    uint64_t nowMs = (nowEpoch >= EPOCH_MS) ? static_cast<uint64_t>(nowEpoch - EPOCH_MS) : 0ULL;
+
+    uint64_t last = lastMs.load(std::memory_order_relaxed);
+    if (nowMs == last)
+    {
+        // Same millisecond -> increment sequence (12 bits)
+        uint16_t s = static_cast<uint16_t>(seq.fetch_add(1, std::memory_order_relaxed)) & SEQ_MASK;
+        if (s == 0)
+        {
+            // Overflowed the 12-bit sequence; wait for the next millisecond
+            do
+            {
+                std::this_thread::yield();
+                const auto now2 = std::chrono::time_point_cast<std::chrono::milliseconds>(
+                                      std::chrono::system_clock::now())
+                                      .time_since_epoch()
+                                      .count();
+                nowMs = (now2 >= EPOCH_MS) ? static_cast<uint64_t>(now2 - EPOCH_MS) : 0ULL;
+            } while (nowMs == last);
+            lastMs.store(nowMs, std::memory_order_relaxed);
+            seq.store(0, std::memory_order_relaxed);
+            s = 0;
+        }
+        // Pack: (ts << (10+12)) | (node << 12) | seq
+        return ((nowMs & TS_MASK) << (NODE_BITS + SEQ_BITS)) | ((static_cast<uint64_t>(NODE_ID) & NODE_MASK) << SEQ_BITS) | (static_cast<uint64_t>(s) & SEQ_MASK);
+    }
+    else
+    {
+        // New millisecond -> reset sequence
+        lastMs.store(nowMs, std::memory_order_relaxed);
+        seq.store(0, std::memory_order_relaxed);
+        return ((nowMs & TS_MASK) << (NODE_BITS + SEQ_BITS)) | ((static_cast<uint64_t>(NODE_ID) & NODE_MASK) << SEQ_BITS) | 0ULL;
+    }
 }
 
 // Finds an entity by its Identifier component with the specified ID
@@ -514,6 +601,10 @@ void BoardManager::deleteFogOfWar(flecs::entity fogEntity)
 
 flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size)
 {
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
+
     auto fog = ecs.entity()
                    .set(Identifier{generateUniqueId()})
                    .set(Position{(int)startPos.x, (int)startPos.y})
@@ -522,6 +613,10 @@ flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size)
 
     fog.add<FogOfWar>();
     fog.add(flecs::ChildOf, active_board);
+
+    auto board_id = active_board.get<Identifier>()->id;
+    nm->broadcastFog(board_id, fog);
+
     return fog;
 }
 

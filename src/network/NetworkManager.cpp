@@ -816,8 +816,19 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
 {
     // read board image (from TextureComponent.image_path)
     auto tex = board.get<TextureComponent>();
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Path: " + tex->image_path);
-    std::vector<unsigned char> img = tex ? readFileBytes(tex->image_path) : std::vector<unsigned char>{};
+    auto image_path = tex->image_path;
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Path: " + image_path);
+    auto is_file_only = PathManager::isFilenameOnly(tex->image_path);
+    auto is_path_like = PathManager::isPathLike(tex->image_path);
+    if (is_file_only || !is_path_like)
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Path is FILE ONLY");
+        auto map_folder = PathManager::getMapsPath();
+        auto image_path_ = map_folder / tex->image_path;
+        image_path = image_path_.string();
+    }
+    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Path AGAIN: " + image_path);
+    std::vector<unsigned char> img = tex ? readFileBytes(image_path) : std::vector<unsigned char>{};
 
     // 1) meta
     auto meta = buildSnapshotBoardFrame(board, static_cast<uint64_t>(img.size()));
@@ -850,10 +861,11 @@ void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, c
     {
         Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Path is FILE ONLY");
         auto marker_folder = PathManager::getMarkersPath();
-        image_path = (marker_folder / tex->image_path).string();
+        auto image_path_ = marker_folder / tex->image_path;
+        image_path = image_path_.string();
     }
-    std::vector<unsigned char> img = tex ? readFileBytes(image_path) : std::vector<unsigned char>{};
     Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Path Again: " + image_path);
+    std::vector<unsigned char> img = tex ? readFileBytes(image_path) : std::vector<unsigned char>{};
     Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + std::to_string(img.size()));
     // 1) meta
     auto meta = buildCreateMarkerFrame(boardId, marker, static_cast<uint64_t>(img.size()));
@@ -1028,10 +1040,8 @@ void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off
     uint64_t off64 = Serializer::deserializeUInt64(b, off);
     int len = Serializer::deserializeInt(b, off);
 
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Kind: " + (kind == msg::ImageOwnerKind::Board) ? "Board" : "Marker");
+    Logger::instance().log("localtunnel", Logger::Level::Info, std::string("Image Chunk Kind: ") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker"));
     Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Byte Offset: " + std::to_string(off64));
-    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk Len: " + std::to_string(len));
 
     auto it = imagesRx_.find(id);
     if (it == imagesRx_.end())
@@ -1225,12 +1235,12 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
 
             case msg::DCType::MarkerCreate:
                 handleMarkerMeta(b, off); // fills imagesRx_
-                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerCreate Handled!!");
+                //Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerCreate Handled!!");
                 break;
 
             case msg::DCType::FogCreate:
                 handleFogCreate(b, off); // pushes ReadyMessage
-                Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
+                //Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
                 break;
 
             case msg::DCType::ImageChunk:

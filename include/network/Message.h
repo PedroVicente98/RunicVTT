@@ -110,8 +110,8 @@ namespace msg
 
     enum class ImageOwnerKind : uint8_t
     {
-        Board,
-        Marker
+        Board = 0,
+        Marker = 1
     };
 
     struct MarkerMeta
