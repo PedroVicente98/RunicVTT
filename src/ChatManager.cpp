@@ -256,18 +256,15 @@ void ChatManager::onChatThreadCreateFrame(const std::vector<uint8_t>& b, size_t&
     const int pc = Serializer::deserializeInt(b, off);
     for (int i = 0; i < pc; ++i)
         th.participants.insert(Serializer::deserializeString(b, off));
-
-    if (!th.participants.empty())
-    {
-        if (uint64_t dup = findThreadByParticipants(th.participants))
-        {
-            if (auto* cur = getThread(dup))
-                cur->displayName = th.displayName;
-            return;
-        }
-    }
     th.unread = 0;
-    threads_.emplace(th.id, std::move(th));
+
+    if (auto it = threads_.find(th.id); it == threads_.end())
+        threads_.emplace(th.id, std::move(th));
+    else
+    {
+        it->second.displayName = th.displayName;
+        it->second.participants = std::move(th.participants);
+    }
 }
 
 void ChatManager::onChatThreadUpdateFrame(const std::vector<uint8_t>& b, size_t& off)
@@ -340,19 +337,19 @@ void ChatManager::markThreadRead(uint64_t threadId)
         th->unread = 0;
 }
 
-void ChatManager::pushMessageLocal(uint64_t threadId, const std::string& fromId,
-                                   const std::string& username, const std::string& text,
-                                   double ts, bool incoming)
+void ChatManager::pushMessageLocal(uint64_t threadId, const std::string& fromId, const std::string& username, const std::string& text, double ts, bool incoming)
 {
     auto* th = getThread(threadId);
     if (!th)
     {
         ChatThreadModel tmp;
         tmp.id = threadId;
-        tmp.displayName = "Thread " + std::to_string(threadId);
+        tmp.displayName = (threadId == generalThreadId_) ? "General" : "(pending…)"; // friendlier
+        tmp.unread = 0;
         threads_.emplace(threadId, std::move(tmp));
         th = getThread(threadId);
     }
+
     ChatMessageModel m;
     m.kind = classifyMessage(text);
     m.senderId = fromId;
@@ -361,12 +358,9 @@ void ChatManager::pushMessageLocal(uint64_t threadId, const std::string& fromId,
     m.ts = ts;
     th->messages.push_back(std::move(m));
 
-    // unread increment (UX only)
     const bool isActive = (activeThreadId_ == threadId);
     if (!isActive || !chatWindowFocused_ || !followScroll_)
-    {
         th->unread = std::min<uint32_t>(th->unread + 1, 999u);
-    }
 }
 
 void ChatManager::tryHandleSlashCommand(uint64_t threadId, const std::string& input)
@@ -438,7 +432,10 @@ void ChatManager::tryHandleSlashCommand(uint64_t threadId, const std::string& in
     const int finalTotal = total + modApplied;
 
     const std::string text =
-        "Roll: [" + rolls + "], mod " + std::to_string(modApplied) + " => Total: " + std::to_string(finalTotal);
+        uname + " rolled " + std::to_string(N) + "d" + std::to_string(M) +
+        (diceModPerDie_ ? " (per-die mod " : " (mod ") +
+        std::to_string(modApplied) + ")" +
+        " => [" + rolls + "] = " + std::to_string(finalTotal);
 
     const uint64_t ts = (uint64_t)nowSec();
     emitChatMessageFrame(threadId, uname, text, ts);
@@ -497,13 +494,24 @@ uint64_t ChatManager::ensureThreadByParticipants(const std::set<std::string>& pa
     if (!hasCurrent())
         return 0;
 
+    // General
     if (participants.empty())
     {
         ensureGeneral();
         return generalThreadId_;
     }
 
-    if (uint64_t dup = findThreadByParticipants(participants))
+    // Include self (creator) so identity is canonical
+    std::set<std::string> parts = participants;
+    if (auto nm = network_.lock())
+    {
+        auto me = nm->getMyId();
+        if (!me.empty())
+            parts.insert(me);
+    }
+
+    // If this exact ID already exists, just update name if provided
+    if (uint64_t dup = findThreadByParticipants(parts))
     {
         if (auto* th = getThread(dup))
         {
@@ -517,10 +525,11 @@ uint64_t ChatManager::ensureThreadByParticipants(const std::set<std::string>& pa
     }
 
     ChatThreadModel th;
-    th.id = makeDeterministicThreadId(participants);
+    th.participants = std::move(parts);
+    th.id = makeDeterministicThreadId(th.participants);
     th.displayName = displayName.empty() ? "Group" : displayName;
-    th.participants = participants;
     th.unread = 0;
+
     threads_.emplace(th.id, th);
     emitThreadCreate(th);
     return th.id;
@@ -541,6 +550,16 @@ void ChatManager::sendTextToThread(uint64_t threadId, const std::string& text)
     {
         tryHandleSlashCommand(threadId, text);
         return;
+    }
+
+    // Ensure thread exists remotely before sending 1st message (non-General)
+    if (auto* th = getThread(threadId))
+    {
+        if (th->id != generalThreadId_ && !th->participants.empty())
+        {
+            // emit a create/update again on first send just-in-case (idempotent)
+            emitThreadCreate(*th);
+        }
     }
 
     const uint64_t ts = (uint64_t)nowSec();
@@ -667,8 +686,10 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
 
 void ChatManager::emitThreadCreate(const ChatThreadModel& th)
 {
+    if (!hasCurrent() || th.id == generalThreadId_)
+        return; // <-- skip General
     auto nm = network_.lock();
-    if (!nm || !hasCurrent())
+    if (!nm)
         return;
 
     std::vector<uint8_t> buf;
@@ -687,8 +708,10 @@ void ChatManager::emitThreadCreate(const ChatThreadModel& th)
 
 void ChatManager::emitThreadUpdate(const ChatThreadModel& th)
 {
+    if (!hasCurrent() || th.id == generalThreadId_)
+        return; // <-- skip General
     auto nm = network_.lock();
-    if (!nm || !hasCurrent())
+    if (!nm)
         return;
 
     std::vector<uint8_t> buf;
@@ -750,6 +773,73 @@ void ChatManager::emitChatMessageFrame(uint64_t threadId, const std::string& use
         nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
     else
         nm->sendChatThreadFrameTo(th->participants, msg::DCType::ChatMessage, buf);
+}
+// ---- snapshot helpers (GameTable snapshot) ----
+void ChatManager::writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const
+{
+    // version
+    Serializer::serializeInt(buf, 1);
+    // count
+    Serializer::serializeInt(buf, (int)threads_.size());
+    for (auto& [id, th] : threads_)
+    {
+        Serializer::serializeUInt64(buf, th.id);
+        Serializer::serializeString(buf, th.displayName);
+        Serializer::serializeInt(buf, (int)th.participants.size());
+        for (auto& p : th.participants)
+            Serializer::serializeString(buf, p);
+
+        Serializer::serializeInt(buf, (int)th.messages.size());
+        for (auto& m : th.messages)
+        {
+            Serializer::serializeInt(buf, (int)m.kind);
+            Serializer::serializeString(buf, m.senderId);
+            Serializer::serializeString(buf, m.username);
+            Serializer::serializeString(buf, m.content);
+            Serializer::serializeUInt64(buf, (uint64_t)m.ts);
+        }
+    }
+}
+
+void ChatManager::readThreadsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off)
+{
+    threads_.clear();
+    if (!hasCurrent())
+    {
+        ensureGeneral();
+        return;
+    }
+
+    (void)Serializer::deserializeInt(buf, off); // version
+    int tcount = Serializer::deserializeInt(buf, off);
+    for (int i = 0; i < tcount; ++i)
+    {
+        ChatThreadModel th;
+        th.id = Serializer::deserializeUInt64(buf, off);
+        th.displayName = Serializer::deserializeString(buf, off);
+
+        int pc = Serializer::deserializeInt(buf, off);
+        for (int k = 0; k < pc; ++k)
+            th.participants.insert(Serializer::deserializeString(buf, off));
+
+        int mc = Serializer::deserializeInt(buf, off);
+        for (int m = 0; m < mc; ++m)
+        {
+            ChatMessageModel msg;
+            msg.kind = (ChatMessageModel::Kind)Serializer::deserializeInt(buf, off);
+            msg.senderId = Serializer::deserializeString(buf, off);
+            msg.username = Serializer::deserializeString(buf, off);
+            msg.content = Serializer::deserializeString(buf, off);
+            msg.ts = (double)Serializer::deserializeUInt64(buf, off);
+            th.messages.push_back(std::move(msg));
+        }
+
+        th.unread = 0;
+        threads_.emplace(th.id, std::move(th));
+    }
+    ensureGeneral();
+    if (threads_.find(activeThreadId_) == threads_.end())
+        activeThreadId_ = generalThreadId_;
 }
 
 //void ChatManager::emitThreadCreate(const ChatThreadModel& th)
@@ -954,27 +1044,44 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/)
         for (auto& m : th->messages)
         {
             ImGui::PushTextWrapPos(0);
-            ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.0f, 1.0f), "%s", m.username.c_str());
-            ImGui::SameLine();
-            ImGui::TextDisabled(" - ");
-            ImGui::SameLine();
-            switch (m.kind)
+            // One-line header+body to avoid layout edge cases
+            if (m.kind == ChatMessageModel::Kind::LINK)
             {
-                case ChatMessageModel::Kind::TEXT:
-                    ImGui::TextWrapped("%s", m.content.c_str());
-                    break;
-                case ChatMessageModel::Kind::LINK:
-                    if (ImGui::SmallButton(m.content.c_str()))
-                    {
-                        // TODO: open URL (platform hook)
-                    }
-                    break;
-                case ChatMessageModel::Kind::IMAGE:
-                    ImGui::TextWrapped("%s", m.content.c_str()); // preview hook later
-                    break;
+                ImGui::TextWrapped("%s — %s", m.username.c_str(), m.content.c_str());
+                // Optional: clickable link
+                // if (ImGui::SmallButton("Open")) { /* open URL */ }
+            }
+            else
+            {
+                ImGui::TextWrapped("%s — %s", m.username.c_str(), m.content.c_str());
             }
             ImGui::PopTextWrapPos();
         }
+
+        //for (auto& m : th->messages)
+        //{
+        //    ImGui::PushTextWrapPos(0);
+        //    ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.0f, 1.0f), "%s", m.username.c_str());
+        //    ImGui::SameLine();
+        //    ImGui::TextDisabled(" - ");
+        //    ImGui::SameLine();
+        //    switch (m.kind)
+        //    {
+        //        case ChatMessageModel::Kind::TEXT:
+        //            ImGui::TextWrapped("%s", m.content.c_str());
+        //            break;
+        //        case ChatMessageModel::Kind::LINK:
+        //            if (ImGui::SmallButton(m.content.c_str()))
+        //            {
+        //                // TODO: open URL (platform hook)
+        //            }
+        //            break;
+        //        case ChatMessageModel::Kind::IMAGE:
+        //            ImGui::TextWrapped("%s", m.content.c_str()); // preview hook later
+        //            break;
+        //    }
+        //    ImGui::PopTextWrapPos();
+        //}
         if (followScroll_)
             ImGui::SetScrollHereY(1.0f);
     }

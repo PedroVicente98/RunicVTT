@@ -66,7 +66,8 @@ public:
     void deleteThread(uint64_t threadId);
     // UI render (call every frame in main render loop)
     void render();
-
+    void readThreadsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off);
+    void writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const;
     // External helpers
     void refreshGeneralParticipants(const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& peers);
     uint64_t ensureThreadByParticipants(const std::set<std::string>& participants, const std::string& displayName);
