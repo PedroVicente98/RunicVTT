@@ -958,7 +958,7 @@ void BoardManager::renderEditWindow()
     ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
-    auto edit_window_hover = ImGui::IsWindowHovered();
+    auto edit_window_hover = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
     if (edit_window_hover)
     {
         setIsNonMapWindowHovered(true);
@@ -1052,8 +1052,6 @@ void BoardManager::renderEditWindow()
                 {
                     if (nm && boardEnt.is_valid())
                     {
-                        edit_window_entity.destruct(); // Delete the entity
-                        showEditWindow = false;
                         if (edit_window_entity.has<MarkerComponent>())
                         {
                             nm->broadcastMarkerDelete(boardEnt.get<Identifier>()->id, edit_window_entity);
@@ -1062,6 +1060,8 @@ void BoardManager::renderEditWindow()
                         {
                             nm->broadcastFogDelete(boardEnt.get<Identifier>()->id, edit_window_entity);
                         }
+                        edit_window_entity.destruct(); // Delete the entity
+                        showEditWindow = false;
                     }
                 }
                 ImGui::CloseCurrentPopup(); // Close the popup after deletion
@@ -1081,24 +1081,123 @@ void BoardManager::renderEditWindow()
     // --- Ownership (only for markers) ---
     if (edit_window_entity.is_valid() && edit_window_entity.has<MarkerComponent>())
     {
-        ImGui::Separator();
-        ImGui::TextUnformatted("Ownership");
-
+        auto nm = network_manager.lock();
         auto mc = edit_window_entity.get_mut<MarkerComponent>();
 
-        static char ownerBuf[128] = {};
-        std::snprintf(ownerBuf, sizeof(ownerBuf), "%s", mc->ownerPeerId.c_str());
-        ImGui::InputText("Owner Peer Id", ownerBuf, IM_ARRAYSIZE(ownerBuf));
+        // Build options: index 0 = (none), then connected peers, then offline owner (if any)
+        std::vector<std::string> options;
+        options.emplace_back(""); // 0 => (none)
+
+        // unique connected peers
+        std::set<std::string> uniq;
+        if (nm)
+        {
+            for (const auto& pid : nm->getConnectedPeerIds())
+            {
+                if (uniq.insert(pid).second)
+                    options.emplace_back(pid);
+            }
+        }
+        // include offline owner if not already in the list
+        if (!mc->ownerPeerId.empty() && !uniq.count(mc->ownerPeerId))
+        {
+            options.emplace_back(mc->ownerPeerId);
+        }
+
+        // Find current selection
+        int selectedIndex = 0;
+        for (int i = 1; i < (int)options.size(); ++i)
+        {
+            if (options[i] == mc->ownerPeerId)
+            {
+                selectedIndex = i;
+                break;
+            }
+        }
+
+        ImGui::Separator();
+        ImGui::TextUnformatted("Owner");
+        ImGui::Spacing();
+
+        // Pagination (no child, no scroll)
+        static int ownerPage = 0;
+        const int rowsPerPage = 6;
+        const int totalRows = (int)options.size();
+        const int totalPages = (totalRows + rowsPerPage - 1) / rowsPerPage;
+        ownerPage = std::clamp(ownerPage, 0, std::max(0, totalPages - 1));
+
+        // Helper: toggle-style full-width button
+        auto ToggleRow = [&](const char* label, bool selected, int id) -> bool
+        {
+            ImGui::PushID(id);
+            if (selected)
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.50f, 0.80f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.25f, 0.55f, 0.85f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.15f, 0.45f, 0.75f, 1.0f));
+            }
+            else
+            {
+                ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.28f, 0.32f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.33f, 0.38f, 1.0f));
+                ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.22f, 0.25f, 0.29f, 1.0f));
+            }
+
+            bool clicked = ImGui::Button(label, ImVec2(-FLT_MIN, 0)); // full width
+            ImGui::PopStyleColor(3);
+            ImGui::PopID();
+            return clicked;
+        };
+
+        // Compute visible slice
+        int start = ownerPage * rowsPerPage;
+        int end = std::min(start + rowsPerPage, totalRows);
+
+        // Render visible rows
+        for (int i = start; i < end; ++i)
+        {
+            const std::string& pid = options[i];
+            const bool isSel = (selectedIndex == i);
+            const char* label = (i == 0) ? "(none)" : pid.c_str();
+            if (ToggleRow(label, isSel, i))
+            {
+                selectedIndex = i;
+            }
+        }
+
+        // Pagination controls (only show if needed)
+        if (totalPages > 1)
+        {
+            ImGui::Spacing();
+            ImGui::BeginDisabled(ownerPage <= 0);
+            if (ImGui::Button("< Prev"))
+            {
+                ownerPage--;
+            }
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::Text("Page %d / %d", ownerPage + 1, std::max(1, totalPages));
+            ImGui::SameLine();
+            ImGui::BeginDisabled(ownerPage >= totalPages - 1);
+            if (ImGui::Button("Next >"))
+            {
+                ownerPage++;
+            }
+            ImGui::EndDisabled();
+        }
+
+        // Apply selection back to component
+        if (selectedIndex == 0)
+            mc->ownerPeerId.clear();
+        else
+            mc->ownerPeerId = options[selectedIndex];
 
         ImGui::Checkbox("Allow all players to move", &mc->allowAllPlayersMove);
         ImGui::Checkbox("Locked (players cannot move)", &mc->locked);
 
         if (ImGui::Button("Apply Ownership"))
         {
-            // write back
-            mc->ownerPeerId = ownerBuf;
 
-            auto nm = network_manager.lock();
             auto boardEnt = getActiveBoard();
             // broadcast a full marker update (GM op)
             if (nm && boardEnt.is_valid())
@@ -1106,10 +1205,6 @@ void BoardManager::renderEditWindow()
                 nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
             }
         }
-    }
-    else
-    {
-        ImGui::Text("Invalid entity or missing components!");
     }
 
     ImGui::End();

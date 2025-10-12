@@ -977,9 +977,6 @@ void NetworkManager::sendFog(uint64_t boardId, const flecs::entity& fog, const s
 }
 
 // --- tuning ---
-static constexpr size_t kChunk = 8 * 1024; // smaller chunks are friendlier to SCTP
-static constexpr int kPaceEveryN = 48;     // crude pacing step
-static constexpr int kPaceMillis = 2;
 
 // Sends an entire image as ImageChunk frames (reliable/ordered DC).
 // kind: 0=Board, 1=Marker (msg::ImageOwnerKind)

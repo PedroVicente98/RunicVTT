@@ -225,6 +225,7 @@ public:
 
     MessageQueue<msg::NetEvent> events_;
     MessageQueue<msg::InboundRaw> inboundRaw_;
+    std::vector<std::string> getConnectedPeerIds() const;
 
 private:
     std::unordered_map<uint64_t, PendingImage> imagesRx_;
@@ -236,9 +237,11 @@ private:
 
     std::shared_ptr<ImGuiToaster> toaster_;
 
-    static constexpr size_t kChunk = 8 * 1024;            // 8KB chunk
-    static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
-    static constexpr size_t kLowWater = 512 * 1024;       // 512 KB before resuming
+    static constexpr size_t kChunk = 8 * 1024; // 8KB chunk
+    //static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
+    //static constexpr size_t kLowWater = 512 * 1024;       // 512 KB before resuming
+    static constexpr int kPaceEveryN = 48; // crude pacing step
+    static constexpr int kPaceMillis = 2;
 
     void handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off);
     void handleBoardMeta(const std::vector<uint8_t>& b, size_t& off);
@@ -271,8 +274,6 @@ private:
     // ---- FOG UPDATE/DELETE ----
     std::vector<unsigned char> buildFogUpdateFrame(uint64_t boardId, const flecs::entity& fog);
     std::vector<unsigned char> buildFogDeleteFrame(uint64_t boardId, uint64_t fogId);
-
-    std::vector<std::string> getConnectedPeerIds() const;
 
     // Helpers used by reconnectPeer (thin wrappers around what you already have)
     /*std::shared_ptr<PeerLink> replaceWithFreshLink_(const std::string& peerId);

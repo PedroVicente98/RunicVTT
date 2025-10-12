@@ -133,8 +133,7 @@ void PeerLink::setupCallbacks()
                 msg::NetEvent ev{msg::NetEvent::Type::PcOpen, peerId, "PC"};
                 nm->events_.push(std::move(ev));
             } 
-        }
-    });
+        } });
 
     pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc)
                            {
@@ -167,12 +166,12 @@ bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& byte
     if (!ch->isOpen())
         return false;
 
-    // Optional backpressure guard (avoid unbounded memory use)
-    if (ch->bufferedAmount() > kMaxBufferedBytes)
-    {
-        // You can queue locally instead of dropping, if you want
-        return false;
-    }
+    //// Optional backpressure guard (avoid unbounded memory use)
+    //if (ch->bufferedAmount() > kMaxBufferedBytes)
+    //{
+    //    // You can queue locally instead of dropping, if you want
+    //    return false;
+    //}
     rtc::binary b;
     b.resize(bytes.size());
     if (!bytes.empty())
@@ -247,7 +246,6 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
                               nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
                           }
                       }
-
                   });
 }
 

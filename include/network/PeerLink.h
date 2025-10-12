@@ -48,8 +48,9 @@ public:
     // accessors
     bool isConnected() const; // PC connected + *at least* Intent channel open
     bool isPcConnectedOnly() const;
-    static constexpr size_t kMaxBufferedBytes = 5 /*MB*/ * 1024 * 1024; //(tune as you like)
-    void setOpen(std::string label, bool open) {
+    //static constexpr size_t kMaxBufferedBytes = 5 /*MB*/ * 1024 * 1024; //(tune as you like)
+    void setOpen(std::string label, bool open)
+    {
         dcOpen_[label] = open;
     }
 
