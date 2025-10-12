@@ -431,11 +431,10 @@ void ChatManager::tryHandleSlashCommand(uint64_t threadId, const std::string& in
     const int modApplied = K;
     const int finalTotal = total + modApplied;
 
-    const std::string text =
-        uname + " rolled " + std::to_string(N) + "d" + std::to_string(M) +
-        (diceModPerDie_ ? " (per-die mod " : " (mod ") +
-        std::to_string(modApplied) + ")" +
-        " => [" + rolls + "] = " + std::to_string(finalTotal);
+    const std::string text = "rolled " + std::to_string(N) + "d" + std::to_string(M) +
+                             (diceModPerDie_ ? " (per-die mod " : " (mod ") +
+                             std::to_string(modApplied) + ")" +
+                             " => [" + rolls + "] = " + std::to_string(finalTotal);
 
     const uint64_t ts = (uint64_t)nowSec();
     emitChatMessageFrame(threadId, uname, text, ts);
@@ -1047,13 +1046,13 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/)
             // One-line header+body to avoid layout edge cases
             if (m.kind == ChatMessageModel::Kind::LINK)
             {
-                ImGui::TextWrapped("%s — %s", m.username.c_str(), m.content.c_str());
+                ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
                 // Optional: clickable link
                 // if (ImGui::SmallButton("Open")) { /* open URL */ }
             }
             else
             {
-                ImGui::TextWrapped("%s — %s", m.username.c_str(), m.content.c_str());
+                ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
             }
             ImGui::PopTextWrapPos();
         }
