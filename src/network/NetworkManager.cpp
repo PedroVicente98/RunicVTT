@@ -1389,17 +1389,33 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
                 break;
 
             case msg::DCType::MarkerUpdate:
-                //handleMarkerUpdate(b, off); // later
+                handleMarkerUpdate(b, off); // later
                 Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
-                return; // or break; depends on your framing
+                break;
+
+            case msg::DCType::FogUpdate:
+                handleFogUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "FogUpdate Handled!!");
+                break;
+
+            case msg::DCType::MarkerDelete:
+                handleMarkerDelete(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete Handled!!");
+                break;
+
+            case msg::DCType::FogDelete:
+                handleFogDelete(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete FogDelete!!");
+                break;
+
             case msg::DCType::GridUpdate:
                 //handleGridUpdate(b, off); // later
                 Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
-                return;
+                break;
 
             default:
                 Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
-                return;
+                break;
         }
     }
 }

@@ -232,7 +232,9 @@ private:
 
     std::shared_ptr<ImGuiToaster> toaster_;
 
-    static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
+    static constexpr size_t kChunk = 8 * 1024;            // 8KB chunk
+    static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
+    static constexpr size_t kLowWater = 512 * 1024;       // 512 KB before resuming
 
     void handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off);
     void handleBoardMeta(const std::vector<uint8_t>& b, size_t& off);

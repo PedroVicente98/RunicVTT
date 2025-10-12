@@ -133,7 +133,7 @@ void GameTableManager::processReceivedMessages()
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
-                    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Created: " + tex);
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Created: " + std::to_string(tex));
                 }
 
                 const auto& bm = *m.boardMeta;
@@ -160,14 +160,14 @@ void GameTableManager::processReceivedMessages()
 
                 GLuint tex = 0;
                 glm::vec2 texSize{m.markerMeta->size.width, m.markerMeta->size.height};
-                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + m.bytes->size());
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + std::to_string(m.bytes->size()));
                 if (m.bytes && !m.bytes->empty())
                 {
                     auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
-                    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Created: " + tex);
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Created: " + std::to_string(tex));
                 }
                 const auto& mm = *m.markerMeta;
                 flecs::entity marker = ecs.entity()
