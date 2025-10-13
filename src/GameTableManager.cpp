@@ -1401,6 +1401,230 @@ void GameTableManager::guidePopUp()
 
     if (ImGui::BeginPopupModal("Guide", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
+        // --- state ---
+        static int section = 0;
+        static const char* kSections[] = {
+            "Getting Started",
+            "Connecting to a Game",
+            "Game Tables",
+            "Boards",
+            "Markers",
+            "Fog of War",
+            "Toolbar & Interface",
+            "Networking & Security",
+            "Known Issues",
+            "Appendix"
+        };
+
+        // quick helper
+        auto Para = [](const char* s) {
+            ImGui::TextWrapped("%s", s);
+            ImGui::Dummy(ImVec2(0, 4));
+        };
+
+        ImGui::TextUnformatted("RunicVTT Guide");
+        ImGui::Separator();
+
+        // main area (Left nav + Right content)
+        ImVec2 full = ImVec2(860, 520);
+        ImGui::BeginChild("GuideContent", full, true);
+
+        // Left: nav
+        ImGui::BeginChild("GuideNav", ImVec2(240, 0), true);
+        for (int i = 0; i < IM_ARRAYSIZE(kSections); ++i)
+        {
+            if (ImGui::Selectable(kSections[i], section == i))
+                section = i;
+        }
+        ImGui::EndChild();
+
+        ImGui::SameLine();
+
+        // Right: body (scroll)
+        ImGui::BeginChild("GuideBody", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+
+        switch (section)
+        {
+            case 0: // Getting Started
+            {
+                ImGui::SeparatorText("Overview");
+                Para("RunicVTT is a virtual tabletop for sharing boards, markers, and fog of war in real-time across peers.");
+
+                ImGui::SeparatorText("Basic Flow");
+                Para("Create or load a Game Table → Host or Join → Add a Board → Place Markers / Fog → Play.");
+
+                ImGui::SeparatorText("Requirements");
+                Para("- Windows 10/11 recommended.\n- Internet connection for WAN.\n- Allow the app in your firewall/antivirus.\n- Read/write access for assets (Boards/Markers folders).");
+
+                ImGui::SeparatorText("Terminology");
+                Para("Game Table: a saved session containing chat and world state.\n"
+                     "Board: a map image displayed to all players.\n"
+                     "Marker: a token/object placed on a board.\n"
+                     "Fog: an overlay hiding/revealing areas.\n"
+                     "Peer: a connected client (GM or Player).");
+                break;
+            }
+
+            case 1: // Connecting to a Game
+            {
+                ImGui::SeparatorText("Connection String");
+                Para("A connection string identifies the host session. Example formats:\n"
+                     "  https://runic-<yourLocalIp>.loca.lt?PASSWORD\n"
+                     "  runic:<host>:<port>?PASSWORD");
+
+                ImGui::SeparatorText("Hosting");
+                Para("Choose a connection mode: LocalTunnel (public URL), Local (LAN), or External (WAN with port forwarding). "
+                     "Start hosting and copy the connection string from the Network Center.");
+
+                ImGui::SeparatorText("Joining");
+                Para("Ask the host for a connection string and password, then use 'Connect to GameTable' and paste it.");
+
+                ImGui::SeparatorText("Troubleshooting");
+                Para("If connection closes over WAN: ensure firewall allows the app, port was fowarded manually or via UPnP and the host is reachable. \n"
+                     "If connection closes over LAN: ensure firewall allows the app, and the moldem dont block local connections. \n"
+                    "If connection closes over LocalTunnel: ensure firewall allows the app, and the generated URL is in the correct format https://runic-<YOURLOCALIP>.loca.lt. if not in the formar generate new by hosting again \n"
+                     "Make sure you are connected to a Wifi or Ethernet moldem connection, 4G/5G mobile network arent supported due to their complex NAT protection. \n"
+                     "Corporate networks or strict NAT may require TURN/relay.");
+                break;
+            }
+
+            case 2: // Game Tables
+            {
+                ImGui::SeparatorText("Create a Game Table");
+                Para("Open 'Host GameTable' → Create tab → set name/username/password/port → choose mode → Host.");
+
+                ImGui::SeparatorText("Load a Game Table");
+                Para("Open 'Host GameTable' → Load tab → select a saved table → set credentials/port → Host.");
+
+                ImGui::SeparatorText("Lifecycle");
+                Para("Networking is tied to the Game Table. Closing it stops all connections. "
+                     "Chat and boards are saved per table.");
+                break;
+            }
+
+            case 3: // Boards
+            {
+                ImGui::SeparatorText("Create a Board");
+                Para("Use 'Add Board' or board toolbar → choose an image (PNG/JPG). The image is shared to peers.");
+
+                ImGui::SeparatorText("Edit Board");
+                Para("Adjust size/scale, toggle grid, panning/zoom. Visibility affects whether players see it fully.");
+
+                ImGui::SeparatorText("Networking Notes");
+                Para("Large images are chunked and sent reliably. Very large files transfer but take longer.");
+                break;
+            }
+
+            case 4: // Markers
+            {
+                ImGui::SeparatorText("Create Markers");
+                Para("Use the Marker directory to place tokens. Drag markers to the board from the Markers directory window.");
+
+                ImGui::SeparatorText("Edit & Ownership");
+                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. "
+                     "Players can only move owned/unlocked markers; the GM can always move.");
+
+                ImGui::SeparatorText("Movement");
+                Para("Drag markers to move. Updates are broadcast at a limited rate to reduce spam.");
+                break;
+            }
+
+            case 5: // Fog of War
+            {
+                ImGui::SeparatorText("Create Fog");
+                Para("Use the Fog tool to add opaque overlays to hide areas from players.");
+
+                ImGui::SeparatorText("Edit/Remove");
+                Para("Move/resize fog areas or delete them. Fog updates are synchronized to all peers.");
+
+                ImGui::SeparatorText("Authority");
+                Para("Fog is GM-controlled; players do not send fog updates.");
+                break;
+            }
+
+            case 6: // Toolbar & Interface
+            {
+                ImGui::SeparatorText("Toolbar Overview");
+                Para("Move Tool: pan map or drag owned markers.\n"
+                     "Fog Tool: create fog areas.\n"
+                     "Edit/Delete: open edit window or remove entities.\n"
+                     "Zoom/Pan: mouse wheel and drag (when panning).
+                     "Grid: open grid window to configure it.\n"
+                     "Camera: open camera window to configure it.\n"
+                    );
+
+                ImGui::SeparatorText("Windows & Panels");
+                Para("Chat Window: General chat + dice roller (/roll).\n"
+                     "Edit Window: per-entity size/visibility/ownership.\n"
+                     "Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
+                     "Camera Window: per-board camera zoom via button and sliders and reset.\n"
+                     "Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
+                     "Connect Window: connect to hosted gametable, connection string and credential.\n"
+                     "Network Center: peers, connection strings, status.");
+
+                //ImGui::SeparatorText("Hotkeys (examples)");
+                //Para("Zoom: Mouse Wheel\nPan: Middle Drag\nEdit: Right-Click on entity");
+                break;
+            }
+
+            case 7: // Networking & Security
+            {
+                ImGui::SeparatorText("How It Works");
+                Para("Peer-to-peer data channels synchronize boards, markers, fog, and chat.");
+
+                ImGui::SeparatorText("Firewall / Antivirus");
+                Para("Allow the executable on first run. Some AVs may slow initial connection.");
+
+                ImGui::SeparatorText("Quality & Reliability");
+                Para("Images are sent on reliable channels.");
+                break;
+            }
+
+            case 8: // Known Issues
+            {
+                ImGui::SeparatorText("Limitations");
+                Para("Very large images transfer slowly.\nDebugging with breakpoints can drop peer connections.");
+
+                ImGui::SeparatorText("Troubleshooting");
+                Para("If desync occurs, rejoin the session or have the host re-broadcast state via Game Table snapshot.");
+
+                ImGui::SeparatorText("Reporting Bugs");
+                Para("Collect logs from the log window/folder and describe steps to reproduce.");
+                break;
+            }
+
+            case 9: // Appendix
+            {
+                ImGui::SeparatorText("File Paths");
+                Para("GameTables folder: <root path>/GameTables/ \n Boards folder: <GameTableFolder>/<GameTableName>/Boards/ \n Maps folder: <root path>/Maps/ \n Marker folder: <root path>/Marker/.");
+
+                ImGui::SeparatorText("Glossary");
+                Para("GM: Game Master (host/authority).\nPlayer: peer participant.\nPeer: a connected client.");
+
+                ImGui::SeparatorText("Credits / Version");
+                Para("RunicVTT © You. Show version from About dialog.");
+                break;
+            }
+        }
+
+        ImGui::EndChild(); // GuideBody
+        ImGui::EndChild(); // GuideContent
+
+        ImGui::Separator();
+        if (ImGui::Button("Close"))
+            ImGui::CloseCurrentPopup();
+
+        ImGui::EndPopup();
+    }
+}
+
+/*void GameTableManager::guidePopUp()
+{
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Guide", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
         // Left: vertical sections; Right: content
         static int section = 0;
         static const char* kSections[] = {
@@ -1481,7 +1705,7 @@ void GameTableManager::guidePopUp()
         ImGui::EndPopup();
     }
 }
-
+*/
 // ======================= About =======================
 void GameTableManager::aboutPopUp()
 {
