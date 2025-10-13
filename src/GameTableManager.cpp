@@ -1413,11 +1413,11 @@ void GameTableManager::guidePopUp()
             "Toolbar & Interface",
             "Networking & Security",
             "Known Issues",
-            "Appendix"
-        };
+            "Appendix"};
 
         // quick helper
-        auto Para = [](const char* s) {
+        auto Para = [](const char* s)
+        {
             ImGui::TextWrapped("%s", s);
             ImGui::Dummy(ImVec2(0, 4));
         };
@@ -1451,17 +1451,20 @@ void GameTableManager::guidePopUp()
                 Para("RunicVTT is a virtual tabletop for sharing boards, markers, and fog of war in real-time across peers.");
 
                 ImGui::SeparatorText("Basic Flow");
-                Para("Create or load a Game Table → Host or Join → Add a Board → Place Markers / Fog → Play.");
+                Para("Create or load a Game Table -> Host or Join -> Add a Board -> Place Markers / Fog -> Play.");
 
                 ImGui::SeparatorText("Requirements");
-                Para("- Windows 10/11 recommended.\n- Internet connection for WAN.\n- Allow the app in your firewall/antivirus.\n- Read/write access for assets (Boards/Markers folders).");
+                Para("- Windows 10/11 recommended.\n"
+                     "- Internet connection for WAN.\n"
+                     "- Allow the app in your firewall/antivirus.\n"
+                     "- Read/write access for assets (Boards/Markers folders).");
 
                 ImGui::SeparatorText("Terminology");
-                Para("Game Table: a saved session containing chat and world state.\n"
-                     "Board: a map image displayed to all players.\n"
-                     "Marker: a token/object placed on a board.\n"
-                     "Fog: an overlay hiding/revealing areas.\n"
-                     "Peer: a connected client (GM or Player).");
+                Para("- Game Table: a saved session containing chat and world state.\n"
+                     "- Board: a map image displayed to all players.\n"
+                     "- Marker: a token/object placed on a board.\n"
+                     "- Fog: an overlay hiding/revealing areas.\n"
+                     "- Peer: a connected client (GM or Player).");
                 break;
             }
 
@@ -1469,8 +1472,8 @@ void GameTableManager::guidePopUp()
             {
                 ImGui::SeparatorText("Connection String");
                 Para("A connection string identifies the host session. Example formats:\n"
-                     "  https://runic-<yourLocalIp>.loca.lt?PASSWORD\n"
-                     "  runic:<host>:<port>?PASSWORD");
+                     "-  https://runic-<yourLocalIp>.loca.lt?PASSWORD\n"
+                     "-  runic:<host>:<port>?PASSWORD");
 
                 ImGui::SeparatorText("Hosting");
                 Para("Choose a connection mode: LocalTunnel (public URL), Local (LAN), or External (WAN with port forwarding). "
@@ -1480,21 +1483,21 @@ void GameTableManager::guidePopUp()
                 Para("Ask the host for a connection string and password, then use 'Connect to GameTable' and paste it.");
 
                 ImGui::SeparatorText("Troubleshooting");
-                Para("If connection closes over WAN: ensure firewall allows the app, port was fowarded manually or via UPnP and the host is reachable. \n"
-                     "If connection closes over LAN: ensure firewall allows the app, and the moldem dont block local connections. \n"
-                    "If connection closes over LocalTunnel: ensure firewall allows the app, and the generated URL is in the correct format https://runic-<YOURLOCALIP>.loca.lt. if not in the formar generate new by hosting again \n"
-                     "Make sure you are connected to a Wifi or Ethernet moldem connection, 4G/5G mobile network arent supported due to their complex NAT protection. \n"
-                     "Corporate networks or strict NAT may require TURN/relay.");
+                Para("- If connection closes over WAN: ensure firewall allows the app, port was fowarded manually or via UPnP and the host is reachable. \n"
+                     "- If connection closes over LAN: ensure firewall allows the app, and the moldem dont block local connections. \n"
+                     "- If connection closes over LocalTunnel: ensure firewall allows the app, and the generated URL is in the correct format https://runic-<YOURLOCALIP>.loca.lt. if not in the formar generate new by hosting again \n"
+                     "- Make sure you are connected to a Wifi or Ethernet moldem connection, 4G/5G mobile network arent supported due to their complex NAT protection. \n"
+                     "- Corporate networks or strict NAT may require TURN/relay.");
                 break;
             }
 
             case 2: // Game Tables
             {
                 ImGui::SeparatorText("Create a Game Table");
-                Para("Open 'Host GameTable' → Create tab → set name/username/password/port → choose mode → Host.");
+                Para("Open 'Host GameTable' -> Create tab -> set name/username/password/port -> choose mode -> Host.");
 
                 ImGui::SeparatorText("Load a Game Table");
-                Para("Open 'Host GameTable' → Load tab → select a saved table → set credentials/port → Host.");
+                Para("Open 'Host GameTable' -> Load tab -> select a saved table -> set credentials/port -> Host.");
 
                 ImGui::SeparatorText("Lifecycle");
                 Para("Networking is tied to the Game Table. Closing it stops all connections. "
@@ -1505,7 +1508,7 @@ void GameTableManager::guidePopUp()
             case 3: // Boards
             {
                 ImGui::SeparatorText("Create a Board");
-                Para("Use 'Add Board' or board toolbar → choose an image (PNG/JPG). The image is shared to peers.");
+                Para("Use 'Add Board' or board toolbar -> choose an image (PNG/JPG). The image is shared to peers.");
 
                 ImGui::SeparatorText("Edit Board");
                 Para("Adjust size/scale, toggle grid, panning/zoom. Visibility affects whether players see it fully.");
@@ -1521,7 +1524,7 @@ void GameTableManager::guidePopUp()
                 Para("Use the Marker directory to place tokens. Drag markers to the board from the Markers directory window.");
 
                 ImGui::SeparatorText("Edit & Ownership");
-                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. "
+                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. \n"
                      "Players can only move owned/unlocked markers; the GM can always move.");
 
                 ImGui::SeparatorText("Movement");
@@ -1545,22 +1548,21 @@ void GameTableManager::guidePopUp()
             case 6: // Toolbar & Interface
             {
                 ImGui::SeparatorText("Toolbar Overview");
-                Para("Move Tool: pan map or drag owned markers.\n"
-                     "Fog Tool: create fog areas.\n"
-                     "Edit/Delete: open edit window or remove entities.\n"
-                     "Zoom/Pan: mouse wheel and drag (when panning).
-                     "Grid: open grid window to configure it.\n"
-                     "Camera: open camera window to configure it.\n"
-                    );
+                Para("- Move Tool: pan map or drag owned markers.\n"
+                     "- Fog Tool: create fog areas.\n"
+                     "- Edit/Delete: open edit window or remove entities.\n"
+                     "- Zoom/Pan: mouse wheel and drag (when panning)."
+                     "- Grid: open grid window to configure it.\n"
+                     "- Camera: open camera window to configure it.\n");
 
                 ImGui::SeparatorText("Windows & Panels");
-                Para("Chat Window: General chat + dice roller (/roll).\n"
-                     "Edit Window: per-entity size/visibility/ownership.\n"
-                     "Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
-                     "Camera Window: per-board camera zoom via button and sliders and reset.\n"
-                     "Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
-                     "Connect Window: connect to hosted gametable, connection string and credential.\n"
-                     "Network Center: peers, connection strings, status.");
+                Para("- Chat Window: General chat + dice roller (/roll).\n"
+                     "- Edit Window: per-entity size/visibility/ownership.\n"
+                     "- Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
+                     "- Camera Window: per-board camera zoom via button and sliders and reset.\n"
+                     "- Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
+                     "- Connect Window: connect to hosted gametable, connection string and credential.\n"
+                     "- Network Center: peers, connection strings, status.");
 
                 //ImGui::SeparatorText("Hotkeys (examples)");
                 //Para("Zoom: Mouse Wheel\nPan: Middle Drag\nEdit: Right-Click on entity");
@@ -1583,7 +1585,9 @@ void GameTableManager::guidePopUp()
             case 8: // Known Issues
             {
                 ImGui::SeparatorText("Limitations");
-                Para("Very large images transfer slowly.\nDebugging with breakpoints can drop peer connections.");
+                Para("- Very large images transfer slowly.\n"
+                     "- Network Over the 4G/5G doesnt work due to NAT restrictions. \n"
+                     "- Network do not work on Mobile Internet of any form(USB Anchoring, Wifi Hotspot, Ethernet and Bluetooth). ");
 
                 ImGui::SeparatorText("Troubleshooting");
                 Para("If desync occurs, rejoin the session or have the host re-broadcast state via Game Table snapshot.");
@@ -1596,13 +1600,16 @@ void GameTableManager::guidePopUp()
             case 9: // Appendix
             {
                 ImGui::SeparatorText("File Paths");
-                Para("GameTables folder: <root path>/GameTables/ \n Boards folder: <GameTableFolder>/<GameTableName>/Boards/ \n Maps folder: <root path>/Maps/ \n Marker folder: <root path>/Marker/.");
+                Para("- GameTables folder: <root path>/GameTables/ \n"
+                     "- Boards folder: <GameTableFolder>/<GameTableName>/Boards/ \n"
+                     "- Maps folder: <root path>/Maps/ \n"
+                     "- Marker folder: <root path>/Marker/.");
 
                 ImGui::SeparatorText("Glossary");
-                Para("GM: Game Master (host/authority).\nPlayer: peer participant.\nPeer: a connected client.");
+                Para("- GM: Game Master (host/authority).\n"
+                     "- Player: peer participant.\n"
+                     "- Peer: a connected client.");
 
-                ImGui::SeparatorText("Credits / Version");
-                Para("RunicVTT © You. Show version from About dialog.");
                 break;
             }
         }
