@@ -210,21 +210,21 @@ public:
             std::string name = "##toast-" + std::to_string(idx++);
             if (ImGui::Begin(name.c_str(), nullptr, flags))
             {
-                if (cfg_.killOnClickAnywhere) {
-                    // Cover the content region with an invisible button.
-                    // It won't change layout because we restore the cursor after.
-                    ImVec2 crMin = ImGui::GetWindowContentRegionMin();
-                    ImVec2 crMax = ImGui::GetWindowContentRegionMax();
-                    ImVec2 old   = ImGui::GetCursorPos();
-                
-                    ImGui::SetCursorPos(crMin);
-                    ImVec2 size(crMax.x - crMin.x, crMax.y - crMin.y);
-                    ImGui::InvisibleButton("##toast_kill", size);
-                    if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
-                        delete_this_toast = true;
-                    }
-                    ImGui::SetCursorPos(old);
+                /*if (cfg_.killOnClickAnywhere &&
+                    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) &&
+                    ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+                {
+                    delete_this_toast = true;
+                }*/
+                if (cfg_.killOnClickAnywhere &&
+                    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_RootAndChildWindows) &&
+                    ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsMouseDragPastThreshold(0, 0.0f) == false)
+                {
+                    delete_this_toast = true;
                 }
+
+
+                
                 // Text wrapping
                 float wrapAt = 0.f;
                 if (cfg_.wrapText)
@@ -241,6 +241,22 @@ public:
                 {
                     ImGui::PopTextWrapPos();
                 }
+
+                /*if (cfg_.killOnClickAnywhere) {
+                    // Cover the content region with an invisible button.
+                    // It won't change layout because we restore the cursor after.
+                    ImVec2 crMin = ImGui::GetWindowContentRegionMin();
+                    ImVec2 crMax = ImGui::GetWindowContentRegionMax();
+                    ImVec2 old   = ImGui::GetCursorPos();
+                
+                    ImGui::SetCursorPos(crMin);
+                    ImVec2 size(crMax.x - crMin.x, crMax.y - crMin.y);
+                    ImGui::InvisibleButton("##toast_kill", size);
+                    if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+                        delete_this_toast = true;
+                    }
+                    ImGui::SetCursorPos(old);
+                }*/
             }
             ImGui::End();
 
