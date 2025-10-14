@@ -78,6 +78,11 @@ public:
         return getExecutableRoot() / "GameTables";
     }
 
+    static fs::path getBoardsPath(std::string gametable_name)
+    {
+        return getGameTablesPath() / gametable_name / "Boards";
+    }
+
     static fs::path getConfigPath()
     {
         return getExecutableRoot() / "Config";

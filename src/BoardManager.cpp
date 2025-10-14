@@ -12,6 +12,8 @@
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/round.hpp>
+
 #include "Components.h"
 #include <filesystem>
 #include <random>  // For random number generation
@@ -621,6 +623,25 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
     return hovered;
 }
 
+// Snap to the nearest cell center in a square grid:
+// centers are at: offset + (i + 0.5) * cell_size
+static inline glm::vec2 snapToSquareCenter(const glm::vec2& worldPos,
+                                           const glm::vec2& offset,
+                                           float cell)
+{
+    glm::vec2 local = worldPos + offset;
+    const glm::vec2 half(cell * 0.5f);
+    glm::vec2 snappedLocal = glm::round((local - half) / cell) * cell + half;
+    return snappedLocal + offset;
+}
+
+static inline glm::vec2 snapToGridCenter(const glm::vec2& worldPos, const Grid& grid)
+{
+    if (!grid.snap_to_grid || grid.cell_size <= 0.0f)
+        return worldPos;
+    return snapToSquareCenter(worldPos, grid.offset, grid.cell_size);
+}
+
 void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
 {
     mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
@@ -642,10 +663,22 @@ void BoardManager::endMouseDrag()
 {
     active_board.set<Panning>({false});
     auto nm = network_manager.lock();
+
+    const Grid* grid = active_board.get<Grid>();
+    const bool canSnap = (grid && grid->snap_to_grid && grid->cell_size > 0.0f);
+
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving)
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& pos)
              {
         if (entity.has(flecs::ChildOf, active_board)) {
+
+            if (canSnap)
+            {
+                glm::vec2 snapped = snapToSquareCenter(glm::vec2(pos.x, pos.y), grid->offset, grid->cell_size);
+                pos.x = snapped.x;
+                pos.y = snapped.y;
+            }
+
             moving.isDragging = false;
             if (nm && entity.has<Identifier>())
             {
@@ -963,7 +996,7 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
 
 //Save and Load Board --------------------------------------------------------------------
 
-void BoardManager::saveActiveBoard(std::filesystem::path& filePath)
+void BoardManager::saveActiveBoard(std::filesystem::path& board_directory_path)
 {
     if (!active_board.is_alive())
     {
@@ -971,12 +1004,12 @@ void BoardManager::saveActiveBoard(std::filesystem::path& filePath)
         return;
     }
     auto board = active_board.get<Board>();
-    if (!std::filesystem::exists(filePath))
+    if (!std::filesystem::exists(board_directory_path))
     {
-        std::filesystem::create_directory(filePath);
+        std::filesystem::create_directory(board_directory_path);
     }
 
-    auto board_file_path = filePath / (board->board_name + ".runic");
+    auto board_file_path = board_directory_path / (board->board_name + ".runic");
 
     std::vector<uint8_t> buffer;
     Serializer::serializeBoardEntity(buffer, active_board, ecs);
@@ -986,17 +1019,17 @@ void BoardManager::saveActiveBoard(std::filesystem::path& filePath)
     {
         outFile.write(reinterpret_cast<const char*>(buffer.data()), buffer.size());
         outFile.close();
-        std::cout << "Board saved successfully to " << filePath << std::endl;
+        std::cout << "Board saved successfully to " << board_directory_path << std::endl;
     }
     else
     {
-        std::cerr << "Failed to save board to " << filePath << std::endl;
+        std::cerr << "Failed to save board to " << board_directory_path << std::endl;
     }
 }
 
-void BoardManager::loadActiveBoard(const std::string& filePath)
+void BoardManager::loadActiveBoard(const std::string& board_file_path)
 {
-    std::ifstream inFile(filePath, std::ios::binary);
+    std::ifstream inFile(board_file_path, std::ios::binary);
     if (inFile)
     {
         std::vector<uint8_t> buffer((std::istreambuf_iterator<char>(inFile)), std::istreambuf_iterator<char>());
@@ -1021,11 +1054,11 @@ void BoardManager::loadActiveBoard(const std::string& filePath)
         ecs.defer_end();
 
         setActiveBoard(active_board);
-        std::cout << "Board loaded successfully from " << filePath << std::endl;
+        std::cout << "Board loaded successfully from " << board_file_path << std::endl;
     }
     else
     {
-        std::cerr << "Failed to load board from " << filePath << std::endl;
+        std::cerr << "Failed to load board from " << board_file_path << std::endl;
     }
 }
 
@@ -1461,11 +1494,6 @@ void BoardManager::renderGridWindow()
             grid->offset.y = grid->offset.y + 0.01f;
         }
 
-        // Button to reset the offset
-        if (ImGui::Button("Reset Offset"))
-        {
-            grid->offset = glm::vec2(0.0f);
-        }
         // Button to reset the offset
         if (ImGui::Button("Reset Offset"))
         {

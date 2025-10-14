@@ -74,7 +74,7 @@ private:
     void CreateMapFBO(int width, int height);
     void ResizeMapFBO(int newWidth, int newHeight);
     void DeleteMapFBO();
-
+    void TickAutoSave();
     void GetMousePosInItem(ImVec2& out_item_size, ImVec2& item_screen_pos);
 
     std::shared_ptr<MapFBO> map_fbo;
