@@ -1422,7 +1422,7 @@ void BoardManager::renderGridWindow()
         // --- BOOLEAN CHECKBOXES ---
         ImGui::Checkbox("Visible", &grid->visible);
         ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
-        ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
+        //ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
 
         // --- FLOAT SLIDERS ---
         ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
