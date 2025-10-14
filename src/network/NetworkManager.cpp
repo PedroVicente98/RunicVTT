@@ -107,7 +107,7 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
         }
     }
     pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
-    startRawDrainWorker();
+    //startRawDrainWorker();
 }
 
 //RECONNECT
@@ -241,7 +241,7 @@ void NetworkManager::closeServer()
         peer_role = Role::NONE;
         signalingServer->stop();
     }
-    stopRawDrainWorker();
+    //stopRawDrainWorker();
     NetworkUtilities::stopLocalTunnel();
 }
 
@@ -1562,10 +1562,11 @@ void NetworkManager::drainEvents()
         }
     }
 }
-
 void NetworkManager::drainInboundRaw(int maxPerTick)
 {
+    using clock = std::chrono::steady_clock;
     int processed = 0;
+
     msg::InboundRaw r;
     while (processed < maxPerTick && inboundRaw_.try_pop(r))
     {
@@ -1585,16 +1586,57 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
             }
             else if (r.label == msg::dc::name::MarkerMove)
             {
-                decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes);
+                decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes); // coalesce into moveLatest_
             }
         }
         catch (...)
         {
-            // swallow & optionally push a toaster
+            // swallow/log
         }
         ++processed;
     }
+
+    // Time-based coalesced flush into ReadyMessage(s)
+    auto now = clock::now();
+    if (now - lastMoveFlush_ >= std::chrono::milliseconds(10))
+    {
+        flushCoalescedMoves(); // locks internally, pushes ReadyMessage(s)
+        lastMoveFlush_ = now;
+    }
 }
+
+//void NetworkManager::drainInboundRaw(int maxPerTick)
+//{
+//    int processed = 0;
+//    msg::InboundRaw r;
+//    while (processed < maxPerTick && inboundRaw_.try_pop(r))
+//    {
+//        try
+//        {
+//            if (r.label == msg::dc::name::Game)
+//            {
+//                decodeRawGameBuffer(r.fromPeer, r.bytes);
+//            }
+//            else if (r.label == msg::dc::name::Chat)
+//            {
+//                decodeRawChatBuffer(r.fromPeer, r.bytes);
+//            }
+//            else if (r.label == msg::dc::name::Notes)
+//            {
+//                decodeRawNotesBuffer(r.fromPeer, r.bytes);
+//            }
+//            else if (r.label == msg::dc::name::MarkerMove)
+//            {
+//                decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes);
+//            }
+//        }
+//        catch (...)
+//        {
+//            // swallow & optionally push a toaster
+//        }
+//        ++processed;
+//    }
+//}
 void NetworkManager::decodeRawMarkerMoveBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
 {
     size_t off = 0;

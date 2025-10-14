@@ -258,6 +258,8 @@ private:
     std::atomic<bool> rawWorkerRunning_{false};
     std::atomic<bool> rawWorkerStop_{false};
     std::thread rawWorker_;
+    // NetworkManager.h
+    std::chrono::steady_clock::time_point lastMoveFlush_{std::chrono::steady_clock::now()};
 
     std::mutex moveMtx_;
     std::unordered_map<uint64_t, MoveLatest> moveLatest_; // markerId -> latest

@@ -58,9 +58,6 @@ void BoardManager::closeBoard()
 
 flecs::entity BoardManager::createBoard(std::string board_name, std::string map_image_path, GLuint texture_id, glm::vec2 size)
 {
-    auto nm = network_manager.lock();
-    if (!nm)
-        throw std::exception("[BoardManager] Network Manager expired!!");
     auto board = ecs.entity()
                      .set(Identifier{generateUniqueId()})
                      .set(Board{board_name})
@@ -68,15 +65,17 @@ flecs::entity BoardManager::createBoard(std::string board_name, std::string map_
                      .set(Grid{{0, 0}, 50.0f, false, false, false, 0.5f})
                      .set(TextureComponent{texture_id, map_image_path, size})
                      .set(Size{size.x, size.y});
-    active_board = board;
-    nm->broadcastBoard(board);
-
+    setActiveBoard(board);
     return board;
 }
 
 void BoardManager::setActiveBoard(flecs::entity board_entity)
 {
     active_board = board_entity;
+    auto nm = network_manager.lock();
+    if (!nm)
+        if (nm->getPeerRole() == Role::GAMEMASTER)
+            nm->broadcastBoard(active_board);
 }
 
 void BoardManager::renderToolbar(const ImVec2& window_position)
@@ -1021,6 +1020,7 @@ void BoardManager::loadActiveBoard(const std::string& filePath)
             } });
         ecs.defer_end();
 
+        setActiveBoard(active_board);
         std::cout << "Board loaded successfully from " << filePath << std::endl;
     }
     else

@@ -51,7 +51,6 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
             active_game_table.children([&](flecs::entity child)
                                        {
                 if (child.has<Board>()) {
-                    board_manager->setActiveBoard(child);
                     auto texture = child.get_mut<TextureComponent>();
                     auto board_image = map_directory->getImageByPath(texture->image_path);
                     texture->textureID = board_image.textureID;
@@ -65,6 +64,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
                             grand_child_texture->size = marker_image.size;
                         }
                     });
+                    board_manager->setActiveBoard(child);
                 } });
         }
         catch (const std::exception&)
@@ -100,7 +100,7 @@ void GameTableManager::processReceivedMessages()
 {
     constexpr int kMaxPerFrame = 32; // avoid long stalls
 
-    //network_manager->drainInboundRaw(kMaxPerFrame);
+    network_manager->drainInboundRaw(kMaxPerFrame);
     network_manager->drainEvents();
     int processed = 0;
     msg::ReadyMessage m;
