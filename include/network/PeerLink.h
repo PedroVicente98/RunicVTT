@@ -32,6 +32,7 @@ public:
     const std::string& displayName() const;
 
     void attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch, const std::string& label);
+    void attachMarkerMoveChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch, const std::string& label);
 
     bool isDataChannelOpen() const;
     rtc::PeerConnection::State pcState() const; // optional

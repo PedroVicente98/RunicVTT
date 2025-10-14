@@ -2028,91 +2028,6 @@ std::vector<unsigned char> NetworkManager::buildCommitMarkerFrame(uint64_t board
     return b;
 }
 
-// ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
-//-{check}wrong logic below
-
-bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-{ //{check}-wrong logic
-    if (img.empty())
-        return false;
-
-    // BEGIN: DCType::CreateEntity
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
-        Serializer::serializeUInt64(b, markerId);
-        Serializer::serializeString(b, name);
-        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    // CHUNKS: DCType::Image
-    uint64_t offset = 0;
-    while (offset < img.size())
-    {
-        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-        Serializer::serializeUInt64(b, markerId);
-        Serializer::serializeUInt64(b, offset);
-        Serializer::serializeInt(b, n);
-        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-        offset += n;
-    }
-
-    // COMMIT: DCType::CommitMarker
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
-        Serializer::serializeUInt64(b, markerId);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    return true;
-}
-
-bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-{ //{check}-wrong logic
-    if (img.empty())
-        return false;
-
-    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
-        Serializer::serializeUInt64(b, boardId);
-        Serializer::serializeString(b, name);
-        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    // CHUNKS: DCType::Image (same as marker)
-    uint64_t offset = 0;
-    while (offset < img.size())
-    {
-        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-        Serializer::serializeUInt64(b, boardId);
-        Serializer::serializeUInt64(b, offset);
-        Serializer::serializeInt(b, n);
-        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-        offset += n;
-    }
-
-    // COMMIT: DCType::CommitBoard
-    {
-        std::vector<uint8_t> b;
-        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
-        Serializer::serializeUInt64(b, boardId);
-        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-    }
-
-    return true;
-}
-
 void NetworkManager::sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes)
 {
     auto it = peers.find(peerId);
@@ -2128,6 +2043,91 @@ void NetworkManager::broadcastGameFrame(const std::vector<unsigned char>& frame,
         sendGameTo(pid, frame);
     }
 }
+
+// ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
+//-{check}wrong logic below
+
+//bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
+//{ //{check}-wrong logic
+//    if (img.empty())
+//        return false;
+//
+//    // BEGIN: DCType::CreateEntity
+//    {
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
+//        Serializer::serializeUInt64(b, markerId);
+//        Serializer::serializeString(b, name);
+//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//    }
+//
+//    // CHUNKS: DCType::Image
+//    uint64_t offset = 0;
+//    while (offset < img.size())
+//    {
+//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
+//        Serializer::serializeUInt64(b, markerId);
+//        Serializer::serializeUInt64(b, offset);
+//        Serializer::serializeInt(b, n);
+//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//        offset += n;
+//    }
+//
+//    // COMMIT: DCType::CommitMarker
+//    {
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
+//        Serializer::serializeUInt64(b, markerId);
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//    }
+//
+//    return true;
+//}
+//
+//bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
+//{ //{check}-wrong logic
+//    if (img.empty())
+//        return false;
+//
+//    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
+//    {
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
+//        Serializer::serializeUInt64(b, boardId);
+//        Serializer::serializeString(b, name);
+//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//    }
+//
+//    // CHUNKS: DCType::Image (same as marker)
+//    uint64_t offset = 0;
+//    while (offset < img.size())
+//    {
+//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
+//        Serializer::serializeUInt64(b, boardId);
+//        Serializer::serializeUInt64(b, offset);
+//        Serializer::serializeInt(b, n);
+//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//        offset += n;
+//    }
+//
+//    // COMMIT: DCType::CommitBoard
+//    {
+//        std::vector<uint8_t> b;
+//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
+//        Serializer::serializeUInt64(b, boardId);
+//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
+//    }
+//
+//    return true;
+//}
 
 /*bool NetworkManager::disconectFromPeers()
 {

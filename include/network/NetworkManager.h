@@ -178,9 +178,6 @@ public:
     //void onDcChatBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
     //void onDcNotesBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
 
-    bool sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name);
-    bool sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name);
-
     void onPeerChannelOpen(const std::string& peerId, const std::string& label);
     void bootstrapPeerIfReady(const std::string& peerId);
 

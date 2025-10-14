@@ -260,18 +260,19 @@ namespace msg
             inline constexpr std::string Game = "game";
             inline constexpr std::string Chat = "chat";
             inline constexpr std::string Notes = "notes";
+            inline constexpr std::string MarkerMove = "marker_move";
         } // namespace name
 
-        inline constexpr std::string_view Chat = "CHAT";
-        inline constexpr std::string_view Image = "IMAGE";
-        inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
-        inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
-        inline constexpr std::string_view Move = "MOVE";
+        //inline constexpr std::string_view Chat = "CHAT";
+        //inline constexpr std::string_view Image = "IMAGE";
+        //inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
+        //inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
+        //inline constexpr std::string_view Move = "MOVE";
 
-        // Examples from earlier discussion:
-        inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
-        inline constexpr std::string_view FogCreate = "FOG_CREATE";
-        inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
+        //// Examples from earlier discussion:
+        //inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
+        //inline constexpr std::string_view FogCreate = "FOG_CREATE";
+        //inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
     } // namespace dc
 
     // ========== Optional JSON helpers (nlohmann::json) ==========

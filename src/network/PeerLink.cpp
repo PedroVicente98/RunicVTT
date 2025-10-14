@@ -52,7 +52,14 @@ void PeerLink::createChannels()
     if (!pc)
         return;
 
-    rtc::DataChannelInit init; // default reliable/ordered
+    rtc::DataChannelInit init;           // default reliable/ordered
+    rtc::DataChannelInit markerMoveInit; // default reliable/ordered
+    auto reliability = rtc::Reliability{};
+    reliability.unordered = true;
+    reliability.maxPacketLifeTime = std::chrono::milliseconds(1);
+    reliability.maxRetransmits = 0;
+
+    markerMoveInit.reliability = reliability;
     // Offerer creates channels; answerer gets them in pc->onDataChannel
     auto dcGame = pc->createDataChannel(std::string(msg::dc::name::Game), init);
     dcs_[std::string(msg::dc::name::Game)] = dcGame;
@@ -65,6 +72,10 @@ void PeerLink::createChannels()
     auto dcNotes = pc->createDataChannel(std::string(msg::dc::name::Notes), init);
     dcs_[std::string(msg::dc::name::Notes)] = dcNotes;
     attachChannelHandlers(dcNotes, std::string(msg::dc::name::Notes));
+
+    auto dcMarkerMove = pc->createDataChannel(std::string(msg::dc::name::MarkerMove), markerMoveInit);
+    dcs_[std::string(msg::dc::name::MarkerMove)] = dcMarkerMove;
+    attachMarkerMoveChannelHandlers(dcMarkerMove, std::string(msg::dc::name::MarkerMove));
 }
 
 rtc::Description PeerLink::createOffer()
@@ -203,6 +214,51 @@ bool PeerLink::allRequiredOpen() const
     return it != dcOpen_.end() && it->second;
 }
 
+void PeerLink::attachMarkerMoveChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc, const std::string& label)
+{
+    if (!dc)
+        return;
+
+    dc->onOpen([this, id = peerId, label]()
+               {
+                   std::cout << "[PeerLink] DC open \"" << label << "\" to " << id << "\n";
+                   if (auto nm = network_manager.lock())
+                   {
+                       msg::NetEvent ev{msg::NetEvent::Type::DcOpen, id, label};
+                       nm->events_.push(std::move(ev)); // or nm->notifyDcOpen(id, label);
+                   }
+                   dcOpen_[label] = true; });
+
+    dc->onClosed([this, id = peerId, label]()
+                 {
+        std::cout << "[PeerLink] DC closed \"" << label << "\" to " << id << "\n";
+        dcOpen_[label] = false;
+        bootstrapSent_ = false;
+        if (auto nm = network_manager.lock()) {
+            msg::NetEvent ev{msg::NetEvent::Type::DcClosed, id, label};
+            nm->events_.push(std::move(ev));
+        } });
+
+    dc->onMessage([this, id = peerId, label](rtc::message_variant m)
+                  {
+                      if (auto nm = network_manager.lock())
+                      {
+                          if (std::holds_alternative<std::string>(m))
+                          {
+                              const auto& s = std::get<std::string>(m);
+                              std::vector<uint8_t> bytes(s.begin(), s.end());
+                              nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
+                          }
+                          else
+                          {
+                              const auto& bin = std::get<rtc::binary>(m);
+                              std::vector<uint8_t> bytes(bin.size());
+                              std::memcpy(bytes.data(), bin.data(), bin.size());
+                              nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
+                          }
+                      } });
+}
+
 void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc, const std::string& label)
 {
     if (!dc)
@@ -245,8 +301,7 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
                               std::memcpy(bytes.data(), bin.data(), bin.size());
                               nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
                           }
-                      }
-                  });
+                      } });
 }
 
 bool PeerLink::isConnected() const
