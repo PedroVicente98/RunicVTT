@@ -57,7 +57,7 @@ void PeerLink::createChannels()
     auto reliability = rtc::Reliability{};
     reliability.unordered = true;
     reliability.maxPacketLifeTime = std::chrono::milliseconds(500);
-    reliability.maxRetransmits = 0;
+    //reliability.maxRetransmits = 0;
     markerMoveInit.reliability = reliability;
 
     // Offerer creates channels; answerer gets them in pc->onDataChannel
