@@ -679,7 +679,7 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
             const auto id = entity.get<Identifier>()->id;
             if (shouldSendMarkerMove(id))
             {
-                //nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "broadcastMarkerMove!");
                 nm->broadcastMarkerMove(active_board.get<Identifier>()->id, entity);
             }
 

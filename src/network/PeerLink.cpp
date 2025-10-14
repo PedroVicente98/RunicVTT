@@ -207,6 +207,11 @@ bool PeerLink::sendNote(const std::vector<uint8_t>& bytes)
     return sendOn(std::string(msg::dc::name::Notes), bytes);
 }
 
+bool PeerLink::sendMarkerMove(const std::vector<uint8_t>& bytes)
+{
+    return sendOn(std::string(msg::dc::name::MarkerMove), bytes);
+}
+
 bool PeerLink::allRequiredOpen() const
 {
     // minimal: only require the channel used for snapshots

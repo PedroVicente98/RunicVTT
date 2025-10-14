@@ -869,7 +869,7 @@ void NetworkManager::sendMarkerMove(uint64_t boardId, const flecs::entity& marke
     {
         if (auto it = peers.find(pid); it != peers.end() && it->second)
         {
-            it->second->sendOn(std::string(msg::dc::name::MarkerMove), frame);
+            it->second->sendMarkerMove(frame);
         }
     }
 }
@@ -1439,6 +1439,7 @@ void NetworkManager::handleMarkerMove(const std::vector<uint8_t>& b, size_t& off
     auto& st = moveLatest_[markerId];
     if (!st.have || seq > st.seq)
     {
+        Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove HAVENT AND BIGGER SEQ!!");
         st.boardId = boardId;
         st.seq = seq;
         st.pos = {x, y};
@@ -1586,6 +1587,7 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
             }
             else if (r.label == msg::dc::name::MarkerMove)
             {
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Received MarkerMOVE ON DRAIN INBOUND!");
                 decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes); // coalesce into moveLatest_
             }
         }
@@ -1647,7 +1649,7 @@ void NetworkManager::decodeRawMarkerMoveBuffer(const std::string& fromPeer, cons
 
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
-
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! MarkerMove");
         if (type != msg::DCType::MarkerMove)
         {
             // If the sender packed something else on this DC, bail
@@ -1655,6 +1657,7 @@ void NetworkManager::decodeRawMarkerMoveBuffer(const std::string& fromPeer, cons
         }
 
         handleMarkerMove(b, off); // parses one frame and updates coalescer
+        Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove Handled!!");
     }
 }
 void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)

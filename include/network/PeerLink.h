@@ -27,7 +27,7 @@ public:
     bool sendGame(const std::vector<uint8_t>& bytes);
     bool sendChat(const std::vector<uint8_t>& bytes);
     bool sendNote(const std::vector<uint8_t>& bytes);
-
+    bool sendMarkerMove(const std::vector<uint8_t>& bytes);
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 
