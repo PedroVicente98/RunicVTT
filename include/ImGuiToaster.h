@@ -158,7 +158,7 @@ public:
             ImVec4 bg = lvlCol;
             bg.w = cfg_.bgOpacity; // apply opacity to window bg
             bool delete_this_toast = false;
-            
+
             ImGui::SetNextWindowViewport(vp->ID);
             ImGui::SetNextWindowPos(pos, ImGuiCond_Always, anchor);
 
@@ -210,21 +210,13 @@ public:
             std::string name = "##toast-" + std::to_string(idx++);
             if (ImGui::Begin(name.c_str(), nullptr, flags))
             {
-                /*if (cfg_.killOnClickAnywhere &&
+                if (cfg_.killOnClickAnywhere &&
                     ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) &&
                     ImGui::IsMouseClicked(ImGuiMouseButton_Left))
                 {
                     delete_this_toast = true;
-                }*/
-                if (cfg_.killOnClickAnywhere &&
-                    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_RootAndChildWindows) &&
-                    ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::IsMouseDragPastThreshold(0, 0.0f) == false)
-                {
-                    delete_this_toast = true;
                 }
 
-
-                
                 // Text wrapping
                 float wrapAt = 0.f;
                 if (cfg_.wrapText)
@@ -267,11 +259,14 @@ public:
             }
             ImGui::PopStyleColor(); // WindowBg
             ImGui::PopStyleVar(2);  // rounding, padding
-            if (cfg_.killOnClickAnywhere && delete_this_toast) {
+            if (cfg_.killOnClickAnywhere && delete_this_toast)
+            {
                 std::scoped_lock lk(mtx_);
                 auto it_real = std::find_if(toasts_.begin(), toasts_.end(),
-                    [&](const Toast& tt){ return tt.id == t.id; });
-                if (it_real != toasts_.end()) toasts_.erase(it_real);
+                                            [&](const Toast& tt)
+                                            { return tt.id == t.id; });
+                if (it_real != toasts_.end())
+                    toasts_.erase(it_real);
             }
             pos.y += y_step;
         }
