@@ -75,7 +75,7 @@ void PeerLink::createChannels()
 
     auto dcMarkerMove = pc->createDataChannel(std::string(msg::dc::name::MarkerMove), markerMoveInit);
     dcs_[std::string(msg::dc::name::MarkerMove)] = dcMarkerMove;
-    attachMarkerMoveChannelHandlers(dcMarkerMove, std::string(msg::dc::name::MarkerMove));
+    attachChannelHandlers(dcMarkerMove, std::string(msg::dc::name::MarkerMove));
 }
 
 rtc::Description PeerLink::createOffer()
@@ -291,6 +291,7 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
 
     dc->onMessage([this, id = peerId, label](rtc::message_variant m)
                   {
+                      Logger::instance().log("localtunnel", Logger::Level::Info, "MESSAGE RECEIVED!! FROM: "+label);
                       if (auto nm = network_manager.lock())
                       {
                           if (std::holds_alternative<std::string>(m))
