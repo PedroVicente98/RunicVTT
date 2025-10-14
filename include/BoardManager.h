@@ -180,7 +180,7 @@ public:
     void deleteMarker(flecs::entity markerEntity);
     void handleMarkerDragging(glm::vec2 mousePos);
     bool isMouseOverMarker(glm::vec2 mousePos);
-    bool canMoveMarker(const MarkerComponent* mc) const;
+    bool canMoveMarker(const MarkerComponent* mc, flecs::entity markerEnt) const;
 
     glm::vec2 computeMarkerDrawSize_ARFit(const TextureComponent& tex, float basePx, float scale);
     // Fog of War interactions

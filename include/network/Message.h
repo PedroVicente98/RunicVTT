@@ -22,6 +22,7 @@ namespace msg
         ImageChunk = 104,
 
         //Operations
+        MarkerMove = 300,
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,

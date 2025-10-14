@@ -371,48 +371,6 @@ void BoardManager::deleteMarker(flecs::entity markerEntity)
     markerEntity.destruct();
 }
 
-void BoardManager::handleMarkerDragging(glm::vec2 world_position)
-{
-    auto nm = network_manager.lock();
-    if (!nm)
-        throw std::exception("[BoardManager] Network Manager expired!!");
-
-    ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position)
-             {
-        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
-            glm::vec2 start_world_position = mouse_start_world_pos;
-            glm::vec2 delta = world_position - start_world_position;
-            position.x += delta.x;
-            position.y += delta.y;
-            mouse_start_world_pos = world_position;
-
-            const auto id = entity.get<Identifier>()->id;
-            if (shouldSendMarkerMove(id))
-            {
-                nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
-            }
-
-        } });
-    ecs.defer_end();
-}
-
-bool BoardManager::shouldSendMarkerMove(uint64_t markerId) const
-{
-    using namespace std::chrono;
-    static std::unordered_map<uint64_t, steady_clock::time_point> lastSent;
-    static constexpr auto kMinInterval = milliseconds(33); // ~30 Hz. Use 50ms for ~20 Hz if you prefer.
-
-    const auto now = steady_clock::now();
-    auto it = lastSent.find(markerId);
-    if (it == lastSent.end() || (now - it->second) >= kMinInterval)
-    {
-        lastSent[markerId] = now;
-        return true; // allow this send
-    }
-    return false; // too soon, skip this tick
-}
-
 // Generates a unique 64-bit ID
 //uint64_t BoardManager::generateUniqueId()
 //{
@@ -520,29 +478,106 @@ flecs::entity BoardManager::findEntityById(uint64_t target_id)
     return result; // Returns the found entity, or an empty entity if not found
 }
 // BoardManager.cpp
-bool BoardManager::canMoveMarker(const MarkerComponent* mc) const
+//bool BoardManager::canMoveMarker(const MarkerComponent* mc, uint64_t markerId) const
+//{
+//    if (!mc)
+//        return false;
+//
+//    auto nm = network_manager.lock();
+//    if (!nm)
+//        return false;
+//
+//    if (edit_window_entity.is_valid() && edit_window_entity.has<Moving>())
+//    {
+//        if (edit_window_entity.get<Moving>()->isDragging)
+//            return false;
+//    }
+//
+//    const auto role = nm->getPeerRole(); // existing in your NM
+//    if (role == Role::GAMEMASTER)
+//        return true; // GM can always move
+//
+//    if (mc->locked)
+//        return false; // hard lock blocks players
+//    if (mc->allowAllPlayersMove)
+//        return true; // GM allowed “all players move”
+//
+//    const std::string me = nm->getMyId();
+//    if (mc->ownerPeerId.empty())
+//        return false;
+//
+//    return (mc->ownerPeerId == me);
+//}
+
+bool BoardManager::canMoveMarker(const MarkerComponent* mc, flecs::entity markerEnt) const
 {
-    if (!mc)
+    if (!mc || !markerEnt.is_valid())
         return false;
 
     auto nm = network_manager.lock();
     if (!nm)
         return false;
 
-    const auto role = nm->getPeerRole(); // existing in your NM
-    if (role == Role::GAMEMASTER)
-        return true; // GM can always move
+    // Disallow if being dragged by anyone
+    if (markerEnt.has<Identifier>())
+    {
+        const auto mid = markerEnt.get<Identifier>()->id;
+        if (nm->isMarkerBeingDragged(mid))
+            return false;
+    }
 
+    const auto role = nm->getPeerRole();
+    if (role == Role::GAMEMASTER)
+        return true;
+
+    // base ownership rules
     if (mc->locked)
-        return false; // hard lock blocks players
+        return false;
     if (mc->allowAllPlayersMove)
-        return true; // GM allowed “all players move”
+        return true;
 
     const std::string me = nm->getMyId();
-    if (mc->ownerPeerId.empty())
-        return false;
+    if (!mc->ownerPeerId.empty() && mc->ownerPeerId == me)
+        return true;
 
-    return (mc->ownerPeerId == me);
+    // --- Fog rule for players ---
+    // Player can move if the marker is NOT visible AND is fully covered by a VISIBLE fog.
+    if (auto vis = markerEnt.get<Visibility>(); vis && !vis->isVisible)
+    {
+        // Compute marker AABB
+        auto pos = markerEnt.get<Position>();
+        auto siz = markerEnt.get<Size>();
+        if (pos && siz)
+        {
+            const float mx1 = pos->x - siz->width * 0.5f;
+            const float mx2 = pos->x + siz->width * 0.5f;
+            const float my1 = pos->y - siz->height * 0.5f;
+            const float my2 = pos->y + siz->height * 0.5f;
+
+            bool covered = false;
+            active_board.children([&](flecs::entity child)
+                                  {
+                if (!child.has<FogOfWar>()) return;
+                if (auto fvis = child.get<Visibility>(); !fvis || !fvis->isVisible) return; // fog must be visible
+
+                auto fpos = child.get<Position>();
+                auto fsz  = child.get<Size>();
+                if (!fpos || !fsz) return;
+
+                const float fx1 = fpos->x - fsz->width * 0.5f;
+                const float fx2 = fpos->x + fsz->width * 0.5f;
+                const float fy1 = fpos->y - fsz->height * 0.5f;
+                const float fy2 = fpos->y + fsz->height * 0.5f;
+
+                // full containment
+                if (mx1 >= fx1 && mx2 <= fx2 && my1 >= fy1 && my2 <= fy2)
+                    covered = true; });
+            if (covered)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
@@ -562,9 +597,21 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
                 (world_position.y <= (markerPos.y + markerSize.height / 2));
          
             if (withinXBounds && withinYBounds) {
-                 if (canMoveMarker(&marker)) {
+                if (canMoveMarker(&marker, entity))
+                {
                     moving.isDragging = true;
                     hovered = true;
+                    if (auto nm = network_manager.lock())
+                    {
+                        if (entity.has<Identifier>() && active_board.has<Identifier>())
+                        {
+                            const auto bid = active_board.get<Identifier>()->id;
+                            const auto mid = entity.get<Identifier>()->id;
+
+                            nm->markDraggingLocal(mid, true);       // <- local registry
+                            nm->broadcastMarkerUpdate(bid, entity); // <- your existing update (mov.isDragging=true)
+                        }
+                    }
                  }
                 //moving.isDragging = true;
                 //hovered = true;           // Mark as hovered
@@ -603,11 +650,58 @@ void BoardManager::endMouseDrag()
             moving.isDragging = false;
             if (nm && entity.has<Identifier>())
             {
-                nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
+                const auto bid = active_board.get<Identifier>()->id;
+                const auto mid = entity.get<Identifier>()->id;
+
+                nm->markDraggingLocal(mid, false);      // <- local registry
+                nm->broadcastMarkerUpdate(bid, entity); // <- final pos + mov=false
             }
         } });
     ecs.defer_end();
     is_creating_fog = false;
+}
+
+void BoardManager::handleMarkerDragging(glm::vec2 world_position)
+{
+    auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
+
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position)
+             {
+        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
+            glm::vec2 start_world_position = mouse_start_world_pos;
+            glm::vec2 delta = world_position - start_world_position;
+            position.x += delta.x;
+            position.y += delta.y;
+            mouse_start_world_pos = world_position;
+
+            const auto id = entity.get<Identifier>()->id;
+            if (shouldSendMarkerMove(id))
+            {
+                //nm->broadcastMarkerUpdate(active_board.get<Identifier>()->id, entity);
+                nm->broadcastMarkerMove(active_board.get<Identifier>()->id, entity);
+            }
+
+        } });
+    ecs.defer_end();
+}
+
+bool BoardManager::shouldSendMarkerMove(uint64_t markerId) const
+{
+    using namespace std::chrono;
+    static std::unordered_map<uint64_t, steady_clock::time_point> lastSent;
+    static constexpr auto kMinInterval = milliseconds(33); // ~30 Hz. Use 50ms for ~20 Hz if you prefer.
+
+    const auto now = steady_clock::now();
+    auto it = lastSent.find(markerId);
+    if (it == lastSent.end() || (now - it->second) >= kMinInterval)
+    {
+        lastSent[markerId] = now;
+        return true; // allow this send
+    }
+    return false; // too soon, skip this tick
 }
 
 bool BoardManager::isPanning()

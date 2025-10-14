@@ -100,7 +100,7 @@ void GameTableManager::processReceivedMessages()
 {
     constexpr int kMaxPerFrame = 32; // avoid long stalls
 
-    network_manager->drainInboundRaw(kMaxPerFrame);
+    //network_manager->drainInboundRaw(kMaxPerFrame);
     network_manager->drainEvents();
     int processed = 0;
     msg::ReadyMessage m;
@@ -251,7 +251,79 @@ void GameTableManager::processReceivedMessages()
                     fogEnt.destruct();
                 break;
             }
+            case msg::DCType::MarkerMove:
+            {
+                if (!m.boardId || !m.markerId || !m.pos)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
 
+                flecs::entity markerEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                if (child.has<MarkerComponent>()) {
+                    auto id = child.get<Identifier>()->id;
+                    if (id == *m.markerId) markerEnt = child;
+                } });
+
+                if (!markerEnt.is_valid())
+                    break;
+
+                // (Optional) avoid fighting with local drag:
+                if (markerEnt.get<Moving>()->isDragging)
+                    break;
+
+                markerEnt.set<Position>(*m.pos);
+                if (m.mov)
+                    markerEnt.set<Moving>(*m.mov);
+                break;
+            }
+            //case msg::DCType::MarkerUpdate:
+            //{
+            //    if (!m.boardId || !m.markerId)
+            //        break;
+
+            //    auto boardEnt = board_manager->findBoardById(*m.boardId);
+            //    if (!boardEnt.is_valid())
+            //        break;
+
+            //    // Find marker child by Identifier
+            //    flecs::entity markerEnt;
+            //    boardEnt.children([&](flecs::entity child)
+            //                      {
+            //            if (child.has<MarkerComponent>()) {
+            //                auto idc = child.get<Identifier>();
+            //                if (idc && idc->id == *m.markerId)
+            //                    markerEnt = child;
+            //            } });
+            //    if (!markerEnt.is_valid())
+            //        break;
+
+            //    if (m.mov)
+            //    {
+            //        auto mov = *markerEnt.get<Moving>();
+            //        mov.isDragging = m.mov->isDragging; // <- this is the important bit
+            //        markerEnt.set<Moving>(mov);
+            //    }
+
+            //    const bool isPlayerOp = m.isPlayerOp.value_or(false);
+
+            //    if (!isPlayerOp)
+            //    {
+            //        if (m.size)
+            //            markerEnt.set<Size>(*m.size);
+            //        if (m.vis)
+            //            markerEnt.set<Visibility>(*m.vis);
+            //        if (m.markerComp)
+            //            markerEnt.set<MarkerComponent>(*m.markerComp);
+            //    }
+
+            //    if (m.pos)
+            //        markerEnt.set<Position>(*m.pos);
+
+            //    break;
+            //}
             case msg::DCType::MarkerUpdate:
             {
                 if (!m.boardId || !m.markerId)
@@ -261,32 +333,61 @@ void GameTableManager::processReceivedMessages()
                 if (!boardEnt.is_valid())
                     break;
 
-                // Find marker child by Identifier
                 flecs::entity markerEnt;
                 boardEnt.children([&](flecs::entity child)
                                   {
-                        if (child.has<MarkerComponent>()) {
-                            auto id = child.get<Identifier>()->id;
-                            if (id == *m.markerId) markerEnt = child;
-                        } });
+                    if (child.has<MarkerComponent>()) {
+                        if (auto idc = child.get<Identifier>(); idc && idc->id == *m.markerId)
+                            markerEnt = child;
+                    } });
+
                 if (!markerEnt.is_valid())
                     break;
 
+                // Apply drag flag first (both Flecs + NM registry)
+                if (m.mov)
+                {
+                    auto mov = *markerEnt.get<Moving>();
+                    const bool wasDragging = mov.isDragging;
+                    mov.isDragging = m.mov->isDragging;
+                    markerEnt.set<Moving>(mov);
+
+                    // Reflect in NetworkManager dragging_ map using sender info if you have it
+                    if (auto nm = network_manager; nm)
+                    {
+                        if (m.mov->isDragging)
+                        {
+                            nm->noteDraggingRemote(*m.markerId, m.fromPeer, true);
+                        }
+                        else
+                        {
+                            nm->noteDraggingRemote(*m.markerId, m.fromPeer, false);
+                        }
+                    }
+                }
+
                 const bool isPlayerOp = m.isPlayerOp.value_or(false);
 
-                if (isPlayerOp)
+                bool allowPosApply = false;
+                if (m.mov)
                 {
-                    if (m.pos)
-                        markerEnt.set<Position>(*m.pos);
-                    if (m.mov)
-                        markerEnt.set<Moving>(*m.mov);
+                    // If this update explicitly says "not dragging", it’s a final pos -> allow.
+                    allowPosApply = (m.mov->isDragging == false);
                 }
                 else
                 {
-                    if (m.pos)
-                        markerEnt.set<Position>(*m.pos);
-                    if (m.mov)
-                        markerEnt.set<Moving>(*m.mov);
+                    // No mov info: only apply if nobody is dragging per shared registry.
+                    allowPosApply = !network_manager->isMarkerBeingDragged(*m.markerId);
+                }
+
+                if (m.pos && allowPosApply)
+                {
+                    markerEnt.set<Position>(*m.pos);
+                }
+
+                // The rest stays as you had (players can't change these, GM can)
+                if (!isPlayerOp)
+                {
                     if (m.size)
                         markerEnt.set<Size>(*m.size);
                     if (m.vis)

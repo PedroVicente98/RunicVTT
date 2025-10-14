@@ -17,6 +17,7 @@ public:
     static void serializeString(std::vector<unsigned char>& buffer, const std::string& str);
     static void serializeVec2(std::vector<unsigned char>& buffer, const glm::vec2& vec);
     static void serializeUInt64(std::vector<unsigned char>& buffer, uint64_t value);
+    static void serializeUInt32(std::vector<unsigned char>& buffer, uint32_t value);
     static void serializeUInt8(std::vector<unsigned char>& buffer, uint8_t value);
 
     // Deserialize methods for basic types
@@ -26,6 +27,7 @@ public:
     static std::string deserializeString(const std::vector<unsigned char>& buffer, size_t& offset);
     static glm::vec2 deserializeVec2(const std::vector<unsigned char>& buffer, size_t& offset);
     static uint64_t deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset);
+    static uint32_t deserializeUInt32(const std::vector<unsigned char>& buffer, size_t& offset);
     static uint8_t deserializeUInt8(const std::vector<unsigned char>& buffer, size_t& offset);
 
     // Serialize methods for components
@@ -329,6 +331,11 @@ inline void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint
     buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint64_t));
 }
 
+inline void Serializer::serializeUInt32(std::vector<unsigned char>& buffer, uint32_t value)
+{
+    buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint64_t));
+}
+
 inline void Serializer::serializeUInt8(std::vector<unsigned char>& buffer, uint8_t value)
 {
     buffer.push_back(static_cast<unsigned char>(value));
@@ -339,6 +346,13 @@ inline uint8_t Serializer::deserializeUInt8(const std::vector<unsigned char>& bu
     uint8_t v = static_cast<uint8_t>(buffer[offset]);
     offset += sizeof(uint8_t);
     return v;
+}
+
+inline uint32_t Serializer::deserializeUInt32(const std::vector<unsigned char>& buffer, size_t& offset)
+{
+    uint32_t value = *reinterpret_cast<const uint32_t*>(&buffer[offset]);
+    offset += sizeof(uint32_t);
+    return value;
 }
 
 inline uint64_t Serializer::deserializeUInt64(const std::vector<unsigned char>& buffer, size_t& offset)

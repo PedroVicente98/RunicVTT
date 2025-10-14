@@ -34,6 +34,15 @@ enum class ConnectionType
     LOCALTUNNEL
 };
 
+struct MoveLatest
+{
+    uint64_t boardId = 0;
+    uint32_t seq = 0;
+    glm::vec2 pos = {};
+    bool dragging = false;
+    bool have = false;
+};
+
 // Forward declare
 class SignalingServer;
 class SignalingClient;
@@ -167,13 +176,16 @@ public:
 
     void drainEvents();
     void drainInboundRaw(int maxPerTick);
+
     void decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
     void decodeRawChatBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
     void decodeRawNotesBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    void decodeRawMarkerMoveBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
 
     void startRawDrainWorker();
     void stopRawDrainWorker();
 
+    void flushCoalescedMoves();
     //void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
     //void onDcChatBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
     //void onDcNotesBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
@@ -190,6 +202,9 @@ public:
     void broadcastFogDelete(uint64_t boardId, const flecs::entity& fog);
     void broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker);
     void broadcastMarkerDelete(uint64_t boardId, const flecs::entity& marker);
+
+    void broadcastMarkerMove(uint64_t boardId, const flecs::entity& marker);
+    void sendMarkerMove(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
 
     void sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendMarkerDelete(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
@@ -224,6 +239,18 @@ public:
     MessageQueue<msg::InboundRaw> inboundRaw_;
     std::vector<std::string> getConnectedPeerIds() const;
 
+    // Called from local UI when we start/stop dragging.
+    void markDraggingLocal(uint64_t markerId, bool dragging);
+
+    // Called from inbound decode/apply paths.
+    void noteDraggingRemote(uint64_t markerId, const std::string& peerId, bool dragging);
+
+    // Single check for BoardManager::canMoveMarker()
+    bool isMarkerBeingDragged(uint64_t markerId) const;
+
+    // Optional helper if you want to allow self-drag to pass the check
+    bool amIDragging(uint64_t markerId) const;
+
 private:
     std::unordered_map<uint64_t, PendingImage> imagesRx_;
     MessageQueue<msg::ReadyMessage> inboundGame_;
@@ -232,6 +259,12 @@ private:
     std::atomic<bool> rawWorkerStop_{false};
     std::thread rawWorker_;
 
+    std::mutex moveMtx_;
+    std::unordered_map<uint64_t, MoveLatest> moveLatest_; // markerId -> latest
+    std::unordered_map<uint64_t, uint32_t> moveSeq_;      // markerId -> last seq
+    mutable std::mutex dragMtx_;
+    // markerId -> peerId currently dragging (myId when it's me)
+    std::unordered_map<uint64_t, std::string> dragging_;
     std::shared_ptr<ImGuiToaster> toaster_;
 
     static constexpr size_t kChunk = 8 * 1024; // 8KB chunk
@@ -249,6 +282,7 @@ private:
     void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
 
     // MarkerUpdate
+    void handleMarkerMove(const std::vector<uint8_t>& b, size_t& off);
     void handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off);
     void handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off);
     // FogUpdate
@@ -266,6 +300,7 @@ private:
     std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
 
     // ---- MARKER UPDATE/DELETE ----
+    std::vector<unsigned char> buildMarkerMoveFrame(uint64_t boardId, const flecs::entity& marker, uint32_t seq, bool dragging);
     std::vector<unsigned char> buildMarkerUpdateFrame(uint64_t boardId, const flecs::entity& marker, bool isPlayerOp);
     std::vector<unsigned char> buildMarkerDeleteFrame(uint64_t boardId, uint64_t markerId);
     // ---- FOG UPDATE/DELETE ----
