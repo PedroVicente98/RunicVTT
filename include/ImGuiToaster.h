@@ -7,6 +7,7 @@
 #include <chrono>
 #include <algorithm>
 #include <memory>
+#include <atomic>
 
 class ImGuiToaster
 {
@@ -49,8 +50,9 @@ public:
 
         // Behavior
         size_t maxToasts = 8;
-        bool clickThrough = true; // let clicks pass through
+        bool clickThrough = false; // let clicks pass through
         bool focusOnAppear = false;
+        bool killOnClickAnywhere = true;
 
         // Colors per level (used as WINDOW background color; text is always white)
         ImVec4 colorInfo = ImVec4(0.20f, 0.45f, 0.85f, 1.0f);    // blue-ish
@@ -71,6 +73,7 @@ public:
     {
         using clock = std::chrono::steady_clock;
         Toast t;
+        t.id = next_id_.fetch_add(1, std::memory_order_relaxed);
         t.message = msg;
         t.level = lvl;
         t.expiresAt = clock::now() + std::chrono::duration_cast<clock::duration>(std::chrono::duration<float>(durationSec));
@@ -154,7 +157,8 @@ public:
             const ImVec4 lvlCol = ColorForLevel_(t.level);
             ImVec4 bg = lvlCol;
             bg.w = cfg_.bgOpacity; // apply opacity to window bg
-
+            bool delete_this_toast = false;
+            
             ImGui::SetNextWindowViewport(vp->ID);
             ImGui::SetNextWindowPos(pos, ImGuiCond_Always, anchor);
 
@@ -187,7 +191,7 @@ public:
                                      ImGuiWindowFlags_NoNav;
             if (!cfg_.focusOnAppear)
                 flags |= ImGuiWindowFlags_NoFocusOnAppearing;
-            if (cfg_.clickThrough)
+            if (cfg_.clickThrough && !cfg_.killOnClickAnywhere)
                 flags |= ImGuiWindowFlags_NoInputs;
             if (cfg_.autoResize && !(cfg_.fixedSize.x > 0.f || cfg_.fixedSize.y > 0.f))
                 flags |= ImGuiWindowFlags_AlwaysAutoResize;
@@ -206,6 +210,21 @@ public:
             std::string name = "##toast-" + std::to_string(idx++);
             if (ImGui::Begin(name.c_str(), nullptr, flags))
             {
+                if (cfg_.killOnClickAnywhere) {
+                    // Cover the content region with an invisible button.
+                    // It won't change layout because we restore the cursor after.
+                    ImVec2 crMin = ImGui::GetWindowContentRegionMin();
+                    ImVec2 crMax = ImGui::GetWindowContentRegionMax();
+                    ImVec2 old   = ImGui::GetCursorPos();
+                
+                    ImGui::SetCursorPos(crMin);
+                    ImVec2 size(crMax.x - crMin.x, crMax.y - crMin.y);
+                    ImGui::InvisibleButton("##toast_kill", size);
+                    if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
+                        delete_this_toast = true;
+                    }
+                    ImGui::SetCursorPos(old);
+                }
                 // Text wrapping
                 float wrapAt = 0.f;
                 if (cfg_.wrapText)
@@ -232,7 +251,12 @@ public:
             }
             ImGui::PopStyleColor(); // WindowBg
             ImGui::PopStyleVar(2);  // rounding, padding
-
+            if (cfg_.killOnClickAnywhere && delete_this_toast) {
+                std::scoped_lock lk(mtx_);
+                auto it_real = std::find_if(toasts_.begin(), toasts_.end(),
+                    [&](const Toast& tt){ return tt.id == t.id; });
+                if (it_real != toasts_.end()) toasts_.erase(it_real);
+            }
             pos.y += y_step;
         }
     }
@@ -247,8 +271,10 @@ public:
     }
 
 private:
+    std::atomic<uint64_t> next_id_{1};
     struct Toast
     {
+        uint64_t id = 0;
         std::string message;
         Level level;
         std::chrono::steady_clock::time_point expiresAt;
