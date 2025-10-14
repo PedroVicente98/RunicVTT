@@ -145,85 +145,95 @@ void ApplicationHandler::TickAutoSave()
     if (now - s_last < kInterval)
         return;
     s_last = now;
-
-    // Sanity checks
-    if (!game_table_manager)
+    if (game_table_manager->network_manager)
     {
-        if (toaster_)
-            toaster_->Push(ImGuiToaster::Level::Warning, "Autosave skipped: GameTableManager missing", 4.0f);
+        if (game_table_manager->network_manager->getPeerRole() == Role::GAMEMASTER)
+        {
+
+            if (!game_table_manager)
+            {
+                if (toaster_)
+                    toaster_->Push(ImGuiToaster::Level::Warning, "Autosave skipped: GameTableManager missing", 4.0f);
+                return;
+            }
+
+            bool ok = true;
+            std::string err;
+
+            // 1) Save active GameTable (your method name as provided)
+            try
+            {
+                auto gametable_entity = game_table_manager->getActiveGameTableEntity();
+                if (gametable_entity.is_valid())
+                {
+                    game_table_manager->saveGameTable(); // (or saveActiveGametable() if that's your actual name)
+                }
+            }
+            catch (const std::exception& e)
+            {
+                ok = false;
+                err += std::string("GameTable: ") + e.what();
+            }
+            catch (...)
+            {
+                ok = false;
+                err += "GameTable: unknown error";
+            }
+
+            // 2) Save active Board
+            try
+            {
+                if (game_table_manager->board_manager)
+                {
+                    auto gametable_entity = game_table_manager->getActiveGameTableEntity();
+                    if (gametable_entity.is_valid())
+                    {
+                        auto game_table_name = gametable_entity.get<GameTable>()->gameTableName;
+                        auto board_dir_path = PathManager::getBoardsPath(game_table_name);
+                        game_table_manager->board_manager->saveActiveBoard(board_dir_path);
+                    }
+                }
+                else
+                {
+                    ok = false;
+                    if (!err.empty())
+                        err += " | ";
+                    err += "BoardManager missing";
+                }
+            }
+            catch (const std::exception& e)
+            {
+                ok = false;
+                if (!err.empty())
+                    err += " | ";
+                err += std::string("Board: ") + e.what();
+            }
+            catch (...)
+            {
+                ok = false;
+                if (!err.empty())
+                    err += " | ";
+                err += "Board: unknown error";
+            }
+
+            // Toast result
+            if (toaster_)
+            {
+                if (ok)
+                    toaster_->Push(ImGuiToaster::Level::Good, "Autosave complete: GameTable & Board", 5.0f);
+                else
+                    toaster_->Push(ImGuiToaster::Level::Error, std::string("Autosave failed: ") + err, 6.0f);
+            }
+        }
+    }
+    else
+    {
         return;
     }
 
-    bool ok = true;
-    std::string err;
-
-    // 1) Save active GameTable (your method name as provided)
-    try
-    {
-        auto gametable_entity = game_table_manager->getActiveGameTableEntity();
-        if (gametable_entity.is_valid())
-        {
-            game_table_manager->saveGameTable(); // (or saveActiveGametable() if that's your actual name)
-        }
-    }
-    catch (const std::exception& e)
-    {
-        ok = false;
-        err += std::string("GameTable: ") + e.what();
-    }
-    catch (...)
-    {
-        ok = false;
-        err += "GameTable: unknown error";
-    }
-
-    // 2) Save active Board
-    try
-    {
-        if (game_table_manager->board_manager)
-        {
-            auto gametable_entity = game_table_manager->getActiveGameTableEntity();
-            if (gametable_entity.is_valid())
-            {
-                auto game_table_name = gametable_entity.get<GameTable>()->gameTableName;
-                auto board_dir_path = PathManager::getBoardsPath(game_table_name);
-                game_table_manager->board_manager->saveActiveBoard(board_dir_path);
-            }
-        }
-        else
-        {
-            ok = false;
-            if (!err.empty())
-                err += " | ";
-            err += "BoardManager missing";
-        }
-    }
-    catch (const std::exception& e)
-    {
-        ok = false;
-        if (!err.empty())
-            err += " | ";
-        err += std::string("Board: ") + e.what();
-    }
-    catch (...)
-    {
-        ok = false;
-        if (!err.empty())
-            err += " | ";
-        err += "Board: unknown error";
-    }
-
+    // Sanity checks
     // 3) Notes (not implemented) — left as-is
     // notes_manager->saveOpenNotes();
-
-    // Toast result
-    if (toaster_)
-    {
-        if (ok)
-            toaster_->Push(ImGuiToaster::Level::Good, "Autosave complete: GameTable & Board", 5.0f);
-        else
-            toaster_->Push(ImGuiToaster::Level::Error, std::string("Autosave failed: ") + err, 6.0f);
-    }
 }
 
 int ApplicationHandler::run()
