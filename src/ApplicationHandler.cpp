@@ -160,7 +160,11 @@ void ApplicationHandler::TickAutoSave()
     // 1) Save active GameTable (your method name as provided)
     try
     {
-        game_table_manager->saveGameTable(); // (or saveActiveGametable() if that's your actual name)
+        auto gametable_entity = game_table_manager->getActiveGameTableEntity();
+        if (gametable_entity.is_valid())
+        {
+            game_table_manager->saveGameTable(); // (or saveActiveGametable() if that's your actual name)
+        }
     }
     catch (const std::exception& e)
     {

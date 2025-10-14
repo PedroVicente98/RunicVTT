@@ -625,13 +625,16 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 
 // Snap to the nearest cell center in a square grid:
 // centers are at: offset + (i + 0.5) * cell_size
-static inline glm::vec2 snapToSquareCenter(const glm::vec2& worldPos,
-                                           const glm::vec2& offset,
-                                           float cell)
+static inline glm::vec2 snapToSquareCenter(const glm::vec2& worldPos, const glm::vec2& offset, float cell)
 {
-    glm::vec2 local = worldPos + offset;
+    // transform to grid-local space (subtract offset, not add)
+    const glm::vec2 local = worldPos - offset;
+
+    // center within a cell
     const glm::vec2 half(cell * 0.5f);
-    glm::vec2 snappedLocal = glm::round((local - half) / cell) * cell + half;
+
+    // round to nearest cell center in local space, then bring back to world
+    const glm::vec2 snappedLocal = glm::round((local - half) / cell) * cell + half;
     return snappedLocal + offset;
 }
 
