@@ -273,8 +273,8 @@ void GameTableManager::processReceivedMessages()
                     break;
                 Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "END OF MARKERMOVE!!!");
                 // (Optional) avoid fighting with local drag:
-                /*if (markerEnt.get<Moving>()->isDragging)
-                    break;*/
+                if (markerEnt.get<Moving>()->isDragging)
+                    break;
 
                 markerEnt.set<Position>(*m.pos);
                 if (m.mov)
