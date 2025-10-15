@@ -1602,7 +1602,7 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
     auto now = clock::now();
     if (now - lastMoveFlush_ >= std::chrono::milliseconds(10))
     {
-        Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED");
+        //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED");
         flushCoalescedMoves(); // locks internally, pushes ReadyMessage(s)
         lastMoveFlush_ = now;
     }
@@ -1932,7 +1932,7 @@ void NetworkManager::flushCoalescedMoves()
         std::lock_guard<std::mutex> lk(moveMtx_);
         for (auto& [markerId, acc] : moveLatest_)
         {
-            Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
+            //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
             if (!acc.have)
                 continue;
             batch.emplace_back(acc.boardId, markerId, acc.pos, acc.dragging);
@@ -2086,7 +2086,6 @@ std::vector<unsigned char> NetworkManager::buildMarkerMoveFrame(uint64_t boardId
 
     // Match your decode that uses deserializeUInt8:
     Serializer::serializeUInt8(b, dragging ? 1 : 0);
-
     return b;
 }
 

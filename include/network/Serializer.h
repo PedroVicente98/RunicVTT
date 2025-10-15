@@ -333,7 +333,7 @@ inline void Serializer::serializeUInt64(std::vector<unsigned char>& buffer, uint
 
 inline void Serializer::serializeUInt32(std::vector<unsigned char>& buffer, uint32_t value)
 {
-    buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint64_t));
+    buffer.insert(buffer.end(), reinterpret_cast<unsigned char*>(&value), reinterpret_cast<unsigned char*>(&value) + sizeof(uint32_t));
 }
 
 inline void Serializer::serializeUInt8(std::vector<unsigned char>& buffer, uint8_t value)
