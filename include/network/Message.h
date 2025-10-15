@@ -102,6 +102,9 @@ namespace msg
             case msg::DCType::ChatMessage:
                 type_str = "ChatMessage";
                 break;
+            case msg::DCType::MarkerMove:
+                type_str = "MarkerMove";
+                break;
             default:
                 type_str = "UnkownType";
                 break;

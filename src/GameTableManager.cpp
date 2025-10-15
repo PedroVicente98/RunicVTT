@@ -106,6 +106,7 @@ void GameTableManager::processReceivedMessages()
     msg::ReadyMessage m;
     while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m))
     {
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "RECEIVED ON PROCESS!!!");
         switch (m.kind)
         {
             case msg::DCType::Snapshot_GameTable:
@@ -253,6 +254,7 @@ void GameTableManager::processReceivedMessages()
             }
             case msg::DCType::MarkerMove:
             {
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove PROCESS MESSAGE RECEIVED");
                 if (!m.boardId || !m.markerId || !m.pos)
                     break;
                 auto boardEnt = board_manager->findBoardById(*m.boardId);
@@ -269,14 +271,15 @@ void GameTableManager::processReceivedMessages()
 
                 if (!markerEnt.is_valid())
                     break;
-
+                Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "END OF MARKERMOVE!!!");
                 // (Optional) avoid fighting with local drag:
-                if (markerEnt.get<Moving>()->isDragging)
-                    break;
+                /*if (markerEnt.get<Moving>()->isDragging)
+                    break;*/
 
                 markerEnt.set<Position>(*m.pos);
                 if (m.mov)
                     markerEnt.set<Moving>(*m.mov);
+                Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "END OF MARKERMOVE!!!");
                 break;
             }
             //case msg::DCType::MarkerUpdate:

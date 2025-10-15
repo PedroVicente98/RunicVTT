@@ -1602,6 +1602,7 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
     auto now = clock::now();
     if (now - lastMoveFlush_ >= std::chrono::milliseconds(10))
     {
+        Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED");
         flushCoalescedMoves(); // locks internally, pushes ReadyMessage(s)
         lastMoveFlush_ = now;
     }
@@ -1931,9 +1932,11 @@ void NetworkManager::flushCoalescedMoves()
         std::lock_guard<std::mutex> lk(moveMtx_);
         for (auto& [markerId, acc] : moveLatest_)
         {
+            Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
             if (!acc.have)
                 continue;
             batch.emplace_back(acc.boardId, markerId, acc.pos, acc.dragging);
+            Logger::instance().log("localtunnel", Logger::Level::Info, "emplace_back: acc: " + std::to_string(acc.boardId) + " | markerid: " + std::to_string(markerId) + " | x: " + std::to_string(acc.pos.x) + " | y: " + std::to_string(acc.pos.y) + " | dragging: " + std::to_string(acc.dragging));
             acc.have = false; // consumed
         }
     }
@@ -1949,6 +1952,7 @@ void NetworkManager::flushCoalescedMoves()
         m.pos = Position{(int)pos.x, (int)pos.y};
         m.mov = Moving{dragging};
 
+        Logger::instance().log("localtunnel", Logger::Level::Info, "ReadyMessage ADDED!! ");
         inboundGame_.push(std::move(m));
     }
 }
