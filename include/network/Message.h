@@ -23,6 +23,7 @@ namespace msg
 
         //Operations
         MarkerMove = 300,
+        MarkerMoveState = 301, 
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,
@@ -105,6 +106,9 @@ namespace msg
             case msg::DCType::MarkerMove:
                 type_str = "MarkerMove";
                 break;
+            case msg::DCType::MarkerMoveState:
+                type_str = "MarkerMoveState";
+                break;
             default:
                 type_str = "UnkownType";
                 break;
@@ -166,6 +170,11 @@ namespace msg
         std::optional<Moving> mov;
         std::optional<MarkerComponent> markerComp;
         std::optional<bool> isPlayerOp;
+
+        std::optional<uint32_t> dragEpoch;
+        std::optional<uint32_t> seq;
+        std::optional<Role>     senderRole;
+
     };
 
     struct NetEvent
@@ -205,7 +214,7 @@ namespace msg
         inline constexpr std::string_view Username = "username";
         inline constexpr std::string_view ClientId = "clientId";
         inline constexpr std::string_view Target = "target";
-
+        inline constexpr std::string_view GmId = "gmId";
         // Signaling-specific
         inline constexpr std::string_view Sdp = "sdp";
         inline constexpr std::string_view Candidate = "candidate";
@@ -351,7 +360,7 @@ namespace msg
         };
     }
 
-    inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
+   /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
     {
 
         auto j = Json{
@@ -366,6 +375,23 @@ namespace msg
             j[std::string(msg::key::Clients)] = clients; // array of peerId strings
         };
 
+        return j;
+    }*/
+inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
+    {
+        auto j = nlohmann::json{
+            {std::string(key::Type), std::string(signaling::AuthResponse)},
+            {std::string(key::AuthOk), ok},
+            {std::string(key::AuthMsg), msg},
+            {std::string(key::ClientId), clientId},
+            {std::string(key::Username), username}
+        };
+        if (!clients.empty()) {
+            j[std::string(msg::key::Clients)] = clients;
+        }
+        if (!gmPeerId.empty()) {
+            j[key::GmId] = gmPeerId; // NEW
+        }
         return j;
     }
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false)
