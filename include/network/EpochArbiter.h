@@ -1,4 +1,4 @@
-// EpochArbiter.h
+// EpochArbiter.h  (final form for 3-op model)
 #pragma once
 #include <unordered_map>
 #include <string>
@@ -23,7 +23,7 @@ struct EA_DragState {
 
 struct EA_Config {
     uint32_t sendMoveMinPeriodMs = 50; // ~20Hz
-    // report-only timers (not auto-closing):
+    // report-only timers (kept for future use; not auto-closing)
     uint32_t dragInactivityTimeoutMs = 2000;
     uint32_t dragMaxDurationMs = 15000;
 };
@@ -33,6 +33,7 @@ public:
     using Clock = std::chrono::steady_clock;
     explicit EpochArbiter(EA_Config cfg = {}) : cfg_(cfg) {}
 
+    // Local lifecycle
     void onLocalDragStart(uint64_t markerId, const std::string& myPeerId) {
         auto& s = st_[markerId];
         s.locallyDragging = true;
@@ -44,18 +45,14 @@ public:
         s.closed = false;
         if (s.locallyProposedEpoch > s.epoch) s.epoch = s.locallyProposedEpoch;
     }
-
     bool shouldSendMoveNow(uint64_t markerId) {
         auto& s = st_[markerId];
         const uint64_t t = nowMs();
-        if (t - s.lastMoveTxMs >= cfg_.sendMoveMinPeriodMs) {
-            s.lastMoveTxMs = t;
-            return true;
-        }
+        if (t - s.lastMoveTxMs >= cfg_.sendMoveMinPeriodMs) { s.lastMoveTxMs = t; return true; }
         return false;
     }
 
-    // OUTGOING messages (ReadyMessage)
+    // OUT: build move (unreliable)
     msg::ReadyMessage buildMove(uint64_t boardId, uint64_t markerId,
                                 Position pos, const std::string& myPeerId, Role myRole) {
         auto& s = st_[markerId];
@@ -74,28 +71,47 @@ public:
         return m;
     }
 
-    msg::ReadyMessage buildFinal(uint64_t boardId, uint64_t markerId,
-                                 std::optional<Position> pos,
-                                 const std::string& myPeerId, Role myRole) {
+    // OUT: build move state START (reliable)
+    msg::ReadyMessage buildMoveStateStart(uint64_t boardId, uint64_t markerId,
+                                          const std::string& myPeerId, Role myRole) {
         auto& s = st_[markerId];
         msg::ReadyMessage m;
-        m.kind      = msg::DCType::MarkerUpdate;
+        m.kind      = msg::DCType::MarkerMoveState;
         m.boardId   = boardId;
         m.markerId  = markerId;
-        if (pos) m.pos = *pos;
-        m.mov       = Moving{false};
+        m.mov       = Moving{true};     // start drag
         m.fromPeer  = myPeerId;
         m.senderRole= myRole;
         m.dragEpoch = s.locallyProposedEpoch;
         m.seq       = ++s.localSeq;
         m.ts        = nowMs();
-        // end local drag immediately for UX
+        s.lastActivityMs = *m.ts;
+        return m;
+    }
+
+    // OUT: build move state FINAL (reliable)
+    msg::ReadyMessage buildMoveStateFinal(uint64_t boardId, uint64_t markerId,
+                                          std::optional<Position> finalPos,
+                                          const std::string& myPeerId, Role myRole) {
+        auto& s = st_[markerId];
+        msg::ReadyMessage m;
+        m.kind      = msg::DCType::MarkerMoveState;
+        m.boardId   = boardId;
+        m.markerId  = markerId;
+        if (finalPos) m.pos = *finalPos; // carry final position if available
+        m.mov       = Moving{false};      // end drag
+        m.fromPeer  = myPeerId;
+        m.senderRole= myRole;
+        m.dragEpoch = s.locallyProposedEpoch;
+        m.seq       = ++s.localSeq;
+        m.ts        = nowMs();
+        // local UX stop
         s.locallyDragging = false;
         s.lastActivityMs  = *m.ts;
         return m;
     }
 
-    // INCOMING gates
+    // IN: MarkerMove (in-drag)
     bool acceptIncomingMove(const msg::ReadyMessage& m) {
         if (!m.markerId || !m.dragEpoch) return false;
         auto& s = st_[*m.markerId];
@@ -113,7 +129,7 @@ public:
         if (m.seq && *m.seq <= s.lastSeq) return false;
         if (m.seq) s.lastSeq = *m.seq;
 
-        // local echo suppression: do not apply echoed moves while we drag locally
+        // local echo suppression
         if (s.locallyDragging) return false;
 
         s.lastMoveRxMs = nowMs();
@@ -121,8 +137,31 @@ public:
         return true;
     }
 
-    bool acceptIncomingFinal(const msg::ReadyMessage& m) {
-        if (!m.markerId || !m.dragEpoch) return false;
+    // IN: MarkerMoveState START
+    bool acceptIncomingMoveStateStart(const msg::ReadyMessage& m) {
+        if (!m.markerId || !m.dragEpoch || !m.mov || !m.mov->isDragging) return false;
+        auto& s = st_[*m.markerId];
+
+        if (*m.dragEpoch < s.epoch) return false;
+        if (*m.dragEpoch > s.epoch) adoptEpoch_(s, *m.dragEpoch, m.fromPeer);
+        else {
+            if (s.closed) return false;
+            if (s.ownerPeerId != m.fromPeer) {
+                if (!ownerWins_(m.fromPeer, s.ownerPeerId)) return false;
+                s.ownerPeerId = m.fromPeer;
+                if (s.locallyDragging) { s.locallyDragging = false; s.localSeq = 0; }
+            }
+        }
+        if (m.seq && *m.seq <= s.lastSeq) return false;
+        if (m.seq) s.lastSeq = *m.seq;
+
+        // this only announces start; applying ECS Moving(true) is up to caller
+        return true;
+    }
+
+    // IN: MarkerMoveState FINAL
+    bool acceptIncomingMoveStateFinal(const msg::ReadyMessage& m) {
+        if (!m.markerId || !m.dragEpoch || !m.mov || m.mov->isDragging) return false;
         auto& s = st_[*m.markerId];
 
         if (*m.dragEpoch < s.epoch) return false;
@@ -154,21 +193,15 @@ public:
         }
     }
 
-    bool isLocallyDragging(uint64_t markerId) const {
-        if (auto it = st_.find(markerId); it != st_.end()) return it->second.locallyDragging;
-        return false;
-    }
-
 private:
     EA_Config cfg_;
     mutable std::unordered_map<uint64_t, EA_DragState> st_;
-
     static uint64_t nowMs() {
         using namespace std::chrono;
         return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
     }
     static bool ownerWins_(const std::string& challenger, const std::string& current) {
-        return (challenger < current); // deterministic tie-break
+        return (challenger < current); // deterministic tiebreak
     }
     static void adoptEpoch_(EA_DragState& s, uint32_t newEpoch, const std::string& owner) {
         s.epoch = newEpoch;
