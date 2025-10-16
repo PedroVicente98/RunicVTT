@@ -205,6 +205,9 @@ public:
 
     void broadcastMarkerMove(uint64_t boardId, const flecs::entity& marker);
     void sendMarkerMove(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+   
+    void broadcastMarkerMoveState(uint64_t boardId, const flecs::entity& marker);
+    void sendMarkerMoveState(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
 
     void sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendMarkerDelete(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
@@ -250,8 +253,13 @@ public:
 
     // Optional helper if you want to allow self-drag to pass the check
     bool amIDragging(uint64_t markerId) const;
+    // GM identity
+    void setGMId(const std::string& id) { gmPeerId_ = id; }
+    const std::string& getGMId() const { return gmPeerId_; }
 
 private:
+    std::string gmPeerId_;
+
     std::unordered_map<uint64_t, PendingImage> imagesRx_;
     MessageQueue<msg::ReadyMessage> inboundGame_;
     // optional background raw-drain worker
