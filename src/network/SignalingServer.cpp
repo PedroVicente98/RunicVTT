@@ -132,10 +132,13 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
                     continue;
                 others.emplace_back(id);
             }
-
+            std::string gmId;
+            gmId = nm->getMyId();
+            if (gmId.empty()) gmId = "GM";
             auto username = j.value(msg::key::Username, "guest" + clientId);
-            auto msg = msg::makeAuthResponse(msg::value::True, "welcome", clientId, username, others);
-            sendTo(clientId, msg.dump());
+            
+            auto resp = msg::makeAuthResponse(msg::value::True, "welcome", clientId, username, others, gmId);
+            sendTo(clientId, resp.dump());
         }
         else
         {
