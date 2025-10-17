@@ -1397,40 +1397,6 @@ void BoardManager::renderCameraWindow()
     ImGui::End();
 }
 
-BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t sizeBytes)
-{
-    if (!bytes || sizeBytes == 0)
-    {
-        std::cerr << "LoadTextureFromMemory: empty buffer\n";
-        return BoardImageData{};
-    }
-
-    // stb_image: ensure vertical flip matches your expectations
-    stbi_set_flip_vertically_on_load(0);
-
-    int width = 0, height = 0, nrChannels = 0;
-    uint8_t* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
-    if (!data)
-    {
-        std::cerr << "LoadTextureFromMemory: decode failed\n";
-        return BoardImageData{};
-    }
-
-    GLuint tex = 0;
-    glGenTextures(1, &tex);
-    glBindTexture(GL_TEXTURE_2D, tex);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
-                 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    stbi_image_free(data);
-    return BoardImageData(tex, glm::vec2(width, height), /*path*/ "");
-}
 
 void BoardManager::renderGridWindow()
 {
@@ -1447,7 +1413,10 @@ void BoardManager::renderGridWindow()
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
     auto grid_hovered = ImGui::IsWindowHovered();
-    setIsNonMapWindowHovered(true);
+    if (grid_hovered)
+    {
+        setIsNonMapWindowHovered(true);
+    }
 
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
@@ -1526,6 +1495,40 @@ flecs::entity BoardManager::findBoardById(uint64_t boardId)
     return result; // will be invalid if not found
 }
 
+BoardImageData BoardManager::LoadTextureFromMemory(const uint8_t* bytes, size_t sizeBytes)
+{
+    if (!bytes || sizeBytes == 0)
+    {
+        std::cerr << "LoadTextureFromMemory: empty buffer\n";
+        return BoardImageData{};
+    }
+
+    // stb_image: ensure vertical flip matches your expectations
+    stbi_set_flip_vertically_on_load(0);
+
+    int width = 0, height = 0, nrChannels = 0;
+    uint8_t* data = stbi_load_from_memory(bytes, (int)sizeBytes, &width, &height, &nrChannels, 4);
+    if (!data)
+    {
+        std::cerr << "LoadTextureFromMemory: decode failed\n";
+        return BoardImageData{};
+    }
+
+    GLuint tex = 0;
+    glGenTextures(1, &tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    stbi_image_free(data);
+    return BoardImageData(tex, glm::vec2(width, height), /*path*/ "");
+}
 //glm::vec2 BoardManager::worldToScreenPosition(glm::vec2 world_position) {
 //    // Step 1: Get the combined MVP matrix
 //    glm::mat4 MVP = camera.getProjectionMatrix() * camera.getViewMatrix();
