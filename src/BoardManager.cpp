@@ -581,13 +581,45 @@ bool BoardManager::canMoveMarker(const MarkerComponent* mc, flecs::entity marker
     return false;
 }
 
+void BoardManager::killIfMouseUp(bool isMouseDown)
+{
+    if (isMouseDown)
+        return;
+
+    // Ensure panning is off
+    if (active_board.is_valid())
+        active_board.set<Panning>({false});
+
+    auto nm = network_manager.lock();
+
+    // If some marker still locally dragging (UI glitch), force-end it now
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity entity, MarkerComponent& mc, Moving& moving, Position& pos)
+             {
+        if (!entity.has(flecs::ChildOf, active_board)) return;
+        if (!moving.isDragging) return;
+
+        moving.isDragging = false;
+
+        if (nm && entity.has<Identifier>() && active_board.has<Identifier>())
+        {
+            const auto bid = active_board.get<Identifier>()->id;
+            const auto mid = entity.get<Identifier>()->id;
+
+            nm->markDraggingLocal(mid, false);
+            nm->broadcastMarkerMoveState(bid, entity);  // end (final)
+            nm->forceCloseDrag(mid);
+        } });
+    ecs.defer_end();
+}
+
 bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 {
     bool hovered = false;
 
     // Query all markers that are children of the active board and have MarkerComponent
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, const Position& markerPos, const Size& markerSize, Moving& moving)
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker_component, const Position& markerPos, const Size& markerSize, Moving& moving)
              {
 
         if (entity.has(flecs::ChildOf, active_board)) {
@@ -596,26 +628,25 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 
             bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
                 (world_position.y <= (markerPos.y + markerSize.height / 2));
-         
-            if (withinXBounds && withinYBounds) {
-                if (canMoveMarker(&marker, entity))
-                {
-                    moving.isDragging = true;
-                    hovered = true;
-                    if (auto nm = network_manager.lock())
-                    {
-                        if (entity.has<Identifier>() && active_board.has<Identifier>())
-                        {
-                            const auto bid = active_board.get<Identifier>()->id;
-                            const auto mid = entity.get<Identifier>()->id;
 
-                            nm->markDraggingLocal(mid, true);       // <- local registry
-                            nm->broadcastMarkerUpdate(bid, entity); // <- your existing update (mov.isDragging=true)
-                        }
-                    }
-                 }
-                //moving.isDragging = true;
-                //hovered = true;           // Mark as hovered
+            if (!(withinXBounds && withinYBounds))
+                return;
+            if (!canMoveMarker(&marker_component, entity))
+                return;
+
+            moving.isDragging = true;
+            hovered = true;
+
+            if (auto nm = network_manager.lock())
+            {
+                if (entity.has<Identifier>() && active_board.has<Identifier>())
+                {
+                    const auto bid = active_board.get<Identifier>()->id;
+                    const auto mid = entity.get<Identifier>()->id;
+
+                    nm->markDraggingLocal(mid, true);       
+                    nm->broadcastMarkerMoveState(bid, entity); 
+                }
             }
         } });
     ecs.defer_end();
@@ -664,6 +695,9 @@ void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
 
 void BoardManager::endMouseDrag()
 {
+    if (!active_board.is_valid())
+        return;
+
     active_board.set<Panning>({false});
     auto nm = network_manager.lock();
 
@@ -673,25 +707,28 @@ void BoardManager::endMouseDrag()
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& pos)
              {
-        if (entity.has(flecs::ChildOf, active_board)) {
+        if (!entity.has(flecs::ChildOf, active_board)) return;
+        if (!moving.isDragging) return;
 
-            if (canSnap)
-            {
-                glm::vec2 snapped = snapToSquareCenter(glm::vec2(pos.x, pos.y), grid->offset, grid->cell_size);
-                pos.x = snapped.x;
-                pos.y = snapped.y;
-            }
 
-            moving.isDragging = false;
-            if (nm && entity.has<Identifier>())
-            {
-                const auto bid = active_board.get<Identifier>()->id;
-                const auto mid = entity.get<Identifier>()->id;
+        if (canSnap)
+        {
+            glm::vec2 snapped = snapToSquareCenter(glm::vec2(pos.x, pos.y), grid->offset, grid->cell_size);
+            pos.x = snapped.x;
+            pos.y = snapped.y;
+        }
 
-                nm->markDraggingLocal(mid, false);      // <- local registry
-                nm->broadcastMarkerUpdate(bid, entity); // <- final pos + mov=false
-            }
+        moving.isDragging = false;
+        if (nm && entity.has<Identifier>())
+        {
+            const auto bid = active_board.get<Identifier>()->id;
+            const auto mid = entity.get<Identifier>()->id;
+
+            nm->markDraggingLocal(mid, false);      // <- local registry
+            nm->broadcastMarkerMoveState(bid, entity); // end (isDragging=false + final pos)broadcastMarkerUpdate(bid, entity); // <- final pos + mov=false
+            nm->forceCloseDrag(mid);
         } });
+
     ecs.defer_end();
     is_creating_fog = false;
 }
@@ -705,20 +742,19 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving, Position& position)
              {
-        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
-            glm::vec2 start_world_position = mouse_start_world_pos;
-            glm::vec2 delta = world_position - start_world_position;
-            position.x += delta.x;
-            position.y += delta.y;
-            mouse_start_world_pos = world_position;
+        if (!entity.has(flecs::ChildOf, active_board)) return;
+        if (!moving.isDragging) return;
 
-            const auto id = entity.get<Identifier>()->id;
-            if (shouldSendMarkerMove(id))
-            {
-                Logger::instance().log("localtunnel", Logger::Level::Info, "broadcastMarkerMove!");
-                nm->broadcastMarkerMove(active_board.get<Identifier>()->id, entity);
-            }
+        glm::vec2 delta = world_position - mouse_start_world_pos;
+        position.x += delta.x;
+        position.y += delta.y;
+        mouse_start_world_pos = world_position;
 
+        const auto id = entity.get<Identifier>()->id;
+        if (shouldSendMarkerMove(id))
+        {
+            //Logger::instance().log("localtunnel", Logger::Level::Info, "broadcastMarkerMove!");
+            nm->broadcastMarkerMove(active_board.get<Identifier>()->id, entity);
         } });
     ecs.defer_end();
 }

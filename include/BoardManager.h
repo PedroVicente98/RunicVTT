@@ -264,6 +264,8 @@ public:
 
     BoardImageData LoadTextureFromMemory(const unsigned char* bytes, size_t sizeBytes);
 
+    void killIfMouseUp(bool isMouseDown);
+
 private:
     bool is_non_map_window_hovered = false;
     bool showEditWindow = false;

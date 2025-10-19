@@ -9,6 +9,20 @@
 // If you use nlohmann::json in this TU, include it once anywhere before using helpers.
 // #include <nlohmann/json.hpp>
 
+enum class Role
+{
+    NONE,
+    GAMEMASTER,
+    PLAYER
+};
+
+enum class ConnectionType
+{
+    EXTERNAL,
+    LOCAL,
+    LOCALTUNNEL
+};
+
 namespace msg
 {
 
@@ -23,7 +37,7 @@ namespace msg
 
         //Operations
         MarkerMove = 300,
-        MarkerMoveState = 301, 
+        MarkerMoveState = 301,
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,
@@ -169,12 +183,10 @@ namespace msg
 
         std::optional<Moving> mov;
         std::optional<MarkerComponent> markerComp;
-        std::optional<bool> isPlayerOp;
 
         std::optional<uint32_t> dragEpoch;
         std::optional<uint32_t> seq;
-        std::optional<Role>     senderRole;
-
+        std::optional<Role> senderRole;
     };
 
     struct NetEvent
@@ -360,7 +372,7 @@ namespace msg
         };
     }
 
-   /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
+    /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
     {
 
         auto j = Json{
@@ -377,19 +389,20 @@ namespace msg
 
         return j;
     }*/
-inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
+    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
     {
         auto j = nlohmann::json{
             {std::string(key::Type), std::string(signaling::AuthResponse)},
             {std::string(key::AuthOk), ok},
             {std::string(key::AuthMsg), msg},
             {std::string(key::ClientId), clientId},
-            {std::string(key::Username), username}
-        };
-        if (!clients.empty()) {
+            {std::string(key::Username), username}};
+        if (!clients.empty())
+        {
             j[std::string(msg::key::Clients)] = clients;
         }
-        if (!gmPeerId.empty()) {
+        if (!gmPeerId.empty())
+        {
             j[key::GmId] = gmPeerId; // NEW
         }
         return j;

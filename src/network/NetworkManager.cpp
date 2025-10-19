@@ -808,12 +808,6 @@ void NetworkManager::broadcastFog(uint64_t boardId, const flecs::entity& fog)
 // ----------------------------
 // Broadcast wrappers
 // ----------------------------
-void NetworkManager::broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker)
-{
-    auto ids = getConnectedPeerIds();
-    if (!ids.empty())
-        sendMarkerUpdate(boardId, marker, ids);
-}
 
 void NetworkManager::broadcastMarkerDelete(uint64_t boardId, const flecs::entity& marker)
 {
@@ -836,6 +830,275 @@ void NetworkManager::broadcastFogDelete(uint64_t boardId, const flecs::entity& f
         sendFogDelete(boardId, fog, ids);
 }
 
+void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
+    decodingFromPeer_ = fromPeer;
+    size_t off = 0;
+    while (off < b.size())
+    {
+        if (!ensureRemaining(b, off, 1))
+            break;
+
+        auto type = static_cast<msg::DCType>(b[off]);
+        off += 1;
+
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
+        switch (type)
+        {
+            case msg::DCType::Snapshot_GameTable:
+                handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_GameTable Handled!!");
+                break;
+
+            case msg::DCType::Snapshot_Board:
+                handleBoardMeta(b, off); // fills imagesRx_
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_Board Handled!!");
+                break;
+
+            case msg::DCType::MarkerCreate:
+                handleMarkerMeta(b, off); // fills imagesRx_
+                //Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerCreate Handled!!");
+                break;
+
+            case msg::DCType::FogCreate:
+                handleFogCreate(b, off); // pushes ReadyMessage
+                //Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
+                break;
+
+            case msg::DCType::ImageChunk:
+                handleImageChunk(b, off); // fills buffers
+                Logger::instance().log("localtunnel", Logger::Level::Info, "ImageChunk Handled!!");
+                break;
+
+            case msg::DCType::CommitBoard:
+                handleCommitBoard(b, off); // pushes ReadyMessage
+                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitBoard Handled!!");
+                break;
+
+            case msg::DCType::CommitMarker:
+                handleCommitMarker(b, off); // pushes ReadyMessage
+                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitMarker Handled!!");
+                break;
+
+            case msg::DCType::MarkerUpdate:
+                handleMarkerUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
+                break;
+
+            case msg::DCType::MarkerMoveState:
+                handleMarkerMoveState(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
+                break;
+
+            case msg::DCType::FogUpdate:
+                handleFogUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "FogUpdate Handled!!");
+                break;
+
+            case msg::DCType::MarkerDelete:
+                handleMarkerDelete(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete Handled!!");
+                break;
+
+            case msg::DCType::FogDelete:
+                handleFogDelete(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete FogDelete!!");
+                break;
+
+            case msg::DCType::GridUpdate:
+                //handleGridUpdate(b, off); // later
+                Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
+                break;
+
+            default:
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
+                break;
+        }
+    }
+    decodingFromPeer_.clear();
+}
+
+// MARKER MOVE OPERATIONS -----------------------------------------------------------------------------------------------------------------------------------------
+void NetworkManager::decodeRawMarkerMoveBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
+{
+    decodingFromPeer_ = fromPeer;
+    size_t off = 0;
+    while (off < b.size())
+    {
+        if (!ensureRemaining(b, off, 1))
+            break;
+
+        auto type = static_cast<msg::DCType>(b[off]);
+        off += 1;
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! MarkerMove");
+        if (type != msg::DCType::MarkerMove)
+        {
+            // If the sender packed something else on this DC, bail
+            return;
+        }
+
+        handleMarkerMove(b, off); // parses one frame and updates coalescer
+        Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove Handled!!");
+    }
+    decodingFromPeer_.clear();
+}
+
+void NetworkManager::handleMarkerMove(const std::vector<uint8_t>& raw, size_t& off)
+{
+    if (!ensureRemaining(raw, off, 8 + 8 + 4 + 4 + 8 + 8)) // 8 bytes Position (2x int32)
+        return;
+
+    const auto& b = reinterpret_cast<const std::vector<unsigned char>&>(raw);
+
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::MarkerMove;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.markerId = Serializer::deserializeUInt64(b, off);
+    m.dragEpoch = Serializer::deserializeUInt32(b, off);
+    m.seq = Serializer::deserializeUInt32(b, off);
+    m.ts = Serializer::deserializeUInt64(b, off);
+    Position p = Serializer::deserializePosition(b, off);
+    m.pos = p;
+    m.mov = Moving{true};
+
+    m.fromPeer = decodingFromPeer_;
+
+    inboundGame_.push(std::move(m));
+}
+
+// MarkerUpdate
+void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::MarkerUpdate;
+
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.markerId = Serializer::deserializeUInt64(b, off);
+    m.size = Serializer::deserializeSize(b, off);
+    m.vis = Serializer::deserializeVisibility(b, off);
+    m.markerComp = Serializer::deserializeMarkerComponent(b, off);
+
+    m.fromPeer = decodingFromPeer_;
+    inboundGame_.push(std::move(m));
+}
+void NetworkManager::handleMarkerMoveState(const std::vector<uint8_t>& raw, size_t& off)
+{
+    // Expect (after type):
+    // [boardId:u64][markerId:u64][epoch:u32][seq:u32][ts:u64][Moving][(Position if final)]
+    if (!ensureRemaining(raw, off, 8 + 8 + 4 + 4 + 8 + 1))
+        return;
+
+    const auto& b = reinterpret_cast<const std::vector<unsigned char>&>(raw);
+
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::MarkerMoveState;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    m.markerId = Serializer::deserializeUInt64(b, off);
+    m.dragEpoch = Serializer::deserializeUInt32(b, off);
+    m.seq = Serializer::deserializeUInt32(b, off);
+    m.ts = Serializer::deserializeUInt64(b, off);
+    Moving mv = Serializer::deserializeMoving(b, off);
+    m.mov = mv;
+
+    if (!mv.isDragging)
+    {
+        if (!ensureRemaining(raw, off, 8))
+            return; // Position (2x int)
+        Position p = Serializer::deserializePosition(b, off);
+        m.pos = p;
+    }
+    m.fromPeer = decodingFromPeer_;
+    inboundGame_.push(std::move(m));
+}
+
+std::vector<unsigned char> NetworkManager::buildMarkerMoveFrame(uint64_t boardId, const flecs::entity& marker, uint32_t seq)
+{
+    std::vector<unsigned char> out;
+    const auto* id = marker.get<Identifier>();
+    const auto* pos = marker.get<Position>();
+    if (!id || !pos)
+        return out;
+
+    // epoch from drag_ state
+    auto& s = drag_[id->id];
+    if (s.locallyProposedEpoch == 0 && s.epoch == 0)
+    {
+        s.locallyProposedEpoch = s.epoch + 1;
+        s.epoch = s.locallyProposedEpoch;
+    }
+    const uint32_t epoch = (s.locallyProposedEpoch ? s.locallyProposedEpoch : s.epoch);
+    const uint64_t ts = nowMs();
+
+    Serializer::serializeUInt8(out, static_cast<uint8_t>(msg::DCType::MarkerMove));
+    Serializer::serializeUInt64(out, boardId);
+    Serializer::serializeUInt64(out, id->id);
+    Serializer::serializeUInt32(out, epoch);
+    Serializer::serializeUInt32(out, seq);
+    Serializer::serializeUInt64(out, ts);
+    Serializer::serializePosition(out, pos);
+    return out;
+}
+std::vector<unsigned char> NetworkManager::buildMarkerMoveStateFrame(uint64_t boardId, const flecs::entity& marker)
+{
+    std::vector<unsigned char> out;
+    const auto* id = marker.get<Identifier>();
+    const auto* mv = marker.get<Moving>();
+    if (!id || !mv)
+        return out;
+
+    auto& s = drag_[id->id];
+    if (s.locallyProposedEpoch == 0 && s.epoch == 0)
+    {
+        s.locallyProposedEpoch = s.epoch + 1;
+        s.epoch = s.locallyProposedEpoch;
+    }
+    const uint32_t epoch = (s.locallyProposedEpoch ? s.locallyProposedEpoch : s.epoch);
+    const uint32_t seq = ++s.localSeq;
+    const uint64_t ts = nowMs();
+    s.lastTxMs = ts;
+
+    Serializer::serializeUInt8(out, static_cast<uint8_t>(msg::DCType::MarkerMoveState));
+    Serializer::serializeUInt64(out, boardId);
+    Serializer::serializeUInt64(out, id->id);
+    Serializer::serializeUInt32(out, epoch);
+    Serializer::serializeUInt32(out, seq);
+    Serializer::serializeUInt64(out, ts);
+    Serializer::serializeMoving(out, mv); // isDragging
+
+    if (!mv->isDragging && marker.has<Position>())
+    {
+        const auto* pos = marker.get<Position>(); // final pos at end
+        Serializer::serializePosition(out, pos);
+    }
+    return out;
+}
+
+// ---- MARKER UPDATE/DELETE ----
+std::vector<unsigned char> NetworkManager::buildMarkerUpdateFrame(uint64_t boardId, const flecs::entity& marker)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::MarkerUpdate));
+    Serializer::serializeUInt64(b, boardId);
+
+    const auto id = marker.get<Identifier>()->id;
+    const auto siz = *marker.get<Size>();
+    const auto vis = *marker.get<Visibility>();
+    const auto mc = *marker.get<MarkerComponent>();
+
+    Serializer::serializeUInt64(b, id);
+    Serializer::serializeSize(b, &siz);
+    Serializer::serializeVisibility(b, &vis);
+    Serializer::serializeMarkerComponent(b, &mc);
+    return b;
+}
+
+void NetworkManager::broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendMarkerUpdate(boardId, marker, ids);
+}
+
 void NetworkManager::broadcastMarkerMove(uint64_t boardId, const flecs::entity& marker)
 {
     auto ids = getConnectedPeerIds();
@@ -849,82 +1112,243 @@ void NetworkManager::sendMarkerMove(uint64_t boardId, const flecs::entity& marke
 
     const uint64_t markerId = marker.get<Identifier>()->id;
 
-    // increment per-marker sequence (wrap allowed)
-    uint32_t seq = 0;
+    // per-drag local seq in DragState
+    auto& s = drag_[markerId];
+    if (s.locallyProposedEpoch == 0 && s.epoch == 0)
     {
-        auto& s = moveSeq_[markerId];
-        seq = ++s;
+        s.locallyProposedEpoch = s.epoch + 1;
+        s.epoch = s.locallyProposedEpoch;
     }
+    const uint32_t seq = ++s.localSeq;
+    s.lastTxMs = nowMs();
 
-    // dragging flag is a hint; read from entity if present
-    bool dragging = false;
-    if (auto* mv = marker.get<Moving>())
-        dragging = mv->isDragging;
-
-    auto frame = buildMarkerMoveFrame(boardId, marker, seq, dragging);
+    auto frame = buildMarkerMoveFrame(boardId, marker, seq);
     if (frame.empty())
         return;
 
     for (auto& pid : toPeerIds)
     {
         if (auto it = peers.find(pid); it != peers.end() && it->second)
-        {
             it->second->sendMarkerMove(frame);
-        }
     }
 }
 
-// NetworkManager.cpp
-void NetworkManager::markDraggingLocal(uint64_t markerId, bool dragging)
+void NetworkManager::broadcastMarkerMoveState(uint64_t boardId, const flecs::entity& marker)
 {
-    std::lock_guard<std::mutex> lk(dragMtx_);
-    if (dragging)
-        dragging_[markerId] = getMyId();
-    else
-        dragging_.erase(markerId);
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendMarkerMoveState(boardId, marker, ids);
 }
 
-void NetworkManager::noteDraggingRemote(uint64_t markerId, const std::string& peerId, bool dragging)
+void NetworkManager::sendMarkerMoveState(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)
 {
-    std::lock_guard<std::mutex> lk(dragMtx_);
+    if (!marker.is_valid() || !marker.has<Identifier>() || !marker.has<Moving>())
+        return;
+
+    auto frame = buildMarkerMoveStateFrame(boardId, marker);
+    if (frame.empty())
+        return;
+
+    // Reliable: use your game channel
+    broadcastGameFrame(frame, toPeerIds);
+}
+
+bool NetworkManager::amIDragging(uint64_t markerId) const
+{
+    auto it = drag_.find(markerId);
+    return (it != drag_.end() && it->second.locallyDragging);
+}
+
+// markDraggingLocal — called by BoardManager on start/end
+void NetworkManager::markDraggingLocal(uint64_t markerId, bool dragging)
+{
+    auto& s = drag_[markerId];
     if (dragging)
-        dragging_[markerId] = peerId;
+    {
+        s.locallyDragging = true;
+        s.locallyProposedEpoch = (s.closed ? (s.epoch + 1) : s.epoch);
+        s.localSeq = 0;
+        s.ownerPeerId = getMyId();
+        s.epochOpenedMs = nowMs();
+        s.closed = false;
+        if (s.locallyProposedEpoch > s.epoch)
+            s.epoch = s.locallyProposedEpoch;
+    }
     else
     {
-        auto it = dragging_.find(markerId);
-        if (it != dragging_.end() && it->second == peerId)
-            dragging_.erase(it);
+        s.locallyDragging = false; // we close epoch on final frame or forceCloseDrag
     }
 }
 
 bool NetworkManager::isMarkerBeingDragged(uint64_t markerId) const
 {
-    std::lock_guard<std::mutex> lk(dragMtx_);
-    return dragging_.find(markerId) != dragging_.end();
+    auto it = drag_.find(markerId);
+    return (it != drag_.end() && !it->second.closed);
 }
 
-bool NetworkManager::amIDragging(uint64_t markerId) const
+void NetworkManager::forceCloseDrag(uint64_t markerId)
 {
-    std::lock_guard<std::mutex> lk(dragMtx_);
-    auto it = dragging_.find(markerId);
-    return it != dragging_.end() && it->second == getMyId();
+    auto it = drag_.find(markerId);
+    if (it == drag_.end())
+        return;
+    auto& s = it->second;
+    s.closed = true;
+    s.locallyDragging = false;
+    s.localSeq = 0;
 }
 
-// ----------------------------
-// Directed send (core)
-// ----------------------------
 void NetworkManager::sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker,
                                       const std::vector<std::string>& toPeerIds)
 {
     if (!marker.is_valid() || !marker.has<Identifier>())
         return;
 
-    // Player vs GM flag (receiver will enforce allowed fields accordingly)
-    const bool isPlayerOp = (getPeerRole() != Role::GAMEMASTER);
-
-    auto frame = buildMarkerUpdateFrame(boardId, marker, isPlayerOp);
+    auto frame = buildMarkerUpdateFrame(boardId, marker);
     broadcastGameFrame(frame, toPeerIds);
 }
+
+bool NetworkManager::shouldApplyMarkerMove(const msg::ReadyMessage& m)
+{
+    if (!m.markerId || !m.dragEpoch)
+        return false;
+    auto& s = drag_[*m.markerId];
+
+    // Epoch
+    if (*m.dragEpoch < s.epoch)
+        return false;
+    if (*m.dragEpoch > s.epoch)
+    {
+        s.epoch = *m.dragEpoch;
+        s.closed = false;
+        s.lastSeq = 0;
+        s.ownerPeerId = m.fromPeer;
+    }
+    else
+    {
+        if (s.closed)
+            return false;
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        {
+            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+                return false;
+            s.ownerPeerId = m.fromPeer;
+            if (s.locallyDragging)
+            {
+                s.locallyDragging = false;
+                s.localSeq = 0;
+            }
+        }
+        else
+        {
+            s.ownerPeerId = m.fromPeer; // first owner for this epoch
+        }
+    }
+
+    // Seq
+    if (m.seq && *m.seq <= s.lastSeq)
+        return false;
+    if (m.seq)
+        s.lastSeq = *m.seq;
+
+    // Local echo suppression while we drag
+    if (s.locallyDragging)
+        return false;
+
+    return true;
+}
+
+bool NetworkManager::shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m)
+{
+    if (!m.markerId || !m.dragEpoch || !m.mov || !m.mov->isDragging)
+        return false;
+    auto& s = drag_[*m.markerId];
+
+    if (*m.dragEpoch < s.epoch)
+        return false;
+    if (*m.dragEpoch > s.epoch)
+    {
+        s.epoch = *m.dragEpoch;
+        s.closed = false;
+        s.lastSeq = 0;
+        s.ownerPeerId = m.fromPeer;
+    }
+    else
+    {
+        if (s.closed)
+            return false;
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        {
+            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+                return false;
+            s.ownerPeerId = m.fromPeer;
+            if (s.locallyDragging)
+            {
+                s.locallyDragging = false;
+                s.localSeq = 0;
+            }
+        }
+        else
+        {
+            s.ownerPeerId = m.fromPeer;
+        }
+    }
+
+    if (m.seq && *m.seq <= s.lastSeq)
+        return false;
+    if (m.seq)
+        s.lastSeq = *m.seq;
+
+    return true;
+}
+
+bool NetworkManager::shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m)
+{
+    if (!m.markerId || !m.dragEpoch || !m.mov || m.mov->isDragging)
+        return false;
+    auto& s = drag_[*m.markerId];
+
+    if (*m.dragEpoch < s.epoch)
+        return false;
+    if (*m.dragEpoch > s.epoch)
+    {
+        s.epoch = *m.dragEpoch;
+        s.closed = false;
+        s.lastSeq = 0;
+        s.ownerPeerId = m.fromPeer;
+    }
+    else
+    {
+        if (s.closed)
+            return false;
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        {
+            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+                return false;
+            s.ownerPeerId = m.fromPeer;
+            if (s.locallyDragging)
+            {
+                s.locallyDragging = false;
+                s.localSeq = 0;
+            }
+        }
+        else
+        {
+            s.ownerPeerId = m.fromPeer;
+        }
+        if (m.seq && *m.seq < s.lastSeq)
+            return false;
+        if (m.seq && *m.seq >= s.lastSeq)
+            s.lastSeq = *m.seq;
+    }
+
+    // finalize epoch
+    s.closed = true;
+    s.locallyDragging = false;
+    s.localSeq = 0;
+
+    return true;
+}
+// END MARKER OPERATIONS -----------------------------------------------------------------------------------------------------------------------------------------
 
 void NetworkManager::sendMarkerDelete(uint64_t boardId, const flecs::entity& marker,
                                       const std::vector<std::string>& toPeerIds)
@@ -1421,52 +1845,6 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
     tryFinalizeImage(msg::ImageOwnerKind::Marker, markerId);
 }
 
-void NetworkManager::handleMarkerMove(const std::vector<uint8_t>& b, size_t& off)
-{
-    // Ensure the rest of fields exist: boardId(8) + markerId(8) + seq(4) + x(4) + y(4) + drag(1)
-    if (!ensureRemaining(b, off, 8 + 8 + 4 + 4 + 4 + 1))
-        return;
-
-    const uint64_t boardId = Serializer::deserializeUInt64(b, off);
-    const uint64_t markerId = Serializer::deserializeUInt64(b, off);
-    const uint32_t seq = Serializer::deserializeUInt32(b, off);
-    const float x = Serializer::deserializeFloat(b, off);
-    const float y = Serializer::deserializeFloat(b, off);
-    const uint8_t dragU8 = Serializer::deserializeUInt8(b, off);
-    const bool dragging = (dragU8 != 0);
-
-    std::lock_guard<std::mutex> lg(moveMtx_);
-    auto& st = moveLatest_[markerId];
-    if (!st.have || seq > st.seq)
-    {
-        Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove HAVENT AND BIGGER SEQ!!");
-        st.boardId = boardId;
-        st.seq = seq;
-        st.pos = {x, y};
-        st.dragging = dragging;
-        st.have = true;
-    }
-}
-
-// MarkerUpdate
-void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off)
-{
-    msg::ReadyMessage m;
-    m.kind = msg::DCType::MarkerUpdate;
-
-    m.boardId = Serializer::deserializeUInt64(b, off);
-    m.markerId = Serializer::deserializeUInt64(b, off);
-    m.isPlayerOp = Serializer::deserializeBool(b, off);
-
-    m.pos = Serializer::deserializePosition(b, off);
-    m.size = Serializer::deserializeSize(b, off);
-    m.vis = Serializer::deserializeVisibility(b, off);
-    m.mov = Serializer::deserializeMoving(b, off);
-    m.markerComp = Serializer::deserializeMarkerComponent(b, off);
-
-    inboundGame_.push(std::move(m));
-}
-
 void NetworkManager::handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::ReadyMessage m;
@@ -1597,15 +1975,6 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
         }
         ++processed;
     }
-
-    // Time-based coalesced flush into ReadyMessage(s)
-    auto now = clock::now();
-    if (now - lastMoveFlush_ >= std::chrono::milliseconds(10))
-    {
-        //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED");
-        flushCoalescedMoves(); // locks internally, pushes ReadyMessage(s)
-        lastMoveFlush_ = now;
-    }
 }
 
 //void NetworkManager::drainInboundRaw(int maxPerTick)
@@ -1640,107 +2009,6 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
 //        ++processed;
 //    }
 //}
-void NetworkManager::decodeRawMarkerMoveBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
-{
-    size_t off = 0;
-    while (off < b.size())
-    {
-        if (!ensureRemaining(b, off, 1))
-            break;
-
-        auto type = static_cast<msg::DCType>(b[off]);
-        off += 1;
-        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! MarkerMove");
-        if (type != msg::DCType::MarkerMove)
-        {
-            // If the sender packed something else on this DC, bail
-            return;
-        }
-
-        handleMarkerMove(b, off); // parses one frame and updates coalescer
-        Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove Handled!!");
-    }
-}
-void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
-{
-    size_t off = 0;
-    while (off < b.size())
-    {
-        if (!ensureRemaining(b, off, 1))
-            break;
-
-        auto type = static_cast<msg::DCType>(b[off]);
-        off += 1;
-
-        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
-        switch (type)
-        {
-            case msg::DCType::Snapshot_GameTable:
-                handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
-                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_GameTable Handled!!");
-                break;
-
-            case msg::DCType::Snapshot_Board:
-                handleBoardMeta(b, off); // fills imagesRx_
-                Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_Board Handled!!");
-                break;
-
-            case msg::DCType::MarkerCreate:
-                handleMarkerMeta(b, off); // fills imagesRx_
-                //Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerCreate Handled!!");
-                break;
-
-            case msg::DCType::FogCreate:
-                handleFogCreate(b, off); // pushes ReadyMessage
-                //Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
-                break;
-
-            case msg::DCType::ImageChunk:
-                handleImageChunk(b, off); // fills buffers
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ImageChunk Handled!!");
-                break;
-
-            case msg::DCType::CommitBoard:
-                handleCommitBoard(b, off); // pushes ReadyMessage
-                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitBoard Handled!!");
-                break;
-
-            case msg::DCType::CommitMarker:
-                handleCommitMarker(b, off); // pushes ReadyMessage
-                Logger::instance().log("localtunnel", Logger::Level::Info, "CommitMarker Handled!!");
-                break;
-
-            case msg::DCType::MarkerUpdate:
-                handleMarkerUpdate(b, off); // later
-                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
-                break;
-
-            case msg::DCType::FogUpdate:
-                handleFogUpdate(b, off); // later
-                Logger::instance().log("localtunnel", Logger::Level::Info, "FogUpdate Handled!!");
-                break;
-
-            case msg::DCType::MarkerDelete:
-                handleMarkerDelete(b, off); // later
-                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete Handled!!");
-                break;
-
-            case msg::DCType::FogDelete:
-                handleFogDelete(b, off); // later
-                Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete FogDelete!!");
-                break;
-
-            case msg::DCType::GridUpdate:
-                //handleGridUpdate(b, off); // later
-                Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
-                break;
-
-            default:
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
-                break;
-        }
-    }
-}
 
 // NetworkManager.cpp
 void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
@@ -1903,15 +2171,7 @@ void NetworkManager::startRawDrainWorker()
                 }
                 didWork = true;
             }
-            // 2) Periodically flush coalesced marker moves into ReadyMessage
-            auto now = clock::now();
-            if (now - lastFlush >= std::chrono::milliseconds(10))
-            {
-                flushCoalescedMoves(); // converts moveLatest_ snapshots into ReadyMessage(s)
-                lastFlush = now;
-            }
-            if (!didWork)
-                std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            
         } });
 }
 
@@ -1924,38 +2184,38 @@ void NetworkManager::stopRawDrainWorker()
         rawWorker_.join();
     rawWorkerRunning_.store(false);
 }
-
-void NetworkManager::flushCoalescedMoves()
-{
-    std::vector<std::tuple<uint64_t /*board*/, uint64_t /*marker*/, glm::vec2, bool /*drag*/>> batch;
-    {
-        std::lock_guard<std::mutex> lk(moveMtx_);
-        for (auto& [markerId, acc] : moveLatest_)
-        {
-            //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
-            if (!acc.have)
-                continue;
-            batch.emplace_back(acc.boardId, markerId, acc.pos, acc.dragging);
-            Logger::instance().log("localtunnel", Logger::Level::Info, "emplace_back: acc: " + std::to_string(acc.boardId) + " | markerid: " + std::to_string(markerId) + " | x: " + std::to_string(acc.pos.x) + " | y: " + std::to_string(acc.pos.y) + " | dragging: " + std::to_string(acc.dragging));
-            acc.have = false; // consumed
-        }
-    }
-
-    for (auto& t : batch)
-    {
-        auto [boardId, markerId, pos, dragging] = t;
-
-        msg::ReadyMessage m;
-        m.kind = msg::DCType::MarkerMove; // <= distinct kind
-        m.boardId = boardId;
-        m.markerId = markerId;
-        m.pos = Position{(int)pos.x, (int)pos.y};
-        m.mov = Moving{dragging};
-
-        Logger::instance().log("localtunnel", Logger::Level::Info, "ReadyMessage ADDED!! ");
-        inboundGame_.push(std::move(m));
-    }
-}
+//
+//void NetworkManager::flushCoalescedMoves()
+//{
+//    std::vector<std::tuple<uint64_t /*board*/, uint64_t /*marker*/, glm::vec2, bool /*drag*/>> batch;
+//    {
+//        std::lock_guard<std::mutex> lk(moveMtx_);
+//        for (auto& [markerId, acc] : moveLatest_)
+//        {
+//            //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
+//            if (!acc.have)
+//                continue;
+//            batch.emplace_back(acc.boardId, markerId, acc.pos, acc.dragging);
+//            Logger::instance().log("localtunnel", Logger::Level::Info, "emplace_back: acc: " + std::to_string(acc.boardId) + " | markerid: " + std::to_string(markerId) + " | x: " + std::to_string(acc.pos.x) + " | y: " + std::to_string(acc.pos.y) + " | dragging: " + std::to_string(acc.dragging));
+//            acc.have = false; // consumed
+//        }
+//    }
+//
+//    for (auto& t : batch)
+//    {
+//        auto [boardId, markerId, pos, dragging] = t;
+//
+//        msg::ReadyMessage m;
+//        m.kind = msg::DCType::MarkerMove; // <= distinct kind
+//        m.boardId = boardId;
+//        m.markerId = markerId;
+//        m.pos = Position{(int)pos.x, (int)pos.y};
+//        m.mov = Moving{dragging};
+//
+//        Logger::instance().log("localtunnel", Logger::Level::Info, "ReadyMessage ADDED!! ");
+//        inboundGame_.push(std::move(m));
+//    }
+//}
 
 //-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
 //void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
@@ -2064,55 +2324,6 @@ void NetworkManager::tryFinalizeImage(msg::ImageOwnerKind kind, uint64_t id)
 }
 
 // ---------- GAME FRAME BUILDERS ----------
-
-std::vector<unsigned char> NetworkManager::buildMarkerMoveFrame(uint64_t boardId, const flecs::entity& marker, uint32_t seq, bool dragging)
-{
-    std::vector<uint8_t> b;
-    // This DC is dedicated, but we include a type byte because your decoder expects it
-    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::MarkerMove));
-
-    const auto* id = marker.get<Identifier>();
-    const auto* pos = marker.get<Position>();
-    if (!id || !pos)
-        return b;
-
-    Serializer::serializeUInt64(b, boardId);
-    Serializer::serializeUInt64(b, id->id);
-    Serializer::serializeUInt32(b, seq);
-
-    // Your current decoder reads: seq -> x -> y -> dragging(U8)
-    Serializer::serializeFloat(b, (float)pos->x);
-    Serializer::serializeFloat(b, (float)pos->y);
-
-    // Match your decode that uses deserializeUInt8:
-    Serializer::serializeUInt8(b, dragging ? 1 : 0);
-    return b;
-}
-
-// ---- MARKER UPDATE/DELETE ----
-std::vector<unsigned char> NetworkManager::buildMarkerUpdateFrame(
-    uint64_t boardId, const flecs::entity& marker, bool isPlayerOp)
-{
-    std::vector<unsigned char> b;
-    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::MarkerUpdate));
-    Serializer::serializeUInt64(b, boardId);
-
-    const auto id = marker.get<Identifier>()->id;
-    const auto pos = *marker.get<Position>();
-    const auto siz = *marker.get<Size>();
-    const auto vis = *marker.get<Visibility>();
-    const auto mov = *marker.get<Moving>();
-    const auto mc = *marker.get<MarkerComponent>();
-
-    Serializer::serializeUInt64(b, id);
-    Serializer::serializeBool(b, isPlayerOp);
-    Serializer::serializePosition(b, &pos);
-    Serializer::serializeSize(b, &siz);
-    Serializer::serializeVisibility(b, &vis);
-    Serializer::serializeMoving(b, &mov);
-    Serializer::serializeMarkerComponent(b, &mc);
-    return b;
-}
 
 std::vector<unsigned char> NetworkManager::buildMarkerDeleteFrame(uint64_t boardId, uint64_t markerId)
 {
