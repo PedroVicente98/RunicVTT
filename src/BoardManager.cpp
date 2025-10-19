@@ -615,47 +615,6 @@ void BoardManager::killIfMouseUp(bool isMouseDown)
     ecs.defer_end();
 }
 
-bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
-{
-    bool hovered = false;
-
-    // Query all markers that are children of the active board and have MarkerComponent
-    ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker_component, const Position& markerPos, const Size& markerSize, Moving& moving)
-             {
-
-        if (entity.has(flecs::ChildOf, active_board)) {
-            bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
-                (world_position.x <= (markerPos.x + markerSize.width / 2));
-
-            bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
-                (world_position.y <= (markerPos.y + markerSize.height / 2));
-
-            if (!(withinXBounds && withinYBounds))
-                return;
-            if (!canMoveMarker(&marker_component, entity))
-                return;
-
-            moving.isDragging = true;
-            hovered = true;
-
-            if (auto nm = network_manager.lock())
-            {
-                if (entity.has<Identifier>() && active_board.has<Identifier>())
-                {
-                    const auto bid = active_board.get<Identifier>()->id;
-                    const auto mid = entity.get<Identifier>()->id;
-
-                    nm->markDraggingLocal(mid, true);       
-                    nm->broadcastMarkerMoveState(bid, entity); 
-                }
-            }
-        } });
-    ecs.defer_end();
-
-    return hovered;
-}
-
 // Snap to the nearest cell center in a square grid:
 // centers are at: offset + (i + 0.5) * cell_size
 static inline glm::vec2 snapToSquareCenter(const glm::vec2& worldPos, const glm::vec2& offset, float cell)
@@ -678,15 +637,104 @@ static inline glm::vec2 snapToGridCenter(const glm::vec2& worldPos, const Grid& 
     return snapToSquareCenter(worldPos, grid.offset, grid.cell_size);
 }
 
+bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
+{
+    bool hovered = false;
+    ecs.defer_begin();
+    ecs.each([&](flecs::entity entity, const MarkerComponent& marker_component, const Position& markerPos, const Size& markerSize, Moving& moving)
+             {
+
+        if (entity.has(flecs::ChildOf, active_board)) {
+            bool withinXBounds = (world_position.x >= (markerPos.x - markerSize.width / 2)) &&
+                (world_position.x <= (markerPos.x + markerSize.width / 2));
+
+            bool withinYBounds = (world_position.y >= (markerPos.y - markerSize.height / 2)) &&
+                (world_position.y <= (markerPos.y + markerSize.height / 2));
+
+            if (!(withinXBounds && withinYBounds))
+                return;
+            if (!canMoveMarker(&marker_component, entity))
+                return;
+
+            //moving.isDragging = true;
+            hovered = true;
+            //if (auto nm = network_manager.lock())
+            //{
+            //    if (entity.has<Identifier>() && active_board.has<Identifier>())
+            //    {
+            //        const auto bid = active_board.get<Identifier>()->id;
+            //        const auto mid = entity.get<Identifier>()->id;
+
+            //        nm->markDraggingLocal(mid, true);       
+            //        nm->broadcastMarkerMoveState(bid, entity); 
+            //    }
+            //}
+        } });
+    ecs.defer_end();
+
+    return hovered;
+}
+//
+//void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
+//{
+//    mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
+//    mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
+//    if (currentTool == Tool::MOVE)
+//    {
+//        if (draggingMap)
+//        {
+//            active_board.set<Panning>({true});
+//        }
+//    }
+//    else if (currentTool == Tool::FOG)
+//    {
+//        is_creating_fog = true;
+//    }
+//}
+
 void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
 {
-    mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
+    mouse_start_world_pos = mousePos;
     mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
+
     if (currentTool == Tool::MOVE)
     {
         if (draggingMap)
         {
             active_board.set<Panning>({true});
+            return;
+        }
+
+        // Marker drag start:
+        auto ent = getEntityAtMousePosition(mousePos);
+        if (!ent.is_valid() || !ent.has<MarkerComponent>() || !ent.has<Moving>() || !ent.has<Identifier>())
+            return;
+
+        auto nm = network_manager.lock();
+        if (!nm)
+            return;
+
+        const auto mid = ent.get<Identifier>()->id;
+
+        // Do NOT start if someone else is already dragging this marker.
+        if (nm->isMarkerBeingDragged(mid) && !nm->amIDragging(mid))
+            return;
+
+        // Optional: prevent starting a second local drag (you said players shouldn’t drag 2 markers)
+        if (isDraggingMarker())
+            return;
+
+        if (!canMoveMarker(ent.get<MarkerComponent>(), ent))
+            return;
+
+        // Local start
+        ent.set<Moving>(Moving{true});
+        nm->markDraggingLocal(mid, true);
+
+        if (active_board.has<Identifier>())
+        {
+            const auto bid = active_board.get<Identifier>()->id;
+            nm->broadcastMarkerMoveState(bid, ent); // START (isDragging=true)
         }
     }
     else if (currentTool == Tool::FOG)
