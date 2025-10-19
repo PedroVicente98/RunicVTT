@@ -17,8 +17,8 @@ struct Identifier
 // Position Component
 struct Position
 {
-    int x;
-    int y;
+    float x;
+    float y;
 };
 
 // Size Component

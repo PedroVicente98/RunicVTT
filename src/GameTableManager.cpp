@@ -173,7 +173,7 @@ void GameTableManager::processReceivedMessages()
                 const auto& mm = *m.markerMeta;
                 flecs::entity marker = ecs.entity()
                                            .set(Identifier{mm.markerId})
-                                           .set(Position{(int)mm.pos.x, (int)mm.pos.y}) //World Position
+                                           .set(Position{mm.pos.x, mm.pos.y}) //World Position
                                            .set(Size{mm.size.width, mm.size.height})
                                            .set(TextureComponent{tex, "", texSize})
                                            .set(Visibility{mm.vis})

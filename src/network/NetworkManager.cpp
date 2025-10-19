@@ -2187,55 +2187,6 @@ void NetworkManager::stopRawDrainWorker()
         rawWorker_.join();
     rawWorkerRunning_.store(false);
 }
-//
-//void NetworkManager::flushCoalescedMoves()
-//{
-//    std::vector<std::tuple<uint64_t /*board*/, uint64_t /*marker*/, glm::vec2, bool /*drag*/>> batch;
-//    {
-//        std::lock_guard<std::mutex> lk(moveMtx_);
-//        for (auto& [markerId, acc] : moveLatest_)
-//        {
-//            //Logger::instance().log("localtunnel", Logger::Level::Info, "GOING TO COALESCED: " + std::to_string(acc.have));
-//            if (!acc.have)
-//                continue;
-//            batch.emplace_back(acc.boardId, markerId, acc.pos, acc.dragging);
-//            Logger::instance().log("localtunnel", Logger::Level::Info, "emplace_back: acc: " + std::to_string(acc.boardId) + " | markerid: " + std::to_string(markerId) + " | x: " + std::to_string(acc.pos.x) + " | y: " + std::to_string(acc.pos.y) + " | dragging: " + std::to_string(acc.dragging));
-//            acc.have = false; // consumed
-//        }
-//    }
-//
-//    for (auto& t : batch)
-//    {
-//        auto [boardId, markerId, pos, dragging] = t;
-//
-//        msg::ReadyMessage m;
-//        m.kind = msg::DCType::MarkerMove; // <= distinct kind
-//        m.boardId = boardId;
-//        m.markerId = markerId;
-//        m.pos = Position{(int)pos.x, (int)pos.y};
-//        m.mov = Moving{dragging};
-//
-//        Logger::instance().log("localtunnel", Logger::Level::Info, "ReadyMessage ADDED!! ");
-//        inboundGame_.push(std::move(m));
-//    }
-//}
-
-//-----ON PEER CONNECTED INITIAL BOOSTSTRAP----------------------------------------------------------------------------
-//void NetworkManager::onPeerChannelOpen(const std::string& peerId, const std::string& label)
-//{//--{check}USED WHEN PEERS CONNECTING, SEND THE SNAPSHOT TO IT
-//    if (peer_role != Role::GAMEMASTER)
-//        return;
-//
-//    auto it = peers.find(peerId);
-//    if (it == peers.end() || !it->second)
-//        return;
-//    auto& link = it->second;
-//
-//    if (link->allRequiredOpen())
-//    {
-//        bootstrapPeerIfReady(peerId);
-//    }
-//}
 
 void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
 {

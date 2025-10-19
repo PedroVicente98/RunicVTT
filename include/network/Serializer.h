@@ -400,14 +400,14 @@ inline glm::vec2 Serializer::deserializeVec2(const std::vector<unsigned char>& b
 
 inline void Serializer::serializePosition(std::vector<unsigned char>& buffer, const Position* position)
 {
-    serializeInt(buffer, position->x);
-    serializeInt(buffer, position->y);
+    serializeFloat(buffer, position->x);
+    serializeFloat(buffer, position->y);
 }
 
 inline Position Serializer::deserializePosition(const std::vector<unsigned char>& buffer, size_t& offset)
 {
-    int x = deserializeInt(buffer, offset);
-    int y = deserializeInt(buffer, offset);
+    float x = deserializeFloat(buffer, offset);
+    float y = deserializeFloat(buffer, offset);
     return Position{x, y};
 }
 

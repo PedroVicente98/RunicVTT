@@ -169,7 +169,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
     if (ImGui::Button("Camera Settings", ImVec2(110, 40)))
     {
-        showCameraSettings = true;
+        showCameraSettings = !showGridSettings;
     }
     ImGui::PopStyleColor(3);
     if (nm->getPeerRole() == Role::GAMEMASTER)
@@ -353,7 +353,7 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
 
     flecs::entity marker = ecs.entity()
                                .set(Identifier{generateUniqueId()})
-                               .set(Position{(int)position.x, (int)position.y}) //World Position
+                               .set(Position{position.x, position.y}) //World Position
                                .set(Size{drawSz.x, drawSz.y})
                                .set(texture_marker)
                                .set(Visibility{true})
@@ -903,7 +903,7 @@ flecs::entity BoardManager::createFogOfWar(glm::vec2 startPos, glm::vec2 size)
 
     auto fog = ecs.entity()
                    .set(Identifier{generateUniqueId()})
-                   .set(Position{(int)startPos.x, (int)startPos.y})
+                   .set(Position{startPos.x, startPos.y})
                    .set(Size{size.x, size.y})
                    .set(Visibility{true});
 
@@ -1478,8 +1478,8 @@ void BoardManager::renderCameraWindow()
     ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Camera", &showCameraSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    auto grid_hovered = ImGui::IsWindowHovered();
-    if (grid_hovered)
+    auto camera_hovered = ImGui::IsWindowHovered();
+    if (camera_hovered)
     {
         setIsNonMapWindowHovered(true);
     }
