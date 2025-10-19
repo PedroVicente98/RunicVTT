@@ -45,19 +45,27 @@ void main()
 {
     // Initialize color to fully transparent
     vec4 line_color = vec4(0.0, 0.0, 0.0, opacity);
-    float line_thickness = 2.0;
+    float line_thickness = 1.0;
 
     // Apply the user-defined offset to the world position for grid calculations
-    vec2 pos = WorldPos.xy + grid_offset;
+    vec2 pos = WorldPos.xy - grid_offset;
     
     if (grid_type == 0) // Square Grid
     {
         // Calculate the position relative to a cell origin
-        vec2 local_pos = mod(pos, cell_size);
-        
+        //vec2 local_pos = mod(pos, cell_size);
+        // fractional position inside the cell, robust for negatives
+        vec2 local = fract(pos / cell_size) * cell_size;
+
+        // distance to nearest vertical/horizontal line in world units
+        float dx = min(local.x, cell_size - local.x);
+        float dy = min(local.y, cell_size - local.y);
+
         // Check if the fragment is close to the left or bottom edge of a cell
         // We use an "OR" to check both horizontal and vertical lines
-        if (local_pos.x < line_thickness || local_pos.y < line_thickness)
+        //if (local_pos.x < line_thickness || local_pos.y < line_thickness)
+        
+        if (dx < line_thickness || dy < line_thickness)
         {
             color = line_color;
         }
@@ -67,7 +75,7 @@ void main()
             color = vec4(0.0, 0.0, 0.0, 0.0);
         }
     }
-    else if (grid_type == 1) // Hexagonal Grid (Pointy-top)
+  /*  else if (grid_type == 1) // Hexagonal Grid (Pointy-top)
     {
         // Hexagonal grid calculation based on axial coordinates
         float S = cell_size;
@@ -98,6 +106,7 @@ void main()
             color = vec4(0.0, 0.0, 0.0, 0.0);
         }
     }
+    */
     else
     {
         // Default to transparent if an unsupported grid type is provided

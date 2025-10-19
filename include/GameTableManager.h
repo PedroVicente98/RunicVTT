@@ -23,7 +23,7 @@ public:
     void setup();
     bool isConnected() const;
 
-    void processReceivedGameMessages();
+    void processReceivedMessages();
 
     void hostGameTablePopUp();
     void networkCenterPopUp();
@@ -82,35 +82,6 @@ public:
             toaster_->Push(lvl, msg, durationSec);
     }
 
-private:
-    std::shared_ptr<ImGuiToaster> toaster_;
-
-    void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin, int fbo_height);
-    void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
-    void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
-
-    flecs::world ecs;
-
-    glm::vec2 current_mouse_pos; // PosiÃ§Ã£o atual do mouse em snake_case
-
-    glm::vec2 current_mouse_ndc_pos;   // PosiÃ§Ã£o atual do mouse em snake_case
-    glm::vec2 current_mouse_world_pos; // PosiÃ§Ã£o atual do mouse em world coordinates
-    glm::vec2 current_mouse_fbo_pos;   // PosiÃ§Ã£o atual do mouse em fbo pixels coordinates
-
-    char buffer[124] = "";
-    char pass_buffer[124] = "";
-    char port_buffer[6] = "7777";
-    char username_buffer[124] = "";
-
-    std::string map_image_path = "";
-
-    bool mouse_left_clicked, mouse_right_clicked, mouse_middle_clicked;
-    bool mouse_left_released, mouse_right_released, mouse_middle_released;
-    float mouse_wheel_delta;
-    bool ignore_mouse_until_release = false;
-    bool is_non_map_window_hovered = false;
-
-public:
     void processMouseInput(bool is_mouse_within_image_bounds)
     {
 
@@ -253,5 +224,44 @@ public:
             ImGui::EndPopup();
         }
         return confirmed;
+    }
+
+private:
+    std::shared_ptr<ImGuiToaster> toaster_;
+
+    void handleMouseButtons(glm::vec2 current_mouse_fbo_pixels_bl_origin, int fbo_height);
+    void handleCursorMovement(glm::vec2 current_mouse_fbo_pixels_bl_origin);
+    void handleScroll(glm::vec2 current_mouse_fbo_pixels_bl_origin);
+
+    flecs::world ecs;
+
+    glm::vec2 current_mouse_pos; // PosiÃ§Ã£o atual do mouse em snake_case
+
+    glm::vec2 current_mouse_ndc_pos;   // PosiÃ§Ã£o atual do mouse em snake_case
+    glm::vec2 current_mouse_world_pos; // PosiÃ§Ã£o atual do mouse em world coordinates
+    glm::vec2 current_mouse_fbo_pos;   // PosiÃ§Ã£o atual do mouse em fbo pixels coordinates
+
+    char buffer[124] = "";
+    char pass_buffer[124] = "";
+    char port_buffer[6] = "7777";
+    char username_buffer[124] = "";
+
+    std::string map_image_path = "";
+
+    bool mouse_left_clicked, mouse_right_clicked, mouse_middle_clicked;
+    bool mouse_left_released, mouse_right_released, mouse_middle_released;
+    float mouse_wheel_delta;
+    bool ignore_mouse_until_release = false;
+    bool is_non_map_window_hovered = false;
+
+    static inline flecs::entity findMarkerInBoard(flecs::entity boardEnt, uint64_t markerId)
+    {
+        flecs::entity out;
+        boardEnt.children([&](flecs::entity child)
+                          {
+        if (!child.has<MarkerComponent>()) return;
+        if (auto id = child.get<Identifier>(); id && id->id == markerId)
+            out = child; });
+        return out;
     }
 };

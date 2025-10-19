@@ -9,6 +9,20 @@
 // If you use nlohmann::json in this TU, include it once anywhere before using helpers.
 // #include <nlohmann/json.hpp>
 
+enum class Role
+{
+    NONE,
+    GAMEMASTER,
+    PLAYER
+};
+
+enum class ConnectionType
+{
+    EXTERNAL,
+    LOCAL,
+    LOCALTUNNEL
+};
+
 namespace msg
 {
 
@@ -22,6 +36,8 @@ namespace msg
         ImageChunk = 104,
 
         //Operations
+        MarkerMove = 300,
+        MarkerMoveState = 301,
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,
@@ -39,11 +55,85 @@ namespace msg
         ChatThreadDelete = 202,
         ChatMessage = 203
     };
+    inline std::string DCtypeString(DCType type)
+    {
+        std::string type_str;
+        switch (type)
+        {
+            case msg::DCType::Snapshot_GameTable:
+                type_str = "Snapshot_GameTable";
+                break;
+            case msg::DCType::Snapshot_Board:
+                type_str = "Snapshot_Board";
+                break;
+            case msg::DCType::CommitMarker:
+                type_str = "CommitMarker";
+                break;
+            case msg::DCType::CommitBoard:
+                type_str = "CommitBoard";
+                break;
+            case msg::DCType::ImageChunk:
+                type_str = "ImageChunk";
+                break;
+            case msg::DCType::MarkerCreate:
+                type_str = "MarkerCreate";
+                break;
+            case msg::DCType::MarkerUpdate:
+                type_str = "MarkerUpdate";
+                break;
+            case msg::DCType::MarkerDelete:
+                type_str = "MarkerDelete";
+                break;
+            case msg::DCType::FogCreate:
+                type_str = "FogCreate";
+                break;
+            case msg::DCType::FogUpdate:
+                type_str = "FogUpdate";
+                break;
+            case msg::DCType::FogDelete:
+                type_str = "FogDelete";
+                break;
+            case msg::DCType::GridUpdate:
+                type_str = "GridUpdate";
+                break;
+            case msg::DCType::NoteCreate:
+                type_str = "NoteCreate";
+                break;
+            case msg::DCType::NoteUpdate:
+                type_str = "NoteUpdate";
+                break;
+            case msg::DCType::NoteDelete:
+                type_str = "NoteDelete";
+                break;
+            case msg::DCType::ChatThreadCreate:
+                type_str = "ChatThreadCreate";
+                break;
+            case msg::DCType::ChatThreadUpdate:
+                type_str = "ChatThreadUpdate";
+                break;
+            case msg::DCType::ChatThreadDelete:
+                type_str = "ChatThreadDelete";
+                break;
+            case msg::DCType::ChatMessage:
+                type_str = "ChatMessage";
+                break;
+            case msg::DCType::MarkerMove:
+                type_str = "MarkerMove";
+                break;
+            case msg::DCType::MarkerMoveState:
+                type_str = "MarkerMoveState";
+                break;
+            default:
+                type_str = "UnkownType";
+                break;
+        }
+        return type_str;
+    }
 
     enum class ImageOwnerKind : uint8_t
     {
-        Board,
-        Marker
+        Board = 0,
+        Marker = 1
     };
 
     struct MarkerMeta
@@ -66,7 +156,7 @@ namespace msg
         Size size{};
     };
 
-    // Single â€œreadyâ€ container with tag + optionals (only 1 engaged)
+    // Single ready container with tag + optionals (only 1 engaged)
     struct ReadyMessage
     {
         DCType kind;
@@ -74,8 +164,9 @@ namespace msg
 
         std::optional<uint64_t> tableId;
         std::optional<uint64_t> boardId;
-
+        std::optional<uint64_t> markerId;
         std::optional<uint64_t> fogId;
+
         std::optional<Position> pos;
         std::optional<Size> size;
         std::optional<Visibility> vis;
@@ -84,6 +175,43 @@ namespace msg
         std::optional<std::vector<uint8_t>> bytes;
         std::optional<BoardMeta> boardMeta;
         std::optional<MarkerMeta> markerMeta;
+
+        std::optional<uint64_t> threadId;
+        std::optional<uint64_t> ts;
+        std::optional<std::string> text;                   // chat text
+        std::optional<std::set<std::string>> participants; // thread participants
+
+        std::optional<Moving> mov;
+        std::optional<MarkerComponent> markerComp;
+
+        std::optional<Grid> grid;
+
+        std::optional<uint32_t> dragEpoch;
+        std::optional<uint32_t> seq;
+        std::optional<Role> senderRole;
+    };
+
+    struct NetEvent
+    {
+        enum class Type
+        {
+            DcOpen,
+            DcClosed,
+            PcOpen,
+            PcClosed,
+            ClientOpen,
+            ClientClosed
+        };
+        Type type;
+        std::string peerId;
+        std::string label;
+    };
+
+    struct InboundRaw
+    {
+        std::string fromPeer;
+        std::string label;
+        std::vector<uint8_t> bytes;
     };
 
     // ---------- Common JSON keys (shared) ----------
@@ -100,7 +228,7 @@ namespace msg
         inline constexpr std::string_view Username = "username";
         inline constexpr std::string_view ClientId = "clientId";
         inline constexpr std::string_view Target = "target";
-
+        inline constexpr std::string_view GmId = "gmId";
         // Signaling-specific
         inline constexpr std::string_view Sdp = "sdp";
         inline constexpr std::string_view Candidate = "candidate";
@@ -159,18 +287,19 @@ namespace msg
             inline constexpr std::string Game = "game";
             inline constexpr std::string Chat = "chat";
             inline constexpr std::string Notes = "notes";
+            inline constexpr std::string MarkerMove = "marker_move";
         } // namespace name
 
-        inline constexpr std::string_view Chat = "CHAT";
-        inline constexpr std::string_view Image = "IMAGE";
-        inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
-        inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
-        inline constexpr std::string_view Move = "MOVE";
+        //inline constexpr std::string_view Chat = "CHAT";
+        //inline constexpr std::string_view Image = "IMAGE";
+        //inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
+        //inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
+        //inline constexpr std::string_view Move = "MOVE";
 
-        // Examples from earlier discussion:
-        inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
-        inline constexpr std::string_view FogCreate = "FOG_CREATE";
-        inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
+        //// Examples from earlier discussion:
+        //inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
+        //inline constexpr std::string_view FogCreate = "FOG_CREATE";
+        //inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
     } // namespace dc
 
     // ========== Optional JSON helpers (nlohmann::json) ==========
@@ -245,7 +374,7 @@ namespace msg
         };
     }
 
-    inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
+    /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
     {
 
         auto j = Json{
@@ -260,6 +389,24 @@ namespace msg
             j[std::string(msg::key::Clients)] = clients; // array of peerId strings
         };
 
+        return j;
+    }*/
+    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
+    {
+        auto j = nlohmann::json{
+            {std::string(key::Type), std::string(signaling::AuthResponse)},
+            {std::string(key::AuthOk), ok},
+            {std::string(key::AuthMsg), msg},
+            {std::string(key::ClientId), clientId},
+            {std::string(key::Username), username}};
+        if (!clients.empty())
+        {
+            j[std::string(msg::key::Clients)] = clients;
+        }
+        if (!gmPeerId.empty())
+        {
+            j[key::GmId] = gmPeerId; // NEW
+        }
         return j;
     }
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false)

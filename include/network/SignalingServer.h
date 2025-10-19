@@ -40,11 +40,15 @@ public:
     {
         return authClients_;
     }
+    bool isRunning() const
+    {
+        return is_running;
+    }
 
 private:
     std::shared_ptr<rtc::WebSocketServer> server;
     std::weak_ptr<NetworkManager> network_manager;
-
+    bool is_running = false;
     // Pending: not authenticated yet
     std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>> pendingClients_;
     //std::unordered_map<std::string, std::chrono::steady_clock::time_point> pendingSince_;

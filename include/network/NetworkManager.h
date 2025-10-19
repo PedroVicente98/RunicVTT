@@ -17,19 +17,20 @@
 #include "Message.h"
 #include <fstream>
 #include "ImGuiToaster.h"
+#include "PathManager.h"
+#include "Logger.h"
 
-enum class Role
+struct DragState
 {
-    NONE,
-    GAMEMASTER,
-    PLAYER
-};
-
-enum class ConnectionType
-{
-    EXTERNAL,
-    LOCAL,
-    LOCALTUNNEL
+    uint32_t epoch{0};
+    bool closed{true};
+    uint32_t lastSeq{0};
+    std::string ownerPeerId;
+    bool locallyDragging{false};
+    uint32_t locallyProposedEpoch{0};
+    uint32_t localSeq{0};
+    uint64_t lastTxMs{0};
+    uint64_t epochOpenedMs{0};
 };
 
 // Forward declare
@@ -53,6 +54,8 @@ struct PendingImage
     uint64_t received = 0;
     std::vector<uint8_t> buf;
 
+    bool commitRequested = false;
+
     bool isComplete() const
     {
         return total == received && total > 0;
@@ -74,6 +77,9 @@ public:
 
     // if not, call this from main thread; otherwise add a mutex)
     bool isConnected();
+    bool isHosting() const;
+    bool hasAnyPeer() const;
+    int connectedPeerCount() const;
 
     void allowPort(unsigned int port);
     void disallowPort(unsigned short port);
@@ -118,6 +124,8 @@ public:
     bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
     void broadcastPeerDisconnect(const std::string& targetId);
+    // Single-shot reconnect of one peer. Returns true if we kicked off a rebuild.
+    /*bool reconnectPeer(const std::string& peerId);*/
 
     // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
@@ -127,6 +135,11 @@ public:
     std::string getMyUsername() const
     {
         return myUsername_;
+    };
+
+    std::string getMyId() const
+    {
+        return myClientId_;
     };
     void setMyIdentity(std::string myId, std::string username);
     void upsertPeerIdentity(const std::string& id, const std::string& username);
@@ -146,26 +159,41 @@ public:
         return inboundGame_.try_pop(out);
     }
 
-    void onDcGameBinary(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    bool tryPopRawMessage(msg::InboundRaw& out)
+    {
+        return inboundRaw_.try_pop(out);
+    }
 
-    bool sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name);
-    bool sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name);
+    void drainEvents();
+    void drainInboundRaw(int maxPerTick);
+
+    void decodeRawChatBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+    void decodeRawNotesBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+
+    void startRawDrainWorker();
+    void stopRawDrainWorker();
 
     void onPeerChannelOpen(const std::string& peerId, const std::string& label);
     void bootstrapPeerIfReady(const std::string& peerId);
 
     void broadcastGameTable(const flecs::entity& gameTable);
     void broadcastBoard(const flecs::entity& board);
-    void broadcastMarker(uint64_t boardId, const flecs::entity& marker);
     void broadcastFog(uint64_t boardId, const flecs::entity& fog);
 
+    void broadcastFogUpdate(uint64_t boardId, const flecs::entity& fog);
+    void broadcastFogDelete(uint64_t boardId, const flecs::entity& fog);
+
+    void sendFogUpdate(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
+    void sendFogDelete(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
+
     void sendGameTo(const std::string& peerId, const std::vector<unsigned char>& bytes);
-    void broadcastFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds);
+    void broadcastGameFrame(const std::vector<unsigned char>& frame, const std::vector<std::string>& toPeerIds);
 
     void sendGameTable(const flecs::entity& gameTable, const std::vector<std::string>& toPeerIds);
     void sendBoard(const flecs::entity& board, const std::vector<std::string>& toPeerIds);
-    void sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
     void sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
+
+    bool sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds);
 
     void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
     void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
@@ -181,33 +209,135 @@ public:
             toaster_->Push(lvl, msg, durationSec);
     }
 
-private:
-    std::shared_ptr<ImGuiToaster> toaster_;
+    MessageQueue<msg::NetEvent> events_;
+    MessageQueue<msg::InboundRaw> inboundRaw_;
+    std::vector<std::string> getConnectedPeerIds() const;
 
-    static constexpr size_t kChunk = 16 * 1024; // or smaller if needed
+    // GM identity
+    void setGMId(const std::string& id)
+    {
+        gmPeerId_ = id;
+    }
+    const std::string& getGMId() const
+    {
+        return gmPeerId_;
+    }
+
+    void decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+
+    void sendMarkerDelete(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+    void broadcastMarkerDelete(uint64_t boardId, const flecs::entity& marker);
+    void broadcastMarker(uint64_t boardId, const flecs::entity& marker);
+    void sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+    //PUBLIC MARKER STUFF--------------------------------------------------------------------------------
+
+    //END STABLE
+    void decodeRawMarkerMoveBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b);
+
+    void markDraggingLocal(uint64_t markerId, bool dragging);
+    bool isMarkerBeingDragged(uint64_t markerId) const;
+    bool amIDragging(uint64_t markerId) const;
+    void forceCloseDrag(uint64_t markerId);
+
+    void broadcastMarkerMove(uint64_t boardId, const flecs::entity& marker);
+    void sendMarkerMove(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+
+    void broadcastMarkerMoveState(uint64_t boardId, const flecs::entity& marker);
+    void sendMarkerMoveState(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+
+    void broadcastMarkerUpdate(uint64_t boardId, const flecs::entity& marker);
+    void sendMarkerUpdate(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds);
+
+    bool shouldApplyMarkerMove(const msg::ReadyMessage& m);           // DCType::MarkerMove
+    bool shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m); // DCType::MarkerMoveState + mov.isDragging==true
+    bool shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m); // DCType::MarkerMoveState + mov.isDragging==false
+
+    // send/broadcast
+    void broadcastGridUpdate(uint64_t boardId, const flecs::entity& board);
+    void sendGridUpdate(uint64_t boardId, const flecs::entity& board, const std::vector<std::string>& toPeerIds);
+
+    //PUBLIC END MARKER STUFF----------------------------------------------------------------------------
+private:
+    // build
+    std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
+    // handle
+    void handleGridUpdate(const std::vector<uint8_t>& b, size_t& off);
+
+    //MARKER STUFF--------------------------------------------------------------------------------
+    std::string decodingFromPeer_;
+    std::unordered_map<uint64_t /*markerId*/, DragState> drag_;
+    uint32_t sendMoveMinPeriodMs_{50}; // pacing target (~20Hz)
+    uint32_t getSendMoveMinPeriodMs() const
+    {
+        return sendMoveMinPeriodMs_;
+    }
+
+    // MarkerUpdate
+    void handleMarkerMove(const std::vector<uint8_t>& b, size_t& off);
+    void handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& off);
+    void handleMarkerMoveState(const std::vector<uint8_t>& b, size_t& off);
+
+    // ---- MARKER UPDATE/DELETE ----
+    std::vector<unsigned char> buildMarkerMoveFrame(uint64_t boardId, const flecs::entity& marker, uint32_t seq);
+    std::vector<unsigned char> buildMarkerMoveStateFrame(uint64_t boardId, const flecs::entity& marker);
+    std::vector<unsigned char> buildMarkerUpdateFrame(uint64_t boardId, const flecs::entity& marker);
+
+    static bool tieBreakWins(const std::string& challengerPeerId, const std::string& currentOwnerPeerId) //NEEDS REVISITING
+    {
+        return challengerPeerId < currentOwnerPeerId;
+    }
+
+    //STABLE
+    void handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off);
+    std::vector<unsigned char> buildMarkerDeleteFrame(uint64_t boardId, uint64_t markerId);
+    std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
+    std::vector<uint8_t> buildCreateMarkerFrame(uint64_t boardId, const flecs::entity& marker, uint64_t imageBytesTotal);
+    void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
+    //END MARKER STUFF----------------------------------------------------------------------------
+
+    std::string gmPeerId_;
+    std::unordered_map<uint64_t, PendingImage> imagesRx_;
+    MessageQueue<msg::ReadyMessage> inboundGame_;
+    // optional background raw-drain worker
+    std::atomic<bool> rawWorkerRunning_{false};
+    std::atomic<bool> rawWorkerStop_{false};
+    std::thread rawWorker_;
+    // NetworkManager.h
+
+    std::shared_ptr<ImGuiToaster> toaster_;
+    static constexpr size_t kChunk = 8 * 1024; // 8KB chunk
+    //static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
+    //static constexpr size_t kLowWater = 512 * 1024;       // 512 KB before resuming
+    static constexpr int kPaceEveryN = 48; // crude pacing step
+    static constexpr int kPaceMillis = 2;
 
     void handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off);
     void handleBoardMeta(const std::vector<uint8_t>& b, size_t& off);
-    void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
     void handleFogCreate(const std::vector<uint8_t>& b, size_t& off);
     void handleImageChunk(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
 
+    // FogUpdate
+    void handleFogUpdate(const std::vector<uint8_t>& b, size_t& off);
+    void handleFogDelete(const std::vector<uint8_t>& b, size_t& off);
+
+    void tryFinalizeImage(msg::ImageOwnerKind kind, uint64_t id);
     // frame builders
     std::vector<uint8_t> buildSnapshotGameTableFrame(uint64_t gameTableId, const std::string& name);
     std::vector<uint8_t> buildSnapshotBoardFrame(const flecs::entity& board, uint64_t imageBytesTotal);
-    std::vector<uint8_t> buildCreateMarkerFrame(uint64_t boardId, const flecs::entity& marker, uint64_t imageBytesTotal);
     std::vector<uint8_t> buildFogCreateFrame(uint64_t boardId, const flecs::entity& fog);
     std::vector<uint8_t> buildImageChunkFrame(uint8_t ownerKind, uint64_t id, uint64_t offset, const uint8_t* data, size_t len);
     std::vector<uint8_t> buildCommitBoardFrame(uint64_t boardId);
-    std::vector<uint8_t> buildCommitMarkerFrame(uint64_t boardId, uint64_t markerId);
 
-    std::vector<std::string> getConnectedPeerIds() const;
+    // ---- FOG UPDATE/DELETE ----
+    std::vector<unsigned char> buildFogUpdateFrame(uint64_t boardId, const flecs::entity& fog);
+    std::vector<unsigned char> buildFogDeleteFrame(uint64_t boardId, uint64_t fogId);
 
-    std::unordered_map<uint64_t, PendingImage> imagesRx_;
-
-    MessageQueue<msg::ReadyMessage> inboundGame_;
+    // Helpers used by reconnectPeer (thin wrappers around what you already have)
+    /*std::shared_ptr<PeerLink> replaceWithFreshLink_(const std::string& peerId);
+    void createOfferAndSend_(const std::string& peerId, const std::shared_ptr<PeerLink>& link);
+    void createChannelsIfOfferer_(const std::shared_ptr<PeerLink>& link);*/
 
     std::string myClientId_;
     std::string myUsername_;
@@ -258,6 +388,61 @@ private:
         }
         return buffer;
     }
+
+    static uint64_t nowMs()
+    {
+        using Clock = std::chrono::steady_clock;
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
+    }
+
+    //inline std::vector<unsigned char> readFileBytes(const std::string& path)
+    //{
+    //    namespace fs = std::filesystem;
+    //    std::error_code ec;
+
+    //    auto tryOpen = [](const fs::path& p) -> std::vector<unsigned char>
+    //    {
+    //        std::ifstream file(p, std::ios::binary);
+    //        if (!file)
+    //            return {};
+    //        file.seekg(0, std::ios::end);
+    //        size_t size = static_cast<size_t>(file.tellg());
+    //        file.seekg(0, std::ios::beg);
+    //        std::vector<unsigned char> buffer(size);
+    //        if (size > 0)
+    //            file.read(reinterpret_cast<char*>(buffer.data()), size);
+    //        return buffer;
+    //    };
+
+    //    fs::path p = path;
+    //    // 1) Direct (absolute or relative to CWD)
+    //    if (auto buf = tryOpen(p); !buf.empty())
+    //        return buf;
+
+    //    // 2) Resolve relative under known asset roots
+    //    std::vector<fs::path> roots = {
+    //        PathManager::getMapsPath(),
+    //        PathManager::getMarkersPath(),
+    //        fs::path("res"),   // if you ship a res/
+    //        fs::current_path() // last-ditch CWD
+    //    };
+
+    //    for (const auto& r : roots)
+    //    {
+    //        fs::path candidate = fs::weakly_canonical(r / p, ec);
+    //        if (ec)
+    //            continue;
+    //        if (auto buf = tryOpen(candidate); !buf.empty())
+    //        {
+    //            return buf;
+    //        }
+    //    }
+
+    //    // Log a helpful error once
+    //    Logger::instance().log("assets", Logger::Level::Error, "readFileBytes: cannot open '" + path + "' (tried known roots).");
+    //    return {};
+    //}
 };
 
 ////Operations

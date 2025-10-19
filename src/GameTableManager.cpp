@@ -3,7 +3,7 @@
 #include "Serializer.h"
 #include "SignalingServer.h"
 #include "UPnPManager.h"
-
+#include "Logger.h"
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
     ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory))
 {
@@ -17,13 +17,13 @@ GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWi
     map_directory->generateTextureIDs();
 }
 
-GameTableManager::~GameTableManager()
-{
-}
-
 void GameTableManager::setup()
 {
     network_manager->setup(board_manager, weak_from_this());
+}
+
+GameTableManager::~GameTableManager()
+{
 }
 
 void GameTableManager::saveGameTable()
@@ -51,7 +51,6 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
             active_game_table.children([&](flecs::entity child)
                                        {
                 if (child.has<Board>()) {
-                    board_manager->setActiveBoard(child);
                     auto texture = child.get_mut<TextureComponent>();
                     auto board_image = map_directory->getImageByPath(texture->image_path);
                     texture->textureID = board_image.textureID;
@@ -65,6 +64,7 @@ void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
                             grand_child_texture->size = marker_image.size;
                         }
                     });
+                    board_manager->setActiveBoard(child);
                 } });
         }
         catch (const std::exception&)
@@ -91,24 +91,22 @@ bool GameTableManager::isGameTableActive()
     return active_game_table.is_valid();
 }
 
-//bool GameTableManager::isConnectionActive() {
-//    return network_manager.isConnectionOpen();
-//}
-//
 bool GameTableManager::isConnected() const
 {
     return network_manager->isConnected();
 }
 
-void GameTableManager::processReceivedGameMessages()
+void GameTableManager::processReceivedMessages()
 {
-
     constexpr int kMaxPerFrame = 32; // avoid long stalls
-    int processed = 0;
 
+    network_manager->drainInboundRaw(kMaxPerFrame);
+    network_manager->drainEvents();
+    int processed = 0;
     msg::ReadyMessage m;
     while (processed < kMaxPerFrame && network_manager->tryPopReadyMessage(m))
     {
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "RECEIVED ON PROCESS!!!");
         switch (m.kind)
         {
             case msg::DCType::Snapshot_GameTable:
@@ -120,6 +118,7 @@ void GameTableManager::processReceivedGameMessages()
                                         .set(Identifier{*m.tableId});
                 game_table_name = *m.name;
                 chat_manager->setActiveGameTable(*m.tableId, *m.name);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "GameTable Created!!");
                 break;
             }
 
@@ -135,13 +134,20 @@ void GameTableManager::processReceivedGameMessages()
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Board Texture Created: " + std::to_string(tex));
                 }
 
                 const auto& bm = *m.boardMeta;
-                auto board = board_manager->createBoard(bm.boardName, /*map path*/ "", tex, texSize);
-                board.set(Identifier{bm.boardId});
-                board.set(bm.pan);
-                board.set(bm.grid);
+                auto board = ecs.entity()
+                                 .set(Identifier{bm.boardId})
+                                 .set(Board{bm.boardName})
+                                 .set(Panning{false})
+                                 .set(Grid{bm.grid})
+                                 .set(TextureComponent{tex, "", texSize})
+                                 .set(Size{texSize.x, texSize.y});
+
+                board_manager->setActiveBoard(board);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Board Created!!");
                 break;
             }
 
@@ -155,22 +161,26 @@ void GameTableManager::processReceivedGameMessages()
 
                 GLuint tex = 0;
                 glm::vec2 texSize{m.markerMeta->size.width, m.markerMeta->size.height};
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Byte Size: " + std::to_string(m.bytes->size()));
                 if (m.bytes && !m.bytes->empty())
                 {
                     auto image = board_manager->LoadTextureFromMemory(m.bytes->data(),
                                                                       m.bytes->size());
                     tex = image.textureID;
                     texSize = image.size;
+                    Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Texture Created: " + std::to_string(tex));
                 }
                 const auto& mm = *m.markerMeta;
-                auto marker = board_manager->createMarker(
-                    /*imageFilePath*/ "", tex,
-                    {(float)mm.pos.x, (float)mm.pos.y},
-                    texSize);
-                marker.set(Identifier{mm.markerId});
-                marker.set(mm.vis);
-                marker.set(mm.mov);
+                flecs::entity marker = ecs.entity()
+                                           .set(Identifier{mm.markerId})
+                                           .set(Position{mm.pos.x, mm.pos.y}) //World Position
+                                           .set(Size{mm.size.width, mm.size.height})
+                                           .set(TextureComponent{tex, "", texSize})
+                                           .set(Visibility{mm.vis})
+                                           .set(MarkerComponent{"", false, false})
+                                           .set(Moving{mm.mov});
                 marker.add(flecs::ChildOf, boardEnt);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Marker Created");
                 break;
             }
 
@@ -182,12 +192,263 @@ void GameTableManager::processReceivedGameMessages()
                 if (!boardEnt.is_valid())
                     break;
 
-                auto fog = board_manager->createFogOfWar(
-                    {(float)m.pos->x, (float)m.pos->y},
-                    {m.size->width, m.size->height});
-                fog.set(Identifier{*m.fogId});
-                fog.set(*m.vis);
+                auto fog = ecs.entity()
+                               .set(Identifier{*m.fogId})
+                               .set(Position{m.pos->x, m.pos->y})
+                               .set(Size{m.size->width, m.size->height})
+                               .set(Visibility{*m.vis});
+
+                fog.add<FogOfWar>();
                 fog.add(flecs::ChildOf, boardEnt);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "Fog Created");
+                break;
+            }
+
+            case msg::DCType::FogUpdate:
+            {
+                if (!m.boardId || !m.fogId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity fogEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<FogOfWar>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.fogId) fogEnt = child;
+                        } });
+                if (!fogEnt.is_valid())
+                    break;
+
+                if (m.pos)
+                    fogEnt.set<Position>(*m.pos);
+                if (m.size)
+                    fogEnt.set<Size>(*m.size);
+                if (m.vis)
+                    fogEnt.set<Visibility>(*m.vis);
+                if (m.mov)
+                    fogEnt.set<Moving>(*m.mov); // if used
+                break;
+            }
+
+            case msg::DCType::FogDelete:
+            {
+                if (!m.boardId || !m.fogId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity fogEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<FogOfWar>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.fogId) fogEnt = child;
+                    } });
+                if (fogEnt.is_valid())
+                    fogEnt.destruct();
+                break;
+            }
+
+            case msg::DCType::MarkerMove:
+            {
+                // Epoch/seq gate (no side effects)
+                if (!network_manager->shouldApplyMarkerMove(m))
+                    break;
+
+                if (!m.boardId || !m.markerId || !m.pos)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                auto markerEnt = findMarkerInBoard(boardEnt, *m.markerId);
+                if (!markerEnt.is_valid())
+                    break;
+
+                // Apply streaming position; keep Moving true during drag
+                markerEnt.set<Position>(*m.pos);
+                //markerEnt.set<Moving>(Moving{true});
+                break;
+            }
+
+            case msg::DCType::MarkerMoveState:
+            {
+                if (!m.boardId || !m.markerId)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                auto markerEnt = findMarkerInBoard(boardEnt, *m.markerId);
+                if (!markerEnt.is_valid())
+                    break;
+
+                // Start of drag
+                if (m.mov && m.mov->isDragging)
+                {
+                    if (!network_manager->shouldApplyMarkerMoveStateStart(m))
+                        break;
+
+                    // optional visual sync (safe; local drags are already set locally)
+                    markerEnt.set<Moving>(Moving{true});
+                }
+                else // End of drag (final)
+                {
+                    if (!network_manager->shouldApplyMarkerMoveStateFinal(m))
+                        break;
+
+                    if (m.pos)
+                        markerEnt.set<Position>(*m.pos);  // authoritative final pos
+                    markerEnt.set<Moving>(Moving{false}); // ensure drag ends
+                }
+                break;
+            }
+
+            case msg::DCType::MarkerUpdate:
+            {
+                if (!m.boardId || !m.markerId)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                auto markerEnt = findMarkerInBoard(boardEnt, *m.markerId);
+                if (!markerEnt.is_valid())
+                    break;
+
+                // Apply only non-movement attributes
+                if (m.size)
+                    markerEnt.set<Size>(*m.size);
+                if (m.vis)
+                    markerEnt.set<Visibility>(*m.vis);
+                if (m.markerComp)
+                    markerEnt.set<MarkerComponent>(*m.markerComp);
+                break;
+            }
+
+            case msg::DCType::MarkerDelete:
+            {
+                if (!m.boardId || !m.markerId)
+                    break;
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                flecs::entity markerEnt;
+                boardEnt.children([&](flecs::entity child)
+                                  {
+                    if (child.has<MarkerComponent>()) {
+                        auto id = child.get<Identifier>()->id;
+                        if (id == *m.markerId) markerEnt = child;
+                    } });
+                if (markerEnt.is_valid())
+                    markerEnt.destruct();
+                break;
+            }
+
+            case msg::DCType::ChatThreadCreate:
+            {
+                if (!m.tableId || !m.threadId)
+                    break;
+                if (m.tableId != chat_manager->currentTableId_)
+                    break; // or rely on ChatManager’s guard
+                ChatThreadModel th;
+                th.id = *m.threadId;
+                th.displayName = m.name.value_or("Group");
+                if (m.participants)
+                    th.participants = *m.participants;
+                // Reuse ChatManager’s logic (dedupe by participants, etc.)
+                chat_manager->ensureThreadByParticipants(th.participants, th.displayName);
+                break;
+            }
+
+            case msg::DCType::ChatThreadUpdate:
+            {
+                if (!m.tableId || !m.threadId)
+                    break;
+                // Minimal: upsert
+                auto* th = chat_manager->getThread(*m.threadId);
+                if (!th)
+                {
+                    ChatThreadModel tmp;
+                    tmp.id = *m.threadId;
+                    tmp.displayName = m.name.value_or("Group");
+                    if (m.participants)
+                        tmp.participants = *m.participants;
+                    // insert
+                    (void)chat_manager->ensureThreadByParticipants(tmp.participants, tmp.displayName);
+                }
+                else
+                {
+                    if (m.name)
+                        th->displayName = *m.name;
+                    if (m.participants)
+                        th->participants = *m.participants;
+                }
+                break;
+            }
+
+            case msg::DCType::ChatThreadDelete:
+            {
+                if (!m.tableId || !m.threadId)
+                    break;
+                // General cannot be deleted; ChatManager guards that internally too
+                // Quick local erase:
+                // (You can add a small ChatManager helper if you prefer)
+                if (*m.threadId != ChatManager::generalThreadId_)
+                {
+                    // emulate ChatManager delete (no emit)
+                    // (direct map erase is fine; keep activeThread on General if needed)
+                    // chat_manager has render-time guards already
+                }
+                break;
+            }
+
+            case msg::DCType::ChatMessage:
+            {
+                if (!m.tableId || !m.threadId || !m.ts || !m.name || !m.text)
+                    break;
+                chat_manager->pushMessageLocal(*m.threadId,
+                                               m.fromPeer,    // senderId
+                                               *m.name,       // username
+                                               *m.text,       // text
+                                               (double)*m.ts, // ts
+                                               /*incoming*/ true);
+                break;
+            }
+
+            case msg::DCType::GridUpdate:
+            {
+                if (!m.boardId || !m.grid)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                boardEnt.set<Grid>(*m.grid);
+                break;
+            }
+
+            case msg::DCType::NoteCreate:
+            {
+                break;
+            }
+
+            case msg::DCType::NoteUpdate:
+            {
+                break;
+            }
+
+            case msg::DCType::NoteDelete:
+            {
                 break;
             }
 
@@ -262,6 +523,8 @@ void GameTableManager::handleMouseButtonInputs()
             board_manager->endMouseDrag();
         }
     }
+
+    board_manager->killIfMouseUp(ImGui::IsMouseDown(ImGuiMouseButton_Left));
 }
 
 void GameTableManager::handleCursorInputs()
@@ -1040,7 +1303,7 @@ void GameTableManager::hostGameTablePopUp()
                     memset(buffer, 0, sizeof(buffer));
                     memset(username_buffer, 0, sizeof(username_buffer));
                     memset(pass_buffer, 0, sizeof(pass_buffer));
-                    memset(port_buffer, 0, sizeof(port_buffer));
+                    //memset(port_buffer, 0, sizeof(port_buffer));
                     tryUpnp = false;
 
                     ImGui::CloseCurrentPopup();
@@ -1151,7 +1414,7 @@ void GameTableManager::hostGameTablePopUp()
                     memset(buffer, 0, sizeof(buffer));
                     memset(username_buffer, 0, sizeof(username_buffer));
                     memset(pass_buffer, 0, sizeof(pass_buffer));
-                    memset(port_buffer, 0, sizeof(port_buffer));
+                    //memset(port_buffer, 0, sizeof(port_buffer));
                     tryUpnp = false;
 
                     ImGui::CloseCurrentPopup();
@@ -1196,11 +1459,11 @@ void GameTableManager::guidePopUp()
             "Toolbar & Interface",
             "Networking & Security",
             "Known Issues",
-            "Appendix"
-        };
+            "Appendix"};
 
         // quick helper
-        auto Para = [](const char* s) {
+        auto Para = [](const char* s)
+        {
             ImGui::TextWrapped("%s", s);
             ImGui::Dummy(ImVec2(0, 4));
         };
@@ -1234,17 +1497,20 @@ void GameTableManager::guidePopUp()
                 Para("RunicVTT is a virtual tabletop for sharing boards, markers, and fog of war in real-time across peers.");
 
                 ImGui::SeparatorText("Basic Flow");
-                Para("Create or load a Game Table → Host or Join → Add a Board → Place Markers / Fog → Play.");
+                Para("Create or load a Game Table -> Host or Join -> Add a Board -> Place Markers / Fog -> Play.");
 
                 ImGui::SeparatorText("Requirements");
-                Para("- Windows 10/11 recommended.\n- Internet connection for WAN.\n- Allow the app in your firewall/antivirus.\n- Read/write access for assets (Boards/Markers folders).");
+                Para("- Windows 10/11 recommended.\n"
+                     "- Internet connection for WAN.\n"
+                     "- Allow the app in your firewall/antivirus.\n"
+                     "- Read/write access for assets (Boards/Markers folders).");
 
                 ImGui::SeparatorText("Terminology");
-                Para("Game Table: a saved session containing chat and world state.\n"
-                     "Board: a map image displayed to all players.\n"
-                     "Marker: a token/object placed on a board.\n"
-                     "Fog: an overlay hiding/revealing areas.\n"
-                     "Peer: a connected client (GM or Player).");
+                Para("- Game Table: a saved session containing chat and world state.\n"
+                     "- Board: a map image displayed to all players.\n"
+                     "- Marker: a token/object placed on a board.\n"
+                     "- Fog: an overlay hiding/revealing areas.\n"
+                     "- Peer: a connected client (GM or Player).");
                 break;
             }
 
@@ -1252,8 +1518,8 @@ void GameTableManager::guidePopUp()
             {
                 ImGui::SeparatorText("Connection String");
                 Para("A connection string identifies the host session. Example formats:\n"
-                     "  https://runic-<yourLocalIp>.loca.lt?PASSWORD\n"
-                     "  runic:<host>:<port>?PASSWORD");
+                     "-  https://runic-<yourLocalIp>.loca.lt?PASSWORD\n"
+                     "-  runic:<host>:<port>?PASSWORD");
 
                 ImGui::SeparatorText("Hosting");
                 Para("Choose a connection mode: LocalTunnel (public URL), Local (LAN), or External (WAN with port forwarding). "
@@ -1263,21 +1529,21 @@ void GameTableManager::guidePopUp()
                 Para("Ask the host for a connection string and password, then use 'Connect to GameTable' and paste it.");
 
                 ImGui::SeparatorText("Troubleshooting");
-                Para("If connection closes over WAN: ensure firewall allows the app, port was fowarded manually or via UPnP and the host is reachable. \n"
-                     "If connection closes over LAN: ensure firewall allows the app, and the moldem dont block local connections. \n"
-                    "If connection closes over LocalTunnel: ensure firewall allows the app, and the generated URL is in the correct format https://runic-<YOURLOCALIP>.loca.lt. if not in the formar generate new by hosting again \n"
-                     "Make sure you are connected to a Wifi or Ethernet moldem connection, 4G/5G mobile network arent supported due to their complex NAT protection. \n"
-                     "Corporate networks or strict NAT may require TURN/relay.");
+                Para("- If connection closes over WAN: ensure firewall allows the app, port was fowarded manually or via UPnP and the host is reachable. \n"
+                     "- If connection closes over LAN: ensure firewall allows the app, and the moldem dont block local connections. \n"
+                     "- If connection closes over LocalTunnel: ensure firewall allows the app, and the generated URL is in the correct format https://runic-<YOURLOCALIP>.loca.lt. if not in the formar generate new by hosting again \n"
+                     "- Make sure you are connected to a Wifi or Ethernet moldem connection, 4G/5G mobile network arent supported due to their complex NAT protection. \n"
+                     "- Corporate networks or strict NAT may require TURN/relay.");
                 break;
             }
 
             case 2: // Game Tables
             {
                 ImGui::SeparatorText("Create a Game Table");
-                Para("Open 'Host GameTable' → Create tab → set name/username/password/port → choose mode → Host.");
+                Para("Open 'Host GameTable' -> Create tab -> set name/username/password/port -> choose mode -> Host.");
 
                 ImGui::SeparatorText("Load a Game Table");
-                Para("Open 'Host GameTable' → Load tab → select a saved table → set credentials/port → Host.");
+                Para("Open 'Host GameTable' -> Load tab -> select a saved table -> set credentials/port -> Host.");
 
                 ImGui::SeparatorText("Lifecycle");
                 Para("Networking is tied to the Game Table. Closing it stops all connections. "
@@ -1288,7 +1554,7 @@ void GameTableManager::guidePopUp()
             case 3: // Boards
             {
                 ImGui::SeparatorText("Create a Board");
-                Para("Use 'Add Board' or board toolbar → choose an image (PNG/JPG). The image is shared to peers.");
+                Para("Use 'Add Board' or board toolbar -> choose an image (PNG/JPG). The image is shared to peers.");
 
                 ImGui::SeparatorText("Edit Board");
                 Para("Adjust size/scale, toggle grid, panning/zoom. Visibility affects whether players see it fully.");
@@ -1304,7 +1570,7 @@ void GameTableManager::guidePopUp()
                 Para("Use the Marker directory to place tokens. Drag markers to the board from the Markers directory window.");
 
                 ImGui::SeparatorText("Edit & Ownership");
-                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. "
+                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. \n"
                      "Players can only move owned/unlocked markers; the GM can always move.");
 
                 ImGui::SeparatorText("Movement");
@@ -1328,22 +1594,21 @@ void GameTableManager::guidePopUp()
             case 6: // Toolbar & Interface
             {
                 ImGui::SeparatorText("Toolbar Overview");
-                Para("Move Tool: pan map or drag owned markers.\n"
-                     "Fog Tool: create fog areas.\n"
-                     "Edit/Delete: open edit window or remove entities.\n"
-                     "Zoom/Pan: mouse wheel and drag (when panning).
-                     "Grid: open grid window to configure it.\n"
-                     "Camera: open camera window to configure it.\n"
-                    );
+                Para("- Move Tool: pan map or drag owned markers.\n"
+                     "- Fog Tool: create fog areas.\n"
+                     "- Edit/Delete: open edit window or remove entities.\n"
+                     "- Zoom/Pan: mouse wheel and drag (when panning)."
+                     "- Grid: open grid window to configure it.\n"
+                     "- Camera: open camera window to configure it.\n");
 
                 ImGui::SeparatorText("Windows & Panels");
-                Para("Chat Window: General chat + dice roller (/roll).\n"
-                     "Edit Window: per-entity size/visibility/ownership.\n"
-                     "Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
-                     "Camera Window: per-board camera zoom via button and sliders and reset.\n"
-                     "Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
-                     "Connect Window: connect to hosted gametable, connection string and credential.\n"
-                     "Network Center: peers, connection strings, status.");
+                Para("- Chat Window: General chat + dice roller (/roll).\n"
+                     "- Edit Window: per-entity size/visibility/ownership.\n"
+                     "- Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
+                     "- Camera Window: per-board camera zoom via button and sliders and reset.\n"
+                     "- Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
+                     "- Connect Window: connect to hosted gametable, connection string and credential.\n"
+                     "- Network Center: peers, connection strings, status.");
 
                 //ImGui::SeparatorText("Hotkeys (examples)");
                 //Para("Zoom: Mouse Wheel\nPan: Middle Drag\nEdit: Right-Click on entity");
@@ -1366,7 +1631,9 @@ void GameTableManager::guidePopUp()
             case 8: // Known Issues
             {
                 ImGui::SeparatorText("Limitations");
-                Para("Very large images transfer slowly.\nDebugging with breakpoints can drop peer connections.");
+                Para("- Very large images transfer slowly.\n"
+                     "- Network Over the 4G/5G doesnt work due to NAT restrictions. \n"
+                     "- Network do not work on Mobile Internet of any form(USB Anchoring, Wifi Hotspot, Ethernet and Bluetooth). ");
 
                 ImGui::SeparatorText("Troubleshooting");
                 Para("If desync occurs, rejoin the session or have the host re-broadcast state via Game Table snapshot.");
@@ -1379,13 +1646,16 @@ void GameTableManager::guidePopUp()
             case 9: // Appendix
             {
                 ImGui::SeparatorText("File Paths");
-                Para("GameTables folder: <root path>/GameTables/ \n Boards folder: <GameTableFolder>/<GameTableName>/Boards/ \n Maps folder: <root path>/Maps/ \n Marker folder: <root path>/Marker/.");
+                Para("- GameTables folder: <root path>/GameTables/ \n"
+                     "- Boards folder: <GameTableFolder>/<GameTableName>/Boards/ \n"
+                     "- Maps folder: <root path>/Maps/ \n"
+                     "- Marker folder: <root path>/Marker/.");
 
                 ImGui::SeparatorText("Glossary");
-                Para("GM: Game Master (host/authority).\nPlayer: peer participant.\nPeer: a connected client.");
+                Para("- GM: Game Master (host/authority).\n"
+                     "- Player: peer participant.\n"
+                     "- Peer: a connected client.");
 
-                ImGui::SeparatorText("Credits / Version");
-                Para("RunicVTT © You. Show version from About dialog.");
                 break;
             }
         }
@@ -1400,7 +1670,36 @@ void GameTableManager::guidePopUp()
         ImGui::EndPopup();
     }
 }
+//case msg::DCType::MarkerMove:
+//{
+//    Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerMove PROCESS MESSAGE RECEIVED");
+//    if (!m.boardId || !m.markerId || !m.pos)
+//        break;
+//    auto boardEnt = board_manager->findBoardById(*m.boardId);
+//    if (!boardEnt.is_valid())
+//        break;
 
+//    flecs::entity markerEnt;
+//    boardEnt.children([&](flecs::entity child)
+//                      {
+//    if (child.has<MarkerComponent>()) {
+//        auto id = child.get<Identifier>()->id;
+//        if (id == *m.markerId) markerEnt = child;
+//    } });
+
+//    if (!markerEnt.is_valid())
+//        break;
+//    Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "END OF MARKERMOVE!!!");
+//    // (Optional) avoid fighting with local drag:
+//    if (markerEnt.get<Moving>()->isDragging)
+//        break;
+
+//    markerEnt.set<Position>(*m.pos);
+//    if (m.mov)
+//        markerEnt.set<Moving>(*m.mov);
+//    Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(m.kind) + "END OF MARKERMOVE!!!");
+//    break;
+//}
 /*void GameTableManager::guidePopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -1541,7 +1840,10 @@ void GameTableManager::aboutPopUp()
 
 void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer)
 {
-    chat_manager->render();
+    if (isGameTableActive())
+    {
+        chat_manager->render();
+    }
     if (board_manager->isBoardActive())
     {
         if (board_manager->isEditWindowOpen())
@@ -1560,7 +1862,124 @@ void GameTableManager::render(VertexArray& va, IndexBuffer& ib, Shader& shader, 
         board_manager->renderBoard(va, ib, shader, grid_shader, renderer);
     }
 }
+//case msg::DCType::MarkerUpdate:
+//{
+//    if (!m.boardId || !m.markerId)
+//        break;
 
+//    auto boardEnt = board_manager->findBoardById(*m.boardId);
+//    if (!boardEnt.is_valid())
+//        break;
+
+//    flecs::entity markerEnt;
+//    boardEnt.children([&](flecs::entity child)
+//                      {
+//        if (child.has<MarkerComponent>()) {
+//            if (auto idc = child.get<Identifier>(); idc && idc->id == *m.markerId)
+//                markerEnt = child;
+//        } });
+
+//    if (!markerEnt.is_valid())
+//        break;
+
+//    // Apply drag flag first (both Flecs + NM registry)
+//    if (m.mov)
+//    {
+//        auto mov = *markerEnt.get<Moving>();
+//        const bool wasDragging = mov.isDragging;
+//        mov.isDragging = m.mov->isDragging;
+//        markerEnt.set<Moving>(mov);
+
+//        // Reflect in NetworkManager dragging_ map using sender info if you have it
+//        if (auto nm = network_manager; nm)
+//        {
+//            if (m.mov->isDragging)
+//            {
+//                nm->noteDraggingRemote(*m.markerId, m.fromPeer, true);
+//            }
+//            else
+//            {
+//                nm->noteDraggingRemote(*m.markerId, m.fromPeer, false);
+//            }
+//        }
+//    }
+
+//    const bool isPlayerOp = m.isPlayerOp.value_or(false);
+
+//    bool allowPosApply = false;
+//    if (m.mov)
+//    {
+//        // If this update explicitly says "not dragging", it’s a final pos -> allow.
+//        allowPosApply = (m.mov->isDragging == false);
+//    }
+//    else
+//    {
+//        // No mov info: only apply if nobody is dragging per shared registry.
+//        allowPosApply = !network_manager->isMarkerBeingDragged(*m.markerId);
+//    }
+
+//    if (m.pos && allowPosApply)
+//    {
+//        markerEnt.set<Position>(*m.pos);
+//    }
+
+//    // The rest stays as you had (players can't change these, GM can)
+//    if (!isPlayerOp)
+//    {
+//        if (m.size)
+//            markerEnt.set<Size>(*m.size);
+//        if (m.vis)
+//            markerEnt.set<Visibility>(*m.vis);
+//        if (m.markerComp)
+//            markerEnt.set<MarkerComponent>(*m.markerComp);
+//    }
+//    break;
+//}
+//case msg::DCType::MarkerUpdate:
+//{
+//    if (!m.boardId || !m.markerId)
+//        break;
+
+//    auto boardEnt = board_manager->findBoardById(*m.boardId);
+//    if (!boardEnt.is_valid())
+//        break;
+
+//    // Find marker child by Identifier
+//    flecs::entity markerEnt;
+//    boardEnt.children([&](flecs::entity child)
+//                      {
+//            if (child.has<MarkerComponent>()) {
+//                auto idc = child.get<Identifier>();
+//                if (idc && idc->id == *m.markerId)
+//                    markerEnt = child;
+//            } });
+//    if (!markerEnt.is_valid())
+//        break;
+
+//    if (m.mov)
+//    {
+//        auto mov = *markerEnt.get<Moving>();
+//        mov.isDragging = m.mov->isDragging; // <- this is the important bit
+//        markerEnt.set<Moving>(mov);
+//    }
+
+//    const bool isPlayerOp = m.isPlayerOp.value_or(false);
+
+//    if (!isPlayerOp)
+//    {
+//        if (m.size)
+//            markerEnt.set<Size>(*m.size);
+//        if (m.vis)
+//            markerEnt.set<Visibility>(*m.vis);
+//        if (m.markerComp)
+//            markerEnt.set<MarkerComponent>(*m.markerComp);
+//    }
+
+//    if (m.pos)
+//        markerEnt.set<Position>(*m.pos);
+
+//    break;
+//}
 //RENDER =========================================================================================================================================================
 //
 //// Call this each frame (after BeginFrame, before EndFrame)

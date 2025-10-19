@@ -6,6 +6,8 @@
 #include "DebugActions.h"
 #include "FirewallUtils.h"
 #include "AssetIO.h"
+#include <chrono>
+#include <string>
 
 ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
     marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directoryry)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
@@ -132,6 +134,108 @@ void ApplicationHandler::DeleteMapFBO()
     map_fbo->height = 0;
 }
 
+void ApplicationHandler::TickAutoSave()
+{
+    using clock = std::chrono::steady_clock;
+    static clock::time_point s_last = clock::now();
+
+    // Early-out if not time yet (every 60s)
+    constexpr auto kInterval = std::chrono::minutes(1);
+    const auto now = clock::now();
+    if (now - s_last < kInterval)
+        return;
+    s_last = now;
+    if (game_table_manager->network_manager)
+    {
+        if (game_table_manager->network_manager->getPeerRole() == Role::GAMEMASTER)
+        {
+
+            if (!game_table_manager)
+            {
+                if (toaster_)
+                    toaster_->Push(ImGuiToaster::Level::Warning, "Autosave skipped: GameTableManager missing", 4.0f);
+                return;
+            }
+
+            bool ok = true;
+            std::string err;
+
+            // 1) Save active GameTable (your method name as provided)
+            try
+            {
+                auto gametable_entity = game_table_manager->getActiveGameTableEntity();
+                if (gametable_entity.is_valid())
+                {
+                    game_table_manager->saveGameTable(); // (or saveActiveGametable() if that's your actual name)
+                }
+            }
+            catch (const std::exception& e)
+            {
+                ok = false;
+                err += std::string("GameTable: ") + e.what();
+            }
+            catch (...)
+            {
+                ok = false;
+                err += "GameTable: unknown error";
+            }
+
+            // 2) Save active Board
+            try
+            {
+                if (game_table_manager->board_manager)
+                {
+                    auto gametable_entity = game_table_manager->getActiveGameTableEntity();
+                    if (gametable_entity.is_valid())
+                    {
+                        auto game_table_name = gametable_entity.get<GameTable>()->gameTableName;
+                        auto board_dir_path = PathManager::getBoardsPath(game_table_name);
+                        game_table_manager->board_manager->saveActiveBoard(board_dir_path);
+                    }
+                }
+                else
+                {
+                    ok = false;
+                    if (!err.empty())
+                        err += " | ";
+                    err += "BoardManager missing";
+                }
+            }
+            catch (const std::exception& e)
+            {
+                ok = false;
+                if (!err.empty())
+                    err += " | ";
+                err += std::string("Board: ") + e.what();
+            }
+            catch (...)
+            {
+                ok = false;
+                if (!err.empty())
+                    err += " | ";
+                err += "Board: unknown error";
+            }
+
+            // Toast result
+            if (toaster_)
+            {
+                if (ok)
+                    toaster_->Push(ImGuiToaster::Level::Good, "Autosave complete: GameTable & Board", 5.0f);
+                else
+                    toaster_->Push(ImGuiToaster::Level::Error, std::string("Autosave failed: ") + err, 6.0f);
+            }
+        }
+    }
+    else
+    {
+        return;
+    }
+
+    // Sanity checks
+    // 3) Notes (not implemented) — left as-is
+    // notes_manager->saveOpenNotes();
+}
+
 int ApplicationHandler::run()
 {
     /* Make the window's context current */
@@ -145,7 +249,7 @@ int ApplicationHandler::run()
 
     // Force the window to maximize
     glfwMaximizeWindow(window);
-    
+
     std::cout << glGetString(GL_VERSION) << std::endl;
     { //Escopo para finalizar OPenGL antes GlFW
         GLCall(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
@@ -196,7 +300,6 @@ int ApplicationHandler::run()
         grid_shader.SetUniform2f("grid_offset", 1.0f, 1.0f);
         grid_shader.SetUniform1f("opacity", 1.0f);
 
-
         shader.Bind();
         shader.SetUniform1i("u_Texture", 0);
         shader.SetUniformMat4f("projection", proj);
@@ -244,7 +347,8 @@ int ApplicationHandler::run()
             glfwPollEvents();
             marker_directory->applyPendingAssetChanges();
             map_directory->applyPendingAssetChanges();
-            game_table_manager->processReceivedGameMessages();
+            game_table_manager->processReceivedMessages();
+            TickAutoSave();
 
             /* Render here */
             GLCall(glClearColor(0.0f, 0.0f, 0.0f, 1.0f));
@@ -417,11 +521,11 @@ void ApplicationHandler::renderActiveGametable()
 void ApplicationHandler::renderMainMenuBar()
 {
     // one-shot flags to open popups
-    bool open_host_gametable = false; 
+    bool open_host_gametable = false;
     bool connect_to_gametable = false;
     bool close_current_gametable = false;
 
-    bool open_network_center = false; 
+    bool open_network_center = false;
 
     bool open_create_board = false;
     bool close_current_board = false;
@@ -580,27 +684,27 @@ void ApplicationHandler::renderMainMenuBar()
     if (connect_to_gametable)
         ImGui::OpenPopup("ConnectToGameTable");
     if (ImGui::IsPopupOpen("ConnectToGameTable"))
-        game_table_manager->connectToGameTablePopUp(); 
+        game_table_manager->connectToGameTablePopUp();
 
     if (close_current_gametable)
         ImGui::OpenPopup("CloseGameTable");
     if (ImGui::IsPopupOpen("CloseGameTable"))
-        game_table_manager->closeGameTablePopUp(); 
+        game_table_manager->closeGameTablePopUp();
 
     if (open_network_center)
         ImGui::OpenPopup("Network Center");
     if (ImGui::IsPopupOpen("Network Center"))
-        game_table_manager->networkCenterPopUp(); 
+        game_table_manager->networkCenterPopUp();
 
     if (open_create_board)
         ImGui::OpenPopup("CreateBoard");
     if (ImGui::IsPopupOpen("CreateBoard"))
-        game_table_manager->createBoardPopUp(); 
+        game_table_manager->createBoardPopUp();
 
     if (load_active_board)
         ImGui::OpenPopup("LoadBoard");
     if (ImGui::IsPopupOpen("LoadBoard"))
-        game_table_manager->loadBoardPopUp(); 
+        game_table_manager->loadBoardPopUp();
 
     if (close_current_board)
         ImGui::OpenPopup("CloseBoard");

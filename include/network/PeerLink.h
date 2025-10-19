@@ -25,11 +25,14 @@ public:
     void send(const std::string& msg);
     bool sendOn(const std::string& label, const std::vector<uint8_t>& bytes);
     bool sendGame(const std::vector<uint8_t>& bytes);
-
+    bool sendChat(const std::vector<uint8_t>& bytes);
+    bool sendNote(const std::vector<uint8_t>& bytes);
+    bool sendMarkerMove(const std::vector<uint8_t>& bytes);
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 
     void attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch, const std::string& label);
+    void attachMarkerMoveChannelHandlers(const std::shared_ptr<rtc::DataChannel>& ch, const std::string& label);
 
     bool isDataChannelOpen() const;
     rtc::PeerConnection::State pcState() const; // optional
@@ -46,7 +49,11 @@ public:
     // accessors
     bool isConnected() const; // PC connected + *at least* Intent channel open
     bool isPcConnectedOnly() const;
-    static constexpr size_t kMaxBufferedBytes = 5 /*MB*/ * 1024 * 1024; //(tune as you like)
+    //static constexpr size_t kMaxBufferedBytes = 5 /*MB*/ * 1024 * 1024; //(tune as you like)
+    void setOpen(std::string label, bool open)
+    {
+        dcOpen_[label] = open;
+    }
 
     bool allRequiredOpen() const;
     bool bootstrapSent() const
@@ -56,6 +63,15 @@ public:
     void markBootstrapSent()
     {
         bootstrapSent_ = true;
+    }
+    void markBootstrapReset()
+    {
+        bootstrapSent_ = false;
+    }
+
+    std::shared_ptr<rtc::PeerConnection> getPeerConnection()
+    {
+        return pc;
     }
 
 private:
@@ -68,7 +84,7 @@ private:
     std::weak_ptr<NetworkManager> network_manager;
 
     std::atomic<rtc::PeerConnection::State> lastState_{rtc::PeerConnection::State::New};
-    std::atomic<double> lastStateAt_{0.0}; // seconds since app start
+    std::atomic<double> lastStateAt_{0.0};
 
     std::atomic<bool> remoteDescSet_{false};
     std::vector<rtc::Candidate> pendingRemoteCandidates_;
@@ -77,11 +93,11 @@ private:
     bool bootstrapSent_ = false;
     std::unordered_map<std::string, bool> dcOpen_;
 
-    // internal handler dispatch (called from each dc->onMessage)
-    void onIntentMessage(const std::vector<uint8_t>& bytes);
-    void onStateMessage(const std::vector<uint8_t>& bytes);
-    void onSnapshotMessage(const std::vector<uint8_t>& bytes);
-    void onChatMessage(const std::vector<uint8_t>& bytes);
+    //// internal handler dispatch (called from each dc->onMessage)
+    //void onIntentMessage(const std::vector<uint8_t>& bytes);
+    //void onStateMessage(const std::vector<uint8_t>& bytes);
+    //void onSnapshotMessage(const std::vector<uint8_t>& bytes);
+    //void onChatMessage(const std::vector<uint8_t>& bytes);
 
     void setupCallbacks(); // internal
 };

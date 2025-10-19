@@ -52,7 +52,14 @@ void PeerLink::createChannels()
     if (!pc)
         return;
 
-    rtc::DataChannelInit init; // default reliable/ordered
+    rtc::DataChannelInit init;           // default reliable/ordered
+    rtc::DataChannelInit markerMoveInit; //
+    auto reliability = rtc::Reliability{};
+    reliability.unordered = true;
+    reliability.maxPacketLifeTime = std::chrono::milliseconds(500);
+    //reliability.maxRetransmits = 0;
+    markerMoveInit.reliability = reliability;
+
     // Offerer creates channels; answerer gets them in pc->onDataChannel
     auto dcGame = pc->createDataChannel(std::string(msg::dc::name::Game), init);
     dcs_[std::string(msg::dc::name::Game)] = dcGame;
@@ -65,6 +72,10 @@ void PeerLink::createChannels()
     auto dcNotes = pc->createDataChannel(std::string(msg::dc::name::Notes), init);
     dcs_[std::string(msg::dc::name::Notes)] = dcNotes;
     attachChannelHandlers(dcNotes, std::string(msg::dc::name::Notes));
+
+    auto dcMarkerMove = pc->createDataChannel(std::string(msg::dc::name::MarkerMove), markerMoveInit);
+    dcs_[std::string(msg::dc::name::MarkerMove)] = dcMarkerMove;
+    attachChannelHandlers(dcMarkerMove, std::string(msg::dc::name::MarkerMove));
 }
 
 rtc::Description PeerLink::createOffer()
@@ -121,22 +132,18 @@ void PeerLink::setupCallbacks()
         lastState_ = s;
         lastStateAt_ = std::chrono::seconds().count();
         std::cout << "[PeerLink] State(" << peerId << "): " << (int)s << "at " << lastStateAt_ << "\n";
-       
-        if (auto nm = network_manager.lock()) {
-            using L = ImGuiToaster::Level;
-            const char* stateStr =
-                s == rtc::PeerConnection::State::Connected    ? "Connected" :
-                s == rtc::PeerConnection::State::Connecting   ? "Connecting" :
-                s == rtc::PeerConnection::State::Disconnected ? "Disconnected" :
-                s == rtc::PeerConnection::State::Failed       ? "Failed" :
-                s == rtc::PeerConnection::State::Closed       ? "Closed" : "New";
-            L lvl =
-                s == rtc::PeerConnection::State::Connected    ? L::Good :
-                s == rtc::PeerConnection::State::Connecting   ? L::Warning :
-                s == rtc::PeerConnection::State::Disconnected ? L::Error :
-                s == rtc::PeerConnection::State::Failed       ? L::Error :
-                s == rtc::PeerConnection::State::Closed       ? L::Warning : L::Info;
-            nm->pushStatusToast(std::string("[Peer] ") + peerId + " " + stateStr, lvl);
+
+        if (s == rtc::PeerConnection::State::Closed || s == rtc::PeerConnection::State::Failed) {
+            if (auto nm = network_manager.lock()) {
+                msg::NetEvent ev{msg::NetEvent::Type::PcClosed, peerId, "PC"};
+                nm->events_.push(std::move(ev));
+            } 
+        }
+        if (s == rtc::PeerConnection::State::Connected) {
+            if (auto nm = network_manager.lock()) {
+                msg::NetEvent ev{msg::NetEvent::Type::PcOpen, peerId, "PC"};
+                nm->events_.push(std::move(ev));
+            } 
         } });
 
     pc->onLocalDescription([wk = network_manager, id = peerId](rtc::Description desc)
@@ -170,12 +177,12 @@ bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& byte
     if (!ch->isOpen())
         return false;
 
-    // Optional backpressure guard (avoid unbounded memory use)
-    if (ch->bufferedAmount() > kMaxBufferedBytes)
-    {
-        // You can queue locally instead of dropping, if you want
-        return false;
-    }
+    //// Optional backpressure guard (avoid unbounded memory use)
+    //if (ch->bufferedAmount() > kMaxBufferedBytes)
+    //{
+    //    // You can queue locally instead of dropping, if you want
+    //    return false;
+    //}
     rtc::binary b;
     b.resize(bytes.size());
     if (!bytes.empty())
@@ -188,6 +195,21 @@ bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& byte
 bool PeerLink::sendGame(const std::vector<uint8_t>& bytes)
 {
     return sendOn(std::string(msg::dc::name::Game), bytes);
+}
+
+bool PeerLink::sendChat(const std::vector<uint8_t>& bytes)
+{
+    return sendOn(std::string(msg::dc::name::Chat), bytes);
+}
+
+bool PeerLink::sendNote(const std::vector<uint8_t>& bytes)
+{
+    return sendOn(std::string(msg::dc::name::Notes), bytes);
+}
+
+bool PeerLink::sendMarkerMove(const std::vector<uint8_t>& bytes)
+{
+    return sendOn(std::string(msg::dc::name::MarkerMove), bytes);
 }
 
 bool PeerLink::allRequiredOpen() const
@@ -204,58 +226,43 @@ void PeerLink::attachChannelHandlers(const std::shared_ptr<rtc::DataChannel>& dc
 
     dc->onOpen([this, id = peerId, label]()
                {
-        std::cout << "[PeerLink] DC open \"" << label << "\" to " << id << "\n";
-        dcOpen_[label] = true;
-        if (label == msg::dc::name::Game /* or "state" if you split */) {
-            if (auto nm = network_manager.lock()) {
-                nm->onPeerChannelOpen(peerId, label);
-            }
-        } });
+                   std::cout << "[PeerLink] DC open \"" << label << "\" to " << id << "\n";
+                   if (auto nm = network_manager.lock())
+                   {
+                       msg::NetEvent ev{msg::NetEvent::Type::DcOpen, id, label};
+                       nm->events_.push(std::move(ev)); // or nm->notifyDcOpen(id, label);
+                   }
+                   dcOpen_[label] = true; });
 
     dc->onClosed([this, id = peerId, label]()
                  {
         std::cout << "[PeerLink] DC closed \"" << label << "\" to " << id << "\n";
         dcOpen_[label] = false;
-        bootstrapSent_ = false; });
-
-    dc->onMessage([this, label](rtc::message_variant m)
-                  {
-        if (std::holds_alternative<std::string>(m)) {
-            const auto& s = std::get<std::string>(m);
-            // Route text by label if you wish; for now, just log & (optionally) notify NM later
-            if (label == msg::dc::name::Chat) {
-                // TODO: add NM hook: nm->onPeerChatText(peerId, s);
-                std::cout << "[PeerLink] CHAT(" << peerId << "): " << s << "\n";
-            }
-            else {
-                std::cout << "[PeerLink] TEXT(" << label << " from " << peerId << "): " << s << "\n";
-            }
-            return;
-        }
-
-        // binary
-        const auto& bin = std::get<rtc::binary>(m);
-        std::vector<uint8_t> bytes(bin.size());
-        std::memcpy(bytes.data(), bin.data(), bin.size()); 
-
+        bootstrapSent_ = false;
         if (auto nm = network_manager.lock()) {
-            if (label == msg::dc::name::Game) {
-                // Your existing binary entrypoint:
-                nm->onDcGameBinary(peerId, bytes);
-            }
-            else if (label == msg::dc::name::Chat) {
-                // Optional: add nm->onPeerChatBinary(peerId, bytes) later
-                std::cout << "[PeerLink] CHAT/BIN " << bytes.size() << "B from " << peerId << "\n";
-            }
-            else if (label == msg::dc::name::Notes) {
-                // Optional: nm->onPeerNotesBinary(peerId, bytes)
-                std::cout << "[PeerLink] NOTES/BIN " << bytes.size() << "B from " << peerId << "\n";
-            }
-            else {
-                // Unknown label, forward to generic handler if you add one later
-                std::cout << "[PeerLink] DC(" << label << ") BIN " << bytes.size() << "B from " << peerId << "\n";
-            }
+            msg::NetEvent ev{msg::NetEvent::Type::DcClosed, id, label};
+            nm->events_.push(std::move(ev));
         } });
+
+    dc->onMessage([this, id = peerId, label](rtc::message_variant m)
+                  {
+                      Logger::instance().log("localtunnel", Logger::Level::Info, "MESSAGE RECEIVED!! FROM: "+label);
+                      if (auto nm = network_manager.lock())
+                      {
+                          if (std::holds_alternative<std::string>(m))
+                          {
+                              const auto& s = std::get<std::string>(m);
+                              std::vector<uint8_t> bytes(s.begin(), s.end());
+                              nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
+                          }
+                          else
+                          {
+                              const auto& bin = std::get<rtc::binary>(m);
+                              std::vector<uint8_t> bytes(bin.size());
+                              std::memcpy(bytes.data(), bin.data(), bin.size());
+                              nm->inboundRaw_.push(msg::InboundRaw{peerId, label, std::move(bytes)});
+                          }
+                      } });
 }
 
 bool PeerLink::isConnected() const
@@ -317,43 +324,50 @@ void PeerLink::close()
     static std::atomic<uint64_t> guardSeq{0};
     const uint64_t seq = ++guardSeq;
 
-    if (closing_.exchange(true)) {
+    if (closing_.exchange(true))
+    {
         Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() re-entry ignored");
         return;
     }
 
     Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() begin #" + std::to_string(seq));
 
-    try {
-        for (auto& [label, ch] : dcs_) {
-            if (!ch) continue;
+    try
+    {
+        for (auto& [label, ch] : dcs_)
+        {
+            if (!ch)
+                continue;
             ch->onOpen(nullptr);
             ch->onMessage(nullptr);
             ch->onBufferedAmountLow(nullptr);
             ch->onClosed(nullptr);
             ch->onError(nullptr);
         }
-        if (pc) {
+        if (pc)
+        {
             pc->onStateChange(nullptr);
             pc->onGatheringStateChange(nullptr);
             pc->onLocalDescription(nullptr);
             pc->onDataChannel(nullptr);
             pc->onTrack(nullptr);
         }
-    } catch (...) {
+    }
+    catch (...)
+    {
         // ignore
     }
 
     std::unordered_map<std::string, std::shared_ptr<rtc::DataChannel>> movedDcs;
-    movedDcs.swap(dcs_); 
+    movedDcs.swap(dcs_);
 
-    for (auto& kv : movedDcs) {
+    for (auto& kv : movedDcs)
+    {
         NetworkUtilities::safeCloseDataChannel(kv.second);
     }
     movedDcs.clear();
 
     NetworkUtilities::safeClosePeerConnection(pc);
-    pc.reset();
 
     Logger::instance().log("main", Logger::Level::Debug, "PeerLink::close() end #" + std::to_string(seq));
 }
@@ -395,3 +409,42 @@ const char* PeerLink::pcStateString() const
     }
     return "Unknown";
 }
+
+//if (std::holds_alternative<std::string>(m)) {
+//    const auto& s = std::get<std::string>(m);
+//    // Route text by label if you wish; for now, just log & (optionally) notify NM later
+//    if (label == msg::dc::name::Chat) {
+//        // TODO: add NM hook: nm->onPeerChatText(peerId, s);
+//        std::cout << "[PeerLink] CHAT(" << peerId << "): " << s << "\n";
+//    }
+//    else {
+//        std::cout << "[PeerLink] TEXT(" << label << " from " << peerId << "): " << s << "\n";
+//    }
+//    return;
+//}
+
+//toBytes(msg) → bytes
+//    inboxRaw_.push({peerId, label, std::move(bytes)})
+//// binary
+//const auto& bin = std::get<rtc::binary>(m);
+//std::vector<uint8_t> bytes(bin.size());
+//std::memcpy(bytes.data(), bin.data(), bin.size());
+
+//if (auto nm = network_manager.lock()) {
+//    if (label == msg::dc::name::Game) {
+//        // Your existing binary entrypoint:
+//        nm->onDcGameBinary(peerId, bytes);
+//    }
+//    else if (label == msg::dc::name::Chat) {
+//        // Optional: add nm->onPeerChatBinary(peerId, bytes) later
+//        std::cout << "[PeerLink] CHAT/BIN " << bytes.size() << "B from " << peerId << "\n";
+//    }
+//    else if (label == msg::dc::name::Notes) {
+//        // Optional: nm->onPeerNotesBinary(peerId, bytes)
+//        std::cout << "[PeerLink] NOTES/BIN " << bytes.size() << "B from " << peerId << "\n";
+//    }
+//    else {
+//        // Unknown label, forward to generic handler if you add one later
+//        std::cout << "[PeerLink] DC(" << label << ") BIN " << bytes.size() << "B from " << peerId << "\n";
+//    }
+//}

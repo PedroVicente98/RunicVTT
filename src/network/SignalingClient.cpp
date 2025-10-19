@@ -223,6 +223,8 @@ void SignalingClient::onMessage(const std::string& msg)
             const std::string myUser = j.value(std::string(msg::key::Username), "me");
 
             nm->setMyIdentity(myId, myUser);
+            const std::string gmId = j.value(msg::key::GmId, "");
+            if (!gmId.empty()) nm->setGMId(gmId);
 
             if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array())
             {
