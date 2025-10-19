@@ -1156,7 +1156,10 @@ void NetworkManager::sendMarkerMoveState(uint64_t boardId, const flecs::entity& 
 bool NetworkManager::amIDragging(uint64_t markerId) const
 {
     auto it = drag_.find(markerId);
-    return (it != drag_.end() && it->second.locallyDragging);
+    if (it == drag_.end())
+        return false;
+    const auto& s = it->second;
+    return !s.closed && s.ownerPeerId == getMyId();
 }
 
 // markDraggingLocal — called by BoardManager on start/end

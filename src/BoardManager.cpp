@@ -596,20 +596,22 @@ void BoardManager::killIfMouseUp(bool isMouseDown)
     ecs.defer_begin();
     ecs.each([&](flecs::entity entity, MarkerComponent& mc, Moving& moving, Position& pos)
              {
-        if (!entity.has(flecs::ChildOf, active_board)) return;
-        if (!moving.isDragging) return;
+        if (!entity.has(flecs::ChildOf, active_board))
+            return;
+        if (!moving.isDragging)
+            return;
+        const auto mid = entity.get<Identifier>()->id;
+        if (!nm->amIDragging(mid))
+            return; // skip markers dragged by others
 
         moving.isDragging = false;
 
-        if (nm && entity.has<Identifier>() && active_board.has<Identifier>())
-        {
-            const auto bid = active_board.get<Identifier>()->id;
-            const auto mid = entity.get<Identifier>()->id;
+        const auto bid = active_board.get<Identifier>()->id;
 
-            nm->markDraggingLocal(mid, false);
-            nm->broadcastMarkerMoveState(bid, entity);  // end (final)
-            nm->forceCloseDrag(mid);
-        } });
+        nm->markDraggingLocal(mid, false);
+        nm->broadcastMarkerMoveState(bid, entity); // end (final)
+        nm->forceCloseDrag(mid); });
+
     ecs.defer_end();
 }
 
@@ -700,6 +702,8 @@ void BoardManager::endMouseDrag()
 
     active_board.set<Panning>({false});
     auto nm = network_manager.lock();
+    if (!nm)
+        throw std::exception("[BoardManager] Network Manager expired!!");
 
     const Grid* grid = active_board.get<Grid>();
     const bool canSnap = (grid && grid->snap_to_grid && grid->cell_size > 0.0f);
@@ -710,6 +714,9 @@ void BoardManager::endMouseDrag()
         if (!entity.has(flecs::ChildOf, active_board)) return;
         if (!moving.isDragging) return;
 
+        const auto mid = entity.get<Identifier>()->id;
+        if (!nm->amIDragging(mid))
+            return; // skip markers dragged by others
 
         if (canSnap)
         {
@@ -719,15 +726,12 @@ void BoardManager::endMouseDrag()
         }
 
         moving.isDragging = false;
-        if (nm && entity.has<Identifier>())
-        {
-            const auto bid = active_board.get<Identifier>()->id;
-            const auto mid = entity.get<Identifier>()->id;
+  
+        const auto bid = active_board.get<Identifier>()->id;
 
-            nm->markDraggingLocal(mid, false);      // <- local registry
-            nm->broadcastMarkerMoveState(bid, entity); // end (isDragging=false + final pos)broadcastMarkerUpdate(bid, entity); // <- final pos + mov=false
-            nm->forceCloseDrag(mid);
-        } });
+        nm->markDraggingLocal(mid, false);      // <- local registry
+        nm->broadcastMarkerMoveState(bid, entity); // end (isDragging=false + final pos)broadcastMarkerUpdate(bid, entity); // <- final pos + mov=false
+        nm->forceCloseDrag(mid); });
 
     ecs.defer_end();
     is_creating_fog = false;
@@ -744,6 +748,14 @@ void BoardManager::handleMarkerDragging(glm::vec2 world_position)
              {
         if (!entity.has(flecs::ChildOf, active_board)) return;
         if (!moving.isDragging) return;
+
+        if (!entity.has<Identifier>())
+            return;
+        const auto mid = entity.get<Identifier>()->id;
+
+        // Only advance locally if I am the drag owner (prevents flicker)
+        if (!nm->amIDragging(mid))
+            return;
 
         glm::vec2 delta = world_position - mouse_start_world_pos;
         position.x += delta.x;
@@ -1433,7 +1445,6 @@ void BoardManager::renderCameraWindow()
     ImGui::End();
 }
 
-
 void BoardManager::renderGridWindow()
 {
     // Check if the window should be shown
@@ -1518,7 +1529,6 @@ void BoardManager::renderGridWindow()
 
 flecs::entity BoardManager::findBoardById(uint64_t boardId)
 {
-    std::cout << "Find Board By Id: " << boardId << "\n";
     flecs::entity result;
     ecs.each([&](flecs::entity e, const Board& b, const Identifier& id)
              {

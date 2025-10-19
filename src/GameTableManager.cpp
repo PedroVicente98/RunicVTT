@@ -272,7 +272,7 @@ void GameTableManager::processReceivedMessages()
 
                 // Apply streaming position; keep Moving true during drag
                 markerEnt.set<Position>(*m.pos);
-                markerEnt.set<Moving>(Moving{true});
+                //markerEnt.set<Moving>(Moving{true});
                 break;
             }
 
@@ -503,7 +503,7 @@ void GameTableManager::handleMouseButtonInputs()
     }
 
     // Left Mouse Button Release
-    if (mouse_left_released || ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    if (mouse_left_released || ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         if (board_manager->isPanning() || board_manager->isDraggingMarker())
         {
@@ -515,6 +515,8 @@ void GameTableManager::handleMouseButtonInputs()
             board_manager->endMouseDrag();
         }
     }
+
+    board_manager->killIfMouseUp(ImGui::IsMouseClicked(ImGuiMouseButton_Left));
 }
 
 void GameTableManager::handleCursorInputs()
