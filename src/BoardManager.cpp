@@ -13,6 +13,8 @@
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <glm/gtc/round.hpp>
+#include <glm/gtc/epsilon.hpp> // epsilonEqual, epsilonNotEqual
+#include <glm/common.hpp>
 
 #include "Components.h"
 #include <filesystem>
@@ -169,7 +171,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
     if (ImGui::Button("Camera Settings", ImVec2(110, 40)))
     {
-        showCameraSettings = !showGridSettings;
+        showCameraSettings = !showCameraSettings;
     }
     ImGui::PopStyleColor(3);
     if (nm->getPeerRole() == Role::GAMEMASTER)
@@ -190,6 +192,10 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     // End the child window
     ImGui::EndChild();
 
+    if (!showCameraSettings && !showGridSettings && !showEditWindow)
+    {
+        setIsNonMapWindowHovered(false);
+    }
     renderGridWindow();
     renderCameraWindow();
 }
@@ -635,6 +641,38 @@ static inline glm::vec2 snapToGridCenter(const glm::vec2& worldPos, const Grid& 
     if (!grid.snap_to_grid || grid.cell_size <= 0.0f)
         return worldPos;
     return snapToSquareCenter(worldPos, grid.offset, grid.cell_size);
+}
+
+void BoardManager::resnapAllMarkersToNearest(const Grid& grid)
+{
+    if (grid.cell_size <= 0.0f)
+        return;
+
+    auto nm = network_manager.lock();
+
+    ecs.defer_begin();
+    active_board.children([&](flecs::entity e)
+                          {
+        if (!e.has<MarkerComponent>()) return;
+
+        Position* pos = e.get_mut<Position>();
+        if (!pos) return;
+
+        glm::vec2 p(pos->x, pos->y);
+        glm::vec2 goal = snapToSquareCenter(p, grid.offset, grid.cell_size);
+
+        // Only write if it actually changes (avoid network spam)
+        if (glm::any(glm::epsilonNotEqual(p, goal, glm::vec2(1e-4f)))) {
+            pos->x = goal.x;
+            pos->y = goal.y;
+
+            // If you're broadcasting grid-driven corrections:
+            if (nm && e.has<Identifier>()) {
+                const auto bid = active_board.get<Identifier>()->id;
+                nm->broadcastMarkerUpdate(bid, e); // or your existing "final pos" message
+            }
+        } });
+    ecs.defer_end();
 }
 
 bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
@@ -1191,7 +1229,7 @@ void BoardManager::renderEditWindow()
 {
     if (!showEditWindow)
     {
-        setIsNonMapWindowHovered(false);
+        is_edit_hovered = false;
         return; // If the window is closed, skip rendering it
     }
     bool is_hovered = false;
@@ -1200,11 +1238,12 @@ void BoardManager::renderEditWindow()
     ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
-    auto edit_window_hover = ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
-    if (edit_window_hover)
+    is_edit_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
+    /*if (edit_window_hover)
     {
         setIsNonMapWindowHovered(true);
-    }
+    }*/
 
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
@@ -1469,7 +1508,7 @@ void BoardManager::renderCameraWindow()
     // Check if the window should be shown
     if (!showCameraSettings)
     {
-        setIsNonMapWindowHovered(false);
+        is_camera_hovered = false;
         return;
     }
 
@@ -1478,11 +1517,12 @@ void BoardManager::renderCameraWindow()
     ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Camera", &showCameraSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    auto camera_hovered = ImGui::IsWindowHovered();
-    if (camera_hovered)
+    is_camera_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
+    /*if (camera_hovered)
     {
         setIsNonMapWindowHovered(true);
-    }
+    }*/
     ImGui::PopStyleColor();
     auto zoom = camera.getZoom();
 
@@ -1514,7 +1554,7 @@ void BoardManager::renderGridWindow()
     // Check if the window should be shown
     if (!showGridSettings)
     {
-        setIsNonMapWindowHovered(false);
+        is_grid_hovered = false;
         return;
     }
 
@@ -1523,11 +1563,12 @@ void BoardManager::renderGridWindow()
     ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    auto grid_hovered = ImGui::IsWindowHovered();
-    if (grid_hovered)
+    is_grid_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
+    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
+    /* if (grid_hovered)
     {
         setIsNonMapWindowHovered(true);
-    }
+    }*/
 
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
@@ -1594,6 +1635,10 @@ void BoardManager::renderGridWindow()
 
         if (changed)
         {
+            if (grid->snap_to_grid)
+            {
+                resnapAllMarkersToNearest(*grid);
+            }
             if (auto nm = network_manager.lock())
             {
                 if (active_board.has<Identifier>())
