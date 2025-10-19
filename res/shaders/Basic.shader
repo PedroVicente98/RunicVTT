@@ -26,14 +26,14 @@ out vec4 color;
 
 in vec2 v_TextCoord;
 
-uniform bool u_UseTexture;    // Flag to choose between texture and solid color
+uniform int u_UseTexture;    // Flag to choose between texture and solid color
 uniform sampler2D u_Texture;  // Texture for rendering (used if u_UseTexture is true)
 uniform float u_Alpha;        // Alpha for transparency control
 
 void main()
 {
     // Conditional: Use texture or solid color
-    if (u_UseTexture)
+    if (u_UseTexture == 1)
     {
         // Sample the texture (map)
         vec4 textColor = texture(u_Texture, v_TextCoord);

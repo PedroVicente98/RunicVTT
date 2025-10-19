@@ -1,0 +1,91 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": { "major": 3, "minor": 20 },
+  "configurePresets": [
+    {
+      "name": "base-ninja-msvc",
+      "displayName": "Base (Ninja + MSVC cl.exe)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl"
+      },
+      "environment": {
+        // Example env vars you wanted to add:
+        "RUNIC_ENV": "common",
+        "MY_EXTRA_FLAG": "1"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [ "Windows" ]
+        }
+      }
+    },
+
+    {
+      "name": "debug",
+      "displayName": "Debug (Ninja + MSVC)",
+      "inherits": "base-ninja-msvc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      },
+      "environment": {
+        "RUNIC_ENV": "debug"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release w/ Debug Info (RelWithDebInfo)",
+      "inherits": "base-ninja-msvc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        // optional: Program Database (PDB) format for MSVC debuginfo
+        "CMAKE_MSVC_DEBUG_INFORMATION_FORMAT": "ProgramDatabase"
+      },
+      "environment": {
+        "RUNIC_ENV": "release"
+      }
+    },
+    {
+      "name": "dist",
+      "displayName": "Distribution (Release, lean)",
+      "inherits": "base-ninja-msvc",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        // optional: enable LTO/IPO on supported compilers
+        "CMAKE_INTERPROCEDURAL_OPTIMIZATION": true,
+        // example of a toggle your CMakeLists could read to strip extras:
+        "RUNIC_DISTRIBUTION": "ON"
+      },
+      "environment": {
+        "RUNIC_ENV": "dist"
+      }
+    },
+
+    {
+      "name": "ninja-generic",
+      "displayName": "Generic Ninja (user supplies compiler)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "cacheVariables": {
+        // no compiler pinned here; user sets CC/CXX or passes -D
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+
+  "buildPresets": [
+    { "name": "build-debug",  "configurePreset": "debug"  },
+    { "name": "build-release","configurePreset": "release" },
+    { "name": "build-dist",   "configurePreset": "dist"    }
+  ],
+
+  "testPresets": [
+    { "name": "test-debug",   "configurePreset": "debug"   },
+    { "name": "test-release", "configurePreset": "release" },
+    { "name": "test-dist",    "configurePreset": "dist"    }
+  ]
+}

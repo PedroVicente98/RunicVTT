@@ -5,3 +5,9 @@ nbproject/
 .DS_Store
 bin/
 out/
+dist/
+Config/
+Maps/
+Markers/
+GameTables/
+Notes/

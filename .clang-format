@@ -1,0 +1,29 @@
+BasedOnStyle: LLVM       # Base template; we override below
+IndentWidth: 4           # 4 spaces indent
+TabWidth: 4
+UseTab: Never            # Always spaces
+ColumnLimit: 0           # Don’t wrap long lines automatically
+BreakBeforeBraces: Allman   # Braces on new line (nice for clear outlining)
+AccessModifierOffset: -4 # Align 'public/private:' with class indent
+NamespaceIndentation: All   # Indent inside namespaces (good readability)
+
+AllowShortFunctionsOnASingleLine: Empty     # Only {} one-liners allowed
+PointerAlignment: Left      # 'int* p' vs 'int *p' → left is common in C++
+DerivePointerAlignment: false
+
+IncludeBlocks: Preserve     # Don’t merge blocks separated by blank lines
+
+SpacesBeforeTrailingComments: 1
+Cpp11BracedListStyle: true
+SpaceBeforeParens: ControlStatements  # 'if (' has a space
+AlignOperands: true
+ReflowComments: false                 # Don’t re-wrap comment paragraphs
+
+SortIncludes: false
+AllowShortIfStatementsOnASingleLine: false
+IndentCaseLabels: true
+BreakConstructorInitializers: AfterColon
+SpaceBeforeInheritanceColon: true
+SpacesInParentheses: false
+SpacesInAngles: false
+

@@ -12,8 +12,8 @@
 #include <windows.h>
 #endif
 
-
-class NoteEditorUI {
+class NoteEditorUI
+{
 public:
     NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager);
     NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager, std::shared_ptr<NoteSyncSystem> syncSystem);
@@ -25,7 +25,8 @@ private:
     void renderNoteTabs(float availableWidth, float height);
     void renderNoteTab(NoteComponent& note);
 
-    struct MarkdownRenderer : public imgui_md {
+    struct MarkdownRenderer : public imgui_md
+    {
         ImFont* get_font() const override;
         void open_url() const override;
         bool get_image(image_info& nfo) const override;

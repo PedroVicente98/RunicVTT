@@ -1,16 +1,35 @@
 #include "ApplicationHandler.h"
 #include "PathManager.h"
 #include "UPnPManager.h"
+#include "DebugConsole.h"
+#include "Logger.h"
+#include "FirewallUtils.h"
 
-GLFWwindow* initializeOpenGLContext() {
-    if (!glfwInit()) {
+namespace ShutdownUtils
+{
+    inline void ArmDeadManKill(unsigned timeoutMs)
+    {
+        std::thread([timeoutMs]()
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));
+                        TerminateProcess(GetCurrentProcess(), 0); // hard kill (OS reclaims everything)
+                    })
+            .detach();
+    }
+} // namespace ShutdownUtils
+
+GLFWwindow* initializeGLFWContext()
+{
+    if (!glfwInit())
+    {
         std::cerr << "Falha ao inicializar o GLFW!" << std::endl;
         return nullptr;
     }
 
     // Cria a janela e inicializa o contexto OpenGL
     GLFWwindow* window = glfwCreateWindow(1280, 720, "Runic VTT", nullptr, nullptr);
-    if (!window) {
+    if (!window)
+    {
         std::cerr << "Falha ao criar a janela GLFW!" << std::endl;
         glfwTerminate();
         return nullptr;
@@ -20,7 +39,8 @@ GLFWwindow* initializeOpenGLContext() {
     glfwMakeContextCurrent(window);
 
     // Inicializa o GLEW (opcional, se estiver usando)
-    if (glewInit() != GLEW_OK) {
+    if (glewInit() != GLEW_OK)
+    {
         std::cerr << "Falha ao inicializar o GLEW!" << std::endl;
         return nullptr;
     }
@@ -35,50 +55,121 @@ GLFWwindow* initializeOpenGLContext() {
     return window;
 }
 
-// Função para definir o ícone da janela
-void setWindowIcon(GLFWwindow* window, const char* iconPath) {
-    // Carrega a imagem do ícone usando stb_image
+GLFWimage loadImage(const char* iconPath)
+{
     int width, height, channels;
-    unsigned char* image = stbi_load(iconPath, &width, &height, &channels, 4);  // Força 4 canais (RGBA)
-    if (!image) {
-        std::cerr << "Erro: Não foi possível carregar o ícone: " << iconPath << std::endl;
-        return;
+    unsigned char* image = stbi_load(iconPath, &width, &height, &channels, 4); // ForÃ§a 4 canais (RGBA)
+    if (!image)
+    {
+        std::cerr << "Erro: NÃ£o foi possÃ­vel carregar o Ã­cone: " << iconPath << std::endl;
     }
 
-    // Cria o objeto GLFWimage e configura o ícone
+    // Cria o objeto GLFWimage e configura o Ã­cone
     GLFWimage icon;
     icon.width = width;
     icon.height = height;
     icon.pixels = image;
-    glfwSetWindowIcon(window, 1, &icon);  // Define o ícone
 
-    // Libera a memória usada pela imagem
-    stbi_image_free(image);
+    return icon;
 }
 
-int main() {
-//
-//#ifndef _DEBUG
-//    // Hide the console window in Release mode
-//    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-//#endif
-    // Inicializa o contexto OpenGL
-    GLFWwindow* window = initializeOpenGLContext();
-    if (!window) {
-        return -1;  // Falha na inicialização
-    }
+// FunÃ§Ã£o para definir o Ã­cone da janela
+void setWindowIcon(GLFWwindow* window, std::filesystem::path iconFolderPath)
+{
+    // Carrega a imagem do Ã­cone usando stb_image
+    auto icon16 = iconFolderPath / "RunicVTTIcon_16.png";
+    auto icon32 = iconFolderPath / "RunicVTTIcon_32.png";
+    auto icon64 = iconFolderPath / "RunicVTTIcon_64.png";
+    auto icon256 = iconFolderPath / "RunicVTTIcon.png";
 
-    //auto pathManager = PathManager();
+    GLFWimage icons[4];
+    icons[0] = loadImage(icon16.string().c_str());
+    icons[1] = loadImage(icon32.string().c_str());
+    icons[2] = loadImage(icon64.string().c_str());
+    icons[3] = loadImage(icon256.string().c_str());
+
+    glfwSetWindowIcon(window, 4, icons); // Define o Ã­cone
+
+    // Libera a memÃ³ria usada pela imagem
+    stbi_image_free(icons[0].pixels);
+    stbi_image_free(icons[1].pixels);
+    stbi_image_free(icons[2].pixels);
+    stbi_image_free(icons[3].pixels);
+}
+
+static std::string getSelfPath()
+{
+    wchar_t buf[MAX_PATH];
+    GetModuleFileNameW(nullptr, buf, MAX_PATH);
+    std::wstring ws(buf);
+    return std::string(ws.begin(), ws.end());
+}
+
+int main()
+{
+    DebugConsole::bootstrapStdCapture();
+    Logger::instance().setChannelCapacity(4000);
+    auto runic_exe = getSelfPath();
+    auto node_exe = PathManager::getNodeExePath().string();
+    auto runic_firewall_rule_name = "RunicVTT Inbound TCP (Any)";
+    auto node_firewall_rule_name = "RunicVTT LocalTunnel(Any TCP)";
+
     PathManager::ensureDirectories();
 
-    auto iconPath = PathManager::getResPath() / "RunicVTTIcon.png";
-    setWindowIcon(window, iconPath.string().c_str());
+    GLFWwindow* window = initializeGLFWContext();
+    if (!window)
+    {
+        return -1; // Falha na inicializaÃ§Ã£o
+    }
+    auto iconFolderPath = PathManager::getResPath();
+    setWindowIcon(window, iconFolderPath);
 
-    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory");
-    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(),"MarkersDirectory");
+    glfwPollEvents();
+
+
+    //FirewallUtils::addInboundAnyTcpForExe(runic_firewall_rule_name, runic_exe, /*Private*/ false);
+    //FirewallUtils::addInboundAnyTcpForExe(node_firewall_rule_name, node_exe, false);
+    //FirewallUtils::addInboundAnyUdpForExe("RunicVTT Inbound UDP (Any)", runic_exe, /*Private*/ false);
+    {
+        const std::string rule1 = runic_firewall_rule_name;
+        const std::string exe1  = runic_exe;
+        const std::string rule2 = node_firewall_rule_name;
+        const std::string exe2  = node_exe;
+    
+        std::thread([rule1, exe1, rule2, exe2]() {
+            try {
+                FirewallUtils::addInboundAnyTcpForExe(rule1, exe1, /*privateOnly*/ false);
+            } catch (...) {
+                // swallow or log
+            }
+            try {
+                FirewallUtils::addInboundAnyTcpForExe(rule2, exe2, /*privateOnly*/ false);
+            } catch (...) {
+                // swallow or log
+            }
+            // thread exits automatically
+        }).detach();
+    }
+        // before CreateProcessA
+    auto nodeModules = (PathManager::getExternalPath() / "node" / "node_modules").string();
+    _putenv_s("NODE_PATH", nodeModules.c_str());
+    if (const char* np = std::getenv("NODE_PATH"))
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Success, std::string("Parent NODE_PATH=") + np);
+    }
+    else
+    {
+        Logger::instance().log("localtunnel", Logger::Level::Error, "Parent NODE_PATH is not set");
+    }
+
+    std::shared_ptr<DirectoryWindow> map_directory = std::make_shared<DirectoryWindow>(PathManager::getMapsPath().string(), "MapsDiretory", DirectoryKind::MAP);
+    std::shared_ptr<DirectoryWindow> marker_directory = std::make_shared<DirectoryWindow>(PathManager::getMarkersPath().string(), "MarkersDirectory", DirectoryKind::MARKER);
     ApplicationHandler app(window, map_directory, marker_directory);
-    app.run();  // Executa o loop principal da aplicação
+    app.run();
 
-    glfwTerminate();  // Limpa os recursos do GLFW quando terminar
+    FirewallUtils::removeRuleElevated(runic_firewall_rule_name);
+    FirewallUtils::removeRuleElevated(node_firewall_rule_name);
+
+    ShutdownUtils::ArmDeadManKill(2000); // 2s grace
     return 0;
 }

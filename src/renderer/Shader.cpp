@@ -1,8 +1,8 @@
 #include "Shader.h"
 #include "Renderer.h"
 
-Shader::Shader(const std::string& filepath)
-	: m_FilePath(filepath), m_RendererID(0)
+Shader::Shader(const std::string& filepath) :
+    m_FilePath(filepath), m_RendererID(0)
 {
     ShaderProgramSource source = ParseShader(filepath);
     m_RendererID = CreateShader(source.VertexSource, source.FragmentSource);
@@ -23,25 +23,32 @@ void Shader::Unbind() const
     GLCall(glUseProgram(0));
 }
 
-
-ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
+ShaderProgramSource Shader::ParseShader(const std::string& filepath)
+{
     std::ifstream stream(filepath);
 
     enum class ShaderType
     {
-        NONE = -1, VERTEX = 0, FRAGMENT = 1
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
     };
 
     std::string line;
     std::stringstream ss[2];
     ShaderType type = ShaderType::NONE;
-    if (stream.is_open()) {
-        while (getline(stream, line)) {
-            if (line.find("#shader") != std::string::npos) {
-                if (line.find("vertex") != std::string::npos) {
+    if (stream.is_open())
+    {
+        while (getline(stream, line))
+        {
+            if (line.find("#shader") != std::string::npos)
+            {
+                if (line.find("vertex") != std::string::npos)
+                {
                     type = ShaderType::VERTEX;
                 }
-                else if (line.find("fragment") != std::string::npos) {
+                else if (line.find("fragment") != std::string::npos)
+                {
                     type = ShaderType::FRAGMENT;
                 }
             }
@@ -51,9 +58,10 @@ ShaderProgramSource Shader::ParseShader(const std::string& filepath) {
             }
         }
 
-        return { ss[0].str(), ss[1].str() };
+        return {ss[0].str(), ss[1].str()};
     }
-    else {
+    else
+    {
         std::cout << "No Shaders File Found!!!" << std::endl;
         throw "No Shaders File Found!!!";
     }
@@ -137,9 +145,8 @@ int Shader::GetUniformLocation(const std::string& name)
     GLCall(int location = glGetUniformLocation(m_RendererID, name.c_str()));
     if (location == -1)
         std::cout << "Warning: uniform '" << name << "' doesn't exist!!" << std::endl;
-    
+
     m_UniformLocationCache[name] = location;
 
-	return location;
+    return location;
 }
-

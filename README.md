@@ -51,7 +51,7 @@ The project uses the following libraries:
 
 ### Clone & Build
 ```bash
-git clone https://github.com/yourusername/RunicVTT.git
+git clone https://github.com/PedroVicente98/RunicVTT.git
 cd RunicVTT
 cmake -S . -B build
 cmake --build build --config Release
@@ -69,7 +69,7 @@ cmake --build build --config Release
 ---
 
 ## Releases & Downloads
-- Stable builds are available on the [Releases page](https://github.com/yourusername/RunicVTT/releases).  
+- Stable builds are available on the [Releases page](https://github.com/PedroVicente98/RunicVTT/releases).  
 - Each release includes:
   - Windows executable installer   
   - A portable application folder (Installer contents already configured)
@@ -79,7 +79,7 @@ cmake --build build --config Release
 
 ## Reporting Bugs
 If you encounter a bug:
-1. Check the [issue tracker](https://github.com/yourusername/RunicVTT/issues) to see if it has already been reported.  
+1. Check the [issue tracker](https://github.com/PedroVicente98/RunicVTT/issues) to see if it has already been reported.  
 2. Open a new issue using the **Bug Report** template.  
    - Please include logs, screenshots, or GIFs if possible.  
 
