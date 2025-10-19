@@ -503,7 +503,7 @@ void GameTableManager::handleMouseButtonInputs()
     }
 
     // Left Mouse Button Release
-    if (mouse_left_released || ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+    if (mouse_left_released || !ImGui::IsMouseClicked(ImGuiMouseButton_Left))
     {
         if (board_manager->isPanning() || board_manager->isDraggingMarker())
         {
@@ -516,7 +516,7 @@ void GameTableManager::handleMouseButtonInputs()
         }
     }
 
-    board_manager->killIfMouseUp(ImGui::IsMouseClicked(ImGuiMouseButton_Left));
+    board_manager->killIfMouseUp(!ImGui::IsMouseClicked(ImGuiMouseButton_Left));
 }
 
 void GameTableManager::handleCursorInputs()
