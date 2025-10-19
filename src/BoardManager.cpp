@@ -1532,55 +1532,73 @@ void BoardManager::renderGridWindow()
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
     auto grid = active_board.get_mut<Grid>();
+    bool changed = false;
 
     if (grid)
     {
         // --- BOOLEAN CHECKBOXES ---
-        ImGui::Checkbox("Visible", &grid->visible);
-        ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
+        changed |= ImGui::Checkbox("Visible", &grid->visible);
+        changed |= ImGui::Checkbox("Snap to Grid", &grid->snap_to_grid);
         //ImGui::Checkbox("Hexagonal Grid", &grid->is_hex);
 
         // --- FLOAT SLIDERS ---
-        ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
+        changed |= ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
         ImGui::SameLine();
         if (ImGui::Button("-"))
         {
             grid->cell_size = grid->cell_size - 0.01f;
+            changed = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("+"))
         {
             grid->cell_size = grid->cell_size + 0.01f;
+            changed = true;
         }
         // --- OFFSET CONTROLS (SIMPLIFIED WITH SLIDERS) ---
         ImGui::Text("Grid Offset");
-        ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
+        changed |= ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
         ImGui::SameLine();
         if (ImGui::Button("-"))
         {
             grid->offset.x = grid->offset.x - 0.01f;
+            changed = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("+"))
         {
             grid->offset.x = grid->offset.x + 0.01f;
+            changed = true;
         }
-        ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
+        changed |= ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
+
         ImGui::SameLine();
         if (ImGui::Button("-"))
         {
             grid->offset.y = grid->offset.y - 0.01f;
+            changed = true;
         }
         ImGui::SameLine();
         if (ImGui::Button("+"))
         {
             grid->offset.y = grid->offset.y + 0.01f;
+            changed = true;
         }
 
         // Button to reset the offset
         if (ImGui::Button("Reset Offset"))
         {
             grid->offset = glm::vec2(0.0f);
+            changed = true;
+        }
+
+        if (changed)
+        {
+            if (auto nm = network_manager.lock())
+            {
+                if (active_board.has<Identifier>())
+                    nm->broadcastGridUpdate(active_board.get<Identifier>()->id, active_board);
+            }
         }
     }
     else

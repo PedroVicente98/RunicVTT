@@ -184,6 +184,8 @@ namespace msg
         std::optional<Moving> mov;
         std::optional<MarkerComponent> markerComp;
 
+        std::optional<Grid> grid;
+
         std::optional<uint32_t> dragEpoch;
         std::optional<uint32_t> seq;
         std::optional<Role> senderRole;

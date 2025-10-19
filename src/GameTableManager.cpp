@@ -426,6 +426,14 @@ void GameTableManager::processReceivedMessages()
 
             case msg::DCType::GridUpdate:
             {
+                if (!m.boardId || !m.grid)
+                    break;
+
+                auto boardEnt = board_manager->findBoardById(*m.boardId);
+                if (!boardEnt.is_valid())
+                    break;
+
+                boardEnt.set<Grid>(*m.grid);
                 break;
             }
 

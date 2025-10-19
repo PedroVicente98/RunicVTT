@@ -846,7 +846,7 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
         switch (type)
         {
             case msg::DCType::Snapshot_GameTable:
-                handleGameTableSnapshot(b, off); // pushes ReadyMessage internally
+                handleGameTableSnapshot(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "Snapshot_GameTable Handled!!");
                 break;
 
@@ -861,52 +861,52 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
                 break;
 
             case msg::DCType::FogCreate:
-                handleFogCreate(b, off); // pushes ReadyMessage
+                handleFogCreate(b, off);
                 //Logger::instance().log("localtunnel", Logger::Level::Info, "FogCreate Handled!!");
                 break;
 
             case msg::DCType::ImageChunk:
-                handleImageChunk(b, off); // fills buffers
+                handleImageChunk(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "ImageChunk Handled!!");
                 break;
 
             case msg::DCType::CommitBoard:
-                handleCommitBoard(b, off); // pushes ReadyMessage
+                handleCommitBoard(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "CommitBoard Handled!!");
                 break;
 
             case msg::DCType::CommitMarker:
-                handleCommitMarker(b, off); // pushes ReadyMessage
+                handleCommitMarker(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "CommitMarker Handled!!");
                 break;
 
             case msg::DCType::MarkerUpdate:
-                handleMarkerUpdate(b, off); // later
+                handleMarkerUpdate(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
                 break;
 
             case msg::DCType::MarkerMoveState:
-                handleMarkerMoveState(b, off); // later
+                handleMarkerMoveState(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerUpdate Handled!!");
                 break;
 
             case msg::DCType::FogUpdate:
-                handleFogUpdate(b, off); // later
+                handleFogUpdate(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "FogUpdate Handled!!");
                 break;
 
             case msg::DCType::MarkerDelete:
-                handleMarkerDelete(b, off); // later
+                handleMarkerDelete(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete Handled!!");
                 break;
 
             case msg::DCType::FogDelete:
-                handleFogDelete(b, off); // later
+                handleFogDelete(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "MarkerDelete FogDelete!!");
                 break;
 
             case msg::DCType::GridUpdate:
-                //handleGridUpdate(b, off); // later
+                handleGridUpdate(b, off);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
                 break;
 
@@ -1584,6 +1584,49 @@ bool NetworkManager::sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, cons
 //}
 
 //---Message Received Handlers--------------------------------------------------------------------------------
+//
+
+void NetworkManager::broadcastGridUpdate(uint64_t boardId, const flecs::entity& board)
+{
+    auto ids = getConnectedPeerIds();
+    if (!ids.empty())
+        sendGridUpdate(boardId, board, ids);
+}
+
+void NetworkManager::sendGridUpdate(uint64_t boardId, const flecs::entity& board,
+                                    const std::vector<std::string>& toPeerIds)
+{
+    if (!board.is_valid() || !board.has<Grid>())
+        return;
+
+    const auto* g = board.get<Grid>();
+    auto frame = buildGridUpdateFrame(boardId, *g);
+    broadcastGameFrame(frame, toPeerIds);
+}
+
+std::vector<unsigned char> NetworkManager::buildGridUpdateFrame(uint64_t boardId, const Grid& grid)
+{
+    std::vector<unsigned char> b;
+    Serializer::serializeUInt8(b, static_cast<uint8_t>(msg::DCType::GridUpdate));
+    Serializer::serializeUInt64(b, boardId);
+    Serializer::serializeGrid(b, &grid);
+    return b;
+}
+
+void NetworkManager::handleGridUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    // type byte already consumed by the caller switch
+    if (!ensureRemaining(b, off, 8))
+        return;
+
+    msg::ReadyMessage m;
+    m.kind = msg::DCType::GridUpdate;
+    m.boardId = Serializer::deserializeUInt64(b, off);
+    Grid g = Serializer::deserializeGrid(b, off);
+    m.grid = g;
+    inboundGame_.push(std::move(m));
+}
+
 // DCType::Snapshot_GameTable (100)
 void NetworkManager::handleGameTableSnapshot(const std::vector<uint8_t>& b, size_t& off)
 {

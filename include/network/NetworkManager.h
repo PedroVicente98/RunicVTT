@@ -252,8 +252,17 @@ public:
     bool shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m); // DCType::MarkerMoveState + mov.isDragging==true
     bool shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m); // DCType::MarkerMoveState + mov.isDragging==false
 
+    // send/broadcast
+    void broadcastGridUpdate(uint64_t boardId, const flecs::entity& board);
+    void sendGridUpdate(uint64_t boardId, const flecs::entity& board, const std::vector<std::string>& toPeerIds);
+
     //PUBLIC END MARKER STUFF----------------------------------------------------------------------------
 private:
+    // build
+    std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
+    // handle
+    void handleGridUpdate(const std::vector<uint8_t>& b, size_t& off);
+
     //MARKER STUFF--------------------------------------------------------------------------------
     std::string decodingFromPeer_;
     std::unordered_map<uint64_t /*markerId*/, DragState> drag_;
