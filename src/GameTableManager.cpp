@@ -516,7 +516,7 @@ void GameTableManager::handleMouseButtonInputs()
         }
     }
 
-    board_manager->killIfMouseUp(!ImGui::IsMouseClicked(ImGuiMouseButton_Left));
+    board_manager->killIfMouseUp(!ImGui::IsMouseDown(ImGuiMouseButton_Left));
 }
 
 void GameTableManager::handleCursorInputs()
