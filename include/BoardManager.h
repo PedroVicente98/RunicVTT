@@ -208,7 +208,7 @@ public:
     void endMouseDrag();
     glm::vec2 getMouseStartPosition() const;
     bool isPanning();
-    bool isDraggingMarker();
+    bool isDraggingMarker(bool local_drag_only = true);
     flecs::entity getEntityAtMousePosition(glm::vec2 mouse_position);
 
     flecs::entity findBoardById(uint64_t boardId);

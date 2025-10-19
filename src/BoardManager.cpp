@@ -841,17 +841,33 @@ bool BoardManager::isPanning()
     return panning->isPanning;
 }
 
-bool BoardManager::isDraggingMarker()
+bool BoardManager::isDraggingMarker(bool local_drag_only /*= true*/)
 {
-    bool isDragginMarker = false;
+    auto nm = network_manager.lock();
+    if (!nm)
+        return false;
+
+    bool any = false;
+
     ecs.defer_begin();
-    ecs.each([&](flecs::entity entity, const MarkerComponent& marker, Moving& moving)
+    ecs.each([&](flecs::entity e, const MarkerComponent&, const Moving& mv, const Identifier& id)
              {
-        if (entity.has(flecs::ChildOf, active_board) && moving.isDragging) {
-            isDragginMarker =  true;
+        if (any) return; // early out from further work in this lambda (flecs will still loop, but we do nothing)
+        if (!e.has(flecs::ChildOf, active_board)) return;
+        if (!mv.isDragging) return;
+
+        if (local_drag_only)
+        {
+            if (nm->amIDragging(id.id))
+                any = true; // found a local-owned drag
+        }
+        else
+        {
+            any = true;     // any drag at all
         } });
     ecs.defer_end();
-    return isDragginMarker;
+
+    return any;
 }
 
 glm::vec2 BoardManager::getMouseStartPosition() const
