@@ -612,7 +612,15 @@ void ApplicationHandler::renderMainMenuBar()
             ImGui::EndMenu();
         }
     }
-
+    if (ImGui::BeginMenu("Notes"))
+    {
+        bool vis = DebugConsole::isVisible();
+        if (ImGui::MenuItem("Note Editor(NOTYET)", nullptr, vis))
+        {
+            DebugConsole::setVisible(!vis);
+        }
+        ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Assets"))
     {
         if (ImGui::MenuItem("Add Marker (from file)"))
