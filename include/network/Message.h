@@ -52,9 +52,9 @@ namespace msg
         UserNameUpdate = 105, // Game channel: broadcast username changes
 
         // chat ops (binary)
-        ChatThreadCreate = 200,
-        ChatThreadUpdate = 201,
-        ChatThreadDelete = 202,
+        ChatGroupCreate = 200,
+        ChatGroupUpdate = 201,
+        ChatGroupDelete = 202,
         ChatMessage = 203
     };
     inline std::string DCtypeString(DCType type)
@@ -107,13 +107,13 @@ namespace msg
             case msg::DCType::NoteDelete:
                 type_str = "NoteDelete";
                 break;
-            case msg::DCType::ChatThreadCreate:
+            case msg::DCType::ChatGroupCreate:
                 type_str = "ChatThreadCreate";
                 break;
-            case msg::DCType::ChatThreadUpdate:
+            case msg::DCType::ChatGroupUpdate:
                 type_str = "ChatThreadUpdate";
                 break;
-            case msg::DCType::ChatThreadDelete:
+            case msg::DCType::ChatGroupDelete:
                 type_str = "ChatThreadDelete";
                 break;
             case msg::DCType::ChatMessage:

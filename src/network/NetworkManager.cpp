@@ -2180,15 +2180,14 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
         Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
         switch (type)
         {
-            case msg::DCType::ChatThreadCreate:
+            case msg::DCType::ChatGroupCreate:
             {
                 msg::ReadyMessage r;
                 r.kind = type;
                 r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // displayName
+                r.tableId = Serializer::deserializeUInt64(b, off);
+                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
+                r.name = Serializer::deserializeString(b, off);     // group name (unique)
                 {
                     const int pc = Serializer::deserializeInt(b, off);
                     std::set<std::string> parts;
@@ -2197,19 +2196,17 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                     r.participants = std::move(parts);
                 }
                 inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadCreate Handled!!");
                 break;
             }
 
-            case msg::DCType::ChatThreadUpdate:
+            case msg::DCType::ChatGroupUpdate:
             {
                 msg::ReadyMessage r;
                 r.kind = type;
                 r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
+                r.tableId = Serializer::deserializeUInt64(b, off);
                 r.threadId = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // displayName
+                r.name = Serializer::deserializeString(b, off);
                 {
                     const int pc = Serializer::deserializeInt(b, off);
                     std::set<std::string> parts;
@@ -2218,20 +2215,17 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                     r.participants = std::move(parts);
                 }
                 inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadUpdate Handled!!");
                 break;
             }
 
-            case msg::DCType::ChatThreadDelete:
+            case msg::DCType::ChatGroupDelete:
             {
                 msg::ReadyMessage r;
                 r.kind = type;
                 r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
+                r.tableId = Serializer::deserializeUInt64(b, off);
                 r.threadId = Serializer::deserializeUInt64(b, off);
                 inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadDelete Handled!!");
                 break;
             }
 
@@ -2240,14 +2234,12 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                 msg::ReadyMessage r;
                 r.kind = type;
                 r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
+                r.tableId = Serializer::deserializeUInt64(b, off);
+                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
                 r.ts = Serializer::deserializeUInt64(b, off);
                 r.name = Serializer::deserializeString(b, off); // username
-                r.text = Serializer::deserializeString(b, off); // message text
+                r.text = Serializer::deserializeString(b, off); // body
                 inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatMessage Handled!!");
                 break;
             }
 
