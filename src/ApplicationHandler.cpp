@@ -526,6 +526,7 @@ void ApplicationHandler::renderMainMenuBar()
     bool close_current_gametable = false;
 
     bool open_network_center = false;
+    bool open_username_change = false;
 
     bool open_create_board = false;
     bool close_current_board = false;
@@ -572,6 +573,11 @@ void ApplicationHandler::renderMainMenuBar()
             if (ImGui::MenuItem("Network Center"))
             {
                 open_network_center = true;
+            }
+
+            if (ImGui::MenuItem("Change Username"))
+            {
+                open_username_change = true;
             }
             ImGui::EndMenu();
         }
@@ -695,6 +701,11 @@ void ApplicationHandler::renderMainMenuBar()
         ImGui::OpenPopup("Network Center");
     if (ImGui::IsPopupOpen("Network Center"))
         game_table_manager->networkCenterPopUp();
+
+    if (open_username_change)
+        ImGui::OpenPopup("Change Username");
+    if (ImGui::IsPopupOpen("Change Username"))
+        game_table_manager->renderUsernameChangePopup();
 
     if (open_create_board)
         ImGui::OpenPopup("CreateBoard");

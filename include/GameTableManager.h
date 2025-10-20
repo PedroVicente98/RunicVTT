@@ -7,6 +7,7 @@
 #include "PathManager.h"
 #include "NetworkManager.h"
 #include "ChatManager.h"
+#include "IdentityManager.h"
 
 class GameTableManager : public std::enable_shared_from_this<GameTableManager>
 {
@@ -32,6 +33,7 @@ public:
     void connectToGameTablePopUp();
     void closeGameTablePopUp();
 
+    void renderUsernameChangePopup();
     void createBoardPopUp();
     void closeBoardPopUp();
     void saveBoardPopUp();
@@ -59,6 +61,7 @@ public:
     std::shared_ptr<ChatManager> chat_manager;
     std::shared_ptr<DirectoryWindow> map_directory;
     std::shared_ptr<NetworkManager> network_manager;
+    std::shared_ptr<IdentityManager> identity_manager;
     std::shared_ptr<BoardManager> board_manager;
     flecs::entity active_game_table = flecs::entity();
 

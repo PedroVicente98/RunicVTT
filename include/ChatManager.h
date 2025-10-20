@@ -88,6 +88,9 @@ public:
     void onChatThreadDeleteFrame(const std::vector<uint8_t>& b, size_t& off);
     void onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off);
 
+    void replaceUsernameEverywhere(const std::string& oldUsername,
+                                   const std::string& newUsername);
+
 private:
     // utils
     std::filesystem::path chatFilePathFor(uint64_t tableId, const std::string& name) const;

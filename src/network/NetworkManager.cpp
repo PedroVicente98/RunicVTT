@@ -9,6 +9,7 @@
 #include "Serializer.h"
 #include "DebugConsole.h"
 #include "Logger.h"
+#include <unordered_set>
 
 NetworkManager::NetworkManager(flecs::world ecs) :
     ecs(ecs), peer_role(Role::NONE)
@@ -95,11 +96,12 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
                     if (!UPnPManager::addPortMapping(localIp, port, port, "TCP", "RunicVTT"))
                     {
                         bool open = true;
-                        ShowPortForwardingHelpPopup(&open);
+                        pushStatusToast("Signalling Server UPnP Failled - Check Moldem configuration!!", ImGuiToaster::Level::Error, 4);
                     }
                 }
                 catch (...)
                 {
+                    pushStatusToast("Signalling Server UPnP Failled - Check Moldem configuration!!", ImGuiToaster::Level::Error, 4);
                 }
             }
             signalingClient->connect("127.0.0.1", port);
@@ -592,17 +594,17 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 }
 
 //NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
-void NetworkManager::setMyIdentity(std::string myId, std::string username)
+void NetworkManager::setMyIdentity(std::string peerId, std::string username)
 {
-    if (myId.empty())
+    if (peerId.empty())
     {
         myUsername_ = std::move(username);
     }
     else
     {
-        clientUsernames_[myId] = username;
+        clientUsernames_[peerId] = username;
         myUsername_ = std::move(username);
-        myClientId_ = std::move(myId);
+        myClientId_ = std::move(peerId);
     }
 }
 
@@ -735,6 +737,20 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
     return ids;
 }
 
+std::vector<std::string> NetworkManager::getConnectedUsernames() const
+{
+    std::vector<std::string> user_names;
+    user_names.reserve(peers.size());
+    for (auto& [pid, link] : peers)
+    {
+        if (link && link->isConnected())
+        {
+            user_names.push_back(displayNameFor(pid));
+        }
+    }
+    return user_names;
+}
+
 //-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
 void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
 {
@@ -830,6 +846,76 @@ void NetworkManager::broadcastFogDelete(uint64_t boardId, const flecs::entity& f
         sendFogDelete(boardId, fog, ids);
 }
 
+// NetworkManager.cpp
+
+void NetworkManager::buildUserNameUpdate(std::vector<uint8_t>& out,
+                                         uint64_t tableId,
+                                         const std::string& userPeerId,
+                                         const std::string& oldUsername,
+                                         const std::string& newUsername,
+                                         bool reboundFlag) const
+{
+    out.clear();
+    // NOTE: do NOT write the type here; caller will prepend it per-channel rules.
+    Serializer::serializeUInt64(out, tableId);
+    Serializer::serializeString(out, userPeerId);
+    Serializer::serializeString(out, oldUsername);
+    Serializer::serializeString(out, newUsername);
+    Serializer::serializeUInt8(out, reboundFlag ? 1 : 0);
+}
+
+void NetworkManager::broadcastUserNameUpdate(const std::vector<uint8_t>& payload)
+{
+    for (auto& [pid, link] : peers)
+    {
+        if (!link)
+            continue;
+        sendUserNameUpdateTo(pid, payload);
+    }
+}
+
+void NetworkManager::sendUserNameUpdateTo(const std::string& peerId,
+                                          const std::vector<uint8_t>& payload)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end() || !it->second)
+        return;
+
+    std::vector<uint8_t> frame;
+    frame.reserve(1 + payload.size());
+    frame.push_back((uint8_t)msg::DCType::UserNameUpdate);
+    frame.insert(frame.end(), payload.begin(), payload.end());
+
+    it->second->sendOn(msg::dc::name::Game, frame);
+}
+
+// NetworkManager.cpp
+std::pair<std::string, bool> NetworkManager::ensureUsernameUnique(const std::string& desired) const
+{
+    if (desired.empty())
+        return {desired, false};
+
+    // Build a bag of all known usernames (self + peers)
+    // clientUsernames_: { myPeerId -> myUsername }
+    // peerUsernames_:   { peerId   -> peerUsername }
+    std::unordered_set<std::string> all;
+    for (const auto& kv : clientUsernames_)
+        all.insert(kv.second);
+    for (const auto& kv : peerUsernames_)
+        all.insert(kv.second);
+
+    if (!all.count(desired))
+        return {desired, false};
+
+    // Find next free suffix _1, _2, ...
+    for (uint32_t i = 1;; ++i)
+    {
+        std::string cand = desired + "_" + std::to_string(i);
+        if (!all.count(cand))
+            return {cand, true};
+    }
+}
+
 void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
 {
     decodingFromPeer_ = fromPeer;
@@ -910,6 +996,11 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
                 Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
                 break;
 
+            case msg::DCType::UserNameUpdate:
+            {
+                handleUserNameUpdate(b, off);
+                break;
+            }
             default:
                 Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
                 break;
@@ -1891,6 +1982,24 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
     tryFinalizeImage(msg::ImageOwnerKind::Marker, markerId);
 }
 
+void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage r;
+    r.kind = msg::DCType::UserNameUpdate; // <-- missing
+    r.fromPeer = decodingFromPeer_;
+    r.tableId = Serializer::deserializeUInt64(b, off);
+    r.userPeerId = Serializer::deserializeString(b, off);
+    r.text = Serializer::deserializeString(b, off);   // oldUsername
+    r.name = Serializer::deserializeString(b, off);   // newUsername
+    r.rebound = Serializer::deserializeUInt8(b, off); // 0/1
+    Logger::instance().log("chat", Logger::Level::Info,
+                           " tbl=" + std::to_string(*r.tableId) +
+                               " peer=" + *r.userPeerId +
+                               " old=" + *r.text +
+                               " new=" + *r.name +
+                               " rb=" + std::to_string(*r.rebound));
+    inboundGame_.push(std::move(r));
+}
 void NetworkManager::handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::ReadyMessage m;
@@ -1987,6 +2096,7 @@ void NetworkManager::drainEvents()
         }
     }
 }
+
 void NetworkManager::drainInboundRaw(int maxPerTick)
 {
     using clock = std::chrono::steady_clock;

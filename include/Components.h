@@ -79,7 +79,8 @@ struct Board
 // Marker Component
 struct MarkerComponent
 {
-    std::string ownerPeerId; // "" = no owner
+    //std::string ownerPeerId;       // "" = no owner
+    std::string ownerPeerUsername; // "" = no owner
     bool allowAllPlayersMove = false;
     bool locked = false; // hard lock (GM can still move)
 };

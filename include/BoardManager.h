@@ -268,6 +268,9 @@ public:
     void killIfMouseUp(bool isMouseDown);
     void resnapAllMarkersToNearest(const Grid& grid);
 
+    void replaceOwnerUsernameEverywhere(const std::string& oldUsername,
+                                        const std::string& newUsername);
+
 private:
     bool is_non_map_window_hovered = false;
     bool is_camera_hovered = false;

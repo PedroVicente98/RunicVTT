@@ -224,7 +224,8 @@ void SignalingClient::onMessage(const std::string& msg)
 
             nm->setMyIdentity(myId, myUser);
             const std::string gmId = j.value(msg::key::GmId, "");
-            if (!gmId.empty()) nm->setGMId(gmId);
+            if (!gmId.empty())
+                nm->setGMId(gmId);
 
             if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array())
             {
@@ -232,7 +233,6 @@ void SignalingClient::onMessage(const std::string& msg)
                 {
                     std::string peerId = v.get<std::string>();
                     auto link = nm->ensurePeerLink(peerId);
-                    //link->createDataChannel(msg::dc::name::Game);
                     link->createChannels();
                     link->createOffer();
                 }
@@ -251,10 +251,7 @@ void SignalingClient::onMessage(const std::string& msg)
 
         auto link = nm->ensurePeerLink(from);
         nm->upsertPeerIdentity(from, username);
-        //link->createPeerConnection(); // safe if already exists
-        // Apply remote offer
         link->setRemoteDescription(rtc::Description(sdp, std::string(msg::signaling::Offer)));
-        // Create local answer (this will trigger NM callback to send)
         link->createAnswer();
         return;
     }
@@ -290,17 +287,6 @@ void SignalingClient::onMessage(const std::string& msg)
 
 void SignalingClient::close()
 {
-    //if (ws)
-    //{
-    //    try
-    //    {
-    //        ws->close();
-    //    }
-    //    catch (...)
-    //    {
-    //    }
-    //    ws.reset();
-    //}
     NetworkUtilities::safeCloseWebSocket(ws);
     ws.reset();
 }

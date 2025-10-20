@@ -543,8 +543,8 @@ bool BoardManager::canMoveMarker(const MarkerComponent* mc, flecs::entity marker
     if (mc->allowAllPlayersMove)
         return true;
 
-    const std::string me = nm->getMyId();
-    if (!mc->ownerPeerId.empty() && mc->ownerPeerId == me)
+    const std::string me = nm->getMyUsername();
+    if (!mc->ownerPeerUsername.empty() && mc->ownerPeerUsername == me)
         return true;
 
     // --- Fog rule for players ---
@@ -1042,110 +1042,21 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
     return entity_at_mouse;
 }
 
-//flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
-//{
-//    flecs::entity best{};
-//    bool bestIsMarker = false;
-//    float bestArea = std::numeric_limits<float>::infinity();
-//
-//    // We're only reading; deferring isn't needed, but keeping your pattern:
-//    ecs.defer_begin();
-//    ecs.each([&](flecs::entity e, const Position& pos, const Size& sz)
-//    {
-//        // Must belong to the active board
-//        if (!e.has(flecs::ChildOf, active_board))
-//            return;
-//
-//        // Point-in-AABB check (centered entity with half extents)
-//        const float hx = sz.width  * 0.5f;
-//        const float hy = sz.height * 0.5f;
-//        const bool inX = (mouse_position.x >= (pos.x - hx)) && (mouse_position.x <= (pos.x + hx));
-//        const bool inY = (mouse_position.y >= (pos.y - hy)) && (mouse_position.y <= (pos.y + hy));
-//        if (!inX || !inY) return;
-//
-//        const bool isMarker = e.has<MarkerComponent>();
-//        // Only Marker and FogOfWar are relevant; ignore other types if you want:
-//        // (If you want Fog only as alternative, check `e.has<FogOfWar>()` here.)
-//        const float area = std::max(0.0f, sz.width) * std::max(0.0f, sz.height);
-//
-//        // Decide priority:
-//        bool better = false;
-//        if (!best.is_valid()) {
-//            better = true; // first hit
-//        } else if (isMarker && !bestIsMarker) {
-//            better = true; // markers beat non-markers
-//        } else if (isMarker == bestIsMarker) {
-//            // same type -> smaller area wins
-//            if (area < bestArea) better = true;
-//        }
-//
-//        if (better) {
-//            best = e;
-//            bestIsMarker = isMarker;
-//            bestArea = area;
-//        }
-//    });
-//    ecs.defer_end();
-//
-//    return best;
-//}
+void BoardManager::replaceOwnerUsernameEverywhere(const std::string& oldUsername,
+                                                  const std::string& newUsername)
+{
+    if (oldUsername == newUsername)
+        return;
 
-//GRID
-
-//// Add this helper function to your BoardManager class
-//glm::vec2 BoardManager::snapToGrid(glm::vec2 raw_world_pos) {
-//    // Get grid parameters from the grid entity
-//    auto grid_comp = grid_entity.get<GridComponent>();
-//    auto grid_pos = grid_entity.get<Position>();
-//
-//    if (!grid_comp || !grid_pos) return raw_world_pos; // Safety check
-//
-//    float cell_size = grid_comp->cellSize;
-//    glm::vec2 offset = glm::vec2(grid_pos->x, grid_pos->y);
-//
-//    if (grid_comp->type == GridComponent::Type::SQUARE) {
-//        // Apply offset, snap, and then re-apply offset
-//        glm::vec2 relative_pos = raw_world_pos - offset;
-//        glm::vec2 snapped_pos = glm::round(relative_pos / cell_size) * cell_size;
-//        return snapped_pos + offset;
-//    }
-//    else if (grid_comp->type == GridComponent::Type::HEXAGONAL) {
-//        // Hex snapping logic (pointy-top orientation)
-//        float S = cell_size;
-//
-//        // Remove the grid offset before snapping
-//        glm::vec2 p = raw_world_pos - offset;
-//
-//        // Convert world position to floating-point axial coordinates
-//        float q_float = (p.x * 0.57735f - p.y * 0.33333f) / S; // 0.577... = 1/sqrt(3), 0.333... = 1/3
-//        float r_float = (p.y * 0.66667f) / S; // 0.666... = 2/3
-//
-//        // Round to nearest integer hex coordinates
-//        int q = round(q_float);
-//        int r = round(r_float);
-//        int s = round(-q_float - r_float);
-//
-//        // Correct for rounding errors by re-adjusting the one with the smallest change
-//        float q_diff = abs(q - q_float);
-//        float r_diff = abs(r - r_float);
-//        float s_diff = abs(s - (-q_float - r_float));
-//
-//        if (q_diff > r_diff && q_diff > s_diff) {
-//            q = -r - s;
-//        }
-//        else if (r_diff > s_diff) {
-//            r = -q - s;
-//        }
-//
-//        // Convert integer axial coordinates back to world position and add the offset
-//        float snapped_x = S * (1.73205f * q + 0.86603f * r); // 1.73... = sqrt(3), 0.866... = sqrt(3)/2
-//        float snapped_y = S * (1.5f * r);
-//
-//        return glm::vec2(snapped_x, snapped_y) + offset;
-//    }
-//
-//    return raw_world_pos; // Return original if no grid type matches
-//}
+    ecs.each([&](flecs::entity e, MarkerComponent& mc)
+             {
+        // Adjust to your field name if different
+        if (mc.ownerPeerUsername == oldUsername)
+        {
+            mc.ownerPeerUsername = newUsername;
+            e.set<MarkerComponent>(mc); // write back (flecs pattern consistent with your other code)
+        } });
+}
 
 //Save and Load Board --------------------------------------------------------------------
 
@@ -1373,23 +1284,23 @@ void BoardManager::renderEditWindow()
         std::set<std::string> uniq;
         if (nm)
         {
-            for (const auto& pid : nm->getConnectedPeerIds())
+            for (const auto& pid : nm->getConnectedUsernames())
             {
                 if (uniq.insert(pid).second)
                     options.emplace_back(pid);
             }
         }
         // include offline owner if not already in the list
-        if (!mc->ownerPeerId.empty() && !uniq.count(mc->ownerPeerId))
+        if (!mc->ownerPeerUsername.empty() && !uniq.count(mc->ownerPeerUsername))
         {
-            options.emplace_back(mc->ownerPeerId);
+            options.emplace_back(mc->ownerPeerUsername);
         }
 
         // Find current selection
         int selectedIndex = 0;
         for (int i = 1; i < (int)options.size(); ++i)
         {
-            if (options[i] == mc->ownerPeerId)
+            if (options[i] == mc->ownerPeerUsername)
             {
                 selectedIndex = i;
                 break;
@@ -1469,9 +1380,9 @@ void BoardManager::renderEditWindow()
 
         // Apply selection back to component
         if (selectedIndex == 0)
-            mc->ownerPeerId.clear();
+            mc->ownerPeerUsername.clear();
         else
-            mc->ownerPeerId = options[selectedIndex];
+            mc->ownerPeerUsername = options[selectedIndex];
 
         ImGui::Checkbox("Allow all players to move", &mc->allowAllPlayersMove);
         ImGui::Checkbox("Locked (players cannot move)", &mc->locked);

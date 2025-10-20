@@ -49,6 +49,8 @@ namespace msg
         NoteUpdate = 9, //Metadata and/or Content
         NoteDelete = 10,
 
+        UserNameUpdate = 105, // Game channel: broadcast username changes
+
         // chat ops (binary)
         ChatThreadCreate = 200,
         ChatThreadUpdate = 201,
@@ -123,6 +125,9 @@ namespace msg
             case msg::DCType::MarkerMoveState:
                 type_str = "MarkerMoveState";
                 break;
+            case msg::DCType::UserNameUpdate:
+                type_str = "UserNameUpdate";
+                break;
             default:
                 type_str = "UnkownType";
                 break;
@@ -189,6 +194,9 @@ namespace msg
         std::optional<uint32_t> dragEpoch;
         std::optional<uint32_t> seq;
         std::optional<Role> senderRole;
+
+        std::optional<std::string> userPeerId;
+        std::optional<uint8_t> rebound;
     };
 
     struct NetEvent

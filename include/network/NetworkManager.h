@@ -119,6 +119,10 @@ public:
     bool removePeer(std::string peerId);
     bool clearPeers() const
     {
+        for (auto [id, peer] : peers)
+        {
+            peer->close();
+        }
         return peers.empty();
     }
     bool disconnectAllPeers();
@@ -212,6 +216,7 @@ public:
     MessageQueue<msg::NetEvent> events_;
     MessageQueue<msg::InboundRaw> inboundRaw_;
     std::vector<std::string> getConnectedPeerIds() const;
+    std::vector<std::string> getConnectedUsernames() const;
 
     // GM identity
     void setGMId(const std::string& id)
@@ -257,6 +262,20 @@ public:
     void sendGridUpdate(uint64_t boardId, const flecs::entity& board, const std::vector<std::string>& toPeerIds);
 
     //PUBLIC END MARKER STUFF----------------------------------------------------------------------------
+
+    void buildUserNameUpdate(std::vector<uint8_t>& out,
+                             uint64_t tableId,
+                             const std::string& userPeerId,
+                             const std::string& oldUsername,
+                             const std::string& newUsername,
+                             bool reboundFlag) const;
+
+    void broadcastUserNameUpdate(const std::vector<uint8_t>& payload); // send on Game DC to all
+    void sendUserNameUpdateTo(const std::string& peerId,               // direct (rare)
+                              const std::vector<uint8_t>& payload);
+
+    std::pair<std::string, bool> ensureUsernameUnique(const std::string& desired) const;
+
 private:
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
@@ -317,6 +336,8 @@ private:
     void handleImageChunk(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
+
+    void handleUserNameUpdate(const std::vector<uint8_t>& b, size_t& off);
 
     // FogUpdate
     void handleFogUpdate(const std::vector<uint8_t>& b, size_t& off);

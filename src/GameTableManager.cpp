@@ -5,9 +5,9 @@
 #include "UPnPManager.h"
 #include "Logger.h"
 GameTableManager::GameTableManager(flecs::world ecs, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
-    ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory))
+    ecs(ecs), network_manager(std::make_shared<NetworkManager>(ecs)), identity_manager(std::make_shared<IdentityManager>()), map_directory(map_directory), board_manager(std::make_shared<BoardManager>(ecs, network_manager, map_directory, marker_directory))
 {
-
+    identity_manager->loadUsernamesFromFile();
     chat_manager = std::make_shared<ChatManager>(network_manager);
 
     std::filesystem::path map_directory_path = PathManager::getMapsPath();
@@ -119,6 +119,28 @@ void GameTableManager::processReceivedMessages()
                 game_table_name = *m.name;
                 chat_manager->setActiveGameTable(*m.tableId, *m.name);
                 Logger::instance().log("localtunnel", Logger::Level::Info, "GameTable Created!!");
+                // resolve & adopt username for this table
+                const std::string before = network_manager->getMyUsername();
+                const std::string resolved = identity_manager->findUsername(*m.tableId, before.empty() ? "Player" : before);
+
+                if (resolved != before)
+                {
+                    network_manager->setMyIdentity("", resolved);
+                    identity_manager->addUsername(*m.tableId, resolved);
+
+                    // OPTIONAL: tell others that your effective name changed
+                    std::vector<uint8_t> buf;
+                    network_manager->buildUserNameUpdate(buf, *m.tableId,
+                                                         network_manager->getMyId(),
+                                                         /*old*/ before,
+                                                         /*new*/ resolved,
+                                                         /*rebound*/ false);
+                    network_manager->broadcastUserNameUpdate(buf);
+
+                    // OPTIONAL: apply locally so UI updates now
+                    board_manager->replaceOwnerUsernameEverywhere(before, resolved);
+                    chat_manager->replaceUsernameEverywhere(before, resolved);
+                }
                 break;
             }
 
@@ -434,6 +456,43 @@ void GameTableManager::processReceivedMessages()
                     break;
 
                 boardEnt.set<Grid>(*m.grid);
+                break;
+            }
+
+            // GameTableManager.cpp — inside processReceivedMessages() switch:
+            case msg::DCType::UserNameUpdate:
+            {
+                if (!m.tableId || !m.userPeerId || !m.name || !m.text)
+                    break;
+                if (*m.tableId != chat_manager->currentTableId_)
+                    break; // same table guard
+
+                const std::string& oldU = *m.text;
+                const std::string& newU = *m.name;
+
+                auto [applied, adjusted] = network_manager->ensureUsernameUnique(newU);
+
+                board_manager->replaceOwnerUsernameEverywhere(oldU, applied);
+                chat_manager->replaceUsernameEverywhere(oldU, applied);
+
+                network_manager->upsertPeerIdentity(*m.userPeerId, applied);
+
+                if (adjusted && (!m.rebound || *m.rebound == 0))
+                {
+                    std::vector<uint8_t> buf;
+                    network_manager->buildUserNameUpdate(buf, *m.tableId, *m.userPeerId, newU, applied, /*rebound*/ true);
+                    network_manager->broadcastUserNameUpdate(buf);
+                }
+
+                if (*m.userPeerId == network_manager->getMyId() &&
+                    applied != network_manager->getMyUsername())
+                {
+                    network_manager->setMyIdentity("", applied);
+                    identity_manager->addUsername(*m.tableId, applied);
+                    network_manager->pushStatusToast(
+                        "Your username is now \"" + applied + "\"", ImGuiToaster::Level::Info);
+                }
+
                 break;
             }
 
@@ -1434,6 +1493,72 @@ void GameTableManager::hostGameTablePopUp()
         }
 
         // Note: Share/copyable connection strings live in Network Center (as you prefer)
+        ImGui::EndPopup();
+    }
+}
+
+void GameTableManager::renderUsernameChangePopup()
+{
+    // You already call OpenPopup("Change Username") elsewhere
+    if (ImGui::BeginPopupModal("Change Username", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static char usernameBuf[64] = {0};
+
+        // Seed the input when the popup appears
+        if (ImGui::IsWindowAppearing())
+        {
+            const std::string cur = network_manager->getMyUsername();
+            std::snprintf(usernameBuf, sizeof(usernameBuf), "%s", cur.c_str());
+        }
+
+        ImGui::TextUnformatted("Username for this table:");
+        ImGui::InputText("##uname", usernameBuf, (int)sizeof(usernameBuf));
+        ImGui::Separator();
+
+        const bool hasTable = active_game_table.is_alive() && active_game_table.has<Identifier>();
+        ImGui::BeginDisabled(!hasTable);
+        if (ImGui::Button("Apply", ImVec2(120, 0)))
+        {
+            if (hasTable)
+            {
+                const uint64_t tableId = active_game_table.get<Identifier>()->id;
+                const std::string oldU = network_manager->getMyUsername();
+                const std::string newU = usernameBuf;
+
+                if (!newU.empty() && newU != oldU)
+                {
+                    // 1) Persist per-table username
+                    identity_manager->loadUsernamesFromFile();    // ok if file missing
+                    identity_manager->addUsername(tableId, newU); // write immediately
+
+                    // 2) Update runtime identity (peerId stays as-is)
+                    network_manager->setMyIdentity(/*peerId*/ "", /*username*/ newU);
+
+                    // 3) Broadcast to peers via Game DC
+                    std::vector<uint8_t> payload;
+                    network_manager->buildUserNameUpdate(payload,
+                                                         tableId,
+                                                         /*userPeerId*/ network_manager->getMyId(),
+                                                         /*oldUsername*/ oldU,
+                                                         /*newUsername*/ newU,
+                                                         /*reboundFlag*/ false);
+                    network_manager->broadcastUserNameUpdate(payload);
+
+                    // 4) Apply locally for instant UI feedback
+                    board_manager->replaceOwnerUsernameEverywhere(oldU, newU);
+                    chat_manager->replaceUsernameEverywhere(oldU, newU);
+                }
+            }
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndDisabled();
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
         ImGui::EndPopup();
     }
 }
