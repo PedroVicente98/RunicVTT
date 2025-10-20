@@ -24,11 +24,14 @@ public:
     void openNoteTab(const std::string& uuid);
     void setActiveTable(std::optional<std::string> tableName);
 
+    void setVisible(bool v) { visible_ = v; }
+    bool isVisible() const { return visible_; }
+
 private:
     std::shared_ptr<NotesManager> mgr_;
     std::shared_ptr<ImGuiToaster> toaster_;
     NoteMarkdownRenderer md_;
-
+    bool visible_ = false;
     float leftWidth_ = 260.f;
 
     std::vector<std::string> openTabs_;  // UUIDs
