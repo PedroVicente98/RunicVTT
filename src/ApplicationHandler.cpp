@@ -614,10 +614,10 @@ void ApplicationHandler::renderMainMenuBar()
     }
     if (ImGui::BeginMenu("Notes"))
     {
-        bool vis = DebugConsole::isVisible();
-        if (ImGui::MenuItem("Note Editor(NOTYET)", nullptr, vis))
+        bool vis = note_editor_ui->isVisible();
+        if (ImGui::MenuItem("Note Editor", nullptr, vis))
         {
-            DebugConsole::setVisible(!vis);
+            note_editor_ui->setVisible(!vis);
         }
         ImGui::EndMenu();
     }
