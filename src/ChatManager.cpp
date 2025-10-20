@@ -649,7 +649,27 @@ void ChatManager::renderLeftPanel(float /*width*/)
     ImGui::SameLine();
     if (ImGui::Button("Delete Group"))
         openDeletePopup_ = true;
-
+    ImGui::SameLine();
+    
+    {
+        // Enable edit only when there is a non-General active group
+        bool canEdit = (activeGroupId_ != 0 && activeGroupId_ != generalGroupId_);
+        ImGui::BeginDisabled(!canEdit);
+        if (ImGui::Button("Edit Group"))
+        {
+            // seed edit state from the active group
+            if (auto* g = getGroup(activeGroupId_))
+            {
+                editGroupId_ = g->id;
+                editGroupSel_ = g->participants;
+                std::fill(editGroupName_.begin(), editGroupName_.end(), '\0');
+                std::snprintf(editGroupName_.data(), (int)editGroupName_.size(), "%s", g->name.c_str());
+                openEditPopup_ = true;
+            }
+        }
+        ImGui::EndDisabled();
+    }
+    
     ImGui::Separator();
     ImGui::TextUnformatted("Chat Groups");
     ImGui::Separator();
@@ -723,6 +743,14 @@ void ChatManager::renderLeftPanel(float /*width*/)
         ImGui::OpenPopup("DeleteGroup");
     }
     renderDeleteGroupPopup();
+
+    if (openEditPopup_) 
+    {
+        openEditPopup_ = false;
+        ImGui::OpenPopup("EditGroup");
+    }
+    renderEditGroupPopup();
+
 }
 
 void ChatManager::renderRightPanel(float /*leftW*/)
@@ -913,6 +941,95 @@ void ChatManager::renderCreateGroupPopup()
         ImGui::EndPopup();
     }
 }
+
+void ChatManager::renderEditGroupPopup()
+{
+    if (ImGui::BeginPopupModal("EditGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ChatGroupModel* g = getGroup(editGroupId_);
+        if (!g) {
+            ImGui::TextDisabled("Group not found.");
+            if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+            ImGui::EndPopup();
+            return;
+        }
+
+        // Optional: only owner can edit (comment out these 6 lines if you want anyone to edit)
+        auto nm = network_.lock();
+        const std::string me = nm ? nm->getMyId() : "";
+        const bool ownerOnly = true;
+        const bool canEdit = !ownerOnly || (!g->ownerPeerId.empty() && g->ownerPeerId == me);
+        if (!canEdit) ImGui::TextColored(ImVec4(1,0.5f,0.3f,1), "Only the owner can edit this group.");
+
+        ImGui::Separator();
+        ImGui::TextUnformatted("Group name:");
+        ImGui::BeginDisabled(!canEdit);
+        ImGui::InputText("##edit_gname", editGroupName_.data(), (int)editGroupName_.size());
+        ImGui::EndDisabled();
+
+        // Participants list (pre-checked)
+        ImGui::Separator();
+        ImGui::TextUnformatted("Participants:");
+        if (nm)
+        {
+            ImGui::BeginDisabled(!canEdit);
+            for (auto& [pid, link] : nm->getPeers())
+            {
+                bool checked = editGroupSel_.count(pid) > 0;
+                const std::string dn = nm->displayNameFor(pid);
+                std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
+                if (ImGui::Checkbox(label.c_str(), &checked))
+                {
+                    if (checked) editGroupSel_.insert(pid);
+                    else         editGroupSel_.erase(pid);
+                }
+            }
+            ImGui::EndDisabled();
+        }
+
+        // Validate (unique name unless unchanged)
+        bool nameTaken = false;
+        const std::string desired = editGroupName_.data();
+        if (!desired.empty() && desired != g->name)
+        {
+            for (auto& [id, gg] : groups_)
+                if (gg.name == desired) { nameTaken = true; break; }
+        }
+        if (nameTaken)
+            ImGui::TextColored(ImVec4(1, 0.4f, 0.2f, 1), "A group with that name already exists.");
+
+        ImGui::Separator();
+        ImGui::BeginDisabled(!canEdit || desired.empty() || nameTaken);
+        if (ImGui::Button("Update", ImVec2(120, 0)))
+        {
+            // Apply local changes
+            g->name = desired;
+            g->participants = editGroupSel_;
+
+            // Broadcast update
+            emitGroupUpdate(*g);
+
+            // nice UX
+            activeGroupId_ = g->id;
+            markGroupRead(g->id);
+            focusInput_ = true;
+            followScroll_ = true;
+
+            // keep popup open OR close—your call; let's close:
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndDisabled();
+
+        ImGui::SameLine();
+        if (ImGui::Button("Close", ImVec2(120, 0)))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
 
 void ChatManager::renderDeleteGroupPopup()
 {
