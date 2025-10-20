@@ -1,19 +1,12 @@
 #pragma once
 #include "NotesManager.h"
 #include "imgui.h"
-#include "imgui_md.h"
+#include "MarkerRenderer.h"
 #include <vector>
 #include <unordered_map>
 #include <memory>
 
 struct ImGuiToaster;
-
-// Minimal markdown renderer (no images)
-struct NoteMarkdownRenderer : public imgui_md {
-    ImFont* get_font() const override { return ImGui::GetFont(); }
-    void open_url() const override {}     // no-op for now
-    bool get_image(image_info&) const override { return false; }
-};
 
 class NoteEditorUI {
 public:
@@ -28,9 +21,10 @@ public:
     bool isVisible() const { return visible_; }
 
 private:
+
     std::shared_ptr<NotesManager> mgr_;
     std::shared_ptr<ImGuiToaster> toaster_;
-    NoteMarkdownRenderer md_;
+    MarkerRenderer md_;
     bool visible_ = false;
     float leftWidth_ = 260.f;
 
