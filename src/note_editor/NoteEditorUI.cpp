@@ -199,7 +199,27 @@ void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float av
         ImGui::SameLine();
         ImGui::TextDisabled("Updated: %lld", (long long)toMs(n->last_update_ts));
         ImGui::Separator();
-
+        
+        md_.onOpenExternal = [](const std::string& url) {
+            // you can leave default (it already opens browser), or hook a toast:
+            toaster_->Push(ImGuiToaster::Level::Info, "Opening: " + url);
+        };
+        
+        md_.onRoll = [this](const std::string& expr) {
+            if (toaster_) toaster_->Push(ImGuiToaster::Level::Good, "Roll: " + expr);
+            // TODO later: send to chat roller
+        };
+        
+        md_.resolveNoteRef = [this](const std::string& ref) -> std::string {
+            // Let NotesManager resolve: by title, alias, or short-id → UUID
+            return notes_manager_->resolveRef(ref); // implement: tries full uuid, short-prefix, title lookup
+        };
+        
+        md_.onNoteOpen = [this](const std::string& uuid) {
+            // Open tab by UUID
+            openTabByUuid(uuid);
+        };
+        
         const std::string& md = n->open_editor ? tabState_[uuid].editBuffer : n->markdown_text;
         if (!md.empty()) {
             md_.print(md.c_str(), md.c_str() + md.size());
