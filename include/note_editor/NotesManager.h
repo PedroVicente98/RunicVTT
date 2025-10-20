@@ -9,15 +9,15 @@
 #include <cstdint>
 #include <mutex>
 #include <memory>
-
-struct ImGuiToaster; // fwd-decl
+#include "ImGuiToaster.h"
 
 // Plain Note model (no ECS)
-struct Note {
+struct Note
+{
     // Identity & placement
-    std::string uuid;                       // stable identifier (globally unique)
-    std::optional<std::string> table_name;  // optional GameTable name
-    std::filesystem::path file_path;        // where it's saved (empty if never saved)
+    std::string uuid;                      // stable identifier (globally unique)
+    std::optional<std::string> table_name; // optional GameTable name
+    std::filesystem::path file_path;       // where it's saved (empty if never saved)
 
     // Metadata
     std::string title;
@@ -40,14 +40,16 @@ struct Note {
 };
 
 // Where notes live on disk
-struct NotesManagerConfig {
-    std::filesystem::path globalNotesDir;     // e.g., <root>/Notes
-    std::filesystem::path gameTablesRootDir;  // e.g., <root>/GameTables
+struct NotesManagerConfig
+{
+    std::filesystem::path globalNotesDir;    // e.g., <root>/Notes
+    std::filesystem::path gameTablesRootDir; // e.g., <root>/GameTables
 };
 
-class NotesManager {
+class NotesManager
+{
 public:
-    explicit NotesManager(NotesManagerConfig cfg, std::shared_ptr<ImGuiToaster> toaster = nullptr);
+    NotesManager(NotesManagerConfig cfg, std::shared_ptr<ImGuiToaster> toaster);
 
     // Loaders
     void loadAllFromDisk();
@@ -88,7 +90,7 @@ public:
     // Utilities
     static std::string generateUUID();
     static std::string slugify(const std::string& title);
-    static int64_t     toEpochMillis(std::chrono::system_clock::time_point tp);
+    static int64_t toEpochMillis(std::chrono::system_clock::time_point tp);
     static std::chrono::system_clock::time_point fromEpochMillis(int64_t ms);
 
     static bool parseMarkdownFile(const std::filesystem::path& path, Note& outNote);
@@ -107,7 +109,6 @@ public:
     void removeFromIndex(const std::string& uuid);
 
 private:
-
     // canonical store
     std::unordered_map<std::string, std::shared_ptr<Note>> notesByUuid_;
 

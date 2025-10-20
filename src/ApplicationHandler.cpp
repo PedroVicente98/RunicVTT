@@ -13,9 +13,16 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
     marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directoryry)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
     ImGuiToaster::Config cfg;
-    this->toaster_ = std::make_shared<ImGuiToaster>(cfg);
+    toaster_ = std::make_shared<ImGuiToaster>(cfg);
     game_table_manager->setup();
     game_table_manager->setToaster(toaster_);
+
+    auto note_cfg = NotesManagerConfig{
+        PathManager::getNotesPath(),
+        PathManager::getGameTablesPath()};
+
+    notes_manager = std::make_shared<NotesManager>(note_cfg, toaster_);
+    note_editor_ui = std::make_shared<NoteEditorUI>(notes_manager, toaster_);
 
     ecs.component<Position>();         // .member<float>("x").member<float>("y");
     ecs.component<Size>();             // .member<float>("width").member<float>("height");
@@ -364,6 +371,7 @@ int ApplicationHandler::run()
 
             renderDockSpace();
             renderMainMenuBar();
+            note_editor_ui->render();
             renderMapFBO(va, ib, shader, grid_shader, renderer);
             renderActiveGametable();
             toaster_->Render();

@@ -1,37 +1,44 @@
 #pragma once
 #include "NotesManager.h"
 #include "imgui.h"
-#include "MarkerRenderer.h"
+#include "MarkdownRenderer.h"
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include "ImGuiToaster.h"
 
-struct ImGuiToaster;
-
-class NoteEditorUI {
+class NoteEditorUI
+{
 public:
-    explicit NoteEditorUI(std::shared_ptr<NotesManager> mgr,
-                          std::shared_ptr<ImGuiToaster> toaster = nullptr);
+    NoteEditorUI(std::shared_ptr<NotesManager> notes_manager, std::shared_ptr<ImGuiToaster> toaster);
 
     void render(bool* pOpen = nullptr);
     void openNoteTab(const std::string& uuid);
     void setActiveTable(std::optional<std::string> tableName);
 
-    void setVisible(bool v) { visible_ = v; }
-    bool isVisible() const { return visible_; }
+    void setVisible(bool v)
+    {
+        visible_ = v;
+    }
+    bool isVisible() const
+    {
+        return visible_;
+    }
+
+    bool openTabByUuid(const std::string& uuid);
 
 private:
-
-    std::shared_ptr<NotesManager> mgr_;
+    std::shared_ptr<NotesManager> notes_manager;
     std::shared_ptr<ImGuiToaster> toaster_;
-    MarkerRenderer md_;
+    MarkdownRenderer md_;
     bool visible_ = false;
     float leftWidth_ = 260.f;
 
-    std::vector<std::string> openTabs_;  // UUIDs
+    std::vector<std::string> openTabs_; // UUIDs
     int currentTabIndex_ = -1;
 
-    struct TabState {
+    struct TabState
+    {
         std::string editBuffer;
         bool bufferInit = false;
     };
