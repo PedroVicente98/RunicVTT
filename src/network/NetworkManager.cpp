@@ -2121,7 +2121,6 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
             }
             else if (r.label == msg::dc::name::MarkerMove)
             {
-                Logger::instance().log("localtunnel", Logger::Level::Info, "Received MarkerMOVE ON DRAIN INBOUND!");
                 decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes); // coalesce into moveLatest_
             }
         }
@@ -2177,7 +2176,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
             break;
         auto type = static_cast<msg::DCType>(b[off]);
         off += 1;
-        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
+        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! onChat");
         switch (type)
         {
             case msg::DCType::ChatGroupCreate:
@@ -2244,7 +2243,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
             }
 
             default:
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onChat");
                 return; // stop this buffer if unknown/out-of-sync
         }
     }
@@ -2280,7 +2279,7 @@ void NetworkManager::decodeRawNotesBuffer(const std::string& fromPeer, const std
                 break;
             default:
                 // unknown / out-of-sync: stop this buffer
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onNotes");
                 return;
         }
     }

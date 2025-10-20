@@ -10,6 +10,8 @@
 #include <optional>
 #include <memory>
 #include <array>
+#include <cmath>
+#include "imgui.h"
 
 #include "Message.h"
 
@@ -124,6 +126,12 @@ private:
     static ChatMessageModel::Kind classifyMessage(const std::string& s);
     static double nowSec();
 
+    mutable std::unordered_map<std::string, ImU32> nameColorCache_;
+    static ImVec4 HSVtoRGB(float h, float s, float v);
+    ImU32 getUsernameColor(const std::string& name) const;
+    void renderColoredUsername(const std::string& name) const;
+    void renderPlainMessage(const std::string& text) const;
+
     std::filesystem::path chatFilePathFor(uint64_t tableId, const std::string& name) const;
     void ensureGeneral();
     void markGroupRead(uint64_t groupId);
@@ -147,4 +155,7 @@ private:
 
     // ---- id utils ----
     uint64_t makeGroupIdFromName(const std::string& name) const; // name is unique; use its hash
+
+    //STATIC METHODS
+    // HSV->RGB helper for ImGui colors
 };

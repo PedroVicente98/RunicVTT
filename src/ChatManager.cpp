@@ -3,13 +3,13 @@
 #include "PeerLink.h"
 #include "Serializer.h"
 #include "Logger.h"
-#include "imgui.h"
-
 #include <algorithm>
 #include <cctype>
 #include <cstring>
 #include <fstream>
 #include <random>
+#include <cstdint>
+#include <unordered_map>
 
 // ====== small utils ======
 double ChatManager::nowSec()
@@ -365,7 +365,9 @@ void ChatManager::emitGroupCreate(const ChatGroupModel& g)
         Serializer::serializeString(buf, p);
 
     Logger::instance().log("chat", Logger::Level::Info,
-                           "SEND GroupCreate id=" + std::to_string(g.id) + " name=" + g.name);
+                           "[SEND] ChatGroupCreate table=" + std::to_string(currentTableId_) +
+                               " gid=" + std::to_string(g.id) + " name='" + g.name +
+                               "' bytes=" + std::to_string(buf.size()));
 
     // broadcast: anyone can see groups list (or you can target participants only if you prefer)
     nm->broadcastChatThreadFrame(msg::DCType::ChatGroupCreate, buf);
@@ -384,6 +386,10 @@ void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
     for (auto& p : g.participants)
         Serializer::serializeString(buf, p);
 
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "[SEND] ChatGroupUpdate table=" + std::to_string(currentTableId_) +
+                               " gid=" + std::to_string(g.id) + " name='" + g.name +
+                               "' bytes=" + std::to_string(buf.size()));
     nm->broadcastChatThreadFrame(msg::DCType::ChatGroupUpdate, buf);
 }
 
@@ -395,6 +401,12 @@ void ChatManager::emitGroupDelete(uint64_t groupId)
     std::vector<uint8_t> buf;
     Serializer::serializeUInt64(buf, currentTableId_);
     Serializer::serializeUInt64(buf, groupId);
+
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "[SEND] ChatGroupDelete table=" + std::to_string(currentTableId_) +
+                               " gid=" + std::to_string(groupId) +
+                               " bytes=" + std::to_string(buf.size()));
+
     nm->broadcastChatThreadFrame(msg::DCType::ChatGroupDelete, buf);
 }
 
@@ -410,6 +422,13 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
     Serializer::serializeUInt64(buf, ts);
     Serializer::serializeString(buf, username);
     Serializer::serializeString(buf, text);
+
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "[SEND] ChatMessage table=" + std::to_string(currentTableId_) +
+                               " gid=" + std::to_string(groupId) +
+                               " user='" + username + "'" +
+                               " text_len=" + std::to_string(text.size()) +
+                               " payload=" + std::to_string(buf.size()));
 
     // broadcast to all; render simply ignores groups you aren’t part of
     nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
@@ -454,6 +473,94 @@ void ChatManager::render()
     ImGui::EndChild();
 
     ImGui::End();
+}
+
+ImVec4 ChatManager::HSVtoRGB(float h, float s, float v)
+{
+    if (s <= 0.0f)
+        return ImVec4(v, v, v, 1.0f);
+    h = std::fmodf(h, 1.0f) * 6.0f; // [0,6)
+    int i = (int)h;
+    float f = h - (float)i;
+    float p = v * (1.0f - s);
+    float q = v * (1.0f - s * f);
+    float t = v * (1.0f - s * (1.0f - f));
+    float r = 0, g = 0, b = 0;
+    switch (i)
+    {
+        case 0:
+            r = v;
+            g = t;
+            b = p;
+            break;
+        case 1:
+            r = q;
+            g = v;
+            b = p;
+            break;
+        case 2:
+            r = p;
+            g = v;
+            b = t;
+            break;
+        case 3:
+            r = p;
+            g = q;
+            b = v;
+            break;
+        case 4:
+            r = t;
+            g = p;
+            b = v;
+            break;
+        default:
+            r = v;
+            g = p;
+            b = q;
+            break;
+    }
+    return ImVec4(r, g, b, 1.0f);
+}
+
+ImU32 ChatManager::getUsernameColor(const std::string& name) const
+{
+    // C++14-friendly: no init-statement in if
+    auto it = nameColorCache_.find(name);
+    if (it != nameColorCache_.end())
+        return it->second;
+
+    // hash -> hue
+    std::hash<std::string> H;
+    uint64_t hv = H(name) ^ 0x9E3779B97F4A7C15ull;
+    float hue = (float)((hv % 10000) / 10000.0f); // [0,1)
+
+    // avoid a narrow hue band if desired
+    if (hue > 0.12f && hue < 0.18f)
+        hue += 0.08f;
+    if (hue >= 1.0f)
+        hue -= 1.0f;
+
+    const float sat = 0.65f;
+    const float val = 0.90f;
+
+    ImVec4 rgb = HSVtoRGB(hue, sat, val);
+    ImU32 col = ImGui::GetColorU32(rgb);
+
+    nameColorCache_.emplace(name, col);
+    return col;
+}
+
+void ChatManager::renderColoredUsername(const std::string& name) const
+{
+    const ImU32 col = getUsernameColor(name);
+    ImGui::PushStyleColor(ImGuiCol_Text, col);
+    ImGui::TextUnformatted(name.c_str());
+    ImGui::PopStyleColor();
+}
+
+void ChatManager::renderPlainMessage(const std::string& text) const
+{
+    ImGui::TextWrapped("%s", text.c_str());
 }
 
 void ChatManager::tryHandleSlashCommand(uint64_t threadId, const std::string& input)
@@ -632,8 +739,18 @@ void ChatManager::renderRightPanel(float /*leftW*/)
 
         for (auto& m : g->messages)
         {
+            renderColoredUsername(m.username);
+
+            // separator
+            ImGui::SameLine(0.0f, 6.0f);
+            ImGui::TextUnformatted("-");
+            ImGui::SameLine(0.0f, 6.0f);
+
+            // message (wrapped). Put it in a child region so the wrap can use full width if you want,
+            // but simplest is to just call TextWrapped now:
+            // ensure we start from current cursor X (SameLine set it)
             ImGui::PushTextWrapPos(0);
-            ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
+            renderPlainMessage(m.content);
             ImGui::PopTextWrapPos();
         }
         if (followScroll_)

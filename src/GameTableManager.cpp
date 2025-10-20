@@ -376,8 +376,20 @@ void GameTableManager::processReceivedMessages()
             }
 
             case msg::DCType::ChatGroupCreate:
+            {
+                chat_manager->applyReady(m);
+                break;
+            }
             case msg::DCType::ChatGroupUpdate:
+            {
+                chat_manager->applyReady(m);
+                break;
+            }
             case msg::DCType::ChatGroupDelete:
+            {
+                chat_manager->applyReady(m);
+                break;
+            }
             case msg::DCType::ChatMessage:
             {
                 chat_manager->applyReady(m);
