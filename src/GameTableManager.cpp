@@ -29,6 +29,7 @@ GameTableManager::~GameTableManager()
 void GameTableManager::saveGameTable()
 {
     createGameTableFile(active_game_table);
+    chat_manager->saveCurrent();
 }
 
 void GameTableManager::loadGameTable(std::filesystem::path game_table_file_path)
