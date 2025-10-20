@@ -112,6 +112,12 @@ private:
     std::array<char, 128> newGroupName_{};
     std::set<std::string> newGroupSel_; // peer ids selected
 
+    // --- Edit popup state ---
+    bool openEditPopup_ = false;
+    uint64_t editGroupId_ = 0;
+    std::array<char, 128> editGroupName_{};
+    std::set<std::string> editGroupSel_; // peer ids selected for edit
+
     // Dice popup state
     int diceN_ = 1;
     int diceSides_ = 20;
@@ -143,6 +149,8 @@ private:
     void emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts);
 
     // ---- UI ----
+
+    void renderEditGroupPopup();
     void renderLeftPanel(float width);
     void renderRightPanel(float leftPanelWidth);
     void renderCreateGroupPopup();
