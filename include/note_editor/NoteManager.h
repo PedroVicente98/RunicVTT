@@ -96,7 +96,29 @@ public:
 
     std::filesystem::path defaultSavePath(const Note& note) const;
 
+    // lookups
+    std::shared_ptr<Note> getByUuid(const std::string& uuid) const;
+
+    // resolve "ref" (uuid, title, short-id) -> UUID string (or empty if not found)
+    std::string resolveRef(const std::string& ref) const;
+
+    // (Called when notes are loaded/created/renamed)
+    void indexNote(const std::shared_ptr<Note>& n);
+    void removeFromIndex(const std::string& uuid);
+
 private:
+
+    // canonical store
+    std::unordered_map<std::string, std::shared_ptr<Note>> notesByUuid_;
+
+    // title → uuid (case-insensitive; exact match only)
+    std::unordered_map<std::string, std::string> titleToUuid_;
+
+    // helpers
+    static bool looksLikeUuid_(const std::string& s);
+    static bool looksLikeShortHex_(const std::string& s);
+    static std::string toLower_(const std::string& s);
+
     NotesManagerConfig cfg_;
     std::shared_ptr<ImGuiToaster> toaster_;
 
