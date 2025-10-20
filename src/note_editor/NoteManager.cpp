@@ -1,168 +1,432 @@
-#include "NoteManager.h"
-#include <filesystem>
+#include "NotesManager.h"
+#include "ImGuiToaster.h"
+
 #include <fstream>
 #include <sstream>
-#include <iomanip>
-#include <chrono>
 #include <random>
+#include <iomanip>
+#include <algorithm>
 
-namespace fs = std::filesystem;
+using Clock = std::chrono::system_clock;
 
-NoteManager::NoteManager(flecs::world& world, const std::string& noteDir) :
-    m_world(world), m_noteDirectory(noteDir)
-{
+static bool isMarkdownExt(const std::filesystem::path& p) {
+    auto ext = p.extension().string();
+    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
+    return (ext == ".md" || ext == ".markdown");
 }
 
-void NoteManager::loadAllNotesFromDisk()
-{
-    if (!fs::exists(m_noteDirectory))
-    {
-        fs::create_directory(m_noteDirectory);
-        return;
-    }
+NotesManager::NotesManager(NotesManagerConfig cfg, std::shared_ptr<ImGuiToaster> toaster)
+    : cfg_(std::move(cfg)), toaster_(std::move(toaster)) {
+    std::error_code ec;
+    if (!cfg_.globalNotesDir.empty())
+        std::filesystem::create_directories(cfg_.globalNotesDir, ec);
+    if (!cfg_.gameTablesRootDir.empty())
+        std::filesystem::create_directories(cfg_.gameTablesRootDir, ec);
+}
 
-    for (const auto& file : fs::directory_iterator(m_noteDirectory))
-    {
-        if (!file.is_regular_file() || file.path().extension() != ".md")
-            continue;
+void NotesManager::loadAllFromDisk() {
+    std::lock_guard<std::mutex> lk(mtx_);
+    notesById_.clear();
 
-        NoteComponent note = parseNoteFromFile(file.path().string());
+    scanFolderForMd_(cfg_.globalNotesDir, std::nullopt);
 
-        // Assign UUID if missing
-        if (note.uuid.empty())
-        {
-            note.uuid = generateUUID();
+    if (!cfg_.gameTablesRootDir.empty() && std::filesystem::exists(cfg_.gameTablesRootDir)) {
+        for (auto& dir : std::filesystem::directory_iterator(cfg_.gameTablesRootDir)) {
+            if (!dir.is_directory()) continue;
+            auto tableName = dir.path().filename().string();
+            auto notesDir = dir.path() / "Notes";
+            scanFolderForMd_(notesDir, tableName);
         }
+    }
+    toastInfo("Notes loaded from disk.");
+}
 
-        note.saved_locally = true;
-        note.shared = false;
+void NotesManager::loadFromGlobal() {
+    std::lock_guard<std::mutex> lk(mtx_);
+    scanFolderForMd_(cfg_.globalNotesDir, std::nullopt);
+    toastInfo("Global notes loaded.");
+}
 
-        m_world.entity(note.uuid.c_str())
-            .set<NoteComponent>(note);
+void NotesManager::loadFromTable(const std::string& tableName) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto notesDir = cfg_.gameTablesRootDir / tableName / "Notes";
+    scanFolderForMd_(notesDir, tableName);
+    toastInfo("Table notes loaded: " + tableName);
+}
+
+void NotesManager::scanFolderForMd_(const std::filesystem::path& dir,
+                                    std::optional<std::string> tableName) {
+    std::error_code ec;
+    if (dir.empty() || !std::filesystem::exists(dir, ec)) return;
+
+    for (auto& entry : std::filesystem::directory_iterator(dir, ec)) {
+        if (!entry.is_regular_file(ec)) continue;
+        if (!isMarkdownExt(entry.path())) continue;
+
+        Note temp;
+        if (parseMarkdownFile(entry.path(), temp)) {
+            auto n = std::make_shared<Note>(std::move(temp));
+            n->file_path = entry.path();
+            n->saved_locally = true;
+            n->dirty = false;
+            n->inbox = false;
+            if (tableName) n->table_name = tableName;
+            notesById_[n->uuid] = std::move(n);
+        }
     }
 }
 
-NoteComponent NoteManager::parseNoteFromFile(const std::string& path)
-{
-    std::ifstream file(path);
-    if (!file)
-        return {};
+std::string NotesManager::createNote(std::string title,
+                                     std::string author,
+                                     std::optional<std::string> tableName) {
+    std::lock_guard<std::mutex> lk(mtx_);
 
-    NoteComponent note;
-    std::ostringstream body;
-    std::string line;
-    bool inMeta = false;
-    bool metaDone = false;
+    auto n = std::make_shared<Note>();
+    n->uuid = generateUUID();
+    n->title = std::move(title);
+    n->author = std::move(author);
+    n->table_name = std::move(tableName);
+    n->creation_ts = Clock::now();
+    n->last_update_ts = n->creation_ts;
+    n->saved_locally = false;
+    n->dirty = true;
+    n->shared = false;
+    n->inbox = false;
+    n->open_editor = true;
 
-    while (std::getline(file, line))
-    {
-        if (!metaDone)
-        {
-            if (line == "---")
-            {
-                inMeta = !inMeta;
-                if (!inMeta)
-                    metaDone = true;
-                continue;
-            }
-
-            if (inMeta)
-            {
-                auto colon = line.find(':');
-                if (colon != std::string::npos)
-                {
-                    std::string key = line.substr(0, colon);
-                    std::string value = line.substr(colon + 1);
-                    value.erase(0, value.find_first_not_of(" \t"));
-
-                    if (key == "uuid")
-                        note.uuid = value;
-                    else if (key == "title")
-                        note.title = value;
-                    else if (key == "author")
-                        note.author = value;
-                    else if (key == "creation_date")
-                        note.creation_date = value;
-                    else if (key == "last_update")
-                        note.last_update = value;
-                }
-                continue;
-            }
-        }
-        else
-        {
-            body << line << '\n';
-        }
-    }
-
-    note.markdown_text = body.str();
-    return note;
+    auto id = n->uuid;
+    notesById_.emplace(id, std::move(n));
+    toastGood("Note created: " + id);
+    return id;
 }
 
-std::string NoteManager::generateUUID()
-{
-    static std::random_device rd;
-    static std::mt19937 gen(rd());
-    static std::uniform_int_distribution<> dis(0, 15);
+bool NotesManager::saveNote(const std::string& uuid) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return false;
+    auto& n = *it->second;
 
-    const char* hex_chars = "0123456789abcdef";
-    std::string uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx";
-    for (auto& c : uuid)
-    {
-        if (c == 'x')
-            c = hex_chars[dis(gen)];
-        else if (c == 'y')
-            c = hex_chars[(dis(gen) & 0x3) | 0x8];
+    std::error_code ec;
+    if (n.file_path.empty()) {
+        n.file_path = defaultSavePath(n);
+    }
+    std::filesystem::create_directories(n.file_path.parent_path(), ec);
+
+    n.last_update_ts = Clock::now();
+    if (!writeMarkdownFile(n.file_path, n)) {
+        toastError("Failed to save: " + n.title);
+        return false;
+    }
+    n.saved_locally = true;
+    n.dirty = false;
+    n.inbox = false;
+    toastGood("Saved: " + n.title);
+    return true;
+}
+
+bool NotesManager::saveNoteAs(const std::string& uuid, const std::filesystem::path& absolutePath) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return false;
+    auto& n = *it->second;
+
+    std::error_code ec;
+    std::filesystem::create_directories(absolutePath.parent_path(), ec);
+
+    n.last_update_ts = Clock::now();
+    if (!writeMarkdownFile(absolutePath, n)) {
+        toastError("Failed to save as: " + absolutePath.string());
+        return false;
+    }
+    n.file_path = absolutePath;
+    n.saved_locally = true;
+    n.dirty = false;
+    n.inbox = false;
+    toastGood("Saved as: " + absolutePath.filename().string());
+    return true;
+}
+
+bool NotesManager::deleteNote(const std::string& uuid, bool deleteFromDisk) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return false;
+
+    if (deleteFromDisk && !it->second->file_path.empty()) {
+        std::error_code ec;
+        std::filesystem::remove(it->second->file_path, ec);
+    }
+    notesById_.erase(it);
+    toastWarn("Note deleted");
+    return true;
+}
+
+std::shared_ptr<Note> NotesManager::getNote(const std::string& uuid) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    return (it == notesById_.end() ? nullptr : it->second);
+}
+
+std::shared_ptr<const Note> NotesManager::getNote(const std::string& uuid) const {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    return (it == notesById_.end() ? nullptr : it->second);
+}
+
+std::vector<std::shared_ptr<Note>> NotesManager::listAll() {
+    std::lock_guard<std::mutex> lk(mtx_);
+    std::vector<std::shared_ptr<Note>> v; v.reserve(notesById_.size());
+    for (auto& kv : notesById_) v.push_back(kv.second);
+    return v;
+}
+
+std::vector<std::shared_ptr<Note>> NotesManager::listMyNotes() {
+    std::lock_guard<std::mutex> lk(mtx_);
+    std::vector<std::shared_ptr<Note>> v;
+    v.reserve(notesById_.size());
+    for (auto& kv : notesById_) {
+        if (!kv.second->inbox) v.push_back(kv.second);
+    }
+    return v;
+}
+
+std::vector<std::shared_ptr<Note>> NotesManager::listInbox() {
+    std::lock_guard<std::mutex> lk(mtx_);
+    std::vector<std::shared_ptr<Note>> v;
+    v.reserve(notesById_.size());
+    for (auto& kv : notesById_) {
+        if (kv.second->inbox) v.push_back(kv.second);
+    }
+    return v;
+}
+
+void NotesManager::setTitle(const std::string& uuid, std::string title) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return;
+    it->second->title = std::move(title);
+    it->second->dirty = true;
+    it->second->last_update_ts = Clock::now();
+}
+
+void NotesManager::setContent(const std::string& uuid, std::string md) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return;
+    it->second->markdown_text = std::move(md);
+    it->second->dirty = true;
+    it->second->last_update_ts = Clock::now();
+}
+
+void NotesManager::setAuthor(const std::string& uuid, std::string author) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return;
+    it->second->author = std::move(author);
+    it->second->dirty = true;
+    it->second->last_update_ts = Clock::now();
+}
+
+std::string NotesManager::upsertSharedIncoming(std::string uuid,
+                                               std::string title,
+                                               std::string author,
+                                               std::string markdown,
+                                               std::optional<std::string> fromPeerName) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    if (uuid.empty()) uuid = generateUUID();
+
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) {
+        auto n = std::make_shared<Note>();
+        n->uuid = uuid;
+        n->title = std::move(title);
+        n->author = std::move(author);
+        n->markdown_text = std::move(markdown);
+        n->creation_ts = Clock::now();
+        n->last_update_ts = n->creation_ts;
+        n->saved_locally = false;
+        n->dirty = false;
+        n->shared = true;
+        n->inbox = true;
+        n->shared_from = std::move(fromPeerName);
+        n->open_editor = false;
+        notesById_.emplace(uuid, std::move(n));
+    } else {
+        auto& n = *it->second;
+        n.title = std::move(title);
+        n.author = std::move(author);
+        n.markdown_text = std::move(markdown);
+        n.last_update_ts = Clock::now();
+        n.shared = true;
+        n.inbox = true;
+        n.shared_from = std::move(fromPeerName);
+        n.dirty = false;
     }
     return uuid;
 }
 
-void NoteManager::discardUnsavedSharedNotes()
-{
-    std::vector<flecs::entity> to_delete;
+bool NotesManager::saveInboxToLocal(const std::string& uuid,
+                                    std::optional<std::string> tableName) {
+    std::lock_guard<std::mutex> lk(mtx_);
+    auto it = notesById_.find(uuid);
+    if (it == notesById_.end()) return false;
+    auto& n = *it->second;
 
-    m_world.each<NoteComponent>([&](flecs::entity e, NoteComponent& note)
-                                {
-        if (note.shared && !note.saved_locally) {
-            to_delete.push_back(e);
-        } });
+    if (tableName) n.table_name = tableName;
 
-    for (auto& e : to_delete)
-    {
-        e.destruct();
+    std::error_code ec;
+    if (n.file_path.empty()) {
+        n.file_path = defaultSavePath(n);
     }
+    std::filesystem::create_directories(n.file_path.parent_path(), ec);
+
+    n.last_update_ts = Clock::now();
+    if (!writeMarkdownFile(n.file_path, n)) {
+        toastError("Failed to save inbox note.");
+        return false;
+    }
+    n.saved_locally = true;
+    n.inbox = false;
+    toastGood("Saved to disk: " + n.title);
+    return true;
 }
 
-NoteComponent NoteManager::createNewNote(const std::string& author)
-{
-    std::string uuid = generateUUID();
-    std::string title = "Note_" + uuid.substr(0, 8); // Shortened title
-
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_c = std::chrono::system_clock::to_time_t(now);
-    std::string now_str = std::ctime(&now_c);
-    now_str.pop_back(); // remove newline
-
-    NoteComponent note;
-    note.uuid = uuid;
-    note.title = title;
-    note.author = author;
-    note.creation_date = now_str;
-    note.last_update = now_str;
-    note.markdown_text = "# " + title + "\n\n";
-    note.open_editor = true;
-    note.selected = true;
-    note.saved_locally = true;
-
-    m_world.entity(uuid.c_str())
-        .set<NoteComponent>(note);
-
-    return note;
+std::filesystem::path NotesManager::defaultSavePath(const Note& n) const {
+    auto slug = slugify(n.title.empty() ? "note" : n.title);
+    auto fname = slug + "__" + n.uuid + ".md";
+    if (n.table_name) return cfg_.gameTablesRootDir / *n.table_name / "Notes" / fname;
+    return cfg_.globalNotesDir / fname;
 }
 
-void NoteManager::saveNoteToDisk(const NoteComponent& note)
-{
+// ------------- utils (same as before) -------------
+std::string NotesManager::generateUUID() {
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
+    uint64_t a = gen(), b = gen();
+    std::ostringstream oss;
+    oss << std::hex << std::nouppercase << std::setfill('0')
+        << std::setw(16) << a << std::setw(16) << b;
+    return oss.str();
 }
-void NoteManager::saveNoteToDiskAs(const NoteComponent& note, const std::string& filename)
-{
+
+std::string NotesManager::slugify(const std::string& s) {
+    std::string out; out.reserve(s.size());
+    for (unsigned char c : s) {
+        if (std::isalnum(c)) out.push_back((char)std::tolower(c));
+        else if (c == ' ' || c == '-' || c == '_') out.push_back('-');
+    }
+    while (!out.empty() && out.back() == '-') out.pop_back();
+    if (out.empty()) out = "note";
+    return out;
+}
+
+int64_t NotesManager::toEpochMillis(std::chrono::system_clock::time_point tp) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch()).count();
+}
+std::chrono::system_clock::time_point NotesManager::fromEpochMillis(int64_t ms) {
+    return std::chrono::system_clock::time_point(std::chrono::milliseconds(ms));
+}
+
+// front-matter parse/write (same as previous version)
+bool NotesManager::parseMarkdownFile(const std::filesystem::path& path, Note& outNote) {
+    std::ifstream in(path, std::ios::binary);
+    if (!in) return false;
+    std::string text((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    in.close();
+
+    size_t pos = 0;
+    auto startsWith = [&](const char* s) { return text.compare(pos, std::strlen(s), s) == 0; };
+
+    std::unordered_map<std::string, std::string> meta;
+    std::string body;
+
+    if (startsWith("---")) {
+        pos += 3;
+        while (pos < text.size() && (text[pos] == '\r' || text[pos] == '\n')) ++pos;
+        while (pos < text.size()) {
+            if (text.compare(pos, 3, "---") == 0) {
+                pos += 3;
+                while (pos < text.size() && (text[pos] == '\r' || text[pos] == '\n')) ++pos;
+                break;
+            }
+            size_t lineEnd = text.find_first_of("\r\n", pos);
+            std::string line = (lineEnd == std::string::npos) ? text.substr(pos)
+                                                              : text.substr(pos, lineEnd - pos);
+            if (lineEnd == std::string::npos) pos = text.size();
+            else {
+                pos = lineEnd;
+                while (pos < text.size() && (text[pos] == '\r' || text[pos] == '\n')) ++pos;
+            }
+            auto colon = line.find(':');
+            if (colon != std::string::npos) {
+                auto k = line.substr(0, colon);
+                auto v = line.substr(colon + 1);
+                auto ltrim = [](std::string& s) {
+                    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch){return !std::isspace(ch);})); };
+                auto rtrim = [](std::string& s) {
+                    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch){return !std::isspace(ch);}).base(), s.end()); };
+                auto trim = [&](std::string& s){ ltrim(s); rtrim(s); };
+                trim(k); trim(v);
+                meta[k] = v;
+            }
+        }
+        body = (pos < text.size()) ? text.substr(pos) : std::string{};
+    } else {
+        body = text;
+    }
+
+    Note n;
+    n.uuid = meta.count("uuid") ? meta["uuid"] : generateUUID();
+    n.title = meta.count("title") ? meta["title"] : path.stem().string();
+    n.author = meta.count("author") ? meta["author"] : "unknown";
+    if (meta.count("creation_ts")) {
+        try { n.creation_ts = fromEpochMillis(std::stoll(meta["creation_ts"])); }
+        catch(...) { n.creation_ts = Clock::now(); }
+    } else n.creation_ts = Clock::now();
+    if (meta.count("last_update_ts")) {
+        try { n.last_update_ts = fromEpochMillis(std::stoll(meta["last_update_ts"])); }
+        catch(...) { n.last_update_ts = n.creation_ts; }
+    } else n.last_update_ts = n.creation_ts;
+
+    if (meta.count("table") && !meta["table"].empty()) n.table_name = meta["table"];
+    if (meta.count("shared")) n.shared = (meta["shared"] == "1");
+    if (meta.count("shared_from") && !meta["shared_from"].empty()) n.shared_from = meta["shared_from"];
+
+    n.markdown_text = std::move(body);
+    outNote = std::move(n);
+    return true;
+}
+
+bool NotesManager::writeMarkdownFile(const std::filesystem::path& path, const Note& note) {
+    std::ofstream out(path, std::ios::binary);
+    if (!out) return false;
+
+    auto c_ms = toEpochMillis(note.creation_ts);
+    auto u_ms = toEpochMillis(note.last_update_ts);
+
+    out << "---\n";
+    out << "uuid: " << note.uuid << "\n";
+    out << "title: " << note.title << "\n";
+    out << "author: " << note.author << "\n";
+    out << "creation_ts: " << c_ms << "\n";
+    out << "last_update_ts: " << u_ms << "\n";
+    out << "table: " << (note.table_name ? *note.table_name : "") << "\n";
+    out << "shared: " << (note.shared ? "1" : "0") << "\n";
+    out << "shared_from: " << (note.shared_from ? *note.shared_from : "") << "\n";
+    out << "---\n";
+    out << note.markdown_text;
+    return true;
+}
+
+// Toaster helpers
+void NotesManager::toastInfo(const std::string& msg) const {
+    if (toaster_) toaster_->Push(ImGuiToaster::Level::Info, msg);
+}
+void NotesManager::toastGood(const std::string& msg) const {
+    if (toaster_) toaster_->Push(ImGuiToaster::Level::Good, msg);
+}
+void NotesManager::toastWarn(const std::string& msg) const {
+    if (toaster_) toaster_->Push(ImGuiToaster::Level::Warning, msg);
+}
+void NotesManager::toastError(const std::string& msg) const {
+    if (toaster_) toaster_->Push(ImGuiToaster::Level::Error, msg);
 }
