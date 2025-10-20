@@ -11,6 +11,8 @@ void NoteEditorUI::setActiveTable(std::optional<std::string> tableName) {
 }
 
 void NoteEditorUI::render(bool* pOpen) {
+    if (!visible_) return;
+    
     ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse |
                              ImGuiWindowFlags_NoBringToFrontOnFocus;
     if (!ImGui::Begin("Notes", pOpen, flags)) {
