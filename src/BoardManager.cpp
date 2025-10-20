@@ -1054,7 +1054,6 @@ void BoardManager::replaceOwnerUsernameEverywhere(const std::string& oldUsername
         if (mc.ownerPeerUsername == oldUsername)
         {
             mc.ownerPeerUsername = newUsername;
-            e.set<MarkerComponent>(mc); // write back (flecs pattern consistent with your other code)
         } });
 }
 
