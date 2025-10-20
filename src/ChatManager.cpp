@@ -323,10 +323,22 @@ void ChatManager::onIncomingChatFrame(const std::vector<uint8_t>& b, size_t& off
     const uint64_t ts = Serializer::deserializeUInt64(b, off);
     const std::string username = Serializer::deserializeString(b, off);
     const std::string text = Serializer::deserializeString(b, off);
+
     if (tableId != currentTableId_)
         return;
 
-    // Append & unread
+    // Ensure the thread exists locally (placeholder if needed)
+    ChatThreadModel* th = getThread(threadId);
+    if (!th)
+    {
+        ChatThreadModel tmp;
+        tmp.id = threadId;
+        tmp.displayName = (threadId == generalThreadId_) ? "General" : "(pending…)";
+        tmp.unread = 0;
+        threads_.emplace(threadId, std::move(tmp));
+    }
+
+    // Append message (render uses m.username + m.content)
     pushMessageLocal(threadId, /*fromId*/ "", username, text, (double)ts, /*incoming*/ true);
 }
 
@@ -336,15 +348,20 @@ void ChatManager::markThreadRead(uint64_t threadId)
     if (auto* th = getThread(threadId))
         th->unread = 0;
 }
-
-void ChatManager::pushMessageLocal(uint64_t threadId, const std::string& fromId, const std::string& username, const std::string& text, double ts, bool incoming)
+// ChatManager.cpp
+void ChatManager::pushMessageLocal(uint64_t threadId,
+                                   const std::string& fromId,
+                                   const std::string& username,
+                                   const std::string& text,
+                                   double ts,
+                                   bool incoming)
 {
-    auto* th = getThread(threadId);
+    ChatThreadModel* th = getThread(threadId);
     if (!th)
     {
         ChatThreadModel tmp;
         tmp.id = threadId;
-        tmp.displayName = (threadId == generalThreadId_) ? "General" : "(pending…)"; // friendlier
+        tmp.displayName = (threadId == generalThreadId_) ? "General" : "(pending…)";
         tmp.unread = 0;
         threads_.emplace(threadId, std::move(tmp));
         th = getThread(threadId);
@@ -353,9 +370,10 @@ void ChatManager::pushMessageLocal(uint64_t threadId, const std::string& fromId,
     ChatMessageModel m;
     m.kind = classifyMessage(text);
     m.senderId = fromId;
-    m.username = username;
-    m.content = text;
+    m.username = username; // <-- username label
+    m.content = text;      // <-- actual message text
     m.ts = ts;
+
     th->messages.push_back(std::move(m));
 
     const bool isActive = (activeThreadId_ == threadId);
@@ -493,24 +511,16 @@ uint64_t ChatManager::ensureThreadByParticipants(const std::set<std::string>& pa
     if (!hasCurrent())
         return 0;
 
-    // General
     if (participants.empty())
-    {
+    { // General
         ensureGeneral();
         return generalThreadId_;
     }
 
-    // Include self (creator) so identity is canonical
-    std::set<std::string> parts = participants;
-    if (auto nm = network_.lock())
-    {
-        auto me = nm->getMyId();
-        if (!me.empty())
-            parts.insert(me);
-    }
+    // Participants are already usernames; DON'T add peer ids anymore.
 
-    // If this exact ID already exists, just update name if provided
-    if (uint64_t dup = findThreadByParticipants(parts))
+    // 1) Exact participants → same id everywhere
+    if (uint64_t dup = findThreadByParticipants(participants))
     {
         if (auto* th = getThread(dup))
         {
@@ -523,8 +533,9 @@ uint64_t ChatManager::ensureThreadByParticipants(const std::set<std::string>& pa
         return dup;
     }
 
+    // 2) New deterministic id (hash of sorted usernames)
     ChatThreadModel th;
-    th.participants = std::move(parts);
+    th.participants = participants;
     th.id = makeDeterministicThreadId(th.participants);
     th.displayName = displayName.empty() ? "Group" : displayName;
     th.unread = 0;
@@ -564,6 +575,26 @@ void ChatManager::sendTextToThread(uint64_t threadId, const std::string& text)
     const uint64_t ts = (uint64_t)nowSec();
     emitChatMessageFrame(threadId, uname, text, ts);
     pushMessageLocal(threadId, "me", uname, text, (double)ts, /*incoming*/ false);
+}
+void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
+                                            const std::string& newUsername)
+{
+    if (oldUsername == newUsername)
+        return;
+
+    for (auto& [id, th] : threads_)
+    {
+        // 1) messages
+        for (auto& msg : th.messages)
+            if (msg.username == oldUsername)
+                msg.username = newUsername;
+
+        // 2) participants (set)
+        if (th.participants.erase(oldUsername) > 0)
+            th.participants.insert(newUsername);
+
+        // Note: threadId remains stable; we do NOT recompute ids after creation.
+    }
 }
 
 // ---- Network ----
@@ -749,18 +780,18 @@ void ChatManager::emitThreadDelete(uint64_t threadId)
     else
         nm->sendChatThreadFrameTo(targets, msg::DCType::ChatThreadDelete, buf);
 }
-
-void ChatManager::emitChatMessageFrame(uint64_t threadId, const std::string& username, const std::string& text, uint64_t ts)
+// ChatManager.cpp
+void ChatManager::emitChatMessageFrame(uint64_t threadId,
+                                       const std::string& username,
+                                       const std::string& text,
+                                       uint64_t ts)
 {
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
 
-    // Figure recipients: General=broadcast; group=participants
-    const ChatThreadModel* th = nullptr;
-    if (auto it = threads_.find(threadId); it != threads_.end())
-        th = &it->second;
-
+    // Serialize in this exact order (must match NetworkManager::decodeRawChatBuffer):
+    // [tableId][threadId][ts][username][text]
     std::vector<uint8_t> buf;
     Serializer::serializeUInt64(buf, currentTableId_);
     Serializer::serializeUInt64(buf, threadId);
@@ -768,11 +799,17 @@ void ChatManager::emitChatMessageFrame(uint64_t threadId, const std::string& use
     Serializer::serializeString(buf, username);
     Serializer::serializeString(buf, text);
 
+    // Decide recipients (General = broadcast, group = participants):
+    const ChatThreadModel* th = nullptr;
+    if (auto it = threads_.find(threadId); it != threads_.end())
+        th = &it->second;
+
     if (!th || th->participants.empty())
         nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
     else
         nm->sendChatThreadFrameTo(th->participants, msg::DCType::ChatMessage, buf);
 }
+
 // ---- snapshot helpers (GameTable snapshot) ----
 void ChatManager::writeThreadsToSnapshotGT(std::vector<unsigned char>& buf) const
 {
@@ -839,23 +876,6 @@ void ChatManager::readThreadsFromSnapshotGT(const std::vector<unsigned char>& bu
     ensureGeneral();
     if (threads_.find(activeThreadId_) == threads_.end())
         activeThreadId_ = generalThreadId_;
-}
-
-// ChatManager.cpp
-void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
-                                            const std::string& newUsername)
-{
-    if (oldUsername == newUsername)
-        return;
-
-    for (auto& [id, th] : threads_)
-    {
-        for (auto& msg : th.messages)
-        {
-            if (msg.username == oldUsername)
-                msg.username = newUsername;
-        }
-    }
 }
 
 // ---- UI ----
@@ -968,10 +988,10 @@ void ChatManager::renderLeftPanel(float width)
     }
     renderDeleteThreadPopup();
 }
-
+// ChatManager.cpp
 void ChatManager::renderRightPanel(float /*leftPanelWidth*/)
 {
-    auto* th = getThread(activeThreadId_);
+    ChatThreadModel* th = getThread(activeThreadId_);
     if (!th)
         th = getThread(generalThreadId_);
 
@@ -979,54 +999,24 @@ void ChatManager::renderRightPanel(float /*leftPanelWidth*/)
     const float footerRowH = ImGui::GetFrameHeightWithSpacing() * 2.0f;
 
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    ImGui::BeginChild("Messages", ImVec2(0, avail.y - headerRowH - footerRowH), true, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("Messages",
+                      ImVec2(0, avail.y - headerRowH - footerRowH),
+                      true,
+                      ImGuiWindowFlags_HorizontalScrollbar);
+
     if (th)
     {
-        // if user scrolls up, disable follow
         if (ImGui::GetScrollY() < ImGui::GetScrollMaxY() - 1.0f)
             followScroll_ = false;
 
         for (auto& m : th->messages)
         {
             ImGui::PushTextWrapPos(0);
-            // One-line header+body to avoid layout edge cases
-            if (m.kind == ChatMessageModel::Kind::LINK)
-            {
-                ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
-                // Optional: clickable link
-                // if (ImGui::SmallButton("Open")) { /* open URL */ }
-            }
-            else
-            {
-                ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
-            }
+            // Always render as "<username> - <message>"
+            ImGui::TextWrapped("%s - %s", m.username.c_str(), m.content.c_str());
             ImGui::PopTextWrapPos();
         }
 
-        //for (auto& m : th->messages)
-        //{
-        //    ImGui::PushTextWrapPos(0);
-        //    ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.0f, 1.0f), "%s", m.username.c_str());
-        //    ImGui::SameLine();
-        //    ImGui::TextDisabled(" - ");
-        //    ImGui::SameLine();
-        //    switch (m.kind)
-        //    {
-        //        case ChatMessageModel::Kind::TEXT:
-        //            ImGui::TextWrapped("%s", m.content.c_str());
-        //            break;
-        //        case ChatMessageModel::Kind::LINK:
-        //            if (ImGui::SmallButton(m.content.c_str()))
-        //            {
-        //                // TODO: open URL (platform hook)
-        //            }
-        //            break;
-        //        case ChatMessageModel::Kind::IMAGE:
-        //            ImGui::TextWrapped("%s", m.content.c_str()); // preview hook later
-        //            break;
-        //    }
-        //    ImGui::PopTextWrapPos();
-        //}
         if (followScroll_)
             ImGui::SetScrollHereY(1.0f);
     }
@@ -1113,7 +1103,21 @@ void ChatManager::renderCreateThreadPopup()
         ImGui::Separator();
         if (ImGui::Button("Create"))
         {
-            uint64_t id = ensureThreadByParticipants(newThreadSel_, newThreadName_.data());
+            // turn selected peerIds into usernames
+            std::set<std::string> partsUsernames;
+            if (auto nm = network_.lock())
+            {
+                for (const auto& pid : newThreadSel_)
+                {
+                    partsUsernames.insert(nm->displayNameFor(pid)); // <- username for that peer
+                }
+                // include me to stabilize identity across clients
+                const std::string me = nm->getMyUsername().empty() ? std::string("me")
+                                                                   : nm->getMyUsername();
+                partsUsernames.insert(me);
+            }
+
+            uint64_t id = ensureThreadByParticipants(partsUsernames, newThreadName_.data());
             if (id)
             {
                 activeThreadId_ = id;
