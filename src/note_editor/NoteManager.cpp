@@ -6,6 +6,8 @@
 #include <random>
 #include <iomanip>
 #include <algorithm>
+#include <cctype>
+
 
 using Clock = std::chrono::system_clock;
 
@@ -429,4 +431,109 @@ void NotesManager::toastWarn(const std::string& msg) const {
 }
 void NotesManager::toastError(const std::string& msg) const {
     if (toaster_) toaster_->Push(ImGuiToaster::Level::Error, msg);
+}
+
+
+std::shared_ptr<Note> NotesManager::getByUuid(const std::string& uuid) const {
+    auto it = notesByUuid_.find(uuid);
+    return (it != notesByUuid_.end()) ? it->second : nullptr;
+}
+
+void NotesManager::indexNote(const std::shared_ptr<Note>& n) {
+    if (!n) return;
+    notesByUuid_[n->uuid] = n;
+
+    // exact, case-insensitive index for title
+    if (!n->title.empty()) {
+        titleToUuid_[toLower_(n->title)] = n->uuid;
+    }
+}
+
+void NotesManager::removeFromIndex(const std::string& uuid) {
+    auto it = notesByUuid_.find(uuid);
+    if (it == notesByUuid_.end()) return;
+
+    // erase title index if it points to this uuid
+    if (!it->second->title.empty()) {
+        auto key = toLower_(it->second->title);
+        auto jt = titleToUuid_.find(key);
+        if (jt != titleToUuid_.end() && jt->second == uuid) {
+            titleToUuid_.erase(jt);
+        }
+    }
+    notesByUuid_.erase(it);
+}
+
+std::string NotesManager::resolveRef(const std::string& ref) const {
+    if (ref.empty()) return {};
+
+    // 1) full UUID? (very loose validation) and it exists
+    if (looksLikeUuid_(ref)) {
+        if (notesByUuid_.find(ref) != notesByUuid_.end())
+            return ref;
+        // if it "looks like uuid" but doesn't exist, fall through to title (user may have typed a title with dashes)
+    }
+
+    // 2) title (case-insensitive exact match)
+    {
+        auto it = titleToUuid_.find(toLower_(ref));
+        if (it != titleToUuid_.end())
+            return it->second;
+    }
+
+    // 3) short id (>=8 hex chars, no dashes) — optional bonus
+    if (looksLikeShortHex_(ref)) {
+        std::string matchUuid;
+        bool ambig = false;
+        for (const auto& kv : notesByUuid_) {
+            const std::string& uuid = kv.first; // canonical 36-char UUID
+            // compare only hex chars (ignore dashes) at the front
+            std::string compact;
+            compact.reserve(32);
+            for (char c : uuid) if (c != '-') compact.push_back((char)std::tolower((unsigned char)c));
+
+            std::string needle = toLower_(ref);
+            if (compact.rfind(needle, 0) == 0) { // prefix match
+                if (matchUuid.empty()) matchUuid = uuid;
+                else { ambig = true; break; }
+            }
+        }
+        if (!ambig && !matchUuid.empty())
+            return matchUuid;
+        // ambiguous or not found → fall through
+    }
+
+    return {};
+}
+
+// ---------------- helpers ----------------
+bool NotesManager::looksLikeUuid_(const std::string& s) {
+    // Very loose: 8-4-4-4-12 hex + dashes
+    if (s.size() != 36) return false;
+    const int dashPos[4] = {8, 13, 18, 23};
+    for (int i = 0; i < 36; ++i) {
+        if (i == dashPos[0] || i == dashPos[1] || i == dashPos[2] || i == dashPos[3]) {
+            if (s[i] != '-') return false;
+        } else if (!std::isxdigit((unsigned char)s[i])) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool NotesManager::looksLikeShortHex_(const std::string& s) {
+    if (s.size() < 8) return false; // minimum 8 for usefulness
+    for (char c : s) {
+        if (c == '-') return false;
+        if (!std::isxdigit((unsigned char)c)) return false;
+    }
+    return true;
+}
+
+std::string NotesManager::toLower_(const std::string& s) {
+    std::string out;
+    out.resize(s.size());
+    std::transform(s.begin(), s.end(), out.begin(),
+                   [](unsigned char c){ return (char)std::tolower(c); });
+    return out;
 }
