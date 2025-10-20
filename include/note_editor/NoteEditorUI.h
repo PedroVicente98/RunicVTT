@@ -1,43 +1,58 @@
 #pragma once
-#include "flecs.h"
-#include "NoteManager.h"
-#include "NoteSyncSystem.h"
-#include "Components.h"
+#include "NotesManager.h"
 #include "imgui.h"
 #include "imgui_md.h"
-#include <cstdlib>
-#include <string>
+#include <vector>
+#include <unordered_map>
+#include <memory>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
+struct ImGuiToaster;
 
-class NoteEditorUI
-{
+// Minimal markdown renderer (no images)
+struct NoteMarkdownRenderer : public imgui_md {
+    ImFont* get_font() const override { return ImGui::GetFont(); }
+    void open_url() const override {}     // no-op for now
+    bool get_image(image_info&) const override { return false; }
+};
+
+class NoteEditorUI {
 public:
-    NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager);
-    NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager, std::shared_ptr<NoteSyncSystem> syncSystem);
+    explicit NoteEditorUI(std::shared_ptr<NotesManager> mgr,
+                          std::shared_ptr<ImGuiToaster> toaster = nullptr);
 
-    void render();
+    void render(bool* pOpen = nullptr);
+    void openNoteTab(const std::string& uuid);
+    void setActiveTable(std::optional<std::string> tableName);
 
 private:
-    void renderDirectoryPanel(float height, float& leftWidth);
-    void renderNoteTabs(float availableWidth, float height);
-    void renderNoteTab(NoteComponent& note);
+    std::shared_ptr<NotesManager> mgr_;
+    std::shared_ptr<ImGuiToaster> toaster_;
+    NoteMarkdownRenderer md_;
 
-    struct MarkdownRenderer : public imgui_md
-    {
-        ImFont* get_font() const override;
-        void open_url() const override;
-        bool get_image(image_info& nfo) const override;
-        void html_div(const std::string& dclass, bool e) override;
+    float leftWidth_ = 260.f;
+
+    std::vector<std::string> openTabs_;  // UUIDs
+    int currentTabIndex_ = -1;
+
+    struct TabState {
+        std::string editBuffer;
+        bool bufferInit = false;
     };
+    std::unordered_map<std::string, TabState> tabState_;
 
-    MarkdownRenderer m_renderer;
+    char searchBuf_[128] = {0};
 
-    std::shared_ptr<flecs::world> m_world;
-    std::shared_ptr<NoteManager> m_noteManager;
-    std::shared_ptr<NoteSyncSystem> m_syncSystem = nullptr;
+    void renderDirectory_(float height);
+    void renderTabsArea_(float width, float height);
+    void renderOneTab_(const std::string& uuid, float availW, float availH);
 
-    float m_leftPanelWidth = 200.0f;
+    void actCreateNote_();
+    void actSaveNote_(const std::string& uuid);
+    void actDeleteNote_(const std::string& uuid);
+    void actSaveInboxToLocal_(const std::string& uuid);
+    void toggleOpenEditor_(const std::string& uuid);
+
+    void addTabIfMissing_(const std::string& uuid);
+    void closeTab_(int tabIndex);
+    bool filterMatch_(const Note& n) const;
 };
