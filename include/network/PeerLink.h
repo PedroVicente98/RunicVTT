@@ -24,10 +24,13 @@ public:
 
     void send(const std::string& msg);
     bool sendOn(const std::string& label, const std::vector<uint8_t>& bytes);
+    bool sendOn(const std::string& label, std::string_view text);
     bool sendGame(const std::vector<uint8_t>& bytes);
     bool sendChat(const std::vector<uint8_t>& bytes);
     bool sendNote(const std::vector<uint8_t>& bytes);
     bool sendMarkerMove(const std::vector<uint8_t>& bytes);
+    void sendChatJson(const std::string& jsonText);
+
     void setDisplayName(std::string n);
     const std::string& displayName() const;
 

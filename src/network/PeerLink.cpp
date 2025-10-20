@@ -168,6 +168,22 @@ void PeerLink::setupCallbacks()
 //    it->second->send(&bytes.front(), bytes.size());
 //}
 
+bool PeerLink::sendOn(const std::string& label, std::string_view text)
+{
+    auto it = dcs_.find(label);
+    if (it == dcs_.end() || !it->second)
+        return false;
+    auto& ch = it->second;
+    if (!ch->isOpen())
+        return false;
+
+    // optional backpressure guard
+    // if (ch->bufferedAmount() > kMaxBufferedBytes) return false;
+
+    ch->send(std::string(text)); // TEXT frame over DC
+    return true;
+}
+
 bool PeerLink::sendOn(const std::string& label, const std::vector<uint8_t>& bytes)
 {
     auto it = dcs_.find(label);
@@ -210,6 +226,10 @@ bool PeerLink::sendNote(const std::vector<uint8_t>& bytes)
 bool PeerLink::sendMarkerMove(const std::vector<uint8_t>& bytes)
 {
     return sendOn(std::string(msg::dc::name::MarkerMove), bytes);
+}
+void PeerLink::sendChatJson(const std::string& jsonText)
+{
+    sendOn(msg::dc::name::Chat, jsonText);
 }
 
 bool PeerLink::allRequiredOpen() const

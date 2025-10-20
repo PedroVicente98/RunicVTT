@@ -245,8 +245,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
                 it->second.participants = std::move(g.participants);
             }
 
-            Logger::instance().log("chat", Logger::Level::Info,
-                                   "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + g.name);
+            Logger::instance().log("chat", Logger::Level::Info, "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + g.name);
             break;
         }
 
@@ -356,21 +355,11 @@ void ChatManager::emitGroupCreate(const ChatGroupModel& g)
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
-    std::vector<uint8_t> buf;
-    Serializer::serializeUInt64(buf, currentTableId_);
-    Serializer::serializeUInt64(buf, g.id);
-    Serializer::serializeString(buf, g.name);
-    Serializer::serializeInt(buf, (int)g.participants.size());
-    for (auto& p : g.participants)
-        Serializer::serializeString(buf, p);
 
+    auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
     Logger::instance().log("chat", Logger::Level::Info,
-                           "[SEND] ChatGroupCreate table=" + std::to_string(currentTableId_) +
-                               " gid=" + std::to_string(g.id) + " name='" + g.name +
-                               "' bytes=" + std::to_string(buf.size()));
-
-    // broadcast: anyone can see groups list (or you can target participants only if you prefer)
-    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupCreate, buf);
+                           "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name);
+    nm->broadcastChatJson(j); // broadcast groups list to everyone
 }
 
 void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
@@ -378,19 +367,9 @@ void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
-    std::vector<uint8_t> buf;
-    Serializer::serializeUInt64(buf, currentTableId_);
-    Serializer::serializeUInt64(buf, g.id);
-    Serializer::serializeString(buf, g.name);
-    Serializer::serializeInt(buf, (int)g.participants.size());
-    for (auto& p : g.participants)
-        Serializer::serializeString(buf, p);
 
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "[SEND] ChatGroupUpdate table=" + std::to_string(currentTableId_) +
-                               " gid=" + std::to_string(g.id) + " name='" + g.name +
-                               "' bytes=" + std::to_string(buf.size()));
-    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupUpdate, buf);
+    auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
+    nm->broadcastChatJson(j); // or nm->sendChatJsonTo(g.participants, j) if you want scoped visibility
 }
 
 void ChatManager::emitGroupDelete(uint64_t groupId)
@@ -398,16 +377,9 @@ void ChatManager::emitGroupDelete(uint64_t groupId)
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
-    std::vector<uint8_t> buf;
-    Serializer::serializeUInt64(buf, currentTableId_);
-    Serializer::serializeUInt64(buf, groupId);
 
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "[SEND] ChatGroupDelete table=" + std::to_string(currentTableId_) +
-                               " gid=" + std::to_string(groupId) +
-                               " bytes=" + std::to_string(buf.size()));
-
-    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupDelete, buf);
+    auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
+    nm->broadcastChatJson(j);
 }
 
 void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
@@ -416,23 +388,92 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
     if (!nm || !hasCurrent())
         return;
 
-    std::vector<uint8_t> buf;
-    Serializer::serializeUInt64(buf, currentTableId_);
-    Serializer::serializeUInt64(buf, groupId);
-    Serializer::serializeUInt64(buf, ts);
-    Serializer::serializeString(buf, username);
-    Serializer::serializeString(buf, text);
-
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "[SEND] ChatMessage table=" + std::to_string(currentTableId_) +
-                               " gid=" + std::to_string(groupId) +
-                               " user='" + username + "'" +
-                               " text_len=" + std::to_string(text.size()) +
-                               " payload=" + std::to_string(buf.size()));
-
-    // broadcast to all; render simply ignores groups you aren’t part of
-    nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
+    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
+    nm->broadcastChatJson(j); // simple: broadcast; groups render ignores unknown groups
 }
+
+//void ChatManager::emitGroupCreate(const ChatGroupModel& g)
+//{
+//    auto nm = network_.lock();
+//    if (!nm || !hasCurrent())
+//        return;
+//    std::vector<uint8_t> buf;
+//    Serializer::serializeUInt64(buf, currentTableId_);
+//    Serializer::serializeUInt64(buf, g.id);
+//    Serializer::serializeString(buf, g.name);
+//    Serializer::serializeInt(buf, (int)g.participants.size());
+//    for (auto& p : g.participants)
+//        Serializer::serializeString(buf, p);
+//
+//    Logger::instance().log("chat", Logger::Level::Info,
+//                           "[SEND] ChatGroupCreate table=" + std::to_string(currentTableId_) +
+//                               " gid=" + std::to_string(g.id) + " name='" + g.name +
+//                               "' bytes=" + std::to_string(buf.size()));
+//
+//    // broadcast: anyone can see groups list (or you can target participants only if you prefer)
+//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupCreate, buf);
+//}
+//
+//void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
+//{
+//    auto nm = network_.lock();
+//    if (!nm || !hasCurrent())
+//        return;
+//    std::vector<uint8_t> buf;
+//    Serializer::serializeUInt64(buf, currentTableId_);
+//    Serializer::serializeUInt64(buf, g.id);
+//    Serializer::serializeString(buf, g.name);
+//    Serializer::serializeInt(buf, (int)g.participants.size());
+//    for (auto& p : g.participants)
+//        Serializer::serializeString(buf, p);
+//
+//    Logger::instance().log("chat", Logger::Level::Info,
+//                           "[SEND] ChatGroupUpdate table=" + std::to_string(currentTableId_) +
+//                               " gid=" + std::to_string(g.id) + " name='" + g.name +
+//                               "' bytes=" + std::to_string(buf.size()));
+//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupUpdate, buf);
+//}
+//
+//void ChatManager::emitGroupDelete(uint64_t groupId)
+//{
+//    auto nm = network_.lock();
+//    if (!nm || !hasCurrent())
+//        return;
+//    std::vector<uint8_t> buf;
+//    Serializer::serializeUInt64(buf, currentTableId_);
+//    Serializer::serializeUInt64(buf, groupId);
+//
+//    Logger::instance().log("chat", Logger::Level::Info,
+//                           "[SEND] ChatGroupDelete table=" + std::to_string(currentTableId_) +
+//                               " gid=" + std::to_string(groupId) +
+//                               " bytes=" + std::to_string(buf.size()));
+//
+//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupDelete, buf);
+//}
+//
+//void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
+//{
+//    auto nm = network_.lock();
+//    if (!nm || !hasCurrent())
+//        return;
+//
+//    std::vector<uint8_t> buf;
+//    Serializer::serializeUInt64(buf, currentTableId_);
+//    Serializer::serializeUInt64(buf, groupId);
+//    Serializer::serializeUInt64(buf, ts);
+//    Serializer::serializeString(buf, username);
+//    Serializer::serializeString(buf, text);
+//
+//    Logger::instance().log("chat", Logger::Level::Info,
+//                           "[SEND] ChatMessage table=" + std::to_string(currentTableId_) +
+//                               " gid=" + std::to_string(groupId) +
+//                               " user='" + username + "'" +
+//                               " text_len=" + std::to_string(text.size()) +
+//                               " payload=" + std::to_string(buf.size()));
+//
+//    // broadcast to all; render simply ignores groups you aren’t part of
+//    nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
+//}
 
 // ====== username cascade (rename everywhere) ======
 void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
@@ -650,7 +691,7 @@ void ChatManager::renderLeftPanel(float /*width*/)
     if (ImGui::Button("Delete Group"))
         openDeletePopup_ = true;
     ImGui::SameLine();
-    
+
     {
         // Enable edit only when there is a non-General active group
         bool canEdit = (activeGroupId_ != 0 && activeGroupId_ != generalGroupId_);
@@ -669,7 +710,7 @@ void ChatManager::renderLeftPanel(float /*width*/)
         }
         ImGui::EndDisabled();
     }
-    
+
     ImGui::Separator();
     ImGui::TextUnformatted("Chat Groups");
     ImGui::Separator();
@@ -744,13 +785,12 @@ void ChatManager::renderLeftPanel(float /*width*/)
     }
     renderDeleteGroupPopup();
 
-    if (openEditPopup_) 
+    if (openEditPopup_)
     {
         openEditPopup_ = false;
         ImGui::OpenPopup("EditGroup");
     }
     renderEditGroupPopup();
-
 }
 
 void ChatManager::renderRightPanel(float /*leftW*/)
@@ -947,9 +987,11 @@ void ChatManager::renderEditGroupPopup()
     if (ImGui::BeginPopupModal("EditGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ChatGroupModel* g = getGroup(editGroupId_);
-        if (!g) {
+        if (!g)
+        {
             ImGui::TextDisabled("Group not found.");
-            if (ImGui::Button("Close")) ImGui::CloseCurrentPopup();
+            if (ImGui::Button("Close"))
+                ImGui::CloseCurrentPopup();
             ImGui::EndPopup();
             return;
         }
@@ -959,7 +1001,8 @@ void ChatManager::renderEditGroupPopup()
         const std::string me = nm ? nm->getMyId() : "";
         const bool ownerOnly = true;
         const bool canEdit = !ownerOnly || (!g->ownerPeerId.empty() && g->ownerPeerId == me);
-        if (!canEdit) ImGui::TextColored(ImVec4(1,0.5f,0.3f,1), "Only the owner can edit this group.");
+        if (!canEdit)
+            ImGui::TextColored(ImVec4(1, 0.5f, 0.3f, 1), "Only the owner can edit this group.");
 
         ImGui::Separator();
         ImGui::TextUnformatted("Group name:");
@@ -980,8 +1023,10 @@ void ChatManager::renderEditGroupPopup()
                 std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
                 if (ImGui::Checkbox(label.c_str(), &checked))
                 {
-                    if (checked) editGroupSel_.insert(pid);
-                    else         editGroupSel_.erase(pid);
+                    if (checked)
+                        editGroupSel_.insert(pid);
+                    else
+                        editGroupSel_.erase(pid);
                 }
             }
             ImGui::EndDisabled();
@@ -993,7 +1038,11 @@ void ChatManager::renderEditGroupPopup()
         if (!desired.empty() && desired != g->name)
         {
             for (auto& [id, gg] : groups_)
-                if (gg.name == desired) { nameTaken = true; break; }
+                if (gg.name == desired)
+                {
+                    nameTaken = true;
+                    break;
+                }
         }
         if (nameTaken)
             ImGui::TextColored(ImVec4(1, 0.4f, 0.2f, 1), "A group with that name already exists.");
@@ -1029,7 +1078,6 @@ void ChatManager::renderEditGroupPopup()
         ImGui::EndPopup();
     }
 }
-
 
 void ChatManager::renderDeleteGroupPopup()
 {

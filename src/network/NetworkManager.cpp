@@ -916,6 +916,46 @@ std::pair<std::string, bool> NetworkManager::ensureUsernameUnique(const std::str
     }
 }
 
+// NetworkManager.cpp
+bool NetworkManager::broadcastChatJson(const msg::Json& j)
+{
+    const std::string text = j.dump(); // UTF-8 JSON
+    bool any = false;
+    for (auto& [pid, link] : peers)
+    {
+        if (link->sendOn(msg::dc::name::Chat, std::string_view(text)))
+            any = true;
+    }
+    return any;
+}
+bool NetworkManager::sendChatJsonTo(const std::string& peerId, const msg::Json& j)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end() || !it->second)
+        return false;
+    auto& link = it->second;
+    if (!link->isConnected())
+        return false;
+    return link->sendOn(msg::dc::name::Chat, std::string_view(j.dump()));
+}
+bool NetworkManager::sendChatJsonTo(const std::set<std::string>& targets, const msg::Json& j)
+{
+    const std::string text = j.dump();
+    bool any = false;
+    for (auto& pid : targets)
+    {
+        auto it = peers.find(pid);
+        if (it == peers.end() || !it->second)
+            continue;
+        auto& link = it->second;
+        if (!link->isConnected())
+            continue;
+        if (link->sendOn(msg::dc::name::Chat, std::string_view(text)))
+            any = true;
+    }
+    return any;
+}
+
 void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
 {
     decodingFromPeer_ = fromPeer;
@@ -2166,85 +2206,162 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
 //}
 
 // NetworkManager.cpp
+//void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
+//                                         const std::vector<uint8_t>& b)
+//{
+//    size_t off = 0;
+//    while (off < b.size())
+//    {
+//        if (!ensureRemaining(b, off, 1))
+//            break;
+//        auto type = static_cast<msg::DCType>(b[off]);
+//        off += 1;
+//        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! onChat");
+//        switch (type)
+//        {
+//            case msg::DCType::ChatGroupCreate:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
+//                r.name = Serializer::deserializeString(b, off);     // group name (unique)
+//                {
+//                    const int pc = Serializer::deserializeInt(b, off);
+//                    std::set<std::string> parts;
+//                    for (int i = 0; i < pc; ++i)
+//                        parts.insert(Serializer::deserializeString(b, off));
+//                    r.participants = std::move(parts);
+//                }
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatGroupUpdate:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off);
+//                r.name = Serializer::deserializeString(b, off);
+//                {
+//                    const int pc = Serializer::deserializeInt(b, off);
+//                    std::set<std::string> parts;
+//                    for (int i = 0; i < pc; ++i)
+//                        parts.insert(Serializer::deserializeString(b, off));
+//                    r.participants = std::move(parts);
+//                }
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatGroupDelete:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off);
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatMessage:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
+//                r.ts = Serializer::deserializeUInt64(b, off);
+//                r.name = Serializer::deserializeString(b, off); // username
+//                r.text = Serializer::deserializeString(b, off); // body
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            default:
+//                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onChat");
+//                return; // stop this buffer if unknown/out-of-sync
+//        }
+//    }
+//}
+
 void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                                          const std::vector<uint8_t>& b)
 {
-    size_t off = 0;
-    while (off < b.size())
+    // ---- JSON branch ----
+    auto first_non_ws = std::find_if(b.begin(), b.end(), [](uint8_t c)
+                                     { return !std::isspace((unsigned char)c); });
+    if (first_non_ws != b.end() && *first_non_ws == '{')
     {
-        if (!ensureRemaining(b, off, 1))
-            break;
-        auto type = static_cast<msg::DCType>(b[off]);
-        off += 1;
-        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! onChat");
-        switch (type)
+        try
         {
-            case msg::DCType::ChatGroupCreate:
+            std::string s(b.begin(), b.end()); // UTF-8
+            msg::Json j = msg::Json::parse(s);
+
+            msg::ReadyMessage r;
+            r.fromPeer = fromPeer;
+
+            // type
+            msg::DCType t;
+            if (!msg::DCTypeFromJson(msg::getString(j, "type"), t))
             {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                r.tableId = Serializer::deserializeUInt64(b, off);
-                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
-                r.name = Serializer::deserializeString(b, off);     // group name (unique)
+                Logger::instance().log("chat", Logger::Level::Warn, "JSON chat: unknown type");
+                return;
+            }
+            r.kind = t;
+
+            // common fields
+            if (j.contains("tableId"))
+                r.tableId = (uint64_t)j["tableId"].get<uint64_t>();
+            if (j.contains("groupId"))
+                r.threadId = (uint64_t)j["groupId"].get<uint64_t>();
+
+            switch (t)
+            {
+                case msg::DCType::ChatGroupCreate:
+                case msg::DCType::ChatGroupUpdate:
                 {
-                    const int pc = Serializer::deserializeInt(b, off);
-                    std::set<std::string> parts;
-                    for (int i = 0; i < pc; ++i)
-                        parts.insert(Serializer::deserializeString(b, off));
-                    r.participants = std::move(parts);
+                    if (j.contains("name"))
+                        r.name = j["name"].get<std::string>();
+                    if (j.contains("participants") && j["participants"].is_array())
+                    {
+                        std::set<std::string> parts;
+                        for (auto& e : j["participants"])
+                            parts.insert(e.get<std::string>());
+                        r.participants = std::move(parts);
+                    }
+                    break;
                 }
-                inboundGame_.push(std::move(r));
-                break;
-            }
-
-            case msg::DCType::ChatGroupUpdate:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                r.tableId = Serializer::deserializeUInt64(b, off);
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off);
+                case msg::DCType::ChatGroupDelete:
                 {
-                    const int pc = Serializer::deserializeInt(b, off);
-                    std::set<std::string> parts;
-                    for (int i = 0; i < pc; ++i)
-                        parts.insert(Serializer::deserializeString(b, off));
-                    r.participants = std::move(parts);
+                    // nothing extra
+                    break;
                 }
-                inboundGame_.push(std::move(r));
-                break;
+                case msg::DCType::ChatMessage:
+                {
+                    if (j.contains("ts"))
+                        r.ts = (uint64_t)j["ts"].get<uint64_t>();
+                    if (j.contains("username"))
+                        r.name = j["username"].get<std::string>();
+                    if (j.contains("text"))
+                        r.text = j["text"].get<std::string>();
+                    break;
+                }
+                default:
+                    return; // ignore non-chat types here
             }
 
-            case msg::DCType::ChatGroupDelete:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                r.tableId = Serializer::deserializeUInt64(b, off);
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                inboundGame_.push(std::move(r));
-                break;
-            }
-
-            case msg::DCType::ChatMessage:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                r.tableId = Serializer::deserializeUInt64(b, off);
-                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
-                r.ts = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // username
-                r.text = Serializer::deserializeString(b, off); // body
-                inboundGame_.push(std::move(r));
-                break;
-            }
-
-            default:
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onChat");
-                return; // stop this buffer if unknown/out-of-sync
+            inboundGame_.push(std::move(r));
+            return; // handled JSON
+        }
+        catch (const std::exception& e)
+        {
+            Logger::instance().log("chat", Logger::Level::Warn, std::string("JSON parse error: ") + e.what());
+            // fall through to legacy-binary branch if you still support it
         }
     }
 }

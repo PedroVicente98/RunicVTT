@@ -298,21 +298,120 @@ namespace msg
             inline constexpr std::string MarkerMove = "marker_move";
         } // namespace name
 
-        //inline constexpr std::string_view Chat = "CHAT";
-        //inline constexpr std::string_view Image = "IMAGE";
-        //inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
-        //inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
-        //inline constexpr std::string_view Move = "MOVE";
-
-        //// Examples from earlier discussion:
-        //inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
-        //inline constexpr std::string_view FogCreate = "FOG_CREATE";
-        //inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
     } // namespace dc
 
-    // ========== Optional JSON helpers (nlohmann::json) ==========
+    // --- DCType <-> string (chat only) ---
+    inline const char* DCTypeToJson(DCType t)
+    {
+        switch (t)
+        {
+            case DCType::ChatGroupCreate:
+                return "ChatGroupCreate";
+            case DCType::ChatGroupUpdate:
+                return "ChatGroupUpdate";
+            case DCType::ChatGroupDelete:
+                return "ChatGroupDelete";
+            case DCType::ChatMessage:
+                return "ChatMessage";
+            default:
+                return "";
+        }
+    }
+    inline bool DCTypeFromJson(std::string_view s, DCType& out)
+    {
+        if (s == "ChatGroupCreate")
+        {
+            out = DCType::ChatGroupCreate;
+            return true;
+        }
+        if (s == "ChatGroupUpdate")
+        {
+            out = DCType::ChatGroupUpdate;
+            return true;
+        }
+        if (s == "ChatGroupDelete")
+        {
+            out = DCType::ChatGroupDelete;
+            return true;
+        }
+        if (s == "ChatMessage")
+        {
+            out = DCType::ChatMessage;
+            return true;
+        }
+        return false;
+    }
+
+    // Common payload keys for chat JSON
+    namespace chatkey
+    {
+        inline constexpr std::string_view Type = "type";          // string (ChatMessage, ChatGroupCreate, ...)
+        inline constexpr std::string_view TableId = "tableId";    // u64
+        inline constexpr std::string_view GroupId = "groupId";    // u64
+        inline constexpr std::string_view Name = "name";          // string (group name)
+        inline constexpr std::string_view Parts = "participants"; // array<string> (peer ids)
+        inline constexpr std::string_view Ts = "ts";              // u64
+        inline constexpr std::string_view Username = "username";  // string
+        inline constexpr std::string_view Text = "text";          // string
+    } // namespace chatkey
+
+    // ========== JSON helpers (nlohmann::json) ==========
     // Enable by including <nlohmann/json.hpp> before using these.
+
     using Json = nlohmann::json;
+
+    // --- builders (chat JSON) ---
+    inline Json makeChatGroupCreate(uint64_t tableId, uint64_t groupId,
+                                    const std::string& name,
+                                    const std::set<std::string>& participants)
+    {
+        Json j = {
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupCreate)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Name), name},
+            {std::string(chatkey::Parts), Json::array()}};
+        for (auto& p : participants)
+            j[std::string(chatkey::Parts)].push_back(p);
+        return j;
+    }
+
+    inline Json makeChatGroupUpdate(uint64_t tableId, uint64_t groupId,
+                                    const std::string& name,
+                                    const std::set<std::string>& participants)
+    {
+        Json j = {
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupUpdate)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Name), name},
+            {std::string(chatkey::Parts), Json::array()}};
+        for (auto& p : participants)
+            j[std::string(chatkey::Parts)].push_back(p);
+        return j;
+    }
+
+    inline Json makeChatGroupDelete(uint64_t tableId, uint64_t groupId)
+    {
+        return Json{
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupDelete)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId}};
+    }
+
+    inline Json makeChatMessage(uint64_t tableId, uint64_t groupId,
+                                uint64_t ts, const std::string& username,
+                                const std::string& text)
+    {
+        return Json{
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatMessage)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Ts), ts},
+            {std::string(chatkey::Username), username},
+            {std::string(chatkey::Text), text}};
+    }
+
     // ---- builders (signaling) ----
     inline Json makeOffer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& username, const std::string& broadcast = msg::value::False)
     {
@@ -452,32 +551,3 @@ namespace msg
     }
 
 } // namespace msg
-
-// namespace msg
-/*
-#pragma once
-#include
-#include <iostream>
-#include "nlohmann/json.hpp"
-
-enum MessageType {
-    CHAT,
-    IMAGE,
-    MOVE,
-    CREATE_ENTITY,
-    PASSWORD,
-    TOGGLE_VISIBILITY,
-    SEND_NOTE
-};
-
-
-
-
-struct Message {
-    MessageType type;
-    std::string senderId;
-    nlohmann::json payload;
-};
-
-
-*/

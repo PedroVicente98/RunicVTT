@@ -276,6 +276,11 @@ public:
 
     std::pair<std::string, bool> ensureUsernameUnique(const std::string& desired) const;
 
+    // NetworkManager.h (public)
+    bool broadcastChatJson(const msg::Json& j);
+    bool sendChatJsonTo(const std::string& peerId, const msg::Json& j);
+    bool sendChatJsonTo(const std::set<std::string>& peers, const msg::Json& j);
+
 private:
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
