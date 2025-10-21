@@ -763,7 +763,7 @@ std::vector<std::string> NetworkManager::getConnectedUsernames() const
     {
         if (link && link->isConnected())
         {
-            user_names.push_back(displayNameFor(pid));
+            user_names.push_back(displayNameForPeer(pid));
         }
     }
     return user_names;
