@@ -407,17 +407,15 @@ void GameTableManager::processReceivedMessages()
                     break;
 
                 const std::string uniqueId = *m.userUniqueId; // now uniqueId
-                const std::string oldU = *m.text;
+                const std::string fromPeerId = m.fromPeerId;
                 const std::string newU = *m.name;
 
                 // 1) record in address book
+                network_manager->upsertPeerIdentityWithUnique(/*peerId=*/m.fromPeerId, /*uniqueId=*/uniqueId, /*username=*/newU);
                 identity_manager->setUsernameForUnique(uniqueId, newU);
-
-                // 2) update visuals / caches
                 board_manager->onUsernameChanged(uniqueId, newU);
                 chat_manager->replaceUsernameForUnique(uniqueId, newU);
 
-                // 3) (optional) if you still use rebound to resolve collisions, you can keep that logic here.
                 break;
             }
 

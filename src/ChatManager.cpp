@@ -531,7 +531,6 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId,
         nm->sendChatJsonTo(targets, j);
 }
 
-// ChatManager.cpp
 std::set<std::string> ChatManager::resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const
 {
     std::set<std::string> out;
@@ -549,107 +548,6 @@ std::set<std::string> ChatManager::resolvePeerIdsForParticipants(const std::set<
     return out;
 }
 
-//void ChatManager::emitGroupCreate(const ChatGroupModel& g)
-//{
-//    auto nm = network_.lock();
-//    if (!nm || !hasCurrent())
-//        return;
-//    std::vector<uint8_t> buf;
-//    Serializer::serializeUInt64(buf, currentTableId_);
-//    Serializer::serializeUInt64(buf, g.id);
-//    Serializer::serializeString(buf, g.name);
-//    Serializer::serializeInt(buf, (int)g.participants.size());
-//    for (auto& p : g.participants)
-//        Serializer::serializeString(buf, p);
-//
-//    Logger::instance().log("chat", Logger::Level::Info,
-//                           "[SEND] ChatGroupCreate table=" + std::to_string(currentTableId_) +
-//                               " gid=" + std::to_string(g.id) + " name='" + g.name +
-//                               "' bytes=" + std::to_string(buf.size()));
-//
-//    // broadcast: anyone can see groups list (or you can target participants only if you prefer)
-//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupCreate, buf);
-//}
-//
-//void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
-//{
-//    auto nm = network_.lock();
-//    if (!nm || !hasCurrent())
-//        return;
-//    std::vector<uint8_t> buf;
-//    Serializer::serializeUInt64(buf, currentTableId_);
-//    Serializer::serializeUInt64(buf, g.id);
-//    Serializer::serializeString(buf, g.name);
-//    Serializer::serializeInt(buf, (int)g.participants.size());
-//    for (auto& p : g.participants)
-//        Serializer::serializeString(buf, p);
-//
-//    Logger::instance().log("chat", Logger::Level::Info,
-//                           "[SEND] ChatGroupUpdate table=" + std::to_string(currentTableId_) +
-//                               " gid=" + std::to_string(g.id) + " name='" + g.name +
-//                               "' bytes=" + std::to_string(buf.size()));
-//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupUpdate, buf);
-//}
-//
-//void ChatManager::emitGroupDelete(uint64_t groupId)
-//{
-//    auto nm = network_.lock();
-//    if (!nm || !hasCurrent())
-//        return;
-//    std::vector<uint8_t> buf;
-//    Serializer::serializeUInt64(buf, currentTableId_);
-//    Serializer::serializeUInt64(buf, groupId);
-//
-//    Logger::instance().log("chat", Logger::Level::Info,
-//                           "[SEND] ChatGroupDelete table=" + std::to_string(currentTableId_) +
-//                               " gid=" + std::to_string(groupId) +
-//                               " bytes=" + std::to_string(buf.size()));
-//
-//    nm->broadcastChatThreadFrame(msg::DCType::ChatGroupDelete, buf);
-//}
-//
-//void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
-//{
-//    auto nm = network_.lock();
-//    if (!nm || !hasCurrent())
-//        return;
-//
-//    std::vector<uint8_t> buf;
-//    Serializer::serializeUInt64(buf, currentTableId_);
-//    Serializer::serializeUInt64(buf, groupId);
-//    Serializer::serializeUInt64(buf, ts);
-//    Serializer::serializeString(buf, username);
-//    Serializer::serializeString(buf, text);
-//
-//    Logger::instance().log("chat", Logger::Level::Info,
-//                           "[SEND] ChatMessage table=" + std::to_string(currentTableId_) +
-//                               " gid=" + std::to_string(groupId) +
-//                               " user='" + username + "'" +
-//                               " text_len=" + std::to_string(text.size()) +
-//                               " payload=" + std::to_string(buf.size()));
-//
-//    // broadcast to all; render simply ignores groups you aren’t part of
-//    nm->broadcastChatThreadFrame(msg::DCType::ChatMessage, buf);
-//}
-
-// ====== username cascade (rename everywhere) ======
-//void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
-//                                            const std::string& newUsername)
-//{
-//    if (oldUsername == newUsername)
-//        return;
-//    for (auto& [id, g] : groups_)
-//    {
-//        for (auto& m : g.messages)
-//        {
-//            if (m.username == oldUsername)
-//                m.username = newUsername;
-//        }
-//    }
-//    Logger::instance().log("chat", Logger::Level::Info,
-//                           "rename chat user old=" + oldUsername + " new=" + newUsername);
-//}
-// ChatManager.cpp
 void ChatManager::replaceUsernameForUnique(const std::string& uniqueId,
                                            const std::string& newUsername)
 {

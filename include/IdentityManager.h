@@ -54,6 +54,8 @@ public:
     {
         return byUnique_;
     }
+    // IdentityManager.h
+    void erasePeer(const std::string& peerId);
 
 private:
     // persisted “me”

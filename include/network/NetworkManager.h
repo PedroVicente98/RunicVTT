@@ -129,26 +129,21 @@ public:
     bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
     void broadcastPeerDisconnect(const std::string& targetId);
-    // Single-shot reconnect of one peer. Returns true if we kicked off a rebuild.
     /*bool reconnectPeer(const std::string& peerId);*/
 
-    // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
     void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
-
-    //void setMyIdentity(std::string myId, std::string username);
-    // void upsertPeerIdentity(const std::string& id, const std::string& username);
 
     std::string displayNameForPeer(const std::string& peerId) const;
 
     std::string getMyUsername() const
     {
-        return identity_manager ? identity_manager->myUsername() : std::string{};
+        return identity_manager->myUsername();
     }
     std::string getMyUniqueId() const
     {
-        return identity_manager ? identity_manager->myUniqueId() : std::string{};
+        return identity_manager->myUniqueId();
     }
 
     const std::string& getMyPeerId() const
@@ -290,6 +285,10 @@ public:
     bool broadcastChatJson(const msg::Json& j);
     bool sendChatJsonTo(const std::string& peerId, const msg::Json& j);
     bool sendChatJsonTo(const std::set<std::string>& peers, const msg::Json& j);
+    std::shared_ptr<IdentityManager> getIdentityManager()
+    {
+        return identity_manager;
+    }
 
 private:
     // build

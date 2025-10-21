@@ -1898,13 +1898,6 @@ void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t&
                            "UserNameUpdate: tbl=" + std::to_string(r.tableId.value_or(0)) +
                                " uid=" + uniqueId + " old=" + oldU + " new=" + newU);
 
-    // Immediately teach IdentityManager the mapping + new name.
-    if (identity_manager)
-    {
-        identity_manager->bindPeer(/*peerId=*/r.fromPeerId, /*uniqueId=*/uniqueId, /*username=*/newU);
-        identity_manager->setUsernameForUnique(uniqueId, newU);
-    }
-
     inboundGame_.push(std::move(r));
 }
 

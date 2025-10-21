@@ -91,6 +91,11 @@ void IdentityManager::bindPeer(const std::string& peerId,
     (void)saveAddressBookToFile(); // optional: you can defer saving if you prefer
 }
 
+void IdentityManager::erasePeer(const std::string& peerId)
+{
+    peerToUnique_.erase(peerId);
+}
+
 // ------------------ public: lookups ------------------
 
 std::string IdentityManager::usernameForUnique(const std::string& uniqueId) const
