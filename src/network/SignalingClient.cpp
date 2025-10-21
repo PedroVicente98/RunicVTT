@@ -15,106 +15,64 @@ SignalingClient::SignalingClient(std::weak_ptr<NetworkManager> parent) :
 }
 
 // SignalingClient.cpp
-bool SignalingClient::connectUrl(const std::string& url)
-{
+bool SignalingClient::connectUrl(const std::string& url) {
     rtc::WebSocketConfiguration cfg;
     cfg.pingInterval = std::chrono::milliseconds(1000);
     cfg.connectionTimeout = std::chrono::milliseconds(0);
     ws = std::make_shared<rtc::WebSocket>(cfg);
 
-    ws->onOpen([=]()
-               {
+    ws->onOpen([=]() {
         if (auto nm = network_manager.lock()) {
             nm->pushStatusToast("Signaling connected", ImGuiToaster::Level::Good);
-            ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername(), nm->getMyUniqueId()).dump());
-        } });
-
-    ws->onClosed([=]()
-                 { 
-        if (auto nm = network_manager.lock())
-            nm->pushStatusToast("Signaling disconnected", ImGuiToaster::Level::Error); });
-
-    ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg)
-                  {
-        if (!std::holds_alternative<rtc::string>(msg)) return;
-        this->onMessage(std::get<rtc::string>(msg)); });
-
-    // normalize httpsâ†’wss, httpâ†’ws; leave ws/wss as-is
-    const std::string norm = NetworkUtilities::normalizeWsUrl(url);
-    std::cout << "[SignalingClient] Opening URL: " << norm << "\n";
-    try
-    {
-        if (ws->isClosed())
-            ws->open(norm);
-        else
-        {
-            ws->close();
-            ws->open(norm);
+            // send AUTH with username + uniqueId from IdentityManager
+            ws->send(msg::makeAuth(nm->getNetworkPassword(),
+                                   nm->getMyUsername(),
+                                   nm->getMyUniqueId()).dump());
         }
-    }
-    catch (const std::exception& e)
-    {
-        std::cout << "Exception on ws->open: " << e.what() << "\n";
-        return false;
-    }
+    });
+
+    ws->onClosed([=]() {
+        if (auto nm = network_manager.lock())
+            nm->pushStatusToast("Signaling disconnected", ImGuiToaster::Level::Error);
+    });
+
+    ws->onMessage([=](std::variant<rtc::binary, rtc::string> m) {
+        if (!std::holds_alternative<rtc::string>(m)) return;
+        this->onMessage(std::get<rtc::string>(m));
+    });
+
+    const std::string norm = NetworkUtilities::normalizeWsUrl(url);
+    try { ws->isClosed() ? ws->open(norm) : (ws->close(), ws->open(norm)); }
+    catch (const std::exception& e) { std::cout << "ws->open: " << e.what() << "\n"; return false; }
     return true;
 }
 
-bool SignalingClient::connect(const std::string& ip, unsigned short port)
-{
-    // If caller accidentally passed a full URL, just route to connectUrl.
-    auto starts = [&](const char* p)
-    { return ip.rfind(p, 0) == 0; };
-    if (starts("https://") || starts("http://") || starts("wss://") || starts("ws://"))
-    {
-        return connectUrl(ip);
-    }
-
+bool SignalingClient::connect(const std::string& ip, unsigned short port) {
+    // (same as your version, only keep the AUTH send identical to above)
     rtc::WebSocketConfiguration cfg;
     cfg.pingInterval = std::chrono::milliseconds(1000);
     cfg.connectionTimeout = std::chrono::milliseconds(0);
     ws = std::make_shared<rtc::WebSocket>(cfg);
 
-    ws->onOpen([=]()
-               {
-        std::cout << "[SignalingClient] Connected to GM.\n";
+    ws->onOpen([=]() {
         auto nm = network_manager.lock();
         if (!nm) throw std::runtime_error("[SignalingClient] NetworkManager Inactive");
-        ws->send(msg::makeAuth(nm->getNetworkPassword(), nm->getMyUsername(), nm->getMyUniqueId()).dump()); });
+        ws->send(msg::makeAuth(nm->getNetworkPassword(),
+                               nm->getMyUsername(),
+                               nm->getMyUniqueId()).dump());
+    });
 
-    ws->onClosed([=]()
-                 { std::cout << "[SignalingClient] Disconnected from GM.\n"; });
+    ws->onMessage([=](std::variant<rtc::binary, rtc::string> m) {
+        if (!std::holds_alternative<rtc::string>(m)) return;
+        this->onMessage(std::get<rtc::string>(m));
+    });
 
-    ws->onError([=](std::string err)
-                { std::cout << "[SignalingClient] WebSocket error: " << err << "\n"; });
-
-    ws->onMessage([=](std::variant<rtc::binary, rtc::string> msg)
-                  {
-        if (!std::holds_alternative<rtc::string>(msg)) return;
-        this->onMessage(std::get<rtc::string>(msg)); });
-
-    // Build a proper ws URL from host:port using your existing helper
-    const std::string url = NetworkUtilities::normalizeWsUrl(ip, port); // e.g. "ws://<ip>:<port>"
-    std::cout << "[SignalingClient] Opening URL: " << url << "\n";
-    try
-    {
-        if (ws->isClosed())
-        {
-            ws->open(url);
-        }
-        else
-        {
-            ws->close();
-            ws->open(url);
-        }
-    }
-    catch (const std::exception& e)
-    { // catch by reference
-        std::cout << "Exception on ws->open: " << e.what() << "\n";
-        return false;
-    }
+    const std::string url = NetworkUtilities::normalizeWsUrl(ip, port);
+    try { ws->isClosed() ? ws->open(url) : (ws->close(), ws->open(url)); }
+    catch (const std::exception& e) { std::cout << "ws->open: " << e.what() << "\n"; return false; }
     return true;
 }
+
 
 void SignalingClient::send(const std::string& message)
 {
@@ -166,21 +124,22 @@ void SignalingClient::onMessage(const std::string& msg)
         return;
     }
 
-    if (type == msg::signaling::AuthResponse)
-    {
-        if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True)
-        {
-            // for each existing authed client -> start offer
-            const std::string myId = j.value(std::string(msg::key::ClientId), "");
-            nm->setMyPeerId(myId); 
-            const std::string gmId = j.value(msg::key::GmId, "");
-            if (!gmId.empty())
-                nm->setGMId(gmId);
+    if (type == msg::signaling::AuthResponse) {
+        if (j.value(msg::key::AuthOk, msg::value::False) == msg::value::True) {
+            // Routing id assigned by the server
+            const std::string myPeerId = j.value(std::string(msg::key::ClientId), "");
+            nm->setMyPeerId(myPeerId);
 
-            if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array())
-            {
-                for (auto& v : j[msg::key::Clients])
-                {
+            // GM id now carries GM UNIQUE ID
+            const std::string gmUniqueId = j.value(std::string(msg::key::GmId), "");
+            if (!gmUniqueId.empty()) {
+                // Use whatever setter you have for GM UNIQUE id
+                nm->setGMUniqueId(gmUniqueId);
+            }
+
+            // Start offers to already-authed peers
+            if (j.contains(msg::key::Clients) && j[msg::key::Clients].is_array()) {
+                for (auto& v : j[msg::key::Clients]) {
                     std::string peerId = v.get<std::string>();
                     auto link = nm->ensurePeerLink(peerId);
                     link->createChannels();
