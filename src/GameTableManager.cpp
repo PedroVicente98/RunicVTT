@@ -677,10 +677,10 @@ void GameTableManager::createBoardPopUp()
         {
             auto board = board_manager->createBoard(board_name, selectedImage.filename, selectedImage.textureID, selectedImage.size);
             board.add(flecs::ChildOf, active_game_table);
-
             map_directory->clearSelectedImage();
             memset(buffer, 0, sizeof(buffer));
 
+            network_manager->broadcastBoard(board_manager->getActiveBoard());
             saved = true;
             ImGui::CloseCurrentPopup();
         }
@@ -777,6 +777,7 @@ void GameTableManager::loadBoardPopUp()
             {
                 std::filesystem::path board_file_path = PathManager::getRootDirectory() / "GameTables" / game_table_name / "Boards" / board;
                 board_manager->loadActiveBoard(board_file_path.string());
+                network_manager->broadcastBoard(board_manager->getActiveBoard());
                 loaded = true;
                 ImGui::CloseCurrentPopup();
             }

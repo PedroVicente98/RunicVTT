@@ -1487,18 +1487,22 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
     uint64_t bid = board.get<Identifier>()->id;
     sendImageChunks(msg::ImageOwnerKind::Board, bid, img, toPeerIds);
 
-    //uint64_t off = 0;
-    //while (off < img.size())
-    //{
-    //    size_t chunk = std::min<size_t>(kChunk, img.size() - off);
-    //    auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
-    //    broadcastGameFrame(frame, toPeerIds);
-    //    off += chunk;
-    //}
-
     // 3) commit
     auto commit = buildCommitBoardFrame(bid);
     broadcastGameFrame(commit, toPeerIds);
+
+    board.children([&](flecs::entity child)
+                   {
+			if (child.has<MarkerComponent>()) {
+                uint64_t bid = board.get<Identifier>()->id;
+                sendMarker(bid, child, toPeerIds);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentMarker");
+			}
+			else if (child.has<FogOfWar>()) {
+                uint64_t bid = board.get<Identifier>()->id;
+                sendFog(bid, child, toPeerIds);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentFog");
+			} });
 }
 
 void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)

@@ -1272,38 +1272,38 @@ void ChatManager::markGroupRead(uint64_t groupId)
         g->unread = 0;
 }
 
-// ====== snapshot passthroughs (optional) ======
-void ChatManager::writeGroupsToSnapshotGT(std::vector<unsigned char>& buf) const
-{
-    // light snapshot (optional): just groups’ metadata; messages are local-only
-    Serializer::serializeInt(buf, 1); // version
-    Serializer::serializeInt(buf, (int)groups_.size());
-    for (auto& [id, g] : groups_)
-    {
-        Serializer::serializeUInt64(buf, g.id);
-        Serializer::serializeString(buf, g.name);
-        Serializer::serializeInt(buf, (int)g.participants.size());
-        for (auto& p : g.participants)
-            Serializer::serializeString(buf, p);
-    }
-}
-
-void ChatManager::readGroupsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off)
-{
-    groups_.clear();
-    ensureGeneral();
-    (void)Serializer::deserializeInt(buf, off); // version
-    int n = Serializer::deserializeInt(buf, off);
-    for (int i = 0; i < n; ++i)
-    {
-        ChatGroupModel g;
-        g.id = Serializer::deserializeUInt64(buf, off);
-        g.name = Serializer::deserializeString(buf, off);
-        int pc = Serializer::deserializeInt(buf, off);
-        for (int k = 0; k < pc; ++k)
-            g.participants.insert(Serializer::deserializeString(buf, off));
-        groups_.emplace(g.id, std::move(g));
-    }
-    if (groups_.find(activeGroupId_) == groups_.end())
-        activeGroupId_ = generalGroupId_;
-}
+//// ====== snapshot passthroughs (optional) ======
+//void ChatManager::writeGroupsToSnapshotGT(std::vector<unsigned char>& buf) const
+//{
+//    // light snapshot (optional): just groups’ metadata; messages are local-only
+//    Serializer::serializeInt(buf, 1); // version
+//    Serializer::serializeInt(buf, (int)groups_.size());
+//    for (auto& [id, g] : groups_)
+//    {
+//        Serializer::serializeUInt64(buf, g.id);
+//        Serializer::serializeString(buf, g.name);
+//        Serializer::serializeInt(buf, (int)g.participants.size());
+//        for (auto& p : g.participants)
+//            Serializer::serializeString(buf, p);
+//    }
+//}
+//
+//void ChatManager::readGroupsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off)
+//{
+//    groups_.clear();
+//    ensureGeneral();
+//    (void)Serializer::deserializeInt(buf, off); // version
+//    int n = Serializer::deserializeInt(buf, off);
+//    for (int i = 0; i < n; ++i)
+//    {
+//        ChatGroupModel g;
+//        g.id = Serializer::deserializeUInt64(buf, off);
+//        g.name = Serializer::deserializeString(buf, off);
+//        int pc = Serializer::deserializeInt(buf, off);
+//        for (int k = 0; k < pc; ++k)
+//            g.participants.insert(Serializer::deserializeString(buf, off));
+//        groups_.emplace(g.id, std::move(g));
+//    }
+//    if (groups_.find(activeGroupId_) == groups_.end())
+//        activeGroupId_ = generalGroupId_;
+//}
