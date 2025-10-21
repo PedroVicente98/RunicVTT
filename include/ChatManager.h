@@ -93,6 +93,7 @@ public:
     ChatGroupModel* getGroup(uint64_t id);
 
     void replaceUsernameForUnique(const std::string& uniqueId, const std::string& newUsername);
+    void tryHandleSlashCommand(uint64_t threadId, const std::string& input);
 
 private:
     std::shared_ptr<IdentityManager> identity_manager;
@@ -127,7 +128,6 @@ private:
     int diceSides_ = 20;
     int diceMod_ = 0;
     bool diceModPerDie_ = false;
-    void tryHandleSlashCommand(uint64_t threadId, const std::string& input);
 
     // wiring
     std::weak_ptr<NetworkManager> network_;

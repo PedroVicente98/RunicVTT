@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <memory>
 #include "ImGuiToaster.h"
+#include "ChatManager.h"
 
 class NoteEditorUI
 {
@@ -26,10 +27,15 @@ public:
     }
 
     bool openTabByUuid(const std::string& uuid);
+    void setChatManager(std::shared_ptr<ChatManager> chat_manager)
+    {
+        this->chat_manager = chat_manager;
+    }
 
 private:
     std::shared_ptr<NotesManager> notes_manager;
     std::shared_ptr<ImGuiToaster> toaster_;
+    std::shared_ptr<ChatManager> chat_manager;
     MarkdownRenderer md_;
     bool visible_ = false;
     float leftWidth_ = 260.f;

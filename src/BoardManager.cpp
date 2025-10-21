@@ -1499,13 +1499,13 @@ void BoardManager::renderGridWindow()
         // --- FLOAT SLIDERS ---
         changed |= ImGui::SliderFloat("Cell Size", &grid->cell_size, 10.0f, 200.0f);
         ImGui::SameLine();
-        if (ImGui::Button("-"))
+        if (ImGui::Button("-##size"))
         {
             grid->cell_size = grid->cell_size - 0.01f;
             changed = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+"))
+        if (ImGui::Button("+##size"))
         {
             grid->cell_size = grid->cell_size + 0.01f;
             changed = true;
@@ -1514,13 +1514,13 @@ void BoardManager::renderGridWindow()
         ImGui::Text("Grid Offset");
         changed |= ImGui::SliderFloat("Offset X", &grid->offset.x, -500.0f, 500.0f);
         ImGui::SameLine();
-        if (ImGui::Button("-"))
+        if (ImGui::Button("-##offsetx"))
         {
             grid->offset.x = grid->offset.x - 0.01f;
             changed = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+"))
+        if (ImGui::Button("+##offsetx"))
         {
             grid->offset.x = grid->offset.x + 0.01f;
             changed = true;
@@ -1528,13 +1528,13 @@ void BoardManager::renderGridWindow()
         changed |= ImGui::SliderFloat("Offset Y", &grid->offset.y, -500.0f, 500.0f);
 
         ImGui::SameLine();
-        if (ImGui::Button("-"))
+        if (ImGui::Button("-##offsety"))
         {
             grid->offset.y = grid->offset.y - 0.01f;
             changed = true;
         }
         ImGui::SameLine();
-        if (ImGui::Button("+"))
+        if (ImGui::Button("+##offsety"))
         {
             grid->offset.y = grid->offset.y + 0.01f;
             changed = true;

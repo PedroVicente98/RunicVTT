@@ -9,8 +9,8 @@
 #include <chrono>
 #include <string>
 
-ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
-    marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directoryry)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
+    marker_directory(marker_directory), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directory)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
     ImGuiToaster::Config cfg;
     toaster_ = std::make_shared<ImGuiToaster>(cfg);
@@ -23,6 +23,7 @@ ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<Direc
 
     notes_manager = std::make_shared<NotesManager>(note_cfg, toaster_);
     note_editor_ui = std::make_shared<NoteEditorUI>(notes_manager, toaster_);
+    note_editor_ui->setChatManager(game_table_manager->chat_manager);
 
     ecs.component<Position>();         // .member<float>("x").member<float>("y");
     ecs.component<Size>();             // .member<float>("width").member<float>("height");

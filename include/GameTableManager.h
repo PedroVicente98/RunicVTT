@@ -56,12 +56,12 @@ public:
     std::vector<std::string> listGameTableFiles();
     void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
+    std::shared_ptr<IdentityManager> identity_manager;
     std::string game_table_name;
     //Chat chat;
     std::shared_ptr<ChatManager> chat_manager;
     std::shared_ptr<DirectoryWindow> map_directory;
     std::shared_ptr<NetworkManager> network_manager;
-    std::shared_ptr<IdentityManager> identity_manager;
     std::shared_ptr<BoardManager> board_manager;
     flecs::entity active_game_table = flecs::entity();
 

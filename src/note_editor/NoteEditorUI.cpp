@@ -472,8 +472,10 @@ void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float /*
         // only set handlers we need; leave external open to MarkdownRenderer default
         md_.onRoll = [this](const std::string& expr)
         {
-            if (toaster_)
-                toaster_->Push(ImGuiToaster::Level::Good, "Roll: " + expr);
+            if (chat_manager)
+                chat_manager->tryHandleSlashCommand(chat_manager->generalGroupId_, "/roll " + expr);
+            //if (toaster_)
+            //toaster_->Push(ImGuiToaster::Level::Good, "Roll: " + expr);
         };
         md_.resolveNoteRef = [this](const std::string& ref) -> std::string
         {
