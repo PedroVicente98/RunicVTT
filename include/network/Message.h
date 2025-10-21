@@ -195,7 +195,7 @@ namespace msg
         std::optional<uint32_t> seq;
         std::optional<Role> senderRole;
 
-        std::optional<std::string> userPeerId;
+        std::optional<std::string> userUniqueId;
         std::optional<uint8_t> rebound;
     };
 
