@@ -134,7 +134,7 @@ void SignalingClient::onMessage(const std::string& msg)
             const std::string gmUniqueId = j.value(std::string(msg::key::GmId), "");
             if (!gmUniqueId.empty()) {
                 // Use whatever setter you have for GM UNIQUE id
-                nm->setGMUniqueId(gmUniqueId);
+                nm->setGMId(gmUniqueId);
             }
 
             // Start offers to already-authed peers
