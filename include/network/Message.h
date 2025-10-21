@@ -165,7 +165,7 @@ namespace msg
     struct ReadyMessage
     {
         DCType kind;
-        std::string fromPeer; // optional: who sent it (fill in DC callback if you have it)
+        std::string fromPeerId; // optional: who sent it (fill in DC callback if you have it)
 
         std::optional<uint64_t> tableId;
         std::optional<uint64_t> boardId;
