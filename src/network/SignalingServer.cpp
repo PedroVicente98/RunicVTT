@@ -106,65 +106,50 @@ void SignalingServer::onMessage(const std::string& clientId, const std::string& 
     if (type.empty())
         return;
 
-    // AUTH
-    if (type == msg::signaling::Auth)
-    {
-        std::string provided = j.value(msg::key::AuthToken, "");
-        std::string expected;
-
+    if (type == msg::signaling::Auth) {
         auto nm = network_manager.lock();
-        if (!nm)
-        {
-            throw std::runtime_error("SignalingServer::onMessage: NetworkManager expired");
-        }
-        expected = nm->getNetworkPassword();
+        if (!nm) throw std::runtime_error("NetworkManager expired");
+
+        const std::string provided = j.value(std::string(msg::key::AuthToken), "");
+        const std::string expected  = nm->getNetworkPassword();
 
         const bool ok = (expected.empty() || provided == expected);
+        const std::string username = j.value(std::string(msg::key::Username), "guest" + clientId);
+        const std::string clientUniqueId = j.value(std::string(msg::key::UniqueId), "");
 
-        if (ok)
-        {
+        if (ok) {
             moveToAuthenticated(clientId);
+
             std::vector<std::string> others;
             others.reserve(authClients_.size());
-            for (auto& [id, ws] : authClients_)
-            {
-                if (id == clientId)
-                    continue;
-                others.emplace_back(id);
-            }
-            std::string gmId;
-            gmId = nm->getMyId();
-            if (gmId.empty())
-                gmId = "GM";
+            for (auto& [id, _] : authClients_) if (id != clientId) others.emplace_back(id);
 
-            auto username = j.value(msg::key::Username, "guest" + clientId);
+            // IMPORTANT: GM id in response must be GM UNIQUE ID
+            const std::string gmUniqueId = nm->getMyUniqueId();
 
-            auto resp = msg::makeAuthResponse(msg::value::True, "welcome", clientId, username, others, gmId);
+            // you may optionally echo client uniqueId back (makeAuthResponse supports uniqueId param)
+            auto resp = msg::makeAuthResponse(msg::value::True, "welcome",
+                                              clientId, username,
+                                              others,
+                                              /*gmPeerId=*/gmUniqueId,
+                                              /*uniqueId=*/clientUniqueId);
             sendTo(clientId, resp.dump());
-        }
-        else
-        {
-            auto username = j.value(msg::key::Username, "guest" + clientId);
-            auto msg = msg::makeAuthResponse(msg::value::False, "invalid password", clientId, username);
-            sendTo(clientId, msg.dump());
-            if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second)
-            {
-                it->second->close();
-            }
-            else if (auto it2 = authClients_.find(clientId); it2 != authClients_.end() && it2->second)
-            {
-                it2->second->close();
-            }
+        } else {
+            auto resp = msg::makeAuthResponse(msg::value::False, "invalid password",
+                                              clientId, username);
+            sendTo(clientId, resp.dump());
+
+            if (auto it = pendingClients_.find(clientId); it != pendingClients_.end() && it->second) it->second->close();
+            else if (auto it2 = authClients_.find(clientId); it2 != authClients_.end() && it2->second) it2->second->close();
         }
         return;
     }
 
-    // All other types require authentication
-    if (!isAuthenticated(clientId))
-    {
-        auto username = j.value(msg::key::Username, "guest" + clientId);
-        auto msg = msg::makeAuthResponse(msg::value::False, "unauthenticated", clientId, username);
-        sendTo(clientId, msg);
+    // for all other types, require auth
+    if (!isAuthenticated(clientId)) {
+        auto resp = msg::makeAuthResponse(msg::value::False, "unauthenticated",
+                                          clientId, "guest" + clientId);
+        sendTo(clientId, resp.dump());
         return;
     }
 
