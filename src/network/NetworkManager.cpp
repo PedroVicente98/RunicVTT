@@ -637,18 +637,25 @@ void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
     if (auto it = peers.find(peerId); it != peers.end() && it->second)
         it->second->setDisplayName(username);
 }
-std::string NetworkManager::displayNameFor(const std::string& id) const
+
+std::string NetworkManager::displayNameFor(const std::string& peerId) const
 {
     if (identity_manager)
     {
-        if (auto u = identity_manager->usernameForUnique(id); !u.empty())
-            return u;
+        if (auto uid = identity_manager->uniqueForPeer(peerId))
+        {
+            auto name = identity_manager->usernameForUnique(*uid); // std::string
+            if (!name.empty())
+                return name;
+            // If it returns optional<string>:
+            // if (name && !name->empty()) return *name;
+        }
     }
-    if (auto it = peerUsernames_.find(id); it != peerUsernames_.end())
+    if (auto it = peerUsernames_.find(peerId); it != peerUsernames_.end())
         return it->second;
-    if (auto it = clientUsernames_.find(id); it != clientUsernames_.end())
+    if (auto it = clientUsernames_.find(peerId); it != clientUsernames_.end())
         return it->second;
-    return id;
+    return peerId;
 }
 
 bool NetworkManager::disconectFromPeers()
