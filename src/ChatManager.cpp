@@ -251,7 +251,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
             // derive owner uniqueId (best-effort)
             std::string ownerUid;
             if (identity_manager)
-                ownerUid = identity_manager->uniqueForPeer(m.fromPeer).value_or("Player");
+                ownerUid = identity_manager->uniqueForPeer(m.fromPeerId).value_or("Player");
             g.ownerUniqueId = ownerUid;
 
             if (m.participants)
@@ -290,7 +290,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
 
                 // best-effort owner
                 if (identity_manager)
-                    stub.ownerUniqueId = identity_manager->uniqueForPeer(m.fromPeer).value_or("Player");
+                    stub.ownerUniqueId = identity_manager->uniqueForPeer(m.fromPeerId).value_or("Player");
 
                 groups_.emplace(stub.id, std::move(stub));
             }
@@ -317,7 +317,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
             {
                 // permission: only owner can delete
                 const std::string reqOwner =
-                    identity_manager ? identity_manager->uniqueForPeer(m.fromPeer).value_or("Player") : std::string{};
+                    identity_manager ? identity_manager->uniqueForPeer(m.fromPeerId).value_or("Player") : std::string{};
                 if (!g->ownerUniqueId.empty() && g->ownerUniqueId == reqOwner)
                 {
                     groups_.erase(*m.threadId);
@@ -337,7 +337,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
 
             // map sender to uniqueId if possible (if ReadyMessage.userPeerId later carries it, use that)
             std::string senderUid =
-                identity_manager ? identity_manager->uniqueForPeer(m.fromPeer).value_or("Player") : std::string{};
+                identity_manager ? identity_manager->uniqueForPeer(m.fromPeerId).value_or("Player") : std::string{};
 
             // inline append to include senderUniqueId
             ChatMessageModel msg;
@@ -464,43 +464,50 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
 void ChatManager::emitGroupCreate(const ChatGroupModel& g)
 {
     auto nm = network_.lock();
-    if (!nm || !hasCurrent()) return;
+    if (!nm || !hasCurrent())
+        return;
 
     auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
     auto targets = resolvePeerIdsForParticipants(g.participants);
 
     Logger::instance().log("chat", Logger::Level::Info,
                            "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name +
-                           " targets=" + std::to_string(targets.size()));
+                               " targets=" + std::to_string(targets.size()));
 
-    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
 {
     auto nm = network_.lock();
-    if (!nm || !hasCurrent()) return;
+    if (!nm || !hasCurrent())
+        return;
 
     auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
     auto targets = resolvePeerIdsForParticipants(g.participants);
 
-    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitGroupDelete(uint64_t groupId)
 {
     auto nm = network_.lock();
-    if (!nm || !hasCurrent()) return;
+    if (!nm || !hasCurrent())
+        return;
 
     // Find current participants for that group so only they get the delete
     auto it = groups_.find(groupId);
-    if (it == groups_.end()) return;
+    if (it == groups_.end())
+        return;
     const auto& parts = it->second.participants;
 
     auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
     auto targets = resolvePeerIdsForParticipants(parts);
 
-    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitChatMessageFrame(uint64_t groupId,
@@ -509,29 +516,33 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId,
                                        uint64_t ts)
 {
     auto nm = network_.lock();
-    if (!nm || !hasCurrent()) return;
+    if (!nm || !hasCurrent())
+        return;
 
     auto it = groups_.find(groupId);
-    if (it == groups_.end()) return; // unknown group locally
+    if (it == groups_.end())
+        return; // unknown group locally
 
     const auto& parts = it->second.participants;
     auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
     auto targets = resolvePeerIdsForParticipants(parts);
 
-    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 // ChatManager.cpp
-std::set<std::string>
-ChatManager::resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const
+std::set<std::string> ChatManager::resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const
 {
     std::set<std::string> out;
     auto nm = network_.lock();
-    auto im = identity_.lock();
-    if (!nm || !im) return out;
+    if (!nm || !identity_manager)
+        return out;
 
-    for (const auto& uid : participantUids) {
-        if (auto pid = im->peerIdForUnique(uid); pid && !pid->empty()) {
+    for (const auto& uid : participantUids)
+    {
+        if (auto pid = identity_manager->peerForUnique(uid); pid && !pid->empty())
+        {
             out.insert(*pid);
         }
     }
@@ -1082,7 +1093,7 @@ void ChatManager::renderCreateGroupPopup()
             for (auto& [pid, link] : nm->getPeers())
             {
                 bool checked = newGroupSel_.count(pid) > 0;
-                const std::string dn = nm->displayNameFor(pid);
+                const std::string dn = nm->displayNameForPeer(pid);
                 std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
                 if (ImGui::Checkbox(label.c_str(), &checked))
                 {
@@ -1183,7 +1194,7 @@ void ChatManager::renderEditGroupPopup()
             for (auto& [pid, link] : nm->getPeers())
             {
                 bool checked = editGroupSel_.count(pid) > 0;
-                const std::string dn = nm->displayNameFor(pid);
+                const std::string dn = nm->displayNameForPeer(pid);
                 std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
                 if (ImGui::Checkbox(label.c_str(), &checked))
                 {
@@ -1249,9 +1260,6 @@ void ChatManager::renderDeleteGroupPopup()
     {
         ImGui::TextUnformatted("Click a group to delete (General cannot be deleted).");
         ImGui::Separator();
-
-        auto nm = network_.lock();
-        const std::string me = nm ? nm->getMyId() : "";
 
         for (auto it = groups_.begin(); it != groups_.end(); /*++ inside*/)
         {

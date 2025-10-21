@@ -44,6 +44,7 @@ public:
     std::string usernameForUnique(const std::string& uniqueId) const;
     std::optional<std::string> uniqueForPeer(const std::string& peerId) const;
     std::optional<std::string> peerForUnique(const std::string& uniqueId) const;
+    std::optional<std::string> usernameForPeer(const std::string& peerId) const;
 
     // Update username for a known uniqueId (no uniqueness enforcement)
     void setUsernameForUnique(const std::string& uniqueId, const std::string& username);

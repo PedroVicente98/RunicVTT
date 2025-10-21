@@ -94,6 +94,7 @@ public:
 
     void replaceUsernameForUnique(const std::string& uniqueId, const std::string& newUsername);
     void tryHandleSlashCommand(uint64_t threadId, const std::string& input);
+    std::set<std::string> resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const;
 
 private:
     std::shared_ptr<IdentityManager> identity_manager;

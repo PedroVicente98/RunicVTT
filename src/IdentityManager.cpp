@@ -124,6 +124,14 @@ std::optional<std::string> IdentityManager::peerForUnique(const std::string& uni
     return std::nullopt;
 }
 
+std::optional<std::string> IdentityManager::usernameForPeer(const std::string& peerId) const
+{
+    for (const auto& kv : peerToUnique_)
+        if (kv.first == peerId)
+            return usernameForUnique(kv.second);
+    return std::nullopt;
+}
+
 void IdentityManager::setUsernameForUnique(const std::string& uniqueId, const std::string& username)
 {
     if (uniqueId == myUniqueId_)

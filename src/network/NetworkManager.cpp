@@ -567,26 +567,32 @@ std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peer
 
 // NetworkManager.cpp (relevant part)
 
-void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc) {
+void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc)
+{
     nlohmann::json j;
     const std::string sdp = std::string(desc);
 
     // Always pull identity from IdentityManager
-    const std::string username = getMyUsername();   // forwards to IdentityManager
-    const std::string uniqueId = getMyUniqueId();   // forwards to IdentityManager
+    const std::string username = getMyUsername(); // forwards to IdentityManager
+    const std::string uniqueId = getMyUniqueId(); // forwards to IdentityManager
 
-    if (desc.type() == rtc::Description::Type::Offer) {
+    if (desc.type() == rtc::Description::Type::Offer)
+    {
         // server will overwrite "from", so "" is fine
-        j = msg::makeOffer(/*from*/"", /*to*/peerId, sdp, username, uniqueId);
-    } else if (desc.type() == rtc::Description::Type::Answer) {
-        j = msg::makeAnswer(/*from*/"", /*to*/peerId, sdp, username, uniqueId);
-    } else {
+        j = msg::makeOffer(/*from*/ "", /*to*/ peerId, sdp, username, uniqueId);
+    }
+    else if (desc.type() == rtc::Description::Type::Answer)
+    {
+        j = msg::makeAnswer(/*from*/ "", /*to*/ peerId, sdp, username, uniqueId);
+    }
+    else
+    {
         return;
     }
 
-    if (signalingClient) signalingClient->send(j.dump());
+    if (signalingClient)
+        signalingClient->send(j.dump());
 }
-
 
 void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand)
 {
@@ -597,19 +603,13 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 
 //NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
 
-
 void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
                                                   const std::string& uniqueId,
                                                   const std::string& username)
 {
-    peerUsernames_[peerId] = username;
-
-    if (identity_manager)
-    {
-        identity_manager->bindPeer(/*peerId=*/peerId,
-                                   /*uniqueId=*/uniqueId,
-                                   /*username=*/username);
-    }
+    identity_manager->bindPeer(/*peerId=*/peerId,
+                               /*uniqueId=*/uniqueId,
+                               /*username=*/username);
 
     if (auto it = peers.find(peerId); it != peers.end() && it->second)
         it->second->setDisplayName(username);
@@ -617,9 +617,10 @@ void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
 
 std::string NetworkManager::displayNameForPeer(const std::string& peerId) const
 {
-    if (!identity_manager) return peerId;
+    if (!identity_manager)
+        return peerId;
     auto u = identity_manager->usernameForPeer(peerId);
-    return u.empty() ? peerId : u;
+    return u.value_or(peerId);
 }
 
 bool NetworkManager::disconectFromPeers()
@@ -744,38 +745,6 @@ std::vector<std::string> NetworkManager::getConnectedUsernames() const
         }
     }
     return user_names;
-}
-
-//-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
-void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
-{
-    //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
-    for (auto& [pid, link] : peers)
-    {
-        if (!link)
-            continue;
-        // build final buffer [u8 type][u32 size][bytes...] or your framing
-        std::vector<uint8_t> frame;
-        frame.push_back((uint8_t)t);
-        Serializer::serializeInt(frame, (int)payload.size());
-        frame.insert(frame.end(), payload.begin(), payload.end());
-        link->sendOn(msg::dc::name::Chat, frame); // PeerLink::send(vector<uint8_t>) must exist
-    }
-}
-
-void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
-{ //{check} --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
-    for (auto& pid : peers_)
-    {
-        auto it = peers.find(pid);
-        if (it == peers.end() || !it->second)
-            continue;
-        std::vector<uint8_t> frame;
-        frame.push_back((uint8_t)t);
-        Serializer::serializeInt(frame, (int)payload.size());
-        frame.insert(frame.end(), payload.begin(), payload.end());
-        it->second->sendOn(msg::dc::name::Chat, frame);
-    }
 }
 
 // ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
@@ -1059,7 +1028,7 @@ void NetworkManager::handleMarkerMove(const std::vector<uint8_t>& raw, size_t& o
     m.pos = p;
     m.mov = Moving{true};
 
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
 
     inboundGame_.push(std::move(m));
 }
@@ -1076,7 +1045,7 @@ void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& o
     m.vis = Serializer::deserializeVisibility(b, off);
     m.markerComp = Serializer::deserializeMarkerComponent(b, off);
 
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
     inboundGame_.push(std::move(m));
 }
 void NetworkManager::handleMarkerMoveState(const std::vector<uint8_t>& raw, size_t& off)
@@ -1105,7 +1074,7 @@ void NetworkManager::handleMarkerMoveState(const std::vector<uint8_t>& raw, size
         Position p = Serializer::deserializePosition(b, off);
         m.pos = p;
     }
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
     inboundGame_.push(std::move(m));
 }
 
@@ -1257,7 +1226,7 @@ bool NetworkManager::amIDragging(uint64_t markerId) const
     if (it == drag_.end())
         return false;
     const auto& s = it->second;
-    return !s.closed && s.ownerPeerId == getMyId();
+    return !s.closed && s.ownerPeerId == getMyPeerId();
 }
 
 // markDraggingLocal — called by BoardManager on start/end
@@ -1269,7 +1238,7 @@ void NetworkManager::markDraggingLocal(uint64_t markerId, bool dragging)
         s.locallyDragging = true;
         s.locallyProposedEpoch = (s.closed ? (s.epoch + 1) : s.epoch);
         s.localSeq = 0;
-        s.ownerPeerId = getMyId();
+        s.ownerPeerId = getMyPeerId();
         s.epochOpenedMs = nowMs();
         s.closed = false;
         if (s.locallyProposedEpoch > s.epoch)
@@ -1322,17 +1291,17 @@ bool NetworkManager::shouldApplyMarkerMove(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1341,7 +1310,7 @@ bool NetworkManager::shouldApplyMarkerMove(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer; // first owner for this epoch
+            s.ownerPeerId = m.fromPeerId; // first owner for this epoch
         }
     }
 
@@ -1371,17 +1340,17 @@ bool NetworkManager::shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1390,7 +1359,7 @@ bool NetworkManager::shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
         }
     }
 
@@ -1415,17 +1384,17 @@ bool NetworkManager::shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1434,7 +1403,7 @@ bool NetworkManager::shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
         }
         if (m.seq && *m.seq < s.lastSeq)
             return false;
@@ -1910,7 +1879,7 @@ void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t&
 {
     msg::ReadyMessage r;
     r.kind = msg::DCType::UserNameUpdate;
-    r.fromPeer = decodingFromPeer_;
+    r.fromPeerId = decodingFromPeer_;
     r.tableId = Serializer::deserializeUInt64(b, off);
 
     // This is UNIQUE ID now:
@@ -1920,7 +1889,7 @@ void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t&
     const uint8_t rebound = Serializer::deserializeUInt8(b, off);
 
     // Keep old ReadyMessage fields for upstream handlers (uses userPeerId/name/text in your codebase):
-    r.userPeerId = uniqueId; // NOTE: field name is legacy; carries uniqueId now.
+    r.userUniqueId = uniqueId; // NOTE: field name is legacy; carries uniqueId now.
     r.text = oldU;
     r.name = newU;
     r.rebound = rebound;
@@ -1932,7 +1901,7 @@ void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t&
     // Immediately teach IdentityManager the mapping + new name.
     if (identity_manager)
     {
-        identity_manager->bindPeer(/*peerId=*/r.fromPeer, /*uniqueId=*/uniqueId, /*username=*/newU);
+        identity_manager->bindPeer(/*peerId=*/r.fromPeerId, /*uniqueId=*/uniqueId, /*username=*/newU);
         identity_manager->setUsernameForUnique(uniqueId, newU);
     }
 
@@ -2202,7 +2171,7 @@ void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
             msg::Json j = msg::Json::parse(s);
 
             msg::ReadyMessage r;
-            r.fromPeer = fromPeer;
+            r.fromPeerId = fromPeer;
 
             // type
             msg::DCType t;

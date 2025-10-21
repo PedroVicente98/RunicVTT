@@ -138,20 +138,27 @@ public:
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
 
     //void setMyIdentity(std::string myId, std::string username);
-   // void upsertPeerIdentity(const std::string& id, const std::string& username);
+    // void upsertPeerIdentity(const std::string& id, const std::string& username);
 
     std::string displayNameForPeer(const std::string& peerId) const;
 
-    std::string getMyUsername() const { 
+    std::string getMyUsername() const
+    {
         return identity_manager ? identity_manager->myUsername() : std::string{};
     }
-    std::string getMyUniqueId() const { 
+    std::string getMyUniqueId() const
+    {
         return identity_manager ? identity_manager->myUniqueId() : std::string{};
     }
 
-    const std::string& getMyPeerId() const { return myPeerId_; }
-    void setMyPeerId(std::string v) { myPeerId_ = std::move(v); }
-
+    const std::string& getMyPeerId() const
+    {
+        return myPeerId_;
+    }
+    void setMyPeerId(std::string v)
+    {
+        myPeerId_ = std::move(v);
+    }
 
     const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const
     {
@@ -202,9 +209,6 @@ public:
     void sendFog(uint64_t boardId, const flecs::entity& fog, const std::vector<std::string>& toPeerIds);
 
     bool sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds);
-
-    //void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
-    //void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
 
     void setToaster(std::shared_ptr<ImGuiToaster> t)
     {
@@ -372,7 +376,7 @@ private:
 
     std::string myPeerId_;
     std::string gmPeerId_;
-    
+
     flecs::world ecs;
     unsigned int port = 8080;
     char network_password[124] = "\0";

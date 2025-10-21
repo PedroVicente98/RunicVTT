@@ -401,12 +401,12 @@ void GameTableManager::processReceivedMessages()
             // GameTableManager.cpp — inside processReceivedMessages() switch:
             case msg::DCType::UserNameUpdate:
             {
-                if (!m.tableId || !m.userPeerId || !m.name || !m.text)
+                if (!m.tableId || !m.userUniqueId || !m.name || !m.text)
                     break;
                 if (*m.tableId != chat_manager->currentTableId_)
                     break;
 
-                const std::string uniqueId = *m.userPeerId; // now uniqueId
+                const std::string uniqueId = *m.userUniqueId; // now uniqueId
                 const std::string oldU = *m.text;
                 const std::string newU = *m.name;
 
@@ -858,7 +858,8 @@ void GameTableManager::connectToGameTablePopUp()
         if (ImGui::Button("Connect") && buffer[0] != '\0')
         {
             // set username (id will be assigned after auth)
-            network_manager->setMyIdentity("", username_buffer);
+            auto my_unique = identity_manager->myUniqueId();
+            identity_manager->setMyIdentity(my_unique, username_buffer);
 
             // this already accepts LocalTunnel URLs or host:port (parseConnectionString handles both)
             if (network_manager->connectToPeer(buffer))
@@ -999,7 +1000,7 @@ void GameTableManager::renderNetworkCenterGM()
 
             // Username
             ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+            ImGui::TextUnformatted(network_manager->displayNameForPeer(peerId).c_str());
 
             // Peer ID
             ImGui::TableSetColumnIndex(1);
@@ -1082,7 +1083,7 @@ void GameTableManager::renderNetworkCenterGM()
                 ImGui::TextUnformatted(cid.c_str());
 
                 ImGui::TableSetColumnIndex(1);
-                ImGui::TextUnformatted(network_manager->displayNameFor(cid).c_str());
+                ImGui::TextUnformatted(network_manager->displayNameForPeer(cid).c_str());
 
                 ImGui::TableSetColumnIndex(2);
                 if (ImGui::SmallButton((std::string("Disconnect##") + cid).c_str()))
@@ -1153,7 +1154,7 @@ void GameTableManager::renderNetworkCenterPlayer()
 
             // Username
             ImGui::TableSetColumnIndex(0);
-            ImGui::TextUnformatted(network_manager->displayNameFor(peerId).c_str());
+            ImGui::TextUnformatted(network_manager->displayNameForPeer(peerId).c_str());
 
             // Peer ID
             ImGui::TableSetColumnIndex(1);
@@ -1278,7 +1279,9 @@ void GameTableManager::hostGameTablePopUp()
                     createGameTableFile(game_table);
 
                     // Identity + network
-                    network_manager->setMyIdentity("", username_buffer);
+                    auto my_unique = identity_manager->myUniqueId();
+                    identity_manager->setMyIdentity(my_unique, username_buffer);
+
                     network_manager->setNetworkPassword(pass_buffer);
                     const unsigned p = static_cast<unsigned>(atoi(port_buffer));
                     network_manager->startServer(hostMode, static_cast<unsigned short>(p), tryUpnp);
@@ -1389,7 +1392,8 @@ void GameTableManager::hostGameTablePopUp()
                     loadGameTable(game_table_file_path);
 
                     // start network
-                    network_manager->setMyIdentity("", username_buffer);
+                    auto my_unique = identity_manager->myUniqueId();
+                    identity_manager->setMyIdentity(my_unique, username_buffer);
                     network_manager->setNetworkPassword(pass_buffer);
                     const unsigned p = static_cast<unsigned>(atoi(port_buffer));
                     network_manager->startServer(hostMode, static_cast<unsigned short>(p), tryUpnp);
