@@ -140,7 +140,7 @@ public:
     //void setMyIdentity(std::string myId, std::string username);
    // void upsertPeerIdentity(const std::string& id, const std::string& username);
 
-    std::string displayNameFor(const std::string& id) const;
+    std::string displayNameForPeer(const std::string& peerId) const;
 
     std::string getMyUsername() const { 
         return identity_manager ? identity_manager->myUsername() : std::string{};
