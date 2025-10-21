@@ -203,8 +203,8 @@ public:
 
     bool sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds);
 
-    void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
-    void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
+    //void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
+    //void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
 
     void setToaster(std::shared_ptr<ImGuiToaster> t)
     {
