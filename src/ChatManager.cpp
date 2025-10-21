@@ -226,6 +226,15 @@ uint64_t ChatManager::makeGroupIdFromName(const std::string& name) const
     return id;
 }
 
+// Returns true if my UID is currently a participant of group g.
+bool ChatManager::isMeParticipantOf(const ChatGroupModel& g) const
+{
+    if (!identity_manager)
+        return false;
+    const std::string meUid = identity_manager->myUniqueId();
+    return g.participants.count(meUid) > 0;
+}
+
 ChatGroupModel* ChatManager::getGroup(uint64_t id)
 {
     auto it = groups_.find(id);
@@ -267,8 +276,7 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
                 // keep existing ownerUniqueId if you want
             }
 
-            Logger::instance().log("chat", Logger::Level::Info,
-                                   "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + g.name);
+            Logger::instance().log("chat", Logger::Level::Info, "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + m.name.value_or("Group"));
             break;
         }
 
@@ -416,17 +424,24 @@ void ChatManager::pushMessageLocal(uint64_t groupId,
 }
 
 // ====== emitters ======
-/*void ChatManager::emitGroupCreate(const ChatGroupModel& g)
+
+void ChatManager::emitGroupCreate(const ChatGroupModel& g)
 {
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
 
     auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name);
-   // nm->broadcastChatJson(j); // broadcast groups list to everyone
-    nm->sendChatJsonTo(g.participants, j);
+
+    if (g.id == generalGroupId_)
+    {
+        nm->broadcastChatJson(j);
+        return;
+    }
+
+    auto targets = resolvePeerIdsForParticipants(g.participants);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
@@ -436,8 +451,16 @@ void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
         return;
 
     auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
-   // nm->broadcastChatJson(j); // 
-    nm->sendChatJsonTo(g.participants, j);
+
+    if (g.id == generalGroupId_)
+    {
+        nm->broadcastChatJson(j);
+        return;
+    }
+
+    auto targets = resolvePeerIdsForParticipants(g.participants);
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitGroupDelete(uint64_t groupId)
@@ -446,9 +469,21 @@ void ChatManager::emitGroupDelete(uint64_t groupId)
     if (!nm || !hasCurrent())
         return;
 
+    if (groupId == generalGroupId_)
+        return;
+
+    auto it = groups_.find(groupId);
+    if (it == groups_.end())
+        return;
+
+    const auto& g = it->second;
+
     auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
-    nm->broadcastChatJson(j);
-    nm->sendChatJsonTo(g.participants, j);
+
+    auto targets = resolvePeerIdsForParticipants(g.participants);
+
+    if (!targets.empty())
+        nm->sendChatJsonTo(targets, j);
 }
 
 void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
@@ -457,78 +492,58 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
     if (!nm || !hasCurrent())
         return;
 
-    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
-    // nm->broadcastChatJson(j); // 
-    nm->sendChatJsonTo(g.participants, j);
-}*/
-void ChatManager::emitGroupCreate(const ChatGroupModel& g)
-{
-    auto nm = network_.lock();
-    if (!nm || !hasCurrent())
+    auto it = groups_.find(groupId);
+    if (it == groups_.end())
         return;
 
-    auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
-    auto targets = resolvePeerIdsForParticipants(g.participants);
-
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name +
-                               " targets=" + std::to_string(targets.size()));
-
+    const auto& parts = it->second.participants;
+    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
+    if (groupId == generalGroupId_)
+    {
+        nm->broadcastChatJson(j);
+        return;
+    }
+    auto targets = resolvePeerIdsForParticipants(parts);
     if (!targets.empty())
         nm->sendChatJsonTo(targets, j);
 }
 
-void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
+void ChatManager::emitGroupLeave(uint64_t groupId)
 {
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
         return;
 
+    // General cannot be “left”
+    if (groupId == generalGroupId_)
+        return;
+
+    auto it = groups_.find(groupId);
+    if (it == groups_.end())
+        return;
+
+    auto& g = it->second;
+    if (!identity_manager)
+        return;
+
+    const std::string meUid = identity_manager->myUniqueId();
+
+    // Owner cannot leave their own group
+    if (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid)
+        return;
+
+    // Remove me locally
+    g.participants.erase(meUid);
+
+    // Broadcast updated participants (re-using ChatGroupUpdate)
     auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
     auto targets = resolvePeerIdsForParticipants(g.participants);
-
     if (!targets.empty())
         nm->sendChatJsonTo(targets, j);
-}
 
-void ChatManager::emitGroupDelete(uint64_t groupId)
-{
-    auto nm = network_.lock();
-    if (!nm || !hasCurrent())
-        return;
-
-    // Find current participants for that group so only they get the delete
-    auto it = groups_.find(groupId);
-    if (it == groups_.end())
-        return;
-    const auto& parts = it->second.participants;
-
-    auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
-    auto targets = resolvePeerIdsForParticipants(parts);
-
-    if (!targets.empty())
-        nm->sendChatJsonTo(targets, j);
-}
-
-void ChatManager::emitChatMessageFrame(uint64_t groupId,
-                                       const std::string& username,
-                                       const std::string& text,
-                                       uint64_t ts)
-{
-    auto nm = network_.lock();
-    if (!nm || !hasCurrent())
-        return;
-
-    auto it = groups_.find(groupId);
-    if (it == groups_.end())
-        return; // unknown group locally
-
-    const auto& parts = it->second.participants;
-    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
-    auto targets = resolvePeerIdsForParticipants(parts);
-
-    if (!targets.empty())
-        nm->sendChatJsonTo(targets, j);
+    // UX: if I’m no longer in it, stop showing it as active
+    if (activeGroupId_ == groupId && g.participants.count(meUid) == 0)
+        activeGroupId_ = generalGroupId_;
 }
 
 std::set<std::string> ChatManager::resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const
@@ -975,6 +990,85 @@ void ChatManager::renderRightPanel(float /*leftW*/)
 
     ImGui::EndChild();
 }
+//
+//void ChatManager::renderCreateGroupPopup()
+//{
+//    if (ImGui::BeginPopupModal("CreateGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+//    {
+//        ImGui::TextUnformatted("Group name (unique):");
+//        ImGui::InputText("##gname", newGroupName_.data(), (int)newGroupName_.size());
+//
+//        // list peers
+//        ImGui::Separator();
+//        ImGui::TextUnformatted("Participants:");
+//        if (auto nm = network_.lock())
+//        {
+//            for (auto& [pid, link] : nm->getPeers())
+//            {
+//                bool checked = newGroupSel_.count(pid) > 0;
+//                const std::string dn = nm->displayNameForPeer(pid);
+//                std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
+//                if (ImGui::Checkbox(label.c_str(), &checked))
+//                {
+//                    if (checked)
+//                        newGroupSel_.insert(pid);
+//                    else
+//                        newGroupSel_.erase(pid);
+//                }
+//            }
+//        }
+//
+//        // ensure name unique
+//        bool nameTaken = false;
+//        std::string desired = newGroupName_.data();
+//        if (!desired.empty())
+//        {
+//            for (auto& [id, g] : groups_)
+//                if (g.name == desired)
+//                {
+//                    nameTaken = true;
+//                    break;
+//                }
+//        }
+//
+//        ImGui::Separator();
+//        ImGui::BeginDisabled(desired.empty() || nameTaken);
+//        if (ImGui::Button("Create"))
+//        {
+//            ChatGroupModel g;
+//            g.name = desired;
+//            g.id = makeGroupIdFromName(g.name);
+//            g.participants = newGroupSel_;
+//            if (identity_manager)
+//                g.ownerUniqueId = identity_manager->myUniqueId();
+//
+//            groups_.emplace(g.id, g);
+//            emitGroupCreate(g);
+//
+//            activeGroupId_ = g.id;
+//            markGroupRead(g.id);
+//            focusInput_ = true;
+//            followScroll_ = true;
+//
+//            newGroupSel_.clear();
+//            newGroupName_.fill('\0');
+//            ImGui::CloseCurrentPopup();
+//        }
+//        ImGui::EndDisabled();
+//
+//        if (nameTaken)
+//            ImGui::TextColored(ImVec4(1, 0.4f, 0.2f, 1), "A group with that name already exists.");
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Cancel"))
+//        {
+//            newGroupSel_.clear();
+//            newGroupName_.fill('\0');
+//            ImGui::CloseCurrentPopup();
+//        }
+//        ImGui::EndPopup();
+//    }
+//}
 
 void ChatManager::renderCreateGroupPopup()
 {
@@ -990,15 +1084,23 @@ void ChatManager::renderCreateGroupPopup()
         {
             for (auto& [pid, link] : nm->getPeers())
             {
-                bool checked = newGroupSel_.count(pid) > 0;
+                // 🔸 map peerId -> uniqueId for selection storage
+                std::string uid = identity_manager
+                                      ? identity_manager->uniqueForPeer(pid).value_or(std::string{})
+                                      : std::string{};
+
+                if (uid.empty())
+                    continue; // not bound yet; skip or show disabled if you prefer
+
+                bool checked = newGroupSel_.count(uid) > 0; // 🔸 store UNIQUE IDs
                 const std::string dn = nm->displayNameForPeer(pid);
                 std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
                 if (ImGui::Checkbox(label.c_str(), &checked))
                 {
                     if (checked)
-                        newGroupSel_.insert(pid);
+                        newGroupSel_.insert(uid); // 🔸 insert UID
                     else
-                        newGroupSel_.erase(pid);
+                        newGroupSel_.erase(uid); // 🔸 erase UID
                 }
             }
         }
@@ -1023,9 +1125,14 @@ void ChatManager::renderCreateGroupPopup()
             ChatGroupModel g;
             g.name = desired;
             g.id = makeGroupIdFromName(g.name);
-            g.participants = newGroupSel_;
+            g.participants = newGroupSel_; // 🔸 UNIQUE IDs
+
             if (identity_manager)
+            {
                 g.ownerUniqueId = identity_manager->myUniqueId();
+                if (!g.ownerUniqueId.empty())
+                    g.participants.insert(g.ownerUniqueId); // 🔸 owner always included (solo OK)
+            }
 
             groups_.emplace(g.id, g);
             emitGroupCreate(g);
@@ -1054,6 +1161,103 @@ void ChatManager::renderCreateGroupPopup()
         ImGui::EndPopup();
     }
 }
+//
+//void ChatManager::renderEditGroupPopup()
+//{
+//    if (ImGui::BeginPopupModal("EditGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+//    {
+//        ChatGroupModel* g = getGroup(editGroupId_);
+//        if (!g)
+//        {
+//            ImGui::TextDisabled("Group not found.");
+//            if (ImGui::Button("Close"))
+//                ImGui::CloseCurrentPopup();
+//            ImGui::EndPopup();
+//            return;
+//        }
+//
+//        // Optional: only owner can edit (comment out these 6 lines if you want anyone to edit)
+//        auto nm = network_.lock();
+//        const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
+//        const bool ownerOnly = true;
+//        const bool canEdit = !ownerOnly || (!g->ownerUniqueId.empty() && g->ownerUniqueId == meUid);
+//        if (!canEdit)
+//            ImGui::TextColored(ImVec4(1, 0.5f, 0.3f, 1), "Only the owner can edit this group.");
+//
+//        ImGui::Separator();
+//        ImGui::TextUnformatted("Group name:");
+//        ImGui::BeginDisabled(!canEdit);
+//        ImGui::InputText("##edit_gname", editGroupName_.data(), (int)editGroupName_.size());
+//        ImGui::EndDisabled();
+//
+//        // Participants list (pre-checked)
+//        ImGui::Separator();
+//        ImGui::TextUnformatted("Participants:");
+//        if (nm)
+//        {
+//            ImGui::BeginDisabled(!canEdit);
+//            for (auto& [pid, link] : nm->getPeers())
+//            {
+//                bool checked = editGroupSel_.count(pid) > 0;
+//                const std::string dn = nm->displayNameForPeer(pid);
+//                std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
+//                if (ImGui::Checkbox(label.c_str(), &checked))
+//                {
+//                    if (checked)
+//                        editGroupSel_.insert(pid);
+//                    else
+//                        editGroupSel_.erase(pid);
+//                }
+//            }
+//            ImGui::EndDisabled();
+//        }
+//
+//        // Validate (unique name unless unchanged)
+//        bool nameTaken = false;
+//        const std::string desired = editGroupName_.data();
+//        if (!desired.empty() && desired != g->name)
+//        {
+//            for (auto& [id, gg] : groups_)
+//                if (gg.name == desired)
+//                {
+//                    nameTaken = true;
+//                    break;
+//                }
+//        }
+//        if (nameTaken)
+//            ImGui::TextColored(ImVec4(1, 0.4f, 0.2f, 1), "A group with that name already exists.");
+//
+//        ImGui::Separator();
+//        ImGui::BeginDisabled(!canEdit || desired.empty() || nameTaken);
+//        if (ImGui::Button("Update", ImVec2(120, 0)))
+//        {
+//            // Apply local changes
+//            g->name = desired;
+//            g->participants = editGroupSel_;
+//
+//            // Broadcast update
+//            emitGroupUpdate(*g);
+//
+//            // nice UX
+//            activeGroupId_ = g->id;
+//            markGroupRead(g->id);
+//            focusInput_ = true;
+//            followScroll_ = true;
+//
+//            // keep popup open OR close—your call; let's close:
+//            ImGui::CloseCurrentPopup();
+//        }
+//        ImGui::EndDisabled();
+//
+//        ImGui::SameLine();
+//        if (ImGui::Button("Close", ImVec2(120, 0)))
+//        {
+//            ImGui::CloseCurrentPopup();
+//        }
+//
+//        ImGui::EndPopup();
+//    }
+//}
 
 void ChatManager::renderEditGroupPopup()
 {
@@ -1069,7 +1273,7 @@ void ChatManager::renderEditGroupPopup()
             return;
         }
 
-        // Optional: only owner can edit (comment out these 6 lines if you want anyone to edit)
+        // Optional: only owner can edit
         auto nm = network_.lock();
         const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
         const bool ownerOnly = true;
@@ -1091,15 +1295,23 @@ void ChatManager::renderEditGroupPopup()
             ImGui::BeginDisabled(!canEdit);
             for (auto& [pid, link] : nm->getPeers())
             {
-                bool checked = editGroupSel_.count(pid) > 0;
+                // 🔸 map peerId -> uniqueId for selection storage
+                std::string uid = identity_manager
+                                      ? identity_manager->uniqueForPeer(pid).value_or(std::string{})
+                                      : std::string{};
+
+                if (uid.empty())
+                    continue;
+
+                bool checked = editGroupSel_.count(uid) > 0; // 🔸 use UID
                 const std::string dn = nm->displayNameForPeer(pid);
                 std::string label = dn.empty() ? pid : (dn + " (" + pid + ")");
                 if (ImGui::Checkbox(label.c_str(), &checked))
                 {
                     if (checked)
-                        editGroupSel_.insert(pid);
+                        editGroupSel_.insert(uid); // 🔸 insert UID
                     else
-                        editGroupSel_.erase(pid);
+                        editGroupSel_.erase(uid); // 🔸 erase UID
                 }
             }
             ImGui::EndDisabled();
@@ -1108,7 +1320,7 @@ void ChatManager::renderEditGroupPopup()
         // Validate (unique name unless unchanged)
         bool nameTaken = false;
         const std::string desired = editGroupName_.data();
-        if (!desired.empty() && desired != g->name)
+        if (desired.empty() == false && desired != g->name)
         {
             for (auto& [id, gg] : groups_)
                 if (gg.name == desired)
@@ -1126,7 +1338,7 @@ void ChatManager::renderEditGroupPopup()
         {
             // Apply local changes
             g->name = desired;
-            g->participants = editGroupSel_;
+            g->participants = editGroupSel_; // 🔸 UNIQUE IDs
 
             // Broadcast update
             emitGroupUpdate(*g);
@@ -1137,57 +1349,163 @@ void ChatManager::renderEditGroupPopup()
             focusInput_ = true;
             followScroll_ = true;
 
-            // keep popup open OR close—your call; let's close:
             ImGui::CloseCurrentPopup();
         }
         ImGui::EndDisabled();
 
         ImGui::SameLine();
         if (ImGui::Button("Close", ImVec2(120, 0)))
-        {
             ImGui::CloseCurrentPopup();
-        }
 
         ImGui::EndPopup();
     }
 }
+//
+//void ChatManager::renderDeleteGroupPopup()
+//{
+//    if (ImGui::BeginPopupModal("DeleteGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+//    {
+//        ImGui::TextUnformatted("Click a group to delete (General cannot be deleted).");
+//        ImGui::Separator();
+//
+//        for (auto it = groups_.begin(); it != groups_.end(); /*++ inside*/)
+//        {
+//            auto id = it->first;
+//            auto& g = it->second;
+//            if (id == generalGroupId_)
+//            {
+//                ++it;
+//                continue;
+//            }
+//
+//            ImGui::PushID((int)id);
+//            const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
+//            const bool canDelete = (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid);
+//            ImGui::BeginDisabled(!canDelete);
+//            if (ImGui::Button(g.name.c_str(), ImVec2(220, 0)))
+//            {
+//                emitGroupDelete(id);
+//                if (activeGroupId_ == id)
+//                    activeGroupId_ = generalGroupId_;
+//                it = groups_.erase(it);
+//                ImGui::PopID();
+//                continue;
+//            }
+//            ImGui::EndDisabled();
+//            if (!canDelete)
+//            {
+//                ImGui::SameLine();
+//                ImGui::TextDisabled("(owner only)");
+//            }
+//            ImGui::PopID();
+//            ++it;
+//        }
+//
+//        ImGui::Separator();
+//        if (ImGui::Button("Close"))
+//            ImGui::CloseCurrentPopup();
+//        ImGui::EndPopup();
+//    }
+//}
 
 void ChatManager::renderDeleteGroupPopup()
 {
     if (ImGui::BeginPopupModal("DeleteGroup", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        ImGui::TextUnformatted("Click a group to delete (General cannot be deleted).");
+        ImGui::TextUnformatted("Manage groups you participate in (General cannot be deleted/left).");
         ImGui::Separator();
 
-        for (auto it = groups_.begin(); it != groups_.end(); /*++ inside*/)
+        // Who am I and am I GM?
+        std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
+        bool iAmGM = false;
+        if (auto nm = network_.lock())
         {
-            auto id = it->first;
-            auto& g = it->second;
+            // Use the accessor you actually have: getGMId() / gmId() / GMId() — pick the right one.
+            // If your NetworkManager exposes a different name, change here only.
+            const std::string gmUid = nm->getGMId(); // <-- adjust if needed in your codebase
+            iAmGM = (!gmUid.empty() && !meUid.empty() && gmUid == meUid);
+        }
+
+        for (auto it = groups_.begin(); it != groups_.end(); /* ++ inside */)
+        {
+            const uint64_t id = it->first;
+            ChatGroupModel& g = it->second;
+
+            // Skip General
             if (id == generalGroupId_)
             {
                 ++it;
                 continue;
             }
 
+            // Only show groups where I’m currently a participant (so I can Leave/Delete)
+            const bool iParticipate = isMeParticipantOf(g);
+
+            // Compute permissions
+            const bool isOwner = (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid);
+            const bool canDelete = (isOwner || (iAmGM && iParticipate));
+            const bool canLeave = (iParticipate && !isOwner); // owners cannot leave by rule
+
             ImGui::PushID((int)id);
-            const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
-            const bool canDelete = (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid);
+
+            // Row label
+            ImGui::TextUnformatted(g.name.c_str());
+            ImGui::SameLine();
+
+            // DELETE button
             ImGui::BeginDisabled(!canDelete);
-            if (ImGui::Button(g.name.c_str(), ImVec2(220, 0)))
+            if (ImGui::Button("Delete"))
             {
+                // Emit delete to participants
                 emitGroupDelete(id);
+
+                // Remove locally
                 if (activeGroupId_ == id)
                     activeGroupId_ = generalGroupId_;
                 it = groups_.erase(it);
+
                 ImGui::PopID();
-                continue;
+                continue; // skip ++it
             }
             ImGui::EndDisabled();
-            if (!canDelete)
+
+            ImGui::SameLine();
+
+            // LEAVE button
+            ImGui::BeginDisabled(!canLeave);
+            if (ImGui::Button("Leave"))
+            {
+                emitGroupLeave(id);
+
+                // If I’m no longer a participant, optionally hide it locally right away
+                if (!isMeParticipantOf(g))
+                {
+                    if (activeGroupId_ == id)
+                        activeGroupId_ = generalGroupId_;
+                    it = groups_.erase(it);
+                    ImGui::PopID();
+                    continue; // skip ++it
+                }
+            }
+            ImGui::EndDisabled();
+
+            // Helper hints
+            if (!iParticipate)
             {
                 ImGui::SameLine();
-                ImGui::TextDisabled("(owner only)");
+                ImGui::TextDisabled("(not a participant)");
             }
+            else if (isOwner)
+            {
+                ImGui::SameLine();
+                ImGui::TextDisabled("(owner)");
+            }
+            else if (iAmGM)
+            {
+                ImGui::SameLine();
+                ImGui::TextDisabled("(GM)");
+            }
+
             ImGui::PopID();
             ++it;
         }
@@ -1307,3 +1625,50 @@ void ChatManager::markGroupRead(uint64_t groupId)
 //    if (groups_.find(activeGroupId_) == groups_.end())
 //        activeGroupId_ = generalGroupId_;
 //}
+
+//ALWAYS BROADCAST EVERYTHING
+/*void ChatManager::emitGroupCreate(const ChatGroupModel& g)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent())
+        return;
+
+    auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name);
+   // nm->broadcastChatJson(j); // broadcast groups list to everyone
+    nm->sendChatJsonTo(g.participants, j);
+}
+
+void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent())
+        return;
+
+    auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
+   // nm->broadcastChatJson(j); // 
+    nm->sendChatJsonTo(g.participants, j);
+}
+
+void ChatManager::emitGroupDelete(uint64_t groupId)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent())
+        return;
+
+    auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
+    nm->broadcastChatJson(j);
+    nm->sendChatJsonTo(g.participants, j);
+}
+
+void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent())
+        return;
+
+    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
+    // nm->broadcastChatJson(j); // 
+    nm->sendChatJsonTo(g.participants, j);
+}*/

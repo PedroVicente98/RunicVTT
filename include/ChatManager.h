@@ -95,6 +95,7 @@ public:
     void replaceUsernameForUnique(const std::string& uniqueId, const std::string& newUsername);
     void tryHandleSlashCommand(uint64_t threadId, const std::string& input);
     std::set<std::string> resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const;
+    bool isMeParticipantOf(const ChatGroupModel& g) const;
 
 private:
     std::shared_ptr<IdentityManager> identity_manager;
@@ -152,7 +153,7 @@ private:
     void emitGroupUpdate(const ChatGroupModel& g);
     void emitGroupDelete(uint64_t groupId);
     void emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts);
-
+    void emitGroupLeave(uint64_t groupId);
     // ---- UI ----
 
     void renderEditGroupPopup();
