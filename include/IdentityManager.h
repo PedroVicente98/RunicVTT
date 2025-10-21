@@ -1,37 +1,77 @@
-// IdentityManager.h  (kept as your IdentityManager; only username-per-table duties)
-
+// IdentityManager.h
 #pragma once
-#include <cstdint>
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <optional>
+
+struct PeerIdentity
+{
+    std::string uniqueId;                      // stable, persisted
+    std::string username;                      // last known display name
+    std::string peerId;                        // last known transport id (ephemeral, can be empty)
+    std::vector<std::string> usernamesHistory; // last few names (optional UX)
+};
 
 class IdentityManager
 {
 public:
-    // File I/O
-    bool loadUsernamesFromFile();     // load (tableId -> username) map
-    bool saveUsernamesToFile() const; // optional: if you want explicit save
+    // ---- my identity (persisted) ----
+    bool loadMyIdentityFromFile();
+    bool saveMyIdentityToFile() const;
 
-    // CRUD
-    bool addUsername(uint64_t tableId, const std::string& username);    // insert (or overwrite) entry
-    bool removeUsername(uint64_t tableId);                              // (unused for now)
-    bool setUsername(uint64_t tableId, const std::string& newUsername); // change username for tableId
-
-    // Queries
-    std::string findUsername(uint64_t tableId,
-                             const std::string& fallback = "Player") const; // returns saved or fallback
-
-    // Access (optional)
-    const std::unordered_map<uint64_t, std::string>& all() const
+    // Set or update my identity (call on first run or rename)
+    void setMyIdentity(const std::string& uniqueId, const std::string& username);
+    const std::string& myUniqueId() const
     {
-        return byTable_;
+        return myUniqueId_;
+    }
+    const std::string& myUsername() const
+    {
+        return myUsername_;
+    }
+
+    // ---- address book (persisted) ----
+    bool loadAddressBookFromFile();
+    bool saveAddressBookToFile() const;
+
+    // Bind a live peerId to a uniqueId + username (on DC open)
+    void bindPeer(const std::string& peerId,
+                  const std::string& uniqueId,
+                  const std::string& username);
+
+    // Lookups
+    std::string usernameForUnique(const std::string& uniqueId) const;
+    std::optional<std::string> uniqueForPeer(const std::string& peerId) const;
+    std::optional<std::string> peerForUnique(const std::string& uniqueId) const;
+
+    // Update username for a known uniqueId (no uniqueness enforcement)
+    void setUsernameForUnique(const std::string& uniqueId, const std::string& username);
+
+    // Optional: expose book
+    const std::unordered_map<std::string, PeerIdentity>& all() const
+    {
+        return byUnique_;
     }
 
 private:
-    // backing map: tableId -> username
-    std::unordered_map<uint64_t, std::string> byTable_;
+    // persisted “me”
+    std::string myUniqueId_;
+    std::string myUsername_;
 
-    // internal helpers (optional; you may keep them private)
-    bool writeBinaryFile() const;
-    bool readBinaryFile();
+    // address book keyed by uniqueId
+    std::unordered_map<std::string, PeerIdentity> byUnique_;
+
+    // session map: peerId -> uniqueId (only for connected peers)
+    std::unordered_map<std::string, std::string> peerToUnique_;
+
+    // file helpers
+    bool writeMeFile() const;
+    bool readMeFile();
+    bool writeBookFile() const;
+    bool readBookFile();
+
+    // paths
+    static const char* kMeFile();
+    static const char* kBookFile();
 };

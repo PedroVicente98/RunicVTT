@@ -32,6 +32,9 @@ public:
 
     // imgui_md hook: called when a markdown link is activated
     void open_url() const override;
+    void soft_break() override;
+
+    static void openDefaultBrowser_(const std::string& url);
 
 private:
     struct Parsed
@@ -45,7 +48,6 @@ private:
     std::string resolveNote_(const std::string& ref) const;
 
     // Platform opener (implemented in .cpp, no headers leak here)
-    static void openDefaultBrowser_(const std::string& url);
 
     // Small helpers
     static bool startsWith_(const std::string& s, const char* pref);

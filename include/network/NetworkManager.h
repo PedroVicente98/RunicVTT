@@ -19,6 +19,7 @@
 #include "ImGuiToaster.h"
 #include "PathManager.h"
 #include "Logger.h"
+#include "IdentityManager.h"
 
 struct DragState
 {
@@ -65,7 +66,7 @@ struct PendingImage
 class NetworkManager : public std::enable_shared_from_this<NetworkManager>
 {
 public:
-    NetworkManager(flecs::world ecs);
+    NetworkManager(flecs::world ecs, std::shared_ptr<IdentityManager> identity_manager);
 
     void setup(std::weak_ptr<BoardManager> board_manager, std::weak_ptr<GameTableManager> gametable_manager);
 
@@ -265,7 +266,7 @@ public:
 
     void buildUserNameUpdate(std::vector<uint8_t>& out,
                              uint64_t tableId,
-                             const std::string& userPeerId,
+                             const std::string& userUniqueId,
                              const std::string& oldUsername,
                              const std::string& newUsername,
                              bool reboundFlag) const;
@@ -274,12 +275,24 @@ public:
     void sendUserNameUpdateTo(const std::string& peerId,               // direct (rare)
                               const std::vector<uint8_t>& payload);
 
-    std::pair<std::string, bool> ensureUsernameUnique(const std::string& desired) const;
+    void upsertPeerIdentityWithUnique(const std::string& peerId,
+                                      const std::string& uniqueId,
+                                      const std::string& username);
 
     // NetworkManager.h (public)
     bool broadcastChatJson(const msg::Json& j);
     bool sendChatJsonTo(const std::string& peerId, const msg::Json& j);
     bool sendChatJsonTo(const std::set<std::string>& peers, const msg::Json& j);
+
+    std::string getMyUniqueId() const
+    {
+        if (identity_manager)
+        {
+            if (auto u = identity_manager->myUniqueId(); !u.empty())
+                return u;
+        }
+        return std::string{}; // empty if unknown
+    }
 
 private:
     // build
@@ -327,7 +340,7 @@ private:
     std::atomic<bool> rawWorkerStop_{false};
     std::thread rawWorker_;
     // NetworkManager.h
-
+    std::shared_ptr<IdentityManager> identity_manager;
     std::shared_ptr<ImGuiToaster> toaster_;
     static constexpr size_t kChunk = 8 * 1024; // 8KB chunk
     //static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
@@ -421,93 +434,4 @@ private:
         using namespace std::chrono;
         return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
     }
-
-    //inline std::vector<unsigned char> readFileBytes(const std::string& path)
-    //{
-    //    namespace fs = std::filesystem;
-    //    std::error_code ec;
-
-    //    auto tryOpen = [](const fs::path& p) -> std::vector<unsigned char>
-    //    {
-    //        std::ifstream file(p, std::ios::binary);
-    //        if (!file)
-    //            return {};
-    //        file.seekg(0, std::ios::end);
-    //        size_t size = static_cast<size_t>(file.tellg());
-    //        file.seekg(0, std::ios::beg);
-    //        std::vector<unsigned char> buffer(size);
-    //        if (size > 0)
-    //            file.read(reinterpret_cast<char*>(buffer.data()), size);
-    //        return buffer;
-    //    };
-
-    //    fs::path p = path;
-    //    // 1) Direct (absolute or relative to CWD)
-    //    if (auto buf = tryOpen(p); !buf.empty())
-    //        return buf;
-
-    //    // 2) Resolve relative under known asset roots
-    //    std::vector<fs::path> roots = {
-    //        PathManager::getMapsPath(),
-    //        PathManager::getMarkersPath(),
-    //        fs::path("res"),   // if you ship a res/
-    //        fs::current_path() // last-ditch CWD
-    //    };
-
-    //    for (const auto& r : roots)
-    //    {
-    //        fs::path candidate = fs::weakly_canonical(r / p, ec);
-    //        if (ec)
-    //            continue;
-    //        if (auto buf = tryOpen(candidate); !buf.empty())
-    //        {
-    //            return buf;
-    //        }
-    //    }
-
-    //    // Log a helpful error once
-    //    Logger::instance().log("assets", Logger::Level::Error, "readFileBytes: cannot open '" + path + "' (tried known roots).");
-    //    return {};
-    //}
 };
-
-////Operations
-//void addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-//void removeClient(std::string client_id);
-//void clearClients() const { clients.empty(); }
-//std::shared_ptr<rtc::WebSocket> getClient(std::string client_id);
-//std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& getClients() { return clients; }
-//void addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-//void removePendingClient(std::string client_id);
-//void clearPendingClients() const { pending_clients.empty(); }
-//std::shared_ptr<rtc::WebSocket> getPendingClient(std::string client_id);
-////Callback Methods
-////WebSocker Client
-//void onOpenClient();                               // WebSocket connected to master
-//void onCloseClient();                              // WebSocket closed
-//void onErrorClient(const std::string& err);        // WebSocket error
-//void onMessageClient(const std::string& msg);      // Message from master server (offers, answers, ICE, etc.)
-
-////Websocket Server
-//void onSignal(std::string clientId, const std::string& msg);
-//void onMessage(std::string clientId, const std::string& msg);
-//void onConnect(std::string peer_id, std::shared_ptr<rtc::WebSocket> client);
-
-//// --- Signaling Server (if this peer is master) ---
-//void onOpenServerClient(int clientId);                      // A client connects to our WebSocket server
-//void onCloseServerClient(int clientId);                     // A client disconnects
-//void onErrorServerClient(int clientId, const std::string&); // Error from one client
-//void onMessageServerClient(int clientId, const std::string& msg); // Msg from a connected client
-
-////PeerLink
-//void onOpenPeer(std::string clientId, const std::string& msg);
-//void onMessagePeer(std::string clientId, const std::string& msg);
-//void onStateChange(rtc::PeerConnection::State state);
-//void onLocalDescription(rtc::Description desc);
-//void onLocalDescription(rtc::Candidate candidate);
-
-//// --- Utility/Housekeeping ---
-//void onDisconnectedPeer(int peerId); // higher-level handler when peer lost
-//void connectToWebRTCPeer(const std::string& peerId);
-//void receiveSignal(const std::string& peerId, const std::string& message);
-//void sendSignalToPeer(const std::string& peerId, const std::string& message);

@@ -13,8 +13,6 @@ void MarkdownRenderer::open_url() const
         case Action::OpenExternal:
             if (onOpenExternal)
                 onOpenExternal(a.payload);
-            else
-                openDefaultBrowser_(a.payload);
             break;
 
         case Action::RollExpr:
@@ -38,6 +36,15 @@ void MarkdownRenderer::open_url() const
                 openDefaultBrowser_(m_href);
             break;
     }
+}
+
+void MarkdownRenderer::soft_break()
+{
+    // Turn Markdown soft-breaks into visible line breaks.
+    // Either of these works; TextUnformatted("\n") is a common pattern with imgui_md.
+    ImGui::TextUnformatted("\n");
+    // Alternatively:
+    // ImGui::NewLine();
 }
 
 // ---------- parse / resolve ----------

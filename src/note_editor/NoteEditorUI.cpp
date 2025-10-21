@@ -2,25 +2,130 @@
 #include "ImGuiToaster.h"
 #include <algorithm>
 
-// at top of NoteEditorUI.cpp (or a small header you include here)
-static bool InputTextMultilineString(const char* label,
-                                     std::string* str,
-                                     const ImVec2& size = ImVec2(0, 0),
-                                     ImGuiInputTextFlags flags = 0)
+//static bool InputTextMultilineString(const char* label,
+//                                     std::string* str,
+//                                     const ImVec2& size = ImVec2(0, 0),
+//                                     ImGuiInputTextFlags flags = 0)
+//{
+//    IM_ASSERT(str);
+//    auto cb = [](ImGuiInputTextCallbackData* data) -> int
+//    {
+//        if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+//        {
+//            auto* s = static_cast<std::string*>(data->UserData);
+//            s->resize(static_cast<size_t>(data->BufTextLen));
+//            data->Buf = s->data();
+//        }
+//        return 0;
+//    };
+//
+//    flags |= ImGuiInputTextFlags_CallbackResize;
+//    flags |= ImGuiInputTextFlags_NoHorizontalScroll;
+//
+//    return ImGui::InputTextMultiline(label, str->data(), str->size() + 1, size, flags, cb, str);
+//}
+
+struct InputTextWrapCtx
+{
+    std::string* buf = nullptr;
+    float max_px = 0.f;
+};
+
+static int InputTextMultilineWrapCallback(ImGuiInputTextCallbackData* data)
+{
+    auto* ctx = static_cast<InputTextWrapCtx*>(data->UserData);
+    if (!ctx || !ctx->buf)
+        return 0;
+
+    // Keep Dear ImGui's string-resize contract
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+    {
+        ctx->buf->resize(static_cast<size_t>(data->BufTextLen));
+        data->Buf = ctx->buf->data();
+        return 0;
+    }
+
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
+    {
+        // Current line range [start, end)
+        const int len = data->BufTextLen;
+        int cur = data->CursorPos;
+        int start = cur;
+        while (start > 0 && data->Buf[start - 1] != '\n')
+            start--;
+        int end = cur;
+        while (end < len && data->Buf[end] != '\n')
+            end++;
+
+        const char* line_start = data->Buf + start;
+        const char* line_end = data->Buf + end;
+
+        // If current line fits, done.
+        ImVec2 sz = ImGui::CalcTextSize(line_start, line_end, false, FLT_MAX);
+        if (sz.x <= ctx->max_px || ctx->max_px <= 0.0f)
+            return 0;
+
+        // Find a nice break point (space/tab/hyphen/slash) before cursor
+        int break_pos = -1;
+        for (int i = cur - 1; i >= start; --i)
+        {
+            char c = data->Buf[i];
+            if (c == ' ' || c == '\t' || c == '-' || c == '/')
+            {
+                // Would the line up to here fit?
+                ImVec2 sz2 = ImGui::CalcTextSize(line_start, data->Buf + i, false, FLT_MAX);
+                if (sz2.x <= ctx->max_px)
+                {
+                    break_pos = i;
+                    break;
+                }
+            }
+        }
+
+        if (break_pos >= start)
+        {
+            // Replace that separator with a newline
+            data->DeleteChars(break_pos, 1);
+            data->InsertChars(break_pos, "\n");
+            // Let Dear ImGui re-evaluate next frame; avoid chaining multiple edits now
+            return 0;
+        }
+        else
+        {
+            // Force break at cursor if no separator found that fits
+            data->InsertChars(cur, "\n");
+            data->CursorPos = cur + 1;
+            return 0;
+        }
+    }
+    return 0;
+}
+
+static bool InputTextMultilineString_HardWrap(const char* label,
+                                              std::string* str,
+                                              const ImVec2& size,
+                                              float max_px_line,
+                                              ImGuiInputTextFlags flags = 0)
 {
     IM_ASSERT(str);
-    auto cb = [](ImGuiInputTextCallbackData* data) -> int
-    {
-        if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
-        {
-            auto* s = static_cast<std::string*>(data->UserData);
-            s->resize(static_cast<size_t>(data->BufTextLen));
-            data->Buf = s->data();
-        }
-        return 0;
-    };
+    if (str->capacity() == 0)
+        str->reserve(1);
+
+    InputTextWrapCtx ctx;
+    ctx.buf = str;
+    ctx.max_px = std::max(0.0f, max_px_line);
+
     flags |= ImGuiInputTextFlags_CallbackResize;
-    return ImGui::InputTextMultiline(label, str->data(), str->size() + 1, size, flags, cb, str);
+    flags |= ImGuiInputTextFlags_CallbackEdit;
+    flags |= ImGuiInputTextFlags_NoHorizontalScroll;
+
+    return ImGui::InputTextMultiline(label,
+                                     str->data(),
+                                     str->capacity() + 1, // bind to capacity; resize callback will keep this valid
+                                     size,
+                                     flags,
+                                     InputTextMultilineWrapCallback,
+                                     &ctx);
 }
 
 NoteEditorUI::NoteEditorUI(std::shared_ptr<NotesManager> notes_manager, std::shared_ptr<ImGuiToaster> toaster) :
@@ -31,17 +136,16 @@ void NoteEditorUI::setActiveTable(std::optional<std::string> tableName)
     (void)tableName; // reserved for future save-locations UX
 }
 
-void NoteEditorUI::render(bool* pOpen)
+void NoteEditorUI::render()
 {
     if (!visible_)
         return;
 
-    const ImU32 winBg = IM_COL32(28, 28, 30, 255);   // window bg
-    const ImU32 childBg = IM_COL32(24, 24, 26, 255); // child panels bg
+    const ImU32 winBg = IM_COL32(16, 16, 18, 255);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, winBg);
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, childBg);
     ImGui::SetNextWindowSizeConstraints(ImVec2(800, 600), ImVec2(FLT_MAX, FLT_MAX));
-    ImGui::Begin("Notes", pOpen);
+    bool open = true;
+    ImGui::Begin("Notes", &open);
 
     const float fullW = ImGui::GetContentRegionAvail().x;
     const float fullH = ImGui::GetContentRegionAvail().y;
@@ -59,20 +163,106 @@ void NoteEditorUI::render(bool* pOpen)
     }
     ImGui::SameLine();
 
-    const float tabsW = (std::max)(0.f, fullW - leftWidth_ - 6.f);
-    ImGui::BeginChild("##Tabs", ImVec2(tabsW, fullH), true);
-    renderTabsArea_(tabsW, fullH);
+    // Let ImGui compute exact remaining width to avoid h-scroll.
+    ImGui::BeginChild("##Tabs", ImVec2(0.f, fullH), true,
+                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    renderTabsArea_(/*unused*/ 0.f, fullH);
     ImGui::EndChild();
 
     ImGui::End();
-    ImGui::PopStyleColor(2);
-}
+    ImGui::PopStyleColor(1); // <-- only 1 was pushed
 
+    if (!open)
+        visible_ = false;
+
+    // ---- CREATE NOTE MODAL ----
+    if (showCreatePopup_)
+        ImGui::OpenPopup("Create Note"); // one-shot
+
+    bool createOpen = true;
+    if (ImGui::BeginPopupModal("Create Note", &createOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::InputText("Title", createTitle_, sizeof(createTitle_));
+        ImGui::InputText("Author", createAuthor_, sizeof(createAuthor_));
+
+        if (ImGui::Button("Create"))
+        {
+            std::string title = createTitle_[0] ? createTitle_ : "Untitled";
+            std::string author = createAuthor_[0] ? createAuthor_ : "unknown";
+            auto id = notes_manager->createNote(title, author);
+            openOrFocusTab(id);
+            createTitle_[0] = 0;
+            createAuthor_[0] = 0;
+            showCreatePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            showCreatePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+    else
+    {
+        // If not visible anymore (closed via ESC or X), clear flag
+        showCreatePopup_ = false;
+    }
+
+    // ---- DELETE NOTE MODAL ----
+    if (showDeletePopup_)
+        ImGui::OpenPopup("Delete Note?");
+
+    bool delOpen = true;
+    if (ImGui::BeginPopupModal("Delete Note?", &delOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static bool alsoDisk = false;
+        ImGui::Checkbox("Also delete from disk", &alsoDisk);
+
+        if (ImGui::Button("Delete"))
+        {
+            if (!pendingDeleteUuid_.empty())
+            {
+                notes_manager->deleteNote(pendingDeleteUuid_, alsoDisk);
+                auto it = std::find(openTabs_.begin(), openTabs_.end(), pendingDeleteUuid_);
+                if (it != openTabs_.end())
+                {
+                    int idx = (int)std::distance(openTabs_.begin(), it);
+                    closeTab_(idx);
+                }
+            }
+            pendingDeleteUuid_.clear();
+            alsoDisk = false;
+            showDeletePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            pendingDeleteUuid_.clear();
+            showDeletePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+    else
+    {
+        // ESC or close -> reset state
+        if (!delOpen)
+        {
+            pendingDeleteUuid_.clear();
+            showDeletePopup_ = false;
+        }
+    }
+}
 void NoteEditorUI::renderDirectory_(float /*height*/)
 {
     if (ImGui::Button("New"))
     {
-        actCreateNote_();
+        showCreatePopup_ = true;
     }
     ImGui::SameLine();
     if (ImGui::Button("Reload"))
@@ -85,7 +275,6 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
     ImGui::InputTextWithHint("##search", "Search title/author/text...", searchBuf_, sizeof(searchBuf_));
     ImGui::Separator();
 
-    // My Notes
     if (ImGui::CollapsingHeader("My Notes", ImGuiTreeNodeFlags_DefaultOpen))
     {
         auto mine = notes_manager->listMyNotes();
@@ -97,22 +286,15 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
         {
             for (auto& n : mine)
             {
-                if (!n)
+                if (!n || !filterMatch_(*n))
                     continue;
-                if (!filterMatch_(*n))
-                    continue;
-
                 ImGui::PushID(n->uuid.c_str());
-                bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
-                std::string label = n->title;
-                if (n->dirty)
-                    label += " *";
-                if (!n->saved_locally)
-                    label += " (unsaved)";
+
+                const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
+                const std::string label = n->title.empty() ? n->uuid : n->title; // ← no '*' or '(unsaved)'
                 if (ImGui::Selectable(label.c_str(), selected))
-                {
-                    addTabIfMissing_(n->uuid);
-                }
+                    openOrFocusTab(n->uuid);
+
                 ImGui::PopID();
             }
         }
@@ -120,7 +302,6 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
 
     ImGui::Separator();
 
-    // Inbox
     if (ImGui::CollapsingHeader("Shared Inbox", ImGuiTreeNodeFlags_DefaultOpen))
     {
         auto inbox = notes_manager->listInbox();
@@ -132,30 +313,26 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
         {
             for (auto& n : inbox)
             {
-                if (!n)
+                if (!n || !filterMatch_(*n))
                     continue;
-                if (!filterMatch_(*n))
-                    continue;
-
                 ImGui::PushID(n->uuid.c_str());
-                bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
-                std::string label = n->title + "  [from: " + (n->shared_from ? *n->shared_from : "?") + "]";
+
+                const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
+                const std::string label = (n->title.empty() ? n->uuid : n->title) + "  [from: " + (n->shared_from ? *n->shared_from : "?") + "]";
                 if (ImGui::Selectable(label.c_str(), selected))
-                {
-                    addTabIfMissing_(n->uuid);
-                }
+                    openOrFocusTab(n->uuid);
+
                 ImGui::SameLine();
                 if (ImGui::SmallButton("Save locally"))
-                {
                     actSaveInboxToLocal_(n->uuid);
-                }
+
                 ImGui::PopID();
             }
         }
     }
 }
 
-void NoteEditorUI::renderTabsArea_(float width, float height)
+void NoteEditorUI::renderTabsArea_(float /*width*/, float /*height*/)
 {
     if (openTabs_.empty())
     {
@@ -180,15 +357,23 @@ void NoteEditorUI::renderTabsArea_(float width, float height)
                 continue;
             }
 
-            std::string tabTitle = n->title.empty() ? n->uuid : n->title;
+            // Visible label stays constant; ID is after '###'
+            const std::string visible = n->title.empty() ? n->uuid : n->title;
+            const std::string label = visible + "###" + uuid;
+
+            ImGuiTabItemFlags tif = 0;
             if (n->dirty)
-                tabTitle += " *";
+                tif |= ImGuiTabItemFlags_UnsavedDocument;
 
             bool open = true;
-            if (ImGui::BeginTabItem(tabTitle.c_str(), &open))
+            if (ImGui::BeginTabItem(label.c_str(), &open, tif))
             {
                 currentTabIndex_ = i;
-                renderOneTab_(uuid, width, height);
+
+                const float availW = ImGui::GetContentRegionAvail().x;
+                const float availH = ImGui::GetContentRegionAvail().y;
+                renderOneTab_(uuid, availW, availH);
+
                 ImGui::EndTabItem();
             }
             if (!open)
@@ -203,38 +388,52 @@ void NoteEditorUI::renderTabsArea_(float width, float height)
     }
 }
 
-void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float availH)
+void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float /*availH*/)
 {
     auto n = notes_manager->getNote(uuid);
     if (!n)
         return;
 
+    ImGuiIO& io = ImGui::GetIO();
+    const bool windowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootAndChildWindows);
+    if (windowFocused && io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S, false))
+        actSaveNote_(uuid);
+
     if (ImGui::Button(n->open_editor ? "Hide Editor" : "Show Editor"))
-    {
         toggleOpenEditor_(uuid);
-    }
     ImGui::SameLine();
     if (ImGui::Button("Save"))
-    {
         actSaveNote_(uuid);
-    }
     ImGui::SameLine();
     if (ImGui::Button("Delete"))
     {
-        actDeleteNote_(uuid);
+        pendingDeleteUuid_ = uuid;
+        showDeletePopup_ = true;
         return;
     }
     ImGui::SameLine();
     ImGui::TextDisabled("%s", n->saved_locally ? n->file_path.filename().string().c_str() : "(unsaved)");
-
     ImGui::Separator();
 
-    float editorW = n->open_editor ? (availW * 0.5f) : 0.f;
-    float viewerW = n->open_editor ? (availW - editorW - 6.f) : availW;
+    const float spacing = ImGui::GetStyle().ItemSpacing.x;
+    const float splitterW = 6.f;
 
+    float editorW = 0.f, viewerW = 0.f;
     if (n->open_editor)
     {
-        ImGui::BeginChild("##editor", ImVec2(editorW, availH - 40), true);
+        const float shared = availW - splitterW - spacing;
+        editorW = floorf(shared * 0.5f);
+        viewerW = shared - editorW; // exact remainder => no 1px overflow
+    }
+    else
+    {
+        viewerW = availW;
+    }
+
+    // --- Editor ---
+    if (n->open_editor)
+    {
+        ImGui::BeginChild("##editor", ImVec2(editorW, 0.f), true); // 0 height => fill
         auto& ts = tabState_[uuid];
         if (!ts.bufferInit)
         {
@@ -242,22 +441,25 @@ void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float av
             ts.bufferInit = true;
         }
 
-        //if (ImGui::InputTextMultiline("##NoteEdit", &ts.editBuffer, ImVec2(-1, -1), ImGuiInputTextFlags_AllowTabInput))
-        //{
-        //    // updated in footer
-        //}
-        if (InputTextMultilineString("##NoteEdit", &ts.editBuffer, ImVec2(-1, -1), ImGuiInputTextFlags_AllowTabInput))
-        {
-            // updated in footer
-        }
+        ImVec2 editorSize = ImGui::GetContentRegionAvail();
+        float wrap_px = editorSize.x - ImGui::GetStyle().FramePadding.x * 2.0f;
+
+        // hard-wrap (inserts '\n' when exceeding width)
+        InputTextMultilineString_HardWrap("##NoteEdit",
+                                          &ts.editBuffer,
+                                          editorSize,
+                                          wrap_px,
+                                          ImGuiInputTextFlags_AllowTabInput);
         ImGui::EndChild();
 
         ImGui::SameLine();
-        ImGui::InvisibleButton("##split2", ImVec2(6, availH - 40));
+        ImGui::InvisibleButton("##split2", ImVec2(splitterW, 0.f));
         ImGui::SameLine();
     }
 
-    ImGui::BeginChild("##viewer", ImVec2(viewerW, availH - 40), true);
+    // --- Viewer ---
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f)); // padding to avoid clipped glyphs
+    ImGui::BeginChild("##viewer", ImVec2(viewerW, 0.f), true);
     {
         const auto toMs = NotesManager::toEpochMillis;
         ImGui::TextDisabled("Author: %s", n->author.c_str());
@@ -267,50 +469,37 @@ void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float av
         ImGui::TextDisabled("Updated: %lld", (long long)toMs(n->last_update_ts));
         ImGui::Separator();
 
-        md_.onOpenExternal = [this](const std::string& url)
-        {
-            // you can leave default (it already opens browser), or hook a toast:
-            toaster_->Push(ImGuiToaster::Level::Info, "Opening: " + url);
-        };
-
+        // only set handlers we need; leave external open to MarkdownRenderer default
         md_.onRoll = [this](const std::string& expr)
         {
             if (toaster_)
                 toaster_->Push(ImGuiToaster::Level::Good, "Roll: " + expr);
-            // TODO later: send to chat roller
         };
-
         md_.resolveNoteRef = [this](const std::string& ref) -> std::string
         {
-            // Let NotesManager resolve: by title, alias, or short-id → UUID
-            return notes_manager->resolveRef(ref); // implement: tries full uuid, short-prefix, title lookup
+            return notes_manager->resolveRef(ref);
         };
-
-        md_.onNoteOpen = [this](const std::string& uuid)
-        {
-            // Open tab by UUID
-            openTabByUuid(uuid);
-        };
+        md_.onNoteOpen = [this](const std::string& id)
+        { openTabByUuid(id); };
 
         const std::string& md = n->open_editor ? tabState_[uuid].editBuffer : n->markdown_text;
+
+        ImGui::PushTextWrapPos(0.f); // wrap md to viewer width (safety; imgui_md usually wraps, this enforces)
         if (!md.empty())
-        {
             md_.print(md.c_str(), md.c_str() + md.size());
-        }
         else
-        {
             ImGui::TextDisabled("(empty)");
-        }
+        ImGui::PopTextWrapPos();
     }
     ImGui::EndChild();
+    ImGui::PopStyleVar();
 
+    // Propagate editor changes to manager
     if (n->open_editor)
     {
         auto& ts = tabState_[uuid];
         if (ts.bufferInit && ts.editBuffer != n->markdown_text)
-        {
             notes_manager->setContent(uuid, ts.editBuffer);
-        }
     }
 }
 
@@ -328,7 +517,7 @@ void NoteEditorUI::actCreateNote_()
             std::string title = titleBuf[0] ? titleBuf : "Untitled";
             std::string author = authorBuf[0] ? authorBuf : "unknown";
             auto id = notes_manager->createNote(title, author);
-            addTabIfMissing_(id);
+            openOrFocusTab(id);
             titleBuf[0] = 0;
             authorBuf[0] = 0;
             ImGui::CloseCurrentPopup();
@@ -413,6 +602,20 @@ void NoteEditorUI::addTabIfMissing_(const std::string& uuid)
     }
 }
 
+void NoteEditorUI::openOrFocusTab(const std::string& uuid)
+{
+    auto it = std::find(openTabs_.begin(), openTabs_.end(), uuid);
+    if (it == openTabs_.end())
+    {
+        addTabIfMissing_(uuid); // opens and selects
+    }
+    else
+    {
+        currentTabIndex_ = (int)std::distance(openTabs_.begin(), it);
+        // ImGui will focus the item with BeginTabItem anyway; this ensures index is correct
+    }
+}
+
 void NoteEditorUI::closeTab_(int tabIndex)
 {
     if (tabIndex < 0 || tabIndex >= (int)openTabs_.size())
@@ -438,7 +641,7 @@ bool NoteEditorUI::filterMatch_(const Note& n) const
 
 void NoteEditorUI::openNoteTab(const std::string& uuid)
 {
-    addTabIfMissing_(uuid);
+    openOrFocusTab(uuid);
 }
 
 bool NoteEditorUI::openTabByUuid(const std::string& uuid)
@@ -461,7 +664,7 @@ bool NoteEditorUI::openTabByUuid(const std::string& uuid)
     }
 
     // otherwise open a new tab
-    addTabIfMissing_(uuid);
+    openOrFocusTab(uuid);
     visible_ = true;
     return true;
 }

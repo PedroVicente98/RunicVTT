@@ -36,8 +36,8 @@ namespace msg
         ImageChunk = 104,
 
         //Operations
-        MarkerMove = 300,
-        MarkerMoveState = 301,
+        MarkerMove = 150,
+        MarkerMoveState = 151,
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,
@@ -244,6 +244,7 @@ namespace msg
         //inline constexpr std::string_view SdpMLineIndex = "sdpMLineIndex";
 
         // Auth / control
+        inline constexpr std::string_view UniqueId = "uniqueId";
         inline constexpr std::string_view AuthOk = "ok";
         inline constexpr std::string_view AuthMsg = "msg";
         inline constexpr std::string_view AuthToken = "token";
@@ -412,8 +413,10 @@ namespace msg
             {std::string(chatkey::Text), text}};
     }
 
-    // ---- builders (signaling) ----
-    inline Json makeOffer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& username, const std::string& broadcast = msg::value::False)
+    inline Json makeOffer(const std::string& from, const std::string& to,
+                          const std::string& sdp, const std::string& username,
+                          const std::string& uniqueId,
+                          const std::string& broadcast = msg::value::False)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Offer)},
@@ -421,9 +424,15 @@ namespace msg
             {std::string(key::To), to},
             {std::string(key::Broadcast), broadcast},
             {std::string(key::Sdp), sdp},
-            {std::string(key::Username), username}};
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
-    inline Json makeAnswer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& username, const std::string& broadcast = msg::value::False)
+
+    inline Json makeAnswer(const std::string& from, const std::string& to,
+                           const std::string& sdp, const std::string& username,
+                           const std::string& uniqueId,
+                           const std::string& broadcast = msg::value::False)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Answer)},
@@ -431,7 +440,9 @@ namespace msg
             {std::string(key::To), to},
             {std::string(key::Broadcast), broadcast},
             {std::string(key::Sdp), sdp},
-            {std::string(key::Username), username}};
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
     inline Json makeCandidate(const std::string& from, const std::string& to, const std::string& cand, const std::string& broadcast = msg::value::False)
     {
@@ -472,15 +483,45 @@ namespace msg
             {std::string(key::Type), std::string(signaling::Ping)},
             {std::string(key::From), from}};
     }
-    inline Json makeAuth(const std::string& token, const std::string& username)
+    /* inline Json makeAuth(const std::string& token, const std::string& username)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Auth)},
             {std::string(key::AuthToken), token},
             {std::string(key::Username), username},
         };
+    }*/
+    inline Json makeAuth(const std::string& token,
+                         const std::string& username,
+                         const std::string& uniqueId)
+    {
+        return Json{
+            {std::string(key::Type), std::string(signaling::Auth)},
+            {std::string(key::AuthToken), token},
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
-
+    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg,
+                                           const std::string& clientId, const std::string& username,
+                                           const std::vector<std::string>& clients = {},
+                                           const std::string& gmPeerId = "",
+                                           const std::string& uniqueId = "")
+    {
+        auto j = nlohmann::json{
+            {std::string(key::Type), std::string(signaling::AuthResponse)},
+            {std::string(key::AuthOk), ok},
+            {std::string(key::AuthMsg), msg},
+            {std::string(key::ClientId), clientId},
+            {std::string(key::Username), username}};
+        if (!clients.empty())
+            j[std::string(msg::key::Clients)] = clients;
+        if (!gmPeerId.empty())
+            j[key::GmId] = gmPeerId;
+        if (!uniqueId.empty())
+            j[std::string(key::UniqueId)] = uniqueId;
+        return j;
+    }
     /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
     {
 
@@ -498,24 +539,24 @@ namespace msg
 
         return j;
     }*/
-    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
-    {
-        auto j = nlohmann::json{
-            {std::string(key::Type), std::string(signaling::AuthResponse)},
-            {std::string(key::AuthOk), ok},
-            {std::string(key::AuthMsg), msg},
-            {std::string(key::ClientId), clientId},
-            {std::string(key::Username), username}};
-        if (!clients.empty())
-        {
-            j[std::string(msg::key::Clients)] = clients;
-        }
-        if (!gmPeerId.empty())
-        {
-            j[key::GmId] = gmPeerId; // NEW
-        }
-        return j;
-    }
+    //inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
+    //{
+    //    auto j = nlohmann::json{
+    //        {std::string(key::Type), std::string(signaling::AuthResponse)},
+    //        {std::string(key::AuthOk), ok},
+    //        {std::string(key::AuthMsg), msg},
+    //        {std::string(key::ClientId), clientId},
+    //        {std::string(key::Username), username}};
+    //    if (!clients.empty())
+    //    {
+    //        j[std::string(msg::key::Clients)] = clients;
+    //    }
+    //    if (!gmPeerId.empty())
+    //    {
+    //        j[key::GmId] = gmPeerId; // NEW
+    //    }
+    //    return j;
+    //}
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false)
     {
         return Json{

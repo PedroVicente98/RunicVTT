@@ -11,8 +11,8 @@
 #include "Logger.h"
 #include <unordered_set>
 
-NetworkManager::NetworkManager(flecs::world ecs) :
-    ecs(ecs), peer_role(Role::NONE)
+NetworkManager::NetworkManager(flecs::world ecs, std::shared_ptr<IdentityManager> identity_manager) :
+    ecs(ecs), identity_manager(identity_manager), peer_role(Role::NONE)
 {
     getLocalIPAddress();
     getExternalIPAddress();
@@ -567,16 +567,16 @@ std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peer
 
 void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc)
 {
-    // Build signaling message and send via SignalingClient
     nlohmann::json j;
     const std::string sdp = std::string(desc);
+    const std::string myUid = getMyUniqueId();
     if (desc.type() == rtc::Description::Type::Offer)
     {
-        j = msg::makeOffer("", peerId, sdp, myUsername_);
+        j = msg::makeOffer("", peerId, sdp, myUsername_, myUid);
     }
     else if (desc.type() == rtc::Description::Type::Answer)
     {
-        j = msg::makeAnswer("", peerId, sdp, myUsername_);
+        j = msg::makeAnswer("", peerId, sdp, myUsername_, myUid);
     }
     else
     {
@@ -611,20 +611,44 @@ void NetworkManager::setMyIdentity(std::string peerId, std::string username)
 void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string& username)
 {
     peerUsernames_[id] = username;
-    // If PeerLink already exists, update its display name for logs/UI:
-    if (auto it = peers.find(id); it != peers.end() && it->second)
+
+    if (identity_manager)
     {
-        it->second->setDisplayName(username);
+        identity_manager->bindPeer(/*peerId=*/id, /*uniqueId=*/"", /*username=*/username);
     }
+
+    if (auto it = peers.find(id); it != peers.end() && it->second)
+        it->second->setDisplayName(username);
 }
 
+void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
+                                                  const std::string& uniqueId,
+                                                  const std::string& username)
+{
+    peerUsernames_[peerId] = username;
+
+    if (identity_manager)
+    {
+        identity_manager->bindPeer(/*peerId=*/peerId,
+                                   /*uniqueId=*/uniqueId,
+                                   /*username=*/username);
+    }
+
+    if (auto it = peers.find(peerId); it != peers.end() && it->second)
+        it->second->setDisplayName(username);
+}
 std::string NetworkManager::displayNameFor(const std::string& id) const
 {
+    if (identity_manager)
+    {
+        if (auto u = identity_manager->usernameForUnique(id); !u.empty())
+            return u;
+    }
     if (auto it = peerUsernames_.find(id); it != peerUsernames_.end())
         return it->second;
     if (auto it = clientUsernames_.find(id); it != clientUsernames_.end())
         return it->second;
-    return id; // fallback to raw id
+    return id;
 }
 
 bool NetworkManager::disconectFromPeers()
@@ -850,15 +874,14 @@ void NetworkManager::broadcastFogDelete(uint64_t boardId, const flecs::entity& f
 
 void NetworkManager::buildUserNameUpdate(std::vector<uint8_t>& out,
                                          uint64_t tableId,
-                                         const std::string& userPeerId,
+                                         const std::string& userUniqueId,
                                          const std::string& oldUsername,
                                          const std::string& newUsername,
                                          bool reboundFlag) const
 {
     out.clear();
-    // NOTE: do NOT write the type here; caller will prepend it per-channel rules.
     Serializer::serializeUInt64(out, tableId);
-    Serializer::serializeString(out, userPeerId);
+    Serializer::serializeString(out, userUniqueId); // <— uniqueId
     Serializer::serializeString(out, oldUsername);
     Serializer::serializeString(out, newUsername);
     Serializer::serializeUInt8(out, reboundFlag ? 1 : 0);
@@ -887,33 +910,6 @@ void NetworkManager::sendUserNameUpdateTo(const std::string& peerId,
     frame.insert(frame.end(), payload.begin(), payload.end());
 
     it->second->sendOn(msg::dc::name::Game, frame);
-}
-
-// NetworkManager.cpp
-std::pair<std::string, bool> NetworkManager::ensureUsernameUnique(const std::string& desired) const
-{
-    if (desired.empty())
-        return {desired, false};
-
-    // Build a bag of all known usernames (self + peers)
-    // clientUsernames_: { myPeerId -> myUsername }
-    // peerUsernames_:   { peerId   -> peerUsername }
-    std::unordered_set<std::string> all;
-    for (const auto& kv : clientUsernames_)
-        all.insert(kv.second);
-    for (const auto& kv : peerUsernames_)
-        all.insert(kv.second);
-
-    if (!all.count(desired))
-        return {desired, false};
-
-    // Find next free suffix _1, _2, ...
-    for (uint32_t i = 1;; ++i)
-    {
-        std::string cand = desired + "_" + std::to_string(i);
-        if (!all.count(cand))
-            return {cand, true};
-    }
 }
 
 // NetworkManager.cpp
@@ -1829,89 +1825,6 @@ void NetworkManager::handleFogCreate(const std::vector<uint8_t>& b, size_t& off)
     inboundGame_.push(std::move(m));
 }
 
-// DCType::Image
-//void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    auto kind = static_cast<msg::ImageOwnerKind>(b[off]);
-//    off += 1;
-//    uint64_t id = Serializer::deserializeUInt64(b, off);
-//    uint64_t off64 = Serializer::deserializeUInt64(b, off);
-//    int len = Serializer::deserializeInt(b, off);
-//
-//    Logger::instance().log("localtunnel", Logger::Level::Info, std::string("Image Chunk Kind: ") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker"));
-//    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
-//
-//    auto it = imagesRx_.find(id);
-//    if (it == imagesRx_.end())
-//        return; // unknown; drop
-//    auto& p = it->second;
-//    Logger::instance().log("localtunnel", Logger::Level::Info, "imagesRx_ Found");
-//    if (p.kind != kind || p.total == 0)
-//        return;
-//    // bounds check
-//    if (off64 + static_cast<uint64_t>(len) > p.total)
-//        return;
-//
-//    std::memcpy(p.buf.data() + off64, b.data() + off, static_cast<size_t>(len));
-//    off += static_cast<size_t>(len);
-//    p.received += static_cast<uint64_t>(len);
-//}
-
-// DCType::CommitBoard
-//void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
-//    auto it = imagesRx_.find(boardId);
-//    if (it == imagesRx_.end())
-//        return;
-//    auto& p = it->second;
-//    if (p.kind != msg::ImageOwnerKind::Board)
-//        return;
-//
-//    if (p.total == 0 || p.isComplete())
-//    {
-//        if (p.boardMeta)
-//        {
-//            msg::ReadyMessage m;
-//            m.kind = msg::DCType::CommitBoard;
-//            m.boardId = boardId;
-//            m.boardMeta = *p.boardMeta;
-//            m.bytes = std::move(p.buf); // image (may be empty)
-//            inboundGame_.push(std::move(m));
-//        }
-//        imagesRx_.erase(it);
-//    }
-//}
-
-// DCType::CommitMarker
-//void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
-//    uint64_t markerId = Serializer::deserializeUInt64(b, off);
-//
-//    auto it = imagesRx_.find(markerId);
-//    if (it == imagesRx_.end())
-//        return;
-//
-//    auto& p = it->second;
-//    if (p.kind != msg::ImageOwnerKind::Marker || p.boardId != boardId)
-//        return;
-//
-//    // marker image may be optional (total==0)
-//    if (p.total == 0 || p.isComplete())
-//    {
-//        if (p.markerMeta)
-//        {
-//            msg::ReadyMessage m;
-//            m.kind = msg::DCType::CommitMarker;
-//            m.boardId = boardId;
-//            m.markerMeta = *p.markerMeta;
-//            m.bytes = std::move(p.buf); // image (may be empty)
-//            inboundGame_.push(std::move(m));
-//        }
-//        imagesRx_.erase(it);
-//    }
-//}
 void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
 {
     uint64_t boardId = Serializer::deserializeUInt64(b, off);
@@ -2025,21 +1938,36 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
 void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::ReadyMessage r;
-    r.kind = msg::DCType::UserNameUpdate; // <-- missing
+    r.kind = msg::DCType::UserNameUpdate;
     r.fromPeer = decodingFromPeer_;
     r.tableId = Serializer::deserializeUInt64(b, off);
-    r.userPeerId = Serializer::deserializeString(b, off);
-    r.text = Serializer::deserializeString(b, off);   // oldUsername
-    r.name = Serializer::deserializeString(b, off);   // newUsername
-    r.rebound = Serializer::deserializeUInt8(b, off); // 0/1
+
+    // This is UNIQUE ID now:
+    const std::string uniqueId = Serializer::deserializeString(b, off);
+    const std::string oldU = Serializer::deserializeString(b, off);
+    const std::string newU = Serializer::deserializeString(b, off);
+    const uint8_t rebound = Serializer::deserializeUInt8(b, off);
+
+    // Keep old ReadyMessage fields for upstream handlers (uses userPeerId/name/text in your codebase):
+    r.userPeerId = uniqueId; // NOTE: field name is legacy; carries uniqueId now.
+    r.text = oldU;
+    r.name = newU;
+    r.rebound = rebound;
+
     Logger::instance().log("chat", Logger::Level::Info,
-                           " tbl=" + std::to_string(*r.tableId) +
-                               " peer=" + *r.userPeerId +
-                               " old=" + *r.text +
-                               " new=" + *r.name +
-                               " rb=" + std::to_string(*r.rebound));
+                           "UserNameUpdate: tbl=" + std::to_string(r.tableId.value_or(0)) +
+                               " uid=" + uniqueId + " old=" + oldU + " new=" + newU);
+
+    // Immediately teach IdentityManager the mapping + new name.
+    if (identity_manager)
+    {
+        identity_manager->bindPeer(/*peerId=*/r.fromPeer, /*uniqueId=*/uniqueId, /*username=*/newU);
+        identity_manager->setUsernameForUnique(uniqueId, newU);
+    }
+
     inboundGame_.push(std::move(r));
 }
+
 void NetworkManager::handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::ReadyMessage m;
@@ -2710,237 +2638,3 @@ void NetworkManager::broadcastGameFrame(const std::vector<unsigned char>& frame,
         sendGameTo(pid, frame);
     }
 }
-
-// ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
-//-{check}wrong logic below
-
-//bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-//{ //{check}-wrong logic
-//    if (img.empty())
-//        return false;
-//
-//    // BEGIN: DCType::CreateEntity
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
-//        Serializer::serializeUInt64(b, markerId);
-//        Serializer::serializeString(b, name);
-//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    // CHUNKS: DCType::Image
-//    uint64_t offset = 0;
-//    while (offset < img.size())
-//    {
-//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-//        Serializer::serializeUInt64(b, markerId);
-//        Serializer::serializeUInt64(b, offset);
-//        Serializer::serializeInt(b, n);
-//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//        offset += n;
-//    }
-//
-//    // COMMIT: DCType::CommitMarker
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
-//        Serializer::serializeUInt64(b, markerId);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    return true;
-//}
-//
-//bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-//{ //{check}-wrong logic
-//    if (img.empty())
-//        return false;
-//
-//    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
-//        Serializer::serializeUInt64(b, boardId);
-//        Serializer::serializeString(b, name);
-//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    // CHUNKS: DCType::Image (same as marker)
-//    uint64_t offset = 0;
-//    while (offset < img.size())
-//    {
-//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-//        Serializer::serializeUInt64(b, boardId);
-//        Serializer::serializeUInt64(b, offset);
-//        Serializer::serializeInt(b, n);
-//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//        offset += n;
-//    }
-//
-//    // COMMIT: DCType::CommitBoard
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
-//        Serializer::serializeUInt64(b, boardId);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    return true;
-//}
-
-/*bool NetworkManager::disconectFromPeers()
-{
-    // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
-
-    // Close signaling client (playerâ€™s WS)
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    // Weâ€™re no longer connected
-    peer_role = Role::NONE;
-    return true;
-}
-
-bool NetworkManager::disconnectAllPeers()
-{
-    // 1) Broadcast a shutdown message (optional, but nice UX)
-    if (signalingServer)
-    {
-        signalingServer->broadcastShutdown(); // 1) tell everyone
-    }
-
-    // 2) Close all peer links locally
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
-
-    // 3) Disconnect all WS clients and stop the server
-    if (signalingServer)
-    {
-        signalingServer->disconnectAllClients();
-        try
-        {
-            signalingServer->stop();
-        }
-        catch (...)
-        {
-        }
-        signalingServer.reset();
-    }
-
-    // 4) If GM also had a self client (loopback to its own server), close it too
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    peer_role = Role::NONE;
-    return true;
-}
-*/
-
-/*bool NetworkManager::removePeer(std::string peerId)
-{
-    auto it = peers.find(peerId);
-    if (it == peers.end())
-        return false;
-    if (auto& link = it->second)
-    {
-        try
-        {
-            link->close(); // ensure pc/dc closed
-        }
-        catch (...)
-        {
-            // swallow â€” safe cleanup path
-        }
-    }
-    peers.erase(it);
-    return true;
-}
-
-// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
-std::size_t NetworkManager::removeDisconnectedPeers()
-{
-    std::size_t removed = 0;
-    for (auto it = peers.begin(); it != peers.end();)
-    {
-        const bool shouldRemove =
-            !it->second ||
-            it->second->isClosedOrFailed(); // helper on PeerLink below
-
-        if (shouldRemove)
-        {
-            if (it->second)
-            {
-                try
-                {
-                    it->second->close();
-                }
-                catch (...)
-                {
-                }
-            }
-            it = peers.erase(it);
-            ++removed;
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    return removed;
-}
-*/
-
-//
-//void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
-//{
-//	peer_role = Role::GAMEMASTER;
-//
-//	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
-//	//auto internalIP = UPnPManager::getLocalIPv4Address();
-//	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
-//		bool open_port_foward_tip = true;
-//		ShowPortForwardingHelpPopup(&open_port_foward_tip);
-//	}*/
-//	signalingServer->start(port);
-//	auto status = signalingClient->connect(local_tunnel_url, port);
-//}

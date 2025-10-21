@@ -12,7 +12,7 @@
 #include <array>
 #include <cmath>
 #include "imgui.h"
-
+#include "IdentityManager.h"
 #include "Message.h"
 
 class NetworkManager; // fwd
@@ -28,9 +28,9 @@ struct ChatMessageModel
         LINK
     };
     Kind kind = Kind::TEXT;
-    std::string senderId; // peer id or "me" (optional)
-    std::string username; // display label
-    std::string content;  // text / url
+    std::string senderUniqueId; // <— NEW: stable sender id
+    std::string username;       // display label
+    std::string content;        // text / url
     double ts = 0.0;
 };
 
@@ -39,7 +39,7 @@ struct ChatGroupModel
     uint64_t id = 0;                       // 1 reserved for General
     std::string name;                      // unique per table
     std::set<std::string> participants;    // peer ids (can duplicate across groups)
-    std::string ownerPeerId;               // who can delete/rename
+    std::string ownerUniqueId;             // who can delete/rename
     std::deque<ChatMessageModel> messages; // local history
     uint32_t unread = 0;                   // UI badge
 };
@@ -48,7 +48,7 @@ struct ChatGroupModel
 class ChatManager : public std::enable_shared_from_this<ChatManager>
 {
 public:
-    explicit ChatManager(std::weak_ptr<NetworkManager> nm);
+    explicit ChatManager(std::weak_ptr<NetworkManager> nm, std::shared_ptr<IdentityManager> identity_manager);
 
     // Attach/replace network
     void setNetwork(std::weak_ptr<NetworkManager> nm);
@@ -80,9 +80,9 @@ public:
     void writeGroupsToSnapshotGT(std::vector<unsigned char>& buf) const;
     void readGroupsFromSnapshotGT(const std::vector<unsigned char>& buf, size_t& off);
 
-    // Replace a username everywhere (rename cascade from Identity flow)
-    void replaceUsernameEverywhere(const std::string& oldUsername,
-                                   const std::string& newUsername);
+    //// Replace a username everywhere (rename cascade from Identity flow)
+    //void replaceUsernameEverywhere(const std::string& oldUsername,
+    //                               const std::string& newUsername);
 
     // Exposed current table data
     static constexpr uint64_t generalGroupId_ = 1;
@@ -92,7 +92,11 @@ public:
     // Utility
     ChatGroupModel* getGroup(uint64_t id);
 
+    void replaceUsernameForUnique(const std::string& uniqueId, const std::string& newUsername);
+
 private:
+    std::shared_ptr<IdentityManager> identity_manager;
+
     // === runtime store ===
     std::unordered_map<uint64_t, ChatGroupModel> groups_;
     uint64_t activeGroupId_ = generalGroupId_;

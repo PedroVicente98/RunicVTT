@@ -36,8 +36,8 @@ ChatMessageModel::Kind ChatManager::classifyMessage(const std::string& s)
 }
 
 // ====== ctor/bind ======
-ChatManager::ChatManager(std::weak_ptr<NetworkManager> nm) :
-    network_(std::move(nm)) {}
+ChatManager::ChatManager(std::weak_ptr<NetworkManager> nm, std::shared_ptr<IdentityManager> identity_manager) :
+    network_(std::move(nm)), identity_manager(identity_manager) {}
 void ChatManager::setNetwork(std::weak_ptr<NetworkManager> nm)
 {
     network_ = std::move(nm);
@@ -68,7 +68,7 @@ void ChatManager::ensureGeneral()
         ChatGroupModel g;
         g.id = generalGroupId_;
         g.name = "General";
-        g.ownerPeerId.clear(); // nobody “owns” General
+        g.ownerUniqueId.clear(); // nobody “owns” General
         groups_.emplace(g.id, std::move(g));
     }
 }
@@ -82,23 +82,24 @@ std::filesystem::path ChatManager::chatFilePathFor(uint64_t tableId, const std::
 bool ChatManager::saveLog(std::vector<uint8_t>& buf) const
 {
     Serializer::serializeString(buf, "RUNIC-CHAT-GROUPS");
-    Serializer::serializeInt(buf, 1); // version
+    Serializer::serializeInt(buf, 2); // <— version 2
 
     Serializer::serializeInt(buf, (int)groups_.size());
     for (auto& [id, g] : groups_)
     {
         Serializer::serializeUInt64(buf, g.id);
         Serializer::serializeString(buf, g.name);
-        Serializer::serializeString(buf, g.ownerPeerId);
+        Serializer::serializeString(buf, g.ownerUniqueId); // <— changed
 
         Serializer::serializeInt(buf, (int)g.participants.size());
         for (auto& p : g.participants)
-            Serializer::serializeString(buf, p);
+            Serializer::serializeString(buf, p); // your set contents (uniqueIds recommended)
 
         Serializer::serializeInt(buf, (int)g.messages.size());
         for (auto& m : g.messages)
         {
             Serializer::serializeInt(buf, (int)m.kind);
+            Serializer::serializeString(buf, m.senderUniqueId); // <— NEW in v2
             Serializer::serializeString(buf, m.username);
             Serializer::serializeString(buf, m.content);
             Serializer::serializeUInt64(buf, (uint64_t)m.ts);
@@ -107,14 +108,14 @@ bool ChatManager::saveLog(std::vector<uint8_t>& buf) const
     }
     return true;
 }
-
 bool ChatManager::loadLog(const std::vector<uint8_t>& buf)
 {
     size_t off = 0;
     auto magic = Serializer::deserializeString(buf, off);
     if (magic != "RUNIC-CHAT-GROUPS")
         return false;
-    (void)Serializer::deserializeInt(buf, off); // version
+
+    int version = Serializer::deserializeInt(buf, off);
 
     groups_.clear();
     int count = Serializer::deserializeInt(buf, off);
@@ -123,7 +124,15 @@ bool ChatManager::loadLog(const std::vector<uint8_t>& buf)
         ChatGroupModel g;
         g.id = Serializer::deserializeUInt64(buf, off);
         g.name = Serializer::deserializeString(buf, off);
-        g.ownerPeerId = Serializer::deserializeString(buf, off);
+
+        if (version >= 2)
+            g.ownerUniqueId = Serializer::deserializeString(buf, off);
+        else
+        {
+            // v1 had ownerPeerId; read it and keep as ownerUniqueId (best-effort: it used to be peerId)
+            const std::string legacyOwner = Serializer::deserializeString(buf, off);
+            g.ownerUniqueId = legacyOwner; // you can map through IdentityManager if you persisted mapping
+        }
 
         int pc = Serializer::deserializeInt(buf, off);
         for (int k = 0; k < pc; ++k)
@@ -134,15 +143,22 @@ bool ChatManager::loadLog(const std::vector<uint8_t>& buf)
         {
             ChatMessageModel msg;
             msg.kind = (ChatMessageModel::Kind)Serializer::deserializeInt(buf, off);
+
+            if (version >= 2)
+                msg.senderUniqueId = Serializer::deserializeString(buf, off);
+            else
+                msg.senderUniqueId.clear();
+
             msg.username = Serializer::deserializeString(buf, off);
             msg.content = Serializer::deserializeString(buf, off);
             msg.ts = (double)Serializer::deserializeUInt64(buf, off);
             g.messages.push_back(std::move(msg));
         }
-        g.unread = (uint32_t)Serializer::deserializeInt(buf, off);
 
+        g.unread = (uint32_t)Serializer::deserializeInt(buf, off);
         groups_.emplace(g.id, std::move(g));
     }
+
     ensureGeneral();
     if (groups_.find(activeGroupId_) == groups_.end())
         activeGroupId_ = generalGroupId_;
@@ -212,8 +228,6 @@ ChatGroupModel* ChatManager::getGroup(uint64_t id)
     auto it = groups_.find(id);
     return it == groups_.end() ? nullptr : &it->second;
 }
-
-// ====== inbound bridge ======
 void ChatManager::applyReady(const msg::ReadyMessage& m)
 {
     using K = msg::DCType;
@@ -230,22 +244,28 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
             ChatGroupModel g;
             g.id = *m.threadId;
             g.name = m.name.value_or("Group");
-            g.ownerPeerId = m.fromPeer; // creator is owner
+
+            // derive owner uniqueId (best-effort)
+            std::string ownerUid;
+            if (identity_manager)
+                ownerUid = identity_manager->uniqueForPeer(m.fromPeer).value_or("Player");
+            g.ownerUniqueId = ownerUid;
+
             if (m.participants)
                 g.participants = *m.participants;
 
             auto it = groups_.find(g.id);
             if (it == groups_.end())
-            {
                 groups_.emplace(g.id, std::move(g));
-            }
             else
             {
                 it->second.name = g.name;
                 it->second.participants = std::move(g.participants);
+                // keep existing ownerUniqueId if you want
             }
 
-            Logger::instance().log("chat", Logger::Level::Info, "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + g.name);
+            Logger::instance().log("chat", Logger::Level::Info,
+                                   "RX GroupCreate id=" + std::to_string(*m.threadId) + " name=" + g.name);
             break;
         }
 
@@ -255,16 +275,20 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
                 return;
             if (*m.tableId != currentTableId_)
                 return;
+
             auto* g = getGroup(*m.threadId);
             if (!g)
             {
-                // late-join: create stub
                 ChatGroupModel stub;
                 stub.id = *m.threadId;
                 stub.name = m.name.value_or("Group");
                 if (m.participants)
                     stub.participants = *m.participants;
-                stub.ownerPeerId = m.fromPeer; // best we can do
+
+                // best-effort owner
+                if (identity_manager)
+                    stub.ownerUniqueId = identity_manager->uniqueForPeer(m.fromPeer).value_or("Player");
+
                 groups_.emplace(stub.id, std::move(stub));
             }
             else
@@ -285,10 +309,13 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
                 return;
             if (*m.threadId == generalGroupId_)
                 return; // never delete General
-            // Honor owner-only delete: if not owner, ignore
+
             if (auto* g = getGroup(*m.threadId))
             {
-                if (g->ownerPeerId == m.fromPeer)
+                // permission: only owner can delete
+                const std::string reqOwner =
+                    identity_manager ? identity_manager->uniqueForPeer(m.fromPeer).value_or("Player") : std::string{};
+                if (!g->ownerUniqueId.empty() && g->ownerUniqueId == reqOwner)
                 {
                     groups_.erase(*m.threadId);
                     if (activeGroupId_ == *m.threadId)
@@ -304,7 +331,33 @@ void ChatManager::applyReady(const msg::ReadyMessage& m)
                 return;
             if (*m.tableId != currentTableId_)
                 return;
-            pushMessageLocal(*m.threadId, m.fromPeer, *m.name, *m.text, (double)*m.ts, /*incoming*/ true);
+
+            // map sender to uniqueId if possible (if ReadyMessage.userPeerId later carries it, use that)
+            std::string senderUid =
+                identity_manager ? identity_manager->uniqueForPeer(m.fromPeer).value_or("Player") : std::string{};
+
+            // inline append to include senderUniqueId
+            ChatMessageModel msg;
+            msg.kind = classifyMessage(*m.text);
+            msg.senderUniqueId = senderUid;
+            msg.username = *m.name;
+            msg.content = *m.text;
+            msg.ts = (double)*m.ts;
+
+            auto* g = getGroup(*m.threadId);
+            if (!g)
+            {
+                ChatGroupModel stub;
+                stub.id = *m.threadId;
+                stub.name = "(pending?)";
+                groups_.emplace(stub.id, std::move(stub));
+                g = getGroup(*m.threadId);
+            }
+            g->messages.push_back(std::move(msg));
+
+            const bool isActive = (activeGroupId_ == *m.threadId);
+            if (!isActive || !chatWindowFocused_ || !followScroll_)
+                g->unread = std::min<uint32_t>(g->unread + 1, 999u);
             break;
         }
 
@@ -323,10 +376,20 @@ void ChatManager::pushMessageLocal(uint64_t groupId,
 {
     ChatMessageModel msg;
     msg.kind = classifyMessage(text);
-    msg.senderId = incoming ? fromPeer : "me";
     msg.username = username;
     msg.content = text;
     msg.ts = ts;
+
+    if (incoming)
+    {
+        // map from transport peer -> stable uniqueId (best effort)
+        msg.senderUniqueId = identity_manager ? identity_manager->uniqueForPeer(fromPeer).value_or("Player") : std::string{};
+    }
+    else
+    {
+        // local user’s unique id
+        msg.senderUniqueId = identity_manager ? identity_manager->myUniqueId() : std::string{};
+    }
 
     auto* g = getGroup(groupId);
     if (!g)
@@ -345,8 +408,8 @@ void ChatManager::pushMessageLocal(uint64_t groupId,
         g->unread = std::min<uint32_t>(g->unread + 1, 999u);
 
     Logger::instance().log("chat", Logger::Level::Info,
-                           "LOCAL append gid=" + std::to_string(groupId) +
-                               " user=" + username + " text=\"" + text + "\"");
+                           "LOCAL append gid=" + std::to_string(groupId) + " user=" + username +
+                               " text=\"" + text + "\"");
 }
 
 // ====== emitters ======
@@ -476,21 +539,41 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
 //}
 
 // ====== username cascade (rename everywhere) ======
-void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
-                                            const std::string& newUsername)
+//void ChatManager::replaceUsernameEverywhere(const std::string& oldUsername,
+//                                            const std::string& newUsername)
+//{
+//    if (oldUsername == newUsername)
+//        return;
+//    for (auto& [id, g] : groups_)
+//    {
+//        for (auto& m : g.messages)
+//        {
+//            if (m.username == oldUsername)
+//                m.username = newUsername;
+//        }
+//    }
+//    Logger::instance().log("chat", Logger::Level::Info,
+//                           "rename chat user old=" + oldUsername + " new=" + newUsername);
+//}
+// ChatManager.cpp
+void ChatManager::replaceUsernameForUnique(const std::string& uniqueId,
+                                           const std::string& newUsername)
 {
-    if (oldUsername == newUsername)
-        return;
-    for (auto& [id, g] : groups_)
+    // update cached labels in message history for this author
+    for (auto& [gid, g] : groups_)
     {
+        // optional: if you show "owner" anywhere:
+        if (g.ownerUniqueId == uniqueId)
+        {
+            // no change to g.name; but if you render "owned by X", use identity_ at draw time.
+        }
+
         for (auto& m : g.messages)
         {
-            if (m.username == oldUsername)
-                m.username = newUsername;
+            if (m.senderUniqueId == uniqueId)
+                m.username = newUsername; // cached label shown in UI
         }
     }
-    Logger::instance().log("chat", Logger::Level::Info,
-                           "rename chat user old=" + oldUsername + " new=" + newUsername);
 }
 
 // ====== UI ======
@@ -690,26 +773,24 @@ void ChatManager::renderLeftPanel(float /*width*/)
     ImGui::SameLine();
     if (ImGui::Button("Delete Group"))
         openDeletePopup_ = true;
-    ImGui::SameLine();
 
+    // Enable edit only when there is a non-General active group
+    bool canEdit = (activeGroupId_ != 0 && activeGroupId_ != generalGroupId_);
+    ImGui::BeginDisabled(!canEdit);
+    if (ImGui::Button("Edit Group"))
     {
-        // Enable edit only when there is a non-General active group
-        bool canEdit = (activeGroupId_ != 0 && activeGroupId_ != generalGroupId_);
-        ImGui::BeginDisabled(!canEdit);
-        if (ImGui::Button("Edit Group"))
+        // seed edit state from the active group
+        if (auto* g = getGroup(activeGroupId_))
         {
-            // seed edit state from the active group
-            if (auto* g = getGroup(activeGroupId_))
-            {
-                editGroupId_ = g->id;
-                editGroupSel_ = g->participants;
-                std::fill(editGroupName_.begin(), editGroupName_.end(), '\0');
-                std::snprintf(editGroupName_.data(), (int)editGroupName_.size(), "%s", g->name.c_str());
-                openEditPopup_ = true;
-            }
+            editGroupId_ = g->id;
+            editGroupSel_ = g->participants;
+            std::fill(editGroupName_.begin(), editGroupName_.end(), '\0');
+            std::snprintf(editGroupName_.data(), (int)editGroupName_.size(), "%s", g->name.c_str());
+            openEditPopup_ = true;
         }
-        ImGui::EndDisabled();
     }
+
+    ImGui::EndDisabled();
 
     ImGui::Separator();
     ImGui::TextUnformatted("Chat Groups");
@@ -951,8 +1032,8 @@ void ChatManager::renderCreateGroupPopup()
             g.name = desired;
             g.id = makeGroupIdFromName(g.name);
             g.participants = newGroupSel_;
-            if (auto nm = network_.lock())
-                g.ownerPeerId = nm->getMyId();
+            if (identity_manager)
+                g.ownerUniqueId = identity_manager->myUniqueId();
 
             groups_.emplace(g.id, g);
             emitGroupCreate(g);
@@ -998,9 +1079,9 @@ void ChatManager::renderEditGroupPopup()
 
         // Optional: only owner can edit (comment out these 6 lines if you want anyone to edit)
         auto nm = network_.lock();
-        const std::string me = nm ? nm->getMyId() : "";
+        const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
         const bool ownerOnly = true;
-        const bool canEdit = !ownerOnly || (!g->ownerPeerId.empty() && g->ownerPeerId == me);
+        const bool canEdit = !ownerOnly || (!g->ownerUniqueId.empty() && g->ownerUniqueId == meUid);
         if (!canEdit)
             ImGui::TextColored(ImVec4(1, 0.5f, 0.3f, 1), "Only the owner can edit this group.");
 
@@ -1100,7 +1181,8 @@ void ChatManager::renderDeleteGroupPopup()
             }
 
             ImGui::PushID((int)id);
-            const bool canDelete = (!g.ownerPeerId.empty() && g.ownerPeerId == me);
+            const std::string meUid = identity_manager ? identity_manager->myUniqueId() : "";
+            const bool canDelete = (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid);
             ImGui::BeginDisabled(!canDelete);
             if (ImGui::Button(g.name.c_str(), ImVec2(220, 0)))
             {

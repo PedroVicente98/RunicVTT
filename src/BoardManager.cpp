@@ -32,8 +32,8 @@
 #include <thread>
 #include <unordered_map>
 
-BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
-    ecs(ecs), camera(), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
+BoardManager::BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<IdentityManager> identity_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
+    ecs(ecs), camera(), identity_manager(identity_manager), currentTool(Tool::MOVE), mouse_start_screen_pos({0, 0}), mouse_start_world_pos({0, 0}), mouse_current_world_pos({0, 0}), marker_directory(marker_directory), map_directory(map_directory), network_manager(network_manager)
 {
 
     std::filesystem::path map_path = std::filesystem::path(map_directory->directoryPath);
@@ -363,7 +363,7 @@ flecs::entity BoardManager::createMarker(const std::string& imageFilePath, GLuin
                                .set(Size{drawSz.x, drawSz.y})
                                .set(texture_marker)
                                .set(Visibility{true})
-                               .set(MarkerComponent{"", false, false})
+                               .set(MarkerComponent{"", "", false, false})
                                .set(Moving{false});
 
     marker.add(flecs::ChildOf, active_board);
@@ -1042,19 +1042,23 @@ flecs::entity BoardManager::getEntityAtMousePosition(glm::vec2 mouse_position)
     return entity_at_mouse;
 }
 
-void BoardManager::replaceOwnerUsernameEverywhere(const std::string& oldUsername,
-                                                  const std::string& newUsername)
+void BoardManager::onUsernameChanged(const std::string& uniqueId, const std::string& newUsername)
 {
-    if (oldUsername == newUsername)
-        return;
-
+    // Update all markers owned by uniqueId: only the DISPLAY name changes.
     ecs.each([&](flecs::entity e, MarkerComponent& mc)
              {
-        // Adjust to your field name if different
-        if (mc.ownerPeerUsername == oldUsername)
-        {
-            mc.ownerPeerUsername = newUsername;
-        } });
+        // you will add/keep ownerUniqueId in MarkerComponent:
+        // struct MarkerComponent {
+        //   std::string ownerUniqueId;      // authoritative owner
+        //   std::string ownerPeerUsername;  // purely visual
+        //   bool allowAllPlayersMove = false;
+        //   bool locked = false;
+        // };
+
+        if (mc.ownerUniqueId == uniqueId)
+            mc.ownerPeerUsername = newUsername; });
+
+    // If you draw any overlays/caches of names, invalidate them here (optional).
 }
 
 //Save and Load Board --------------------------------------------------------------------

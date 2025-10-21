@@ -12,7 +12,7 @@ class NoteEditorUI
 public:
     NoteEditorUI(std::shared_ptr<NotesManager> notes_manager, std::shared_ptr<ImGuiToaster> toaster);
 
-    void render(bool* pOpen = nullptr);
+    void render();
     void openNoteTab(const std::string& uuid);
     void setActiveTable(std::optional<std::string> tableName);
 
@@ -33,6 +33,13 @@ private:
     MarkdownRenderer md_;
     bool visible_ = false;
     float leftWidth_ = 260.f;
+
+    bool showCreatePopup_ = false;
+    bool showDeletePopup_ = false;
+    std::string pendingDeleteUuid_;
+
+    char createTitle_[128] = {0};
+    char createAuthor_[128] = {0};
 
     std::vector<std::string> openTabs_; // UUIDs
     int currentTabIndex_ = -1;
@@ -57,6 +64,7 @@ private:
     void toggleOpenEditor_(const std::string& uuid);
 
     void addTabIfMissing_(const std::string& uuid);
+    void openOrFocusTab(const std::string& uuid);
     void closeTab_(int tabIndex);
     bool filterMatch_(const Note& n) const;
 };
