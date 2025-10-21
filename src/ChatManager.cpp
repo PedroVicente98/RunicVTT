@@ -416,7 +416,7 @@ void ChatManager::pushMessageLocal(uint64_t groupId,
 }
 
 // ====== emitters ======
-void ChatManager::emitGroupCreate(const ChatGroupModel& g)
+/*void ChatManager::emitGroupCreate(const ChatGroupModel& g)
 {
     auto nm = network_.lock();
     if (!nm || !hasCurrent())
@@ -460,6 +460,82 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
     auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
     // nm->broadcastChatJson(j); // 
     nm->sendChatJsonTo(g.participants, j);
+}*/
+void ChatManager::emitGroupCreate(const ChatGroupModel& g)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent()) return;
+
+    auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
+    auto targets = resolvePeerIdsForParticipants(g.participants);
+
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name +
+                           " targets=" + std::to_string(targets.size()));
+
+    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+}
+
+void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent()) return;
+
+    auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
+    auto targets = resolvePeerIdsForParticipants(g.participants);
+
+    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+}
+
+void ChatManager::emitGroupDelete(uint64_t groupId)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent()) return;
+
+    // Find current participants for that group so only they get the delete
+    auto it = groups_.find(groupId);
+    if (it == groups_.end()) return;
+    const auto& parts = it->second.participants;
+
+    auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
+    auto targets = resolvePeerIdsForParticipants(parts);
+
+    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+}
+
+void ChatManager::emitChatMessageFrame(uint64_t groupId,
+                                       const std::string& username,
+                                       const std::string& text,
+                                       uint64_t ts)
+{
+    auto nm = network_.lock();
+    if (!nm || !hasCurrent()) return;
+
+    auto it = groups_.find(groupId);
+    if (it == groups_.end()) return; // unknown group locally
+
+    const auto& parts = it->second.participants;
+    auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
+    auto targets = resolvePeerIdsForParticipants(parts);
+
+    if (!targets.empty()) nm->sendChatJsonTo(targets, j);
+}
+
+// ChatManager.cpp
+std::set<std::string>
+ChatManager::resolvePeerIdsForParticipants(const std::set<std::string>& participantUids) const
+{
+    std::set<std::string> out;
+    auto nm = network_.lock();
+    auto im = identity_.lock();
+    if (!nm || !im) return out;
+
+    for (const auto& uid : participantUids) {
+        if (auto pid = im->peerIdForUnique(uid); pid && !pid->empty()) {
+            out.insert(*pid);
+        }
+    }
+    return out;
 }
 
 //void ChatManager::emitGroupCreate(const ChatGroupModel& g)
