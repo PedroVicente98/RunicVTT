@@ -172,9 +172,7 @@ void SignalingClient::onMessage(const std::string& msg)
         {
             // for each existing authed client -> start offer
             const std::string myId = j.value(std::string(msg::key::ClientId), "");
-            const std::string myUser = j.value(std::string(msg::key::Username), "me");
-
-            nm->setMyIdentity(myId, myUser);
+            nm->setMyPeerId(myId); 
             const std::string gmId = j.value(msg::key::GmId, "");
             if (!gmId.empty())
                 nm->setGMId(gmId);
@@ -199,8 +197,11 @@ void SignalingClient::onMessage(const std::string& msg)
         const std::string sdp = j.value(msg::key::Sdp, "");
         const std::string username = j.value(msg::key::Username, "guest_" + from);
         const std::string uniqueId = j.value(std::string(msg::key::UniqueId), "");
-        if (from.empty() || sdp.empty())
+        if (from.empty() || sdp.empty() || uniqueId.empty()) {
+            Logger::instance().log("net", Logger::Level::Warn,
+                "Signaling missing fields (from/sdp/uniqueId). Dropping.");
             return;
+        }
 
         auto link = nm->ensurePeerLink(from);
         nm->upsertPeerIdentityWithUnique(from, uniqueId, username);
@@ -215,8 +216,11 @@ void SignalingClient::onMessage(const std::string& msg)
         const std::string sdp = j.value(msg::key::Sdp, "");
         const std::string username = j.value(msg::key::Username, "guest_" + from);
         const std::string uniqueId = j.value(std::string(msg::key::UniqueId), "");
-        if (from.empty() || sdp.empty())
+        if (from.empty() || sdp.empty() || uniqueId.empty()) {
+            Logger::instance().log("net", Logger::Level::Warn,
+                "Signaling missing fields (from/sdp/uniqueId). Dropping.");
             return;
+        }
 
         auto link = nm->ensurePeerLink(from);
         nm->upsertPeerIdentityWithUnique(from, uniqueId, username);
