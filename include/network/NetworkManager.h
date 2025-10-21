@@ -137,18 +137,21 @@ public:
     void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
 
-    std::string getMyUsername() const
-    {
-        return myUsername_;
-    };
+    //void setMyIdentity(std::string myId, std::string username);
+   // void upsertPeerIdentity(const std::string& id, const std::string& username);
 
-    std::string getMyId() const
-    {
-        return myClientId_;
-    };
-    void setMyIdentity(std::string myId, std::string username);
-    void upsertPeerIdentity(const std::string& id, const std::string& username);
     std::string displayNameFor(const std::string& id) const;
+
+    std::string getMyUsername() const { 
+        return identity_manager ? identity_manager->myUsername() : std::string{};
+    }
+    std::string getMyUniqueId() const { 
+        return identity_manager ? identity_manager->myUniqueId() : std::string{};
+    }
+
+    const std::string& getMyPeerId() const { return myPeerId_; }
+    void setMyPeerId(std::string v) { myPeerId_ = std::move(v); }
+
 
     const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const
     {
@@ -284,16 +287,6 @@ public:
     bool sendChatJsonTo(const std::string& peerId, const msg::Json& j);
     bool sendChatJsonTo(const std::set<std::string>& peers, const msg::Json& j);
 
-    std::string getMyUniqueId() const
-    {
-        if (identity_manager)
-        {
-            if (auto u = identity_manager->myUniqueId(); !u.empty())
-                return u;
-        }
-        return std::string{}; // empty if unknown
-    }
-
 private:
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
@@ -332,7 +325,6 @@ private:
     void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
     //END MARKER STUFF----------------------------------------------------------------------------
 
-    std::string gmPeerId_;
     std::unordered_map<uint64_t, PendingImage> imagesRx_;
     MessageQueue<msg::ReadyMessage> inboundGame_;
     // optional background raw-drain worker
@@ -378,11 +370,9 @@ private:
     void createOfferAndSend_(const std::string& peerId, const std::shared_ptr<PeerLink>& link);
     void createChannelsIfOfferer_(const std::shared_ptr<PeerLink>& link);*/
 
-    std::string myClientId_;
-    std::string myUsername_;
-    std::unordered_map<std::string, std::string> peerUsernames_;
-    std::unordered_map<std::string, std::string> clientUsernames_;
-
+    std::string myPeerId_;
+    std::string gmPeerId_;
+    
     flecs::world ecs;
     unsigned int port = 8080;
     char network_password[124] = "\0";
