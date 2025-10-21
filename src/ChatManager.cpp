@@ -10,6 +10,7 @@
 #include <random>
 #include <cstdint>
 #include <unordered_map>
+#include "PathManager.h"
 
 // ====== small utils ======
 double ChatManager::nowSec()
@@ -76,7 +77,9 @@ void ChatManager::ensureGeneral()
 // ====== storage ======
 std::filesystem::path ChatManager::chatFilePathFor(uint64_t tableId, const std::string& name) const
 {
-    return std::filesystem::path(name + "_" + std::to_string(tableId) + "_chatgroups.runic");
+    auto gametables_folder = PathManager::getGameTablesPath();
+    auto gametable_name_folder = gametables_folder / name;
+    return gametable_name_folder / std::filesystem::path(name + "_" + std::to_string(tableId) + "_chatgroups.runic");
 }
 
 bool ChatManager::saveLog(std::vector<uint8_t>& buf) const
