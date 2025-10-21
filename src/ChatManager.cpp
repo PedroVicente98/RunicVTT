@@ -425,7 +425,8 @@ void ChatManager::emitGroupCreate(const ChatGroupModel& g)
     auto j = msg::makeChatGroupCreate(currentTableId_, g.id, g.name, g.participants);
     Logger::instance().log("chat", Logger::Level::Info,
                            "SEND ChatGroupCreate id=" + std::to_string(g.id) + " name=" + g.name);
-    nm->broadcastChatJson(j); // broadcast groups list to everyone
+   // nm->broadcastChatJson(j); // broadcast groups list to everyone
+    nm->sendChatJsonTo(g.participants, j);
 }
 
 void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
@@ -435,7 +436,8 @@ void ChatManager::emitGroupUpdate(const ChatGroupModel& g)
         return;
 
     auto j = msg::makeChatGroupUpdate(currentTableId_, g.id, g.name, g.participants);
-    nm->broadcastChatJson(j); // or nm->sendChatJsonTo(g.participants, j) if you want scoped visibility
+   // nm->broadcastChatJson(j); // 
+    nm->sendChatJsonTo(g.participants, j);
 }
 
 void ChatManager::emitGroupDelete(uint64_t groupId)
@@ -446,6 +448,7 @@ void ChatManager::emitGroupDelete(uint64_t groupId)
 
     auto j = msg::makeChatGroupDelete(currentTableId_, groupId);
     nm->broadcastChatJson(j);
+    nm->sendChatJsonTo(g.participants, j);
 }
 
 void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& username, const std::string& text, uint64_t ts)
@@ -455,7 +458,8 @@ void ChatManager::emitChatMessageFrame(uint64_t groupId, const std::string& user
         return;
 
     auto j = msg::makeChatMessage(currentTableId_, groupId, ts, username, text);
-    nm->broadcastChatJson(j); // simple: broadcast; groups render ignores unknown groups
+    // nm->broadcastChatJson(j); // 
+    nm->sendChatJsonTo(g.participants, j);
 }
 
 //void ChatManager::emitGroupCreate(const ChatGroupModel& g)
