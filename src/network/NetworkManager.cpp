@@ -565,26 +565,28 @@ std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peer
     return link;
 }
 
-void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc)
-{
+// NetworkManager.cpp (relevant part)
+
+void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc) {
     nlohmann::json j;
     const std::string sdp = std::string(desc);
-    const std::string myUid = getMyUniqueId();
-    if (desc.type() == rtc::Description::Type::Offer)
-    {
-        j = msg::makeOffer("", peerId, sdp, myUsername_, myUid);
-    }
-    else if (desc.type() == rtc::Description::Type::Answer)
-    {
-        j = msg::makeAnswer("", peerId, sdp, myUsername_, myUid);
-    }
-    else
-    {
+
+    // Always pull identity from IdentityManager
+    const std::string username = getMyUsername();   // forwards to IdentityManager
+    const std::string uniqueId = getMyUniqueId();   // forwards to IdentityManager
+
+    if (desc.type() == rtc::Description::Type::Offer) {
+        // server will overwrite "from", so "" is fine
+        j = msg::makeOffer(/*from*/"", /*to*/peerId, sdp, username, uniqueId);
+    } else if (desc.type() == rtc::Description::Type::Answer) {
+        j = msg::makeAnswer(/*from*/"", /*to*/peerId, sdp, username, uniqueId);
+    } else {
         return;
     }
-    if (signalingClient)
-        signalingClient->send(j.dump());
+
+    if (signalingClient) signalingClient->send(j.dump());
 }
+
 
 void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand)
 {
@@ -594,32 +596,7 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 }
 
 //NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
-void NetworkManager::setMyIdentity(std::string peerId, std::string username)
-{
-    if (peerId.empty())
-    {
-        myUsername_ = std::move(username);
-    }
-    else
-    {
-        clientUsernames_[peerId] = username;
-        myUsername_ = std::move(username);
-        myClientId_ = std::move(peerId);
-    }
-}
 
-void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string& username)
-{
-    peerUsernames_[id] = username;
-
-    if (identity_manager)
-    {
-        identity_manager->bindPeer(/*peerId=*/id, /*uniqueId=*/"", /*username=*/username);
-    }
-
-    if (auto it = peers.find(id); it != peers.end() && it->second)
-        it->second->setDisplayName(username);
-}
 
 void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
                                                   const std::string& uniqueId,
