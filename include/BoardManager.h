@@ -13,7 +13,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "flecs.h"
-
+#include "IdentityManager.h"
 #include "Components.h"
 #include "DirectoryWindow.h"
 
@@ -168,7 +168,7 @@ enum class Tool
 class BoardManager : std::enable_shared_from_this<BoardManager>
 {
 public:
-    BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
+    BoardManager(flecs::world ecs, std::weak_ptr<NetworkManager> network_manager, std::shared_ptr<IdentityManager> identity_manager, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory);
     ~BoardManager();
 
     void renderBoard(VertexArray& va, IndexBuffer& ib, Shader& shader, Shader& grid_shader, Renderer& renderer); // Render board elements (map, markers, fog)
@@ -268,6 +268,10 @@ public:
     void killIfMouseUp(bool isMouseDown);
     void resnapAllMarkersToNearest(const Grid& grid);
 
+    //void replaceOwnerUsernameEverywhere(const std::string& oldUsername,
+    //                                    const std::string& newUsername);
+    void onUsernameChanged(const std::string& uniqueId, const std::string& newUsername);
+
 private:
     bool is_non_map_window_hovered = false;
     bool is_camera_hovered = false;
@@ -280,6 +284,7 @@ private:
     float markerBasePx = 50.0f;
     flecs::entity edit_window_entity = flecs::entity();
     std::weak_ptr<NetworkManager> network_manager;
+    std::shared_ptr<IdentityManager> identity_manager;
     //glm::vec2 mouseStartPos;
 
     glm::vec2 mouse_start_screen_pos;

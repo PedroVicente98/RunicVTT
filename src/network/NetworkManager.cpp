@@ -9,9 +9,10 @@
 #include "Serializer.h"
 #include "DebugConsole.h"
 #include "Logger.h"
+#include <unordered_set>
 
-NetworkManager::NetworkManager(flecs::world ecs) :
-    ecs(ecs), peer_role(Role::NONE)
+NetworkManager::NetworkManager(flecs::world ecs, std::shared_ptr<IdentityManager> identity_manager) :
+    ecs(ecs), identity_manager(identity_manager), peer_role(Role::NONE)
 {
     getLocalIPAddress();
     getExternalIPAddress();
@@ -95,11 +96,12 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
                     if (!UPnPManager::addPortMapping(localIp, port, port, "TCP", "RunicVTT"))
                     {
                         bool open = true;
-                        ShowPortForwardingHelpPopup(&open);
+                        pushStatusToast("Signalling Server UPnP Failled - Check Moldem configuration!!", ImGuiToaster::Level::Error, 4);
                     }
                 }
                 catch (...)
                 {
+                    pushStatusToast("Signalling Server UPnP Failled - Check Moldem configuration!!", ImGuiToaster::Level::Error, 4);
                 }
             }
             signalingClient->connect("127.0.0.1", port);
@@ -563,23 +565,31 @@ std::shared_ptr<PeerLink> NetworkManager::ensurePeerLink(const std::string& peer
     return link;
 }
 
+// NetworkManager.cpp (relevant part)
+
 void NetworkManager::onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc)
 {
-    // Build signaling message and send via SignalingClient
     nlohmann::json j;
     const std::string sdp = std::string(desc);
+
+    // Always pull identity from IdentityManager
+    const std::string username = getMyUsername(); // forwards to IdentityManager
+    const std::string uniqueId = getMyUniqueId(); // forwards to IdentityManager
+
     if (desc.type() == rtc::Description::Type::Offer)
     {
-        j = msg::makeOffer("", peerId, sdp, myUsername_);
+        // server will overwrite "from", so "" is fine
+        j = msg::makeOffer(/*from*/ "", /*to*/ peerId, sdp, username, uniqueId);
     }
     else if (desc.type() == rtc::Description::Type::Answer)
     {
-        j = msg::makeAnswer("", peerId, sdp, myUsername_);
+        j = msg::makeAnswer(/*from*/ "", /*to*/ peerId, sdp, username, uniqueId);
     }
     else
     {
         return;
     }
+
     if (signalingClient)
         signalingClient->send(j.dump());
 }
@@ -592,37 +602,25 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 }
 
 //NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
-void NetworkManager::setMyIdentity(std::string myId, std::string username)
-{
-    if (myId.empty())
-    {
-        myUsername_ = std::move(username);
-    }
-    else
-    {
-        clientUsernames_[myId] = username;
-        myUsername_ = std::move(username);
-        myClientId_ = std::move(myId);
-    }
-}
 
-void NetworkManager::upsertPeerIdentity(const std::string& id, const std::string& username)
+void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
+                                                  const std::string& uniqueId,
+                                                  const std::string& username)
 {
-    peerUsernames_[id] = username;
-    // If PeerLink already exists, update its display name for logs/UI:
-    if (auto it = peers.find(id); it != peers.end() && it->second)
-    {
+    identity_manager->bindPeer(/*peerId=*/peerId,
+                               /*uniqueId=*/uniqueId,
+                               /*username=*/username);
+
+    if (auto it = peers.find(peerId); it != peers.end() && it->second)
         it->second->setDisplayName(username);
-    }
 }
 
-std::string NetworkManager::displayNameFor(const std::string& id) const
+std::string NetworkManager::displayNameForPeer(const std::string& peerId) const
 {
-    if (auto it = peerUsernames_.find(id); it != peerUsernames_.end())
-        return it->second;
-    if (auto it = clientUsernames_.find(id); it != clientUsernames_.end())
-        return it->second;
-    return id; // fallback to raw id
+    if (!identity_manager)
+        return peerId;
+    auto u = identity_manager->usernameForPeer(peerId);
+    return u.value_or(peerId);
 }
 
 bool NetworkManager::disconectFromPeers()
@@ -735,36 +733,18 @@ std::vector<std::string> NetworkManager::getConnectedPeerIds() const
     return ids;
 }
 
-//-SEND AND BROADCAST CHAT FRAME-------------------------------------------------------------------------------------------------------
-void NetworkManager::broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload)
+std::vector<std::string> NetworkManager::getConnectedUsernames() const
 {
-    //{check}--PLUG THIS METHOD AND ADAPT TO CHATMANAGER
+    std::vector<std::string> user_names;
+    user_names.reserve(peers.size());
     for (auto& [pid, link] : peers)
     {
-        if (!link)
-            continue;
-        // build final buffer [u8 type][u32 size][bytes...] or your framing
-        std::vector<uint8_t> frame;
-        frame.push_back((uint8_t)t);
-        Serializer::serializeInt(frame, (int)payload.size());
-        frame.insert(frame.end(), payload.begin(), payload.end());
-        link->sendOn(msg::dc::name::Chat, frame); // PeerLink::send(vector<uint8_t>) must exist
+        if (link && link->isConnected())
+        {
+            user_names.push_back(displayNameForPeer(pid));
+        }
     }
-}
-
-void NetworkManager::sendChatThreadFrameTo(const std::set<std::string>& peers_, msg::DCType t, const std::vector<uint8_t>& payload)
-{ //{check} --PLUG THIS METHOD AND ADAPT TO CHATMANAGER
-    for (auto& pid : peers_)
-    {
-        auto it = peers.find(pid);
-        if (it == peers.end() || !it->second)
-            continue;
-        std::vector<uint8_t> frame;
-        frame.push_back((uint8_t)t);
-        Serializer::serializeInt(frame, (int)payload.size());
-        frame.insert(frame.end(), payload.begin(), payload.end());
-        it->second->sendOn(msg::dc::name::Chat, frame);
-    }
+    return user_names;
 }
 
 // ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
@@ -828,6 +808,88 @@ void NetworkManager::broadcastFogDelete(uint64_t boardId, const flecs::entity& f
     auto ids = getConnectedPeerIds();
     if (!ids.empty())
         sendFogDelete(boardId, fog, ids);
+}
+
+// NetworkManager.cpp
+
+void NetworkManager::buildUserNameUpdate(std::vector<uint8_t>& out,
+                                         uint64_t tableId,
+                                         const std::string& userUniqueId,
+                                         const std::string& oldUsername,
+                                         const std::string& newUsername,
+                                         bool reboundFlag) const
+{
+    out.clear();
+    Serializer::serializeUInt64(out, tableId);
+    Serializer::serializeString(out, userUniqueId); // <— uniqueId
+    Serializer::serializeString(out, oldUsername);
+    Serializer::serializeString(out, newUsername);
+    Serializer::serializeUInt8(out, reboundFlag ? 1 : 0);
+}
+
+void NetworkManager::broadcastUserNameUpdate(const std::vector<uint8_t>& payload)
+{
+    for (auto& [pid, link] : peers)
+    {
+        if (!link)
+            continue;
+        sendUserNameUpdateTo(pid, payload);
+    }
+}
+
+void NetworkManager::sendUserNameUpdateTo(const std::string& peerId,
+                                          const std::vector<uint8_t>& payload)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end() || !it->second)
+        return;
+
+    std::vector<uint8_t> frame;
+    frame.reserve(1 + payload.size());
+    frame.push_back((uint8_t)msg::DCType::UserNameUpdate);
+    frame.insert(frame.end(), payload.begin(), payload.end());
+
+    it->second->sendOn(msg::dc::name::Game, frame);
+}
+
+// NetworkManager.cpp
+bool NetworkManager::broadcastChatJson(const msg::Json& j)
+{
+    const std::string text = j.dump(); // UTF-8 JSON
+    bool any = false;
+    for (auto& [pid, link] : peers)
+    {
+        if (link->sendOn(msg::dc::name::Chat, std::string_view(text)))
+            any = true;
+    }
+    return any;
+}
+bool NetworkManager::sendChatJsonTo(const std::string& peerId, const msg::Json& j)
+{
+    auto it = peers.find(peerId);
+    if (it == peers.end() || !it->second)
+        return false;
+    auto& link = it->second;
+    if (!link->isConnected())
+        return false;
+    return link->sendOn(msg::dc::name::Chat, std::string_view(j.dump()));
+}
+bool NetworkManager::sendChatJsonTo(const std::set<std::string>& targets, const msg::Json& j)
+{
+    const std::string text = j.dump();
+    bool any = false;
+    for (auto& pid : targets)
+    {
+        auto it = peers.find(pid);
+        if (it == peers.end() || !it->second)
+            continue;
+        auto& link = it->second;
+        if (!link->isConnected())
+            continue;
+        if (link->sendOn(msg::dc::name::Chat, std::string_view(text)))
+            any = true;
+    }
+    return any;
 }
 
 void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std::vector<uint8_t>& b)
@@ -910,6 +972,11 @@ void NetworkManager::decodeRawGameBuffer(const std::string& fromPeer, const std:
                 Logger::instance().log("localtunnel", Logger::Level::Info, "GridUpdate Handled!!");
                 break;
 
+            case msg::DCType::UserNameUpdate:
+            {
+                handleUserNameUpdate(b, off);
+                break;
+            }
             default:
                 Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
                 break;
@@ -961,7 +1028,7 @@ void NetworkManager::handleMarkerMove(const std::vector<uint8_t>& raw, size_t& o
     m.pos = p;
     m.mov = Moving{true};
 
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
 
     inboundGame_.push(std::move(m));
 }
@@ -978,7 +1045,7 @@ void NetworkManager::handleMarkerUpdate(const std::vector<uint8_t>& b, size_t& o
     m.vis = Serializer::deserializeVisibility(b, off);
     m.markerComp = Serializer::deserializeMarkerComponent(b, off);
 
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
     inboundGame_.push(std::move(m));
 }
 void NetworkManager::handleMarkerMoveState(const std::vector<uint8_t>& raw, size_t& off)
@@ -1007,7 +1074,7 @@ void NetworkManager::handleMarkerMoveState(const std::vector<uint8_t>& raw, size
         Position p = Serializer::deserializePosition(b, off);
         m.pos = p;
     }
-    m.fromPeer = decodingFromPeer_;
+    m.fromPeerId = decodingFromPeer_;
     inboundGame_.push(std::move(m));
 }
 
@@ -1159,7 +1226,7 @@ bool NetworkManager::amIDragging(uint64_t markerId) const
     if (it == drag_.end())
         return false;
     const auto& s = it->second;
-    return !s.closed && s.ownerPeerId == getMyId();
+    return !s.closed && s.ownerPeerId == getMyPeerId();
 }
 
 // markDraggingLocal — called by BoardManager on start/end
@@ -1171,7 +1238,7 @@ void NetworkManager::markDraggingLocal(uint64_t markerId, bool dragging)
         s.locallyDragging = true;
         s.locallyProposedEpoch = (s.closed ? (s.epoch + 1) : s.epoch);
         s.localSeq = 0;
-        s.ownerPeerId = getMyId();
+        s.ownerPeerId = getMyPeerId();
         s.epochOpenedMs = nowMs();
         s.closed = false;
         if (s.locallyProposedEpoch > s.epoch)
@@ -1224,17 +1291,17 @@ bool NetworkManager::shouldApplyMarkerMove(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1243,7 +1310,7 @@ bool NetworkManager::shouldApplyMarkerMove(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer; // first owner for this epoch
+            s.ownerPeerId = m.fromPeerId; // first owner for this epoch
         }
     }
 
@@ -1273,17 +1340,17 @@ bool NetworkManager::shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1292,7 +1359,7 @@ bool NetworkManager::shouldApplyMarkerMoveStateStart(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
         }
     }
 
@@ -1317,17 +1384,17 @@ bool NetworkManager::shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m)
         s.epoch = *m.dragEpoch;
         s.closed = false;
         s.lastSeq = 0;
-        s.ownerPeerId = m.fromPeer;
+        s.ownerPeerId = m.fromPeerId;
     }
     else
     {
         if (s.closed)
             return false;
-        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeer)
+        if (!s.ownerPeerId.empty() && s.ownerPeerId != m.fromPeerId)
         {
-            if (!tieBreakWins(m.fromPeer, s.ownerPeerId))
+            if (!tieBreakWins(m.fromPeerId, s.ownerPeerId))
                 return false;
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
             if (s.locallyDragging)
             {
                 s.locallyDragging = false;
@@ -1336,7 +1403,7 @@ bool NetworkManager::shouldApplyMarkerMoveStateFinal(const msg::ReadyMessage& m)
         }
         else
         {
-            s.ownerPeerId = m.fromPeer;
+            s.ownerPeerId = m.fromPeerId;
         }
         if (m.seq && *m.seq < s.lastSeq)
             return false;
@@ -1420,18 +1487,22 @@ void NetworkManager::sendBoard(const flecs::entity& board, const std::vector<std
     uint64_t bid = board.get<Identifier>()->id;
     sendImageChunks(msg::ImageOwnerKind::Board, bid, img, toPeerIds);
 
-    //uint64_t off = 0;
-    //while (off < img.size())
-    //{
-    //    size_t chunk = std::min<size_t>(kChunk, img.size() - off);
-    //    auto frame = buildImageChunkFrame(/*ownerKind=*/0, bid, off, img.data() + off, chunk);
-    //    broadcastGameFrame(frame, toPeerIds);
-    //    off += chunk;
-    //}
-
     // 3) commit
     auto commit = buildCommitBoardFrame(bid);
     broadcastGameFrame(commit, toPeerIds);
+
+    board.children([&](flecs::entity child)
+                   {
+			if (child.has<MarkerComponent>()) {
+                uint64_t bid = board.get<Identifier>()->id;
+                sendMarker(bid, child, toPeerIds);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentMarker");
+			}
+			else if (child.has<FogOfWar>()) {
+                uint64_t bid = board.get<Identifier>()->id;
+                sendFog(bid, child, toPeerIds);
+                Logger::instance().log("localtunnel", Logger::Level::Info, "SentFog");
+			} });
 }
 
 void NetworkManager::sendMarker(uint64_t boardId, const flecs::entity& marker, const std::vector<std::string>& toPeerIds)
@@ -1698,89 +1769,6 @@ void NetworkManager::handleFogCreate(const std::vector<uint8_t>& b, size_t& off)
     inboundGame_.push(std::move(m));
 }
 
-// DCType::Image
-//void NetworkManager::handleImageChunk(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    auto kind = static_cast<msg::ImageOwnerKind>(b[off]);
-//    off += 1;
-//    uint64_t id = Serializer::deserializeUInt64(b, off);
-//    uint64_t off64 = Serializer::deserializeUInt64(b, off);
-//    int len = Serializer::deserializeInt(b, off);
-//
-//    Logger::instance().log("localtunnel", Logger::Level::Info, std::string("Image Chunk Kind: ") + (kind == msg::ImageOwnerKind::Board ? "Board" : "Marker"));
-//    Logger::instance().log("localtunnel", Logger::Level::Info, "Image Chunk ID: " + std::to_string(id));
-//
-//    auto it = imagesRx_.find(id);
-//    if (it == imagesRx_.end())
-//        return; // unknown; drop
-//    auto& p = it->second;
-//    Logger::instance().log("localtunnel", Logger::Level::Info, "imagesRx_ Found");
-//    if (p.kind != kind || p.total == 0)
-//        return;
-//    // bounds check
-//    if (off64 + static_cast<uint64_t>(len) > p.total)
-//        return;
-//
-//    std::memcpy(p.buf.data() + off64, b.data() + off, static_cast<size_t>(len));
-//    off += static_cast<size_t>(len);
-//    p.received += static_cast<uint64_t>(len);
-//}
-
-// DCType::CommitBoard
-//void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
-//    auto it = imagesRx_.find(boardId);
-//    if (it == imagesRx_.end())
-//        return;
-//    auto& p = it->second;
-//    if (p.kind != msg::ImageOwnerKind::Board)
-//        return;
-//
-//    if (p.total == 0 || p.isComplete())
-//    {
-//        if (p.boardMeta)
-//        {
-//            msg::ReadyMessage m;
-//            m.kind = msg::DCType::CommitBoard;
-//            m.boardId = boardId;
-//            m.boardMeta = *p.boardMeta;
-//            m.bytes = std::move(p.buf); // image (may be empty)
-//            inboundGame_.push(std::move(m));
-//        }
-//        imagesRx_.erase(it);
-//    }
-//}
-
-// DCType::CommitMarker
-//void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& off)
-//{
-//    uint64_t boardId = Serializer::deserializeUInt64(b, off);
-//    uint64_t markerId = Serializer::deserializeUInt64(b, off);
-//
-//    auto it = imagesRx_.find(markerId);
-//    if (it == imagesRx_.end())
-//        return;
-//
-//    auto& p = it->second;
-//    if (p.kind != msg::ImageOwnerKind::Marker || p.boardId != boardId)
-//        return;
-//
-//    // marker image may be optional (total==0)
-//    if (p.total == 0 || p.isComplete())
-//    {
-//        if (p.markerMeta)
-//        {
-//            msg::ReadyMessage m;
-//            m.kind = msg::DCType::CommitMarker;
-//            m.boardId = boardId;
-//            m.markerMeta = *p.markerMeta;
-//            m.bytes = std::move(p.buf); // image (may be empty)
-//            inboundGame_.push(std::move(m));
-//        }
-//        imagesRx_.erase(it);
-//    }
-//}
 void NetworkManager::handleCommitBoard(const std::vector<uint8_t>& b, size_t& off)
 {
     uint64_t boardId = Serializer::deserializeUInt64(b, off);
@@ -1891,6 +1879,32 @@ void NetworkManager::handleCommitMarker(const std::vector<uint8_t>& b, size_t& o
     tryFinalizeImage(msg::ImageOwnerKind::Marker, markerId);
 }
 
+void NetworkManager::handleUserNameUpdate(const std::vector<uint8_t>& b, size_t& off)
+{
+    msg::ReadyMessage r;
+    r.kind = msg::DCType::UserNameUpdate;
+    r.fromPeerId = decodingFromPeer_;
+    r.tableId = Serializer::deserializeUInt64(b, off);
+
+    // This is UNIQUE ID now:
+    const std::string uniqueId = Serializer::deserializeString(b, off);
+    const std::string oldU = Serializer::deserializeString(b, off);
+    const std::string newU = Serializer::deserializeString(b, off);
+    const uint8_t rebound = Serializer::deserializeUInt8(b, off);
+
+    // Keep old ReadyMessage fields for upstream handlers (uses userPeerId/name/text in your codebase):
+    r.userUniqueId = uniqueId; // NOTE: field name is legacy; carries uniqueId now.
+    r.text = oldU;
+    r.name = newU;
+    r.rebound = rebound;
+
+    Logger::instance().log("chat", Logger::Level::Info,
+                           "UserNameUpdate: tbl=" + std::to_string(r.tableId.value_or(0)) +
+                               " uid=" + uniqueId + " old=" + oldU + " new=" + newU);
+
+    inboundGame_.push(std::move(r));
+}
+
 void NetworkManager::handleMarkerDelete(const std::vector<uint8_t>& b, size_t& off)
 {
     msg::ReadyMessage m;
@@ -1987,6 +2001,7 @@ void NetworkManager::drainEvents()
         }
     }
 }
+
 void NetworkManager::drainInboundRaw(int maxPerTick)
 {
     using clock = std::chrono::steady_clock;
@@ -2011,7 +2026,6 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
             }
             else if (r.label == msg::dc::name::MarkerMove)
             {
-                Logger::instance().log("localtunnel", Logger::Level::Info, "Received MarkerMOVE ON DRAIN INBOUND!");
                 decodeRawMarkerMoveBuffer(r.fromPeer, r.bytes); // coalesce into moveLatest_
             }
         }
@@ -2057,93 +2071,162 @@ void NetworkManager::drainInboundRaw(int maxPerTick)
 //}
 
 // NetworkManager.cpp
+//void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
+//                                         const std::vector<uint8_t>& b)
+//{
+//    size_t off = 0;
+//    while (off < b.size())
+//    {
+//        if (!ensureRemaining(b, off, 1))
+//            break;
+//        auto type = static_cast<msg::DCType>(b[off]);
+//        off += 1;
+//        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!! onChat");
+//        switch (type)
+//        {
+//            case msg::DCType::ChatGroupCreate:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
+//                r.name = Serializer::deserializeString(b, off);     // group name (unique)
+//                {
+//                    const int pc = Serializer::deserializeInt(b, off);
+//                    std::set<std::string> parts;
+//                    for (int i = 0; i < pc; ++i)
+//                        parts.insert(Serializer::deserializeString(b, off));
+//                    r.participants = std::move(parts);
+//                }
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatGroupUpdate:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off);
+//                r.name = Serializer::deserializeString(b, off);
+//                {
+//                    const int pc = Serializer::deserializeInt(b, off);
+//                    std::set<std::string> parts;
+//                    for (int i = 0; i < pc; ++i)
+//                        parts.insert(Serializer::deserializeString(b, off));
+//                    r.participants = std::move(parts);
+//                }
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatGroupDelete:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off);
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            case msg::DCType::ChatMessage:
+//            {
+//                msg::ReadyMessage r;
+//                r.kind = type;
+//                r.fromPeer = fromPeer;
+//                r.tableId = Serializer::deserializeUInt64(b, off);
+//                r.threadId = Serializer::deserializeUInt64(b, off); // groupId
+//                r.ts = Serializer::deserializeUInt64(b, off);
+//                r.name = Serializer::deserializeString(b, off); // username
+//                r.text = Serializer::deserializeString(b, off); // body
+//                inboundGame_.push(std::move(r));
+//                break;
+//            }
+//
+//            default:
+//                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onChat");
+//                return; // stop this buffer if unknown/out-of-sync
+//        }
+//    }
+//}
+
 void NetworkManager::decodeRawChatBuffer(const std::string& fromPeer,
                                          const std::vector<uint8_t>& b)
 {
-    size_t off = 0;
-    while (off < b.size())
+    // ---- JSON branch ----
+    auto first_non_ws = std::find_if(b.begin(), b.end(), [](uint8_t c)
+                                     { return !std::isspace((unsigned char)c); });
+    if (first_non_ws != b.end() && *first_non_ws == '{')
     {
-        if (!ensureRemaining(b, off, 1))
-            break;
-        auto type = static_cast<msg::DCType>(b[off]);
-        off += 1;
-        Logger::instance().log("localtunnel", Logger::Level::Info, msg::DCtypeString(type) + " Received!!");
-        switch (type)
+        try
         {
-            case msg::DCType::ChatThreadCreate:
+            std::string s(b.begin(), b.end()); // UTF-8
+            msg::Json j = msg::Json::parse(s);
+
+            msg::ReadyMessage r;
+            r.fromPeerId = fromPeer;
+
+            // type
+            msg::DCType t;
+            if (!msg::DCTypeFromJson(msg::getString(j, "type"), t))
             {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // displayName
+                Logger::instance().log("chat", Logger::Level::Warn, "JSON chat: unknown type");
+                return;
+            }
+            r.kind = t;
+
+            // common fields
+            if (j.contains("tableId"))
+                r.tableId = (uint64_t)j["tableId"].get<uint64_t>();
+            if (j.contains("groupId"))
+                r.threadId = (uint64_t)j["groupId"].get<uint64_t>();
+
+            switch (t)
+            {
+                case msg::DCType::ChatGroupCreate:
+                case msg::DCType::ChatGroupUpdate:
                 {
-                    const int pc = Serializer::deserializeInt(b, off);
-                    std::set<std::string> parts;
-                    for (int i = 0; i < pc; ++i)
-                        parts.insert(Serializer::deserializeString(b, off));
-                    r.participants = std::move(parts);
+                    if (j.contains("name"))
+                        r.name = j["name"].get<std::string>();
+                    if (j.contains("participants") && j["participants"].is_array())
+                    {
+                        std::set<std::string> parts;
+                        for (auto& e : j["participants"])
+                            parts.insert(e.get<std::string>());
+                        r.participants = std::move(parts);
+                    }
+                    break;
                 }
-                inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadCreate Handled!!");
-                break;
-            }
-
-            case msg::DCType::ChatThreadUpdate:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // displayName
+                case msg::DCType::ChatGroupDelete:
                 {
-                    const int pc = Serializer::deserializeInt(b, off);
-                    std::set<std::string> parts;
-                    for (int i = 0; i < pc; ++i)
-                        parts.insert(Serializer::deserializeString(b, off));
-                    r.participants = std::move(parts);
+                    // nothing extra
+                    break;
                 }
-                inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadUpdate Handled!!");
-                break;
+                case msg::DCType::ChatMessage:
+                {
+                    if (j.contains("ts"))
+                        r.ts = (uint64_t)j["ts"].get<uint64_t>();
+                    if (j.contains("username"))
+                        r.name = j["username"].get<std::string>();
+                    if (j.contains("text"))
+                        r.text = j["text"].get<std::string>();
+                    break;
+                }
+                default:
+                    return; // ignore non-chat types here
             }
 
-            case msg::DCType::ChatThreadDelete:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatThreadDelete Handled!!");
-                break;
-            }
-
-            case msg::DCType::ChatMessage:
-            {
-                msg::ReadyMessage r;
-                r.kind = type;
-                r.fromPeer = fromPeer;
-                const uint64_t tableId = Serializer::deserializeUInt64(b, off);
-                r.tableId = tableId;
-                r.threadId = Serializer::deserializeUInt64(b, off);
-                r.ts = Serializer::deserializeUInt64(b, off);
-                r.name = Serializer::deserializeString(b, off); // username
-                r.text = Serializer::deserializeString(b, off); // message text
-                inboundGame_.push(std::move(r));
-                Logger::instance().log("localtunnel", Logger::Level::Info, "ChatMessage Handled!!");
-                break;
-            }
-
-            default:
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
-                return; // stop this buffer if unknown/out-of-sync
+            inboundGame_.push(std::move(r));
+            return; // handled JSON
+        }
+        catch (const std::exception& e)
+        {
+            Logger::instance().log("chat", Logger::Level::Warn, std::string("JSON parse error: ") + e.what());
+            // fall through to legacy-binary branch if you still support it
         }
     }
 }
@@ -2178,7 +2261,7 @@ void NetworkManager::decodeRawNotesBuffer(const std::string& fromPeer, const std
                 break;
             default:
                 // unknown / out-of-sync: stop this buffer
-                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!!");
+                Logger::instance().log("localtunnel", Logger::Level::Warn, "Unkown Message Type not Handled!! onNotes");
                 return;
         }
     }
@@ -2492,237 +2575,3 @@ void NetworkManager::broadcastGameFrame(const std::vector<unsigned char>& frame,
         sendGameTo(pid, frame);
     }
 }
-
-// ---------- (DEPRECATED) send primitives (DONT FIT CURRENT IMPLEMENTATION) ----------
-//-{check}wrong logic below
-
-//bool NetworkManager::sendMarkerCreate(const std::string& to, uint64_t markerId, const std::vector<uint8_t>& img, const std::string& name)
-//{ //{check}-wrong logic
-//    if (img.empty())
-//        return false;
-//
-//    // BEGIN: DCType::CreateEntity
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::MarkerCreate));
-//        Serializer::serializeUInt64(b, markerId);
-//        Serializer::serializeString(b, name);
-//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    // CHUNKS: DCType::Image
-//    uint64_t offset = 0;
-//    while (offset < img.size())
-//    {
-//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-//        Serializer::serializeUInt64(b, markerId);
-//        Serializer::serializeUInt64(b, offset);
-//        Serializer::serializeInt(b, n);
-//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//        offset += n;
-//    }
-//
-//    // COMMIT: DCType::CommitMarker
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitMarker));
-//        Serializer::serializeUInt64(b, markerId);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    return true;
-//}
-//
-//bool NetworkManager::sendBoardCreate(const std::string& to, uint64_t boardId, const std::vector<uint8_t>& img, const std::string& name)
-//{ //{check}-wrong logic
-//    if (img.empty())
-//        return false;
-//
-//    // BEGIN: we use DCType::Snapshot_Board as â€œBoardCreateBeginâ€
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::Snapshot_Board));
-//        Serializer::serializeUInt64(b, boardId);
-//        Serializer::serializeString(b, name);
-//        Serializer::serializeUInt64(b, static_cast<uint64_t>(img.size()));
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    // CHUNKS: DCType::Image (same as marker)
-//    uint64_t offset = 0;
-//    while (offset < img.size())
-//    {
-//        const int n = static_cast<int>(std::min<size_t>(kChunk, img.size() - offset));
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::ImageChunk));
-//        Serializer::serializeUInt64(b, boardId);
-//        Serializer::serializeUInt64(b, offset);
-//        Serializer::serializeInt(b, n);
-//        b.insert(b.end(), img.data() + offset, img.data() + offset + n);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//        offset += n;
-//    }
-//
-//    // COMMIT: DCType::CommitBoard
-//    {
-//        std::vector<uint8_t> b;
-//        b.push_back(static_cast<uint8_t>(msg::DCType::CommitBoard));
-//        Serializer::serializeUInt64(b, boardId);
-//        //queueMessage(OutboundMsg{ to, msg::dc::name::Game, std::move(b) });
-//    }
-//
-//    return true;
-//}
-
-/*bool NetworkManager::disconectFromPeers()
-{
-    // Close all peer links (donâ€™t let PeerLink::close() call back into NM to erase)
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
-
-    // Close signaling client (playerâ€™s WS)
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    // Weâ€™re no longer connected
-    peer_role = Role::NONE;
-    return true;
-}
-
-bool NetworkManager::disconnectAllPeers()
-{
-    // 1) Broadcast a shutdown message (optional, but nice UX)
-    if (signalingServer)
-    {
-        signalingServer->broadcastShutdown(); // 1) tell everyone
-    }
-
-    // 2) Close all peer links locally
-    for (auto& [pid, link] : peers)
-    {
-        if (link)
-        {
-            try
-            {
-                link->close();
-            }
-            catch (...)
-            {
-            }
-        }
-    }
-    peers.clear();
-
-    // 3) Disconnect all WS clients and stop the server
-    if (signalingServer)
-    {
-        signalingServer->disconnectAllClients();
-        try
-        {
-            signalingServer->stop();
-        }
-        catch (...)
-        {
-        }
-        signalingServer.reset();
-    }
-
-    // 4) If GM also had a self client (loopback to its own server), close it too
-    if (signalingClient)
-    {
-        signalingClient->close();
-        signalingClient.reset();
-    }
-
-    peer_role = Role::NONE;
-    return true;
-}
-*/
-
-/*bool NetworkManager::removePeer(std::string peerId)
-{
-    auto it = peers.find(peerId);
-    if (it == peers.end())
-        return false;
-    if (auto& link = it->second)
-    {
-        try
-        {
-            link->close(); // ensure pc/dc closed
-        }
-        catch (...)
-        {
-            // swallow â€” safe cleanup path
-        }
-    }
-    peers.erase(it);
-    return true;
-}
-
-// Optional: remove peers that are no longer usable (Closed/Failed or nullptr)
-std::size_t NetworkManager::removeDisconnectedPeers()
-{
-    std::size_t removed = 0;
-    for (auto it = peers.begin(); it != peers.end();)
-    {
-        const bool shouldRemove =
-            !it->second ||
-            it->second->isClosedOrFailed(); // helper on PeerLink below
-
-        if (shouldRemove)
-        {
-            if (it->second)
-            {
-                try
-                {
-                    it->second->close();
-                }
-                catch (...)
-                {
-                }
-            }
-            it = peers.erase(it);
-            ++removed;
-        }
-        else
-        {
-            ++it;
-        }
-    }
-    return removed;
-}
-*/
-
-//
-//void NetworkManager::startServer(std::string internal_ip_address, unsigned short port)
-//{
-//	peer_role = Role::GAMEMASTER;
-//
-//	auto local_tunnel_url = NetworkUtilities::startLocalTunnel("runic-" + internal_ip_address, port);
-//	//auto internalIP = UPnPManager::getLocalIPv4Address();
-//	/*if (!UPnPManager::addPortMapping(internal_ip_address, port, port, "TCP", "libdatachannel Signaling Server")) {
-//		bool open_port_foward_tip = true;
-//		ShowPortForwardingHelpPopup(&open_port_foward_tip);
-//	}*/
-//	signalingServer->start(port);
-//	auto status = signalingClient->connect(local_tunnel_url, port);
-//}

@@ -28,6 +28,8 @@
 #include "DirectoryWindow.h"
 #include "flecs.h"
 #include "PathManager.h"
+#include "NoteEditorUI.h"
+#include "NotesManager.h"
 
 //#include "ConsoleUtils.h"
 
@@ -83,6 +85,9 @@ private:
     std::shared_ptr<GameTableManager> game_table_manager;
     std::shared_ptr<DirectoryWindow> map_directory;
     std::shared_ptr<DirectoryWindow> marker_directory;
+    std::shared_ptr<NotesManager> notes_manager;
+    std::shared_ptr<NoteEditorUI> note_editor_ui;
+
     bool g_dockspace_initialized = false;
 
     glm::vec2 current_fbo_mouse_pos = glm::vec2(0, 0);

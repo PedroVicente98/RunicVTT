@@ -24,6 +24,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING "" FORCE)
 # ----------------------
 # Sources
 # ----------------------
+
 file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
     src/*.cpp
     src/network/*.cpp
@@ -34,7 +35,10 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS
 )
 
 add_executable(RunicVTT ${SOURCES})
-
+target_sources(RunicVTT PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/note_editor/NotesManager.cpp
+    ${CMAKE_SOURCE_DIR}/src/note_editor/NoteEditorUI.cpp
+)
 if (WIN32)
   if (MSVC)
     target_link_options(RunicVTT PRIVATE "/MANIFESTUAC:level='requireAdministrator' uiAccess='false'")

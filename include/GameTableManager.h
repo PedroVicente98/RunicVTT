@@ -7,6 +7,7 @@
 #include "PathManager.h"
 #include "NetworkManager.h"
 #include "ChatManager.h"
+#include "IdentityManager.h"
 
 class GameTableManager : public std::enable_shared_from_this<GameTableManager>
 {
@@ -32,6 +33,7 @@ public:
     void connectToGameTablePopUp();
     void closeGameTablePopUp();
 
+    void renderUsernameChangePopup();
     void createBoardPopUp();
     void closeBoardPopUp();
     void saveBoardPopUp();
@@ -54,6 +56,7 @@ public:
     std::vector<std::string> listGameTableFiles();
     void setCameraWindowSizePos(glm::vec2 window_size, glm::vec2 window_pos);
 
+    std::shared_ptr<IdentityManager> identity_manager;
     std::string game_table_name;
     //Chat chat;
     std::shared_ptr<ChatManager> chat_manager;

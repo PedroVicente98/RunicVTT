@@ -76,12 +76,12 @@ struct Board
     std::string board_name;
 };
 
-// Marker Component
 struct MarkerComponent
 {
-    std::string ownerPeerId; // "" = no owner
+    std::string ownerUniqueId;     // authoritative owner (stable)
+    std::string ownerPeerUsername; // cosmetic cache for UI (last known)
     bool allowAllPlayersMove = false;
-    bool locked = false; // hard lock (GM can still move)
+    bool locked = false;
 };
 
 // FogOfWar Component

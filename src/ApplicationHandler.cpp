@@ -9,13 +9,21 @@
 #include <chrono>
 #include <string>
 
-ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directoryry) :
-    marker_directory(marker_directoryry), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directoryry)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
+ApplicationHandler::ApplicationHandler(GLFWwindow* window, std::shared_ptr<DirectoryWindow> map_directory, std::shared_ptr<DirectoryWindow> marker_directory) :
+    marker_directory(marker_directory), map_directory(map_directory), game_table_manager(std::make_shared<GameTableManager>(ecs, map_directory, marker_directory)), window(window), g_dockspace_initialized(false), map_fbo(std::make_shared<MapFBO>())
 {
     ImGuiToaster::Config cfg;
-    this->toaster_ = std::make_shared<ImGuiToaster>(cfg);
+    toaster_ = std::make_shared<ImGuiToaster>(cfg);
     game_table_manager->setup();
     game_table_manager->setToaster(toaster_);
+
+    auto note_cfg = NotesManagerConfig{
+        PathManager::getNotesPath(),
+        PathManager::getGameTablesPath()};
+
+    notes_manager = std::make_shared<NotesManager>(note_cfg, toaster_);
+    note_editor_ui = std::make_shared<NoteEditorUI>(notes_manager, toaster_);
+    note_editor_ui->setChatManager(game_table_manager->chat_manager);
 
     ecs.component<Position>();         // .member<float>("x").member<float>("y");
     ecs.component<Size>();             // .member<float>("width").member<float>("height");
@@ -364,6 +372,7 @@ int ApplicationHandler::run()
 
             renderDockSpace();
             renderMainMenuBar();
+            note_editor_ui->render();
             renderMapFBO(va, ib, shader, grid_shader, renderer);
             renderActiveGametable();
             toaster_->Render();
@@ -526,6 +535,7 @@ void ApplicationHandler::renderMainMenuBar()
     bool close_current_gametable = false;
 
     bool open_network_center = false;
+    bool open_username_change = false;
 
     bool open_create_board = false;
     bool close_current_board = false;
@@ -573,6 +583,11 @@ void ApplicationHandler::renderMainMenuBar()
             {
                 open_network_center = true;
             }
+
+            if (ImGui::MenuItem("Change Username"))
+            {
+                open_username_change = true;
+            }
             ImGui::EndMenu();
         }
     }
@@ -606,7 +621,15 @@ void ApplicationHandler::renderMainMenuBar()
             ImGui::EndMenu();
         }
     }
-
+    if (ImGui::BeginMenu("Notes"))
+    {
+        bool vis = note_editor_ui->isVisible();
+        if (ImGui::MenuItem("Note Editor", nullptr, vis))
+        {
+            note_editor_ui->setVisible(!vis);
+        }
+        ImGui::EndMenu();
+    }
     if (ImGui::BeginMenu("Assets"))
     {
         if (ImGui::MenuItem("Add Marker (from file)"))
@@ -695,6 +718,11 @@ void ApplicationHandler::renderMainMenuBar()
         ImGui::OpenPopup("Network Center");
     if (ImGui::IsPopupOpen("Network Center"))
         game_table_manager->networkCenterPopUp();
+
+    if (open_username_change)
+        ImGui::OpenPopup("Change Username");
+    if (ImGui::IsPopupOpen("Change Username"))
+        game_table_manager->renderUsernameChangePopup();
 
     if (open_create_board)
         ImGui::OpenPopup("CreateBoard");

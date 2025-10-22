@@ -19,6 +19,7 @@
 #include "ImGuiToaster.h"
 #include "PathManager.h"
 #include "Logger.h"
+#include "IdentityManager.h"
 
 struct DragState
 {
@@ -65,7 +66,7 @@ struct PendingImage
 class NetworkManager : public std::enable_shared_from_this<NetworkManager>
 {
 public:
-    NetworkManager(flecs::world ecs);
+    NetworkManager(flecs::world ecs, std::shared_ptr<IdentityManager> identity_manager);
 
     void setup(std::weak_ptr<BoardManager> board_manager, std::weak_ptr<GameTableManager> gametable_manager);
 
@@ -119,31 +120,40 @@ public:
     bool removePeer(std::string peerId);
     bool clearPeers() const
     {
+        for (auto [id, peer] : peers)
+        {
+            peer->close();
+        }
         return peers.empty();
     }
     bool disconnectAllPeers();
     std::size_t removeDisconnectedPeers();
     void broadcastPeerDisconnect(const std::string& targetId);
-    // Single-shot reconnect of one peer. Returns true if we kicked off a rebuild.
     /*bool reconnectPeer(const std::string& peerId);*/
 
-    // PeerLink -> NM (send via signaling)
     void onPeerLocalDescription(const std::string& peerId, const rtc::Description& desc);
     void onPeerLocalCandidate(const std::string& peerId, const rtc::Candidate& cand);
     std::shared_ptr<PeerLink> ensurePeerLink(const std::string& peerId);
 
+    std::string displayNameForPeer(const std::string& peerId) const;
+
     std::string getMyUsername() const
     {
-        return myUsername_;
-    };
-
-    std::string getMyId() const
+        return identity_manager->myUsername();
+    }
+    std::string getMyUniqueId() const
     {
-        return myClientId_;
-    };
-    void setMyIdentity(std::string myId, std::string username);
-    void upsertPeerIdentity(const std::string& id, const std::string& username);
-    std::string displayNameFor(const std::string& id) const;
+        return identity_manager->myUniqueId();
+    }
+
+    const std::string& getMyPeerId() const
+    {
+        return myPeerId_;
+    }
+    void setMyPeerId(std::string v)
+    {
+        myPeerId_ = std::move(v);
+    }
 
     const std::unordered_map<std::string, std::shared_ptr<PeerLink>>& getPeers() const
     {
@@ -195,9 +205,6 @@ public:
 
     bool sendImageChunks(msg::ImageOwnerKind kind, uint64_t id, const std::vector<unsigned char>& img, const std::vector<std::string>& toPeerIds);
 
-    void broadcastChatThreadFrame(msg::DCType t, const std::vector<uint8_t>& payload);
-    void sendChatThreadFrameTo(const std::set<std::string>& peers, msg::DCType t, const std::vector<uint8_t>& payload);
-
     void setToaster(std::shared_ptr<ImGuiToaster> t)
     {
         toaster_ = t;
@@ -212,6 +219,7 @@ public:
     MessageQueue<msg::NetEvent> events_;
     MessageQueue<msg::InboundRaw> inboundRaw_;
     std::vector<std::string> getConnectedPeerIds() const;
+    std::vector<std::string> getConnectedUsernames() const;
 
     // GM identity
     void setGMId(const std::string& id)
@@ -257,6 +265,31 @@ public:
     void sendGridUpdate(uint64_t boardId, const flecs::entity& board, const std::vector<std::string>& toPeerIds);
 
     //PUBLIC END MARKER STUFF----------------------------------------------------------------------------
+
+    void buildUserNameUpdate(std::vector<uint8_t>& out,
+                             uint64_t tableId,
+                             const std::string& userUniqueId,
+                             const std::string& oldUsername,
+                             const std::string& newUsername,
+                             bool reboundFlag) const;
+
+    void broadcastUserNameUpdate(const std::vector<uint8_t>& payload); // send on Game DC to all
+    void sendUserNameUpdateTo(const std::string& peerId,               // direct (rare)
+                              const std::vector<uint8_t>& payload);
+
+    void upsertPeerIdentityWithUnique(const std::string& peerId,
+                                      const std::string& uniqueId,
+                                      const std::string& username);
+
+    // NetworkManager.h (public)
+    bool broadcastChatJson(const msg::Json& j);
+    bool sendChatJsonTo(const std::string& peerId, const msg::Json& j);
+    bool sendChatJsonTo(const std::set<std::string>& peers, const msg::Json& j);
+    std::shared_ptr<IdentityManager> getIdentityManager()
+    {
+        return identity_manager;
+    }
+
 private:
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
@@ -295,7 +328,6 @@ private:
     void handleMarkerMeta(const std::vector<uint8_t>& b, size_t& off);
     //END MARKER STUFF----------------------------------------------------------------------------
 
-    std::string gmPeerId_;
     std::unordered_map<uint64_t, PendingImage> imagesRx_;
     MessageQueue<msg::ReadyMessage> inboundGame_;
     // optional background raw-drain worker
@@ -303,7 +335,7 @@ private:
     std::atomic<bool> rawWorkerStop_{false};
     std::thread rawWorker_;
     // NetworkManager.h
-
+    std::shared_ptr<IdentityManager> identity_manager;
     std::shared_ptr<ImGuiToaster> toaster_;
     static constexpr size_t kChunk = 8 * 1024; // 8KB chunk
     //static constexpr size_t kHighWater = 2 * 1024 * 1024; // 2 MB queued
@@ -317,6 +349,8 @@ private:
     void handleImageChunk(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitBoard(const std::vector<uint8_t>& b, size_t& off);
     void handleCommitMarker(const std::vector<uint8_t>& b, size_t& off);
+
+    void handleUserNameUpdate(const std::vector<uint8_t>& b, size_t& off);
 
     // FogUpdate
     void handleFogUpdate(const std::vector<uint8_t>& b, size_t& off);
@@ -339,10 +373,8 @@ private:
     void createOfferAndSend_(const std::string& peerId, const std::shared_ptr<PeerLink>& link);
     void createChannelsIfOfferer_(const std::shared_ptr<PeerLink>& link);*/
 
-    std::string myClientId_;
-    std::string myUsername_;
-    std::unordered_map<std::string, std::string> peerUsernames_;
-    std::unordered_map<std::string, std::string> clientUsernames_;
+    std::string myPeerId_;
+    std::string gmPeerId_;
 
     flecs::world ecs;
     unsigned int port = 8080;
@@ -395,93 +427,4 @@ private:
         using namespace std::chrono;
         return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
     }
-
-    //inline std::vector<unsigned char> readFileBytes(const std::string& path)
-    //{
-    //    namespace fs = std::filesystem;
-    //    std::error_code ec;
-
-    //    auto tryOpen = [](const fs::path& p) -> std::vector<unsigned char>
-    //    {
-    //        std::ifstream file(p, std::ios::binary);
-    //        if (!file)
-    //            return {};
-    //        file.seekg(0, std::ios::end);
-    //        size_t size = static_cast<size_t>(file.tellg());
-    //        file.seekg(0, std::ios::beg);
-    //        std::vector<unsigned char> buffer(size);
-    //        if (size > 0)
-    //            file.read(reinterpret_cast<char*>(buffer.data()), size);
-    //        return buffer;
-    //    };
-
-    //    fs::path p = path;
-    //    // 1) Direct (absolute or relative to CWD)
-    //    if (auto buf = tryOpen(p); !buf.empty())
-    //        return buf;
-
-    //    // 2) Resolve relative under known asset roots
-    //    std::vector<fs::path> roots = {
-    //        PathManager::getMapsPath(),
-    //        PathManager::getMarkersPath(),
-    //        fs::path("res"),   // if you ship a res/
-    //        fs::current_path() // last-ditch CWD
-    //    };
-
-    //    for (const auto& r : roots)
-    //    {
-    //        fs::path candidate = fs::weakly_canonical(r / p, ec);
-    //        if (ec)
-    //            continue;
-    //        if (auto buf = tryOpen(candidate); !buf.empty())
-    //        {
-    //            return buf;
-    //        }
-    //    }
-
-    //    // Log a helpful error once
-    //    Logger::instance().log("assets", Logger::Level::Error, "readFileBytes: cannot open '" + path + "' (tried known roots).");
-    //    return {};
-    //}
 };
-
-////Operations
-//void addClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-//void removeClient(std::string client_id);
-//void clearClients() const { clients.empty(); }
-//std::shared_ptr<rtc::WebSocket> getClient(std::string client_id);
-//std::unordered_map<std::string, std::shared_ptr<rtc::WebSocket>>& getClients() { return clients; }
-//void addPendingClient(std::string client_id, std::shared_ptr<rtc::WebSocket> ws);
-//void removePendingClient(std::string client_id);
-//void clearPendingClients() const { pending_clients.empty(); }
-//std::shared_ptr<rtc::WebSocket> getPendingClient(std::string client_id);
-////Callback Methods
-////WebSocker Client
-//void onOpenClient();                               // WebSocket connected to master
-//void onCloseClient();                              // WebSocket closed
-//void onErrorClient(const std::string& err);        // WebSocket error
-//void onMessageClient(const std::string& msg);      // Message from master server (offers, answers, ICE, etc.)
-
-////Websocket Server
-//void onSignal(std::string clientId, const std::string& msg);
-//void onMessage(std::string clientId, const std::string& msg);
-//void onConnect(std::string peer_id, std::shared_ptr<rtc::WebSocket> client);
-
-//// --- Signaling Server (if this peer is master) ---
-//void onOpenServerClient(int clientId);                      // A client connects to our WebSocket server
-//void onCloseServerClient(int clientId);                     // A client disconnects
-//void onErrorServerClient(int clientId, const std::string&); // Error from one client
-//void onMessageServerClient(int clientId, const std::string& msg); // Msg from a connected client
-
-////PeerLink
-//void onOpenPeer(std::string clientId, const std::string& msg);
-//void onMessagePeer(std::string clientId, const std::string& msg);
-//void onStateChange(rtc::PeerConnection::State state);
-//void onLocalDescription(rtc::Description desc);
-//void onLocalDescription(rtc::Candidate candidate);
-
-//// --- Utility/Housekeeping ---
-//void onDisconnectedPeer(int peerId); // higher-level handler when peer lost
-//void connectToWebRTCPeer(const std::string& peerId);
-//void receiveSignal(const std::string& peerId, const std::string& message);
-//void sendSignalToPeer(const std::string& peerId, const std::string& message);

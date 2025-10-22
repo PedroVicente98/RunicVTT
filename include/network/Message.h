@@ -36,8 +36,8 @@ namespace msg
         ImageChunk = 104,
 
         //Operations
-        MarkerMove = 300,
-        MarkerMoveState = 301,
+        MarkerMove = 150,
+        MarkerMoveState = 151,
         MarkerCreate = 1,
         MarkerUpdate = 2, //Position and/or Visibility
         MarkerDelete = 3,
@@ -49,10 +49,12 @@ namespace msg
         NoteUpdate = 9, //Metadata and/or Content
         NoteDelete = 10,
 
+        UserNameUpdate = 105, // Game channel: broadcast username changes
+
         // chat ops (binary)
-        ChatThreadCreate = 200,
-        ChatThreadUpdate = 201,
-        ChatThreadDelete = 202,
+        ChatGroupCreate = 200,
+        ChatGroupUpdate = 201,
+        ChatGroupDelete = 202,
         ChatMessage = 203
     };
     inline std::string DCtypeString(DCType type)
@@ -105,13 +107,13 @@ namespace msg
             case msg::DCType::NoteDelete:
                 type_str = "NoteDelete";
                 break;
-            case msg::DCType::ChatThreadCreate:
+            case msg::DCType::ChatGroupCreate:
                 type_str = "ChatThreadCreate";
                 break;
-            case msg::DCType::ChatThreadUpdate:
+            case msg::DCType::ChatGroupUpdate:
                 type_str = "ChatThreadUpdate";
                 break;
-            case msg::DCType::ChatThreadDelete:
+            case msg::DCType::ChatGroupDelete:
                 type_str = "ChatThreadDelete";
                 break;
             case msg::DCType::ChatMessage:
@@ -122,6 +124,9 @@ namespace msg
                 break;
             case msg::DCType::MarkerMoveState:
                 type_str = "MarkerMoveState";
+                break;
+            case msg::DCType::UserNameUpdate:
+                type_str = "UserNameUpdate";
                 break;
             default:
                 type_str = "UnkownType";
@@ -160,7 +165,7 @@ namespace msg
     struct ReadyMessage
     {
         DCType kind;
-        std::string fromPeer; // optional: who sent it (fill in DC callback if you have it)
+        std::string fromPeerId; // optional: who sent it (fill in DC callback if you have it)
 
         std::optional<uint64_t> tableId;
         std::optional<uint64_t> boardId;
@@ -189,6 +194,9 @@ namespace msg
         std::optional<uint32_t> dragEpoch;
         std::optional<uint32_t> seq;
         std::optional<Role> senderRole;
+
+        std::optional<std::string> userUniqueId;
+        std::optional<uint8_t> rebound;
     };
 
     struct NetEvent
@@ -236,6 +244,7 @@ namespace msg
         //inline constexpr std::string_view SdpMLineIndex = "sdpMLineIndex";
 
         // Auth / control
+        inline constexpr std::string_view UniqueId = "uniqueId";
         inline constexpr std::string_view AuthOk = "ok";
         inline constexpr std::string_view AuthMsg = "msg";
         inline constexpr std::string_view AuthToken = "token";
@@ -290,23 +299,124 @@ namespace msg
             inline constexpr std::string MarkerMove = "marker_move";
         } // namespace name
 
-        //inline constexpr std::string_view Chat = "CHAT";
-        //inline constexpr std::string_view Image = "IMAGE";
-        //inline constexpr std::string_view ToggleVisibility = "TOGGLE_VISIBILITY";
-        //inline constexpr std::string_view CreateEntity = "CREATE_ENTITY";
-        //inline constexpr std::string_view Move = "MOVE";
-
-        //// Examples from earlier discussion:
-        //inline constexpr std::string_view MarkerMove = "MARKER_MOVE";
-        //inline constexpr std::string_view FogCreate = "FOG_CREATE";
-        //inline constexpr std::string_view FogUpdate = "FOG_UPDATE";
     } // namespace dc
 
-    // ========== Optional JSON helpers (nlohmann::json) ==========
+    // --- DCType <-> string (chat only) ---
+    inline const char* DCTypeToJson(DCType t)
+    {
+        switch (t)
+        {
+            case DCType::ChatGroupCreate:
+                return "ChatGroupCreate";
+            case DCType::ChatGroupUpdate:
+                return "ChatGroupUpdate";
+            case DCType::ChatGroupDelete:
+                return "ChatGroupDelete";
+            case DCType::ChatMessage:
+                return "ChatMessage";
+            default:
+                return "";
+        }
+    }
+    inline bool DCTypeFromJson(std::string_view s, DCType& out)
+    {
+        if (s == "ChatGroupCreate")
+        {
+            out = DCType::ChatGroupCreate;
+            return true;
+        }
+        if (s == "ChatGroupUpdate")
+        {
+            out = DCType::ChatGroupUpdate;
+            return true;
+        }
+        if (s == "ChatGroupDelete")
+        {
+            out = DCType::ChatGroupDelete;
+            return true;
+        }
+        if (s == "ChatMessage")
+        {
+            out = DCType::ChatMessage;
+            return true;
+        }
+        return false;
+    }
+
+    // Common payload keys for chat JSON
+    namespace chatkey
+    {
+        inline constexpr std::string_view Type = "type";          // string (ChatMessage, ChatGroupCreate, ...)
+        inline constexpr std::string_view TableId = "tableId";    // u64
+        inline constexpr std::string_view GroupId = "groupId";    // u64
+        inline constexpr std::string_view Name = "name";          // string (group name)
+        inline constexpr std::string_view Parts = "participants"; // array<string> (peer ids)
+        inline constexpr std::string_view Ts = "ts";              // u64
+        inline constexpr std::string_view Username = "username";  // string
+        inline constexpr std::string_view Text = "text";          // string
+    } // namespace chatkey
+
+    // ========== JSON helpers (nlohmann::json) ==========
     // Enable by including <nlohmann/json.hpp> before using these.
+
     using Json = nlohmann::json;
-    // ---- builders (signaling) ----
-    inline Json makeOffer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& username, const std::string& broadcast = msg::value::False)
+
+    // --- builders (chat JSON) ---
+    inline Json makeChatGroupCreate(uint64_t tableId, uint64_t groupId,
+                                    const std::string& name,
+                                    const std::set<std::string>& participants)
+    {
+        Json j = {
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupCreate)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Name), name},
+            {std::string(chatkey::Parts), Json::array()}};
+        for (auto& p : participants)
+            j[std::string(chatkey::Parts)].push_back(p);
+        return j;
+    }
+
+    inline Json makeChatGroupUpdate(uint64_t tableId, uint64_t groupId,
+                                    const std::string& name,
+                                    const std::set<std::string>& participants)
+    {
+        Json j = {
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupUpdate)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Name), name},
+            {std::string(chatkey::Parts), Json::array()}};
+        for (auto& p : participants)
+            j[std::string(chatkey::Parts)].push_back(p);
+        return j;
+    }
+
+    inline Json makeChatGroupDelete(uint64_t tableId, uint64_t groupId)
+    {
+        return Json{
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatGroupDelete)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId}};
+    }
+
+    inline Json makeChatMessage(uint64_t tableId, uint64_t groupId,
+                                uint64_t ts, const std::string& username,
+                                const std::string& text)
+    {
+        return Json{
+            {std::string(chatkey::Type), DCTypeToJson(DCType::ChatMessage)},
+            {std::string(chatkey::TableId), tableId},
+            {std::string(chatkey::GroupId), groupId},
+            {std::string(chatkey::Ts), ts},
+            {std::string(chatkey::Username), username},
+            {std::string(chatkey::Text), text}};
+    }
+
+    inline Json makeOffer(const std::string& from, const std::string& to,
+                          const std::string& sdp, const std::string& username,
+                          const std::string& uniqueId,
+                          const std::string& broadcast = msg::value::False)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Offer)},
@@ -314,9 +424,15 @@ namespace msg
             {std::string(key::To), to},
             {std::string(key::Broadcast), broadcast},
             {std::string(key::Sdp), sdp},
-            {std::string(key::Username), username}};
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
-    inline Json makeAnswer(const std::string& from, const std::string& to, const std::string& sdp, const std::string& username, const std::string& broadcast = msg::value::False)
+
+    inline Json makeAnswer(const std::string& from, const std::string& to,
+                           const std::string& sdp, const std::string& username,
+                           const std::string& uniqueId,
+                           const std::string& broadcast = msg::value::False)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Answer)},
@@ -324,7 +440,9 @@ namespace msg
             {std::string(key::To), to},
             {std::string(key::Broadcast), broadcast},
             {std::string(key::Sdp), sdp},
-            {std::string(key::Username), username}};
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
     inline Json makeCandidate(const std::string& from, const std::string& to, const std::string& cand, const std::string& broadcast = msg::value::False)
     {
@@ -365,15 +483,45 @@ namespace msg
             {std::string(key::Type), std::string(signaling::Ping)},
             {std::string(key::From), from}};
     }
-    inline Json makeAuth(const std::string& token, const std::string& username)
+    /* inline Json makeAuth(const std::string& token, const std::string& username)
     {
         return Json{
             {std::string(key::Type), std::string(signaling::Auth)},
             {std::string(key::AuthToken), token},
             {std::string(key::Username), username},
         };
+    }*/
+    inline Json makeAuth(const std::string& token,
+                         const std::string& username,
+                         const std::string& uniqueId)
+    {
+        return Json{
+            {std::string(key::Type), std::string(signaling::Auth)},
+            {std::string(key::AuthToken), token},
+            {std::string(key::Username), username},
+            {std::string(key::UniqueId), uniqueId},
+        };
     }
-
+    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg,
+                                           const std::string& clientId, const std::string& username,
+                                           const std::vector<std::string>& clients = {},
+                                           const std::string& gmPeerId = "",
+                                           const std::string& uniqueId = "")
+    {
+        auto j = nlohmann::json{
+            {std::string(key::Type), std::string(signaling::AuthResponse)},
+            {std::string(key::AuthOk), ok},
+            {std::string(key::AuthMsg), msg},
+            {std::string(key::ClientId), clientId},
+            {std::string(key::Username), username}};
+        if (!clients.empty())
+            j[std::string(msg::key::Clients)] = clients;
+        if (!gmPeerId.empty())
+            j[key::GmId] = gmPeerId;
+        if (!uniqueId.empty())
+            j[std::string(key::UniqueId)] = uniqueId;
+        return j;
+    }
     /* inline Json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {})
     {
 
@@ -391,24 +539,24 @@ namespace msg
 
         return j;
     }*/
-    inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
-    {
-        auto j = nlohmann::json{
-            {std::string(key::Type), std::string(signaling::AuthResponse)},
-            {std::string(key::AuthOk), ok},
-            {std::string(key::AuthMsg), msg},
-            {std::string(key::ClientId), clientId},
-            {std::string(key::Username), username}};
-        if (!clients.empty())
-        {
-            j[std::string(msg::key::Clients)] = clients;
-        }
-        if (!gmPeerId.empty())
-        {
-            j[key::GmId] = gmPeerId; // NEW
-        }
-        return j;
-    }
+    //inline nlohmann::json makeAuthResponse(const std::string ok, const std::string& msg, const std::string& clientId, const std::string& username, const std::vector<std::string>& clients = {}, const std::string& gmPeerId = "")
+    //{
+    //    auto j = nlohmann::json{
+    //        {std::string(key::Type), std::string(signaling::AuthResponse)},
+    //        {std::string(key::AuthOk), ok},
+    //        {std::string(key::AuthMsg), msg},
+    //        {std::string(key::ClientId), clientId},
+    //        {std::string(key::Username), username}};
+    //    if (!clients.empty())
+    //    {
+    //        j[std::string(msg::key::Clients)] = clients;
+    //    }
+    //    if (!gmPeerId.empty())
+    //    {
+    //        j[key::GmId] = gmPeerId; // NEW
+    //    }
+    //    return j;
+    //}
     inline Json makeText(const std::string& from, const std::string& to, const std::string& text, bool broadcast = false)
     {
         return Json{
@@ -444,32 +592,3 @@ namespace msg
     }
 
 } // namespace msg
-
-// namespace msg
-/*
-#pragma once
-#include
-#include <iostream>
-#include "nlohmann/json.hpp"
-
-enum MessageType {
-    CHAT,
-    IMAGE,
-    MOVE,
-    CREATE_ENTITY,
-    PASSWORD,
-    TOGGLE_VISIBILITY,
-    SEND_NOTE
-};
-
-
-
-
-struct Message {
-    MessageType type;
-    std::string senderId;
-    nlohmann::json payload;
-};
-
-
-*/

@@ -1,237 +1,672 @@
 #include "NoteEditorUI.h"
+#include "ImGuiToaster.h"
+#include <algorithm>
 
-NoteEditorUI::NoteEditorUI(std::shared_ptr<flecs::world> world, std::shared_ptr<NoteManager> noteManager) :
-    m_world(world), m_noteManager(noteManager)
+//static bool InputTextMultilineString(const char* label,
+//                                     std::string* str,
+//                                     const ImVec2& size = ImVec2(0, 0),
+//                                     ImGuiInputTextFlags flags = 0)
+//{
+//    IM_ASSERT(str);
+//    auto cb = [](ImGuiInputTextCallbackData* data) -> int
+//    {
+//        if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+//        {
+//            auto* s = static_cast<std::string*>(data->UserData);
+//            s->resize(static_cast<size_t>(data->BufTextLen));
+//            data->Buf = s->data();
+//        }
+//        return 0;
+//    };
+//
+//    flags |= ImGuiInputTextFlags_CallbackResize;
+//    flags |= ImGuiInputTextFlags_NoHorizontalScroll;
+//
+//    return ImGui::InputTextMultiline(label, str->data(), str->size() + 1, size, flags, cb, str);
+//}
+
+struct InputTextWrapCtx
 {
+    std::string* buf = nullptr;
+    float max_px = 0.f;
+};
+
+static int InputTextMultilineWrapCallback(ImGuiInputTextCallbackData* data)
+{
+    auto* ctx = static_cast<InputTextWrapCtx*>(data->UserData);
+    if (!ctx || !ctx->buf)
+        return 0;
+
+    // Keep Dear ImGui's string-resize contract
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackResize)
+    {
+        ctx->buf->resize(static_cast<size_t>(data->BufTextLen));
+        data->Buf = ctx->buf->data();
+        return 0;
+    }
+
+    if (data->EventFlag == ImGuiInputTextFlags_CallbackEdit)
+    {
+        // Current line range [start, end)
+        const int len = data->BufTextLen;
+        int cur = data->CursorPos;
+        int start = cur;
+        while (start > 0 && data->Buf[start - 1] != '\n')
+            start--;
+        int end = cur;
+        while (end < len && data->Buf[end] != '\n')
+            end++;
+
+        const char* line_start = data->Buf + start;
+        const char* line_end = data->Buf + end;
+
+        // If current line fits, done.
+        ImVec2 sz = ImGui::CalcTextSize(line_start, line_end, false, FLT_MAX);
+        if (sz.x <= ctx->max_px || ctx->max_px <= 0.0f)
+            return 0;
+
+        // Find a nice break point (space/tab/hyphen/slash) before cursor
+        int break_pos = -1;
+        for (int i = cur - 1; i >= start; --i)
+        {
+            char c = data->Buf[i];
+            if (c == ' ' || c == '\t' || c == '-' || c == '/')
+            {
+                // Would the line up to here fit?
+                ImVec2 sz2 = ImGui::CalcTextSize(line_start, data->Buf + i, false, FLT_MAX);
+                if (sz2.x <= ctx->max_px)
+                {
+                    break_pos = i;
+                    break;
+                }
+            }
+        }
+
+        if (break_pos >= start)
+        {
+            // Replace that separator with a newline
+            data->DeleteChars(break_pos, 1);
+            data->InsertChars(break_pos, "\n");
+            // Let Dear ImGui re-evaluate next frame; avoid chaining multiple edits now
+            return 0;
+        }
+        else
+        {
+            // Force break at cursor if no separator found that fits
+            data->InsertChars(cur, "\n");
+            data->CursorPos = cur + 1;
+            return 0;
+        }
+    }
+    return 0;
+}
+
+static bool InputTextMultilineString_HardWrap(const char* label,
+                                              std::string* str,
+                                              const ImVec2& size,
+                                              float max_px_line,
+                                              ImGuiInputTextFlags flags = 0)
+{
+    IM_ASSERT(str);
+    if (str->capacity() == 0)
+        str->reserve(1);
+
+    InputTextWrapCtx ctx;
+    ctx.buf = str;
+    ctx.max_px = std::max(0.0f, max_px_line);
+
+    flags |= ImGuiInputTextFlags_CallbackResize;
+    flags |= ImGuiInputTextFlags_CallbackEdit;
+    flags |= ImGuiInputTextFlags_NoHorizontalScroll;
+
+    return ImGui::InputTextMultiline(label,
+                                     str->data(),
+                                     str->capacity() + 1, // bind to capacity; resize callback will keep this valid
+                                     size,
+                                     flags,
+                                     InputTextMultilineWrapCallback,
+                                     &ctx);
+}
+
+NoteEditorUI::NoteEditorUI(std::shared_ptr<NotesManager> notes_manager, std::shared_ptr<ImGuiToaster> toaster) :
+    notes_manager(std::move(notes_manager)), toaster_(std::move(toaster)) {}
+
+void NoteEditorUI::setActiveTable(std::optional<std::string> tableName)
+{
+    (void)tableName; // reserved for future save-locations UX
 }
 
 void NoteEditorUI::render()
 {
-    float windowHeight = ImGui::GetContentRegionAvail().y;
-    float windowWidth = ImGui::GetContentRegionAvail().x;
+    if (!visible_)
+        return;
 
-    ImGui::Begin("Note Manager", nullptr, ImGuiWindowFlags_NoCollapse);
+    const ImU32 winBg = IM_COL32(16, 16, 18, 255);
+    ImGui::PushStyleColor(ImGuiCol_WindowBg, winBg);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(800, 600), ImVec2(FLT_MAX, FLT_MAX));
+    bool open = true;
+    ImGui::Begin("Notes", &open);
 
-    renderDirectoryPanel(windowHeight, m_leftPanelWidth);
+    const float fullW = ImGui::GetContentRegionAvail().x;
+    const float fullH = ImGui::GetContentRegionAvail().y;
+
+    ImGui::BeginChild("##Dir", ImVec2(leftWidth_, fullH), true);
+    renderDirectory_(fullH);
+    ImGui::EndChild();
 
     ImGui::SameLine();
-    ImGui::InvisibleButton("splitter1", ImVec2(5, windowHeight));
+    ImGui::InvisibleButton("##splitter", ImVec2(3, fullH));
     if (ImGui::IsItemActive())
     {
-        m_leftPanelWidth += ImGui::GetIO().MouseDelta.x;
+        leftWidth_ += ImGui::GetIO().MouseDelta.x;
+        leftWidth_ = std::clamp(leftWidth_, 180.0f, fullW - 240.0f);
     }
     ImGui::SameLine();
 
-    float tabsWidth = windowWidth - m_leftPanelWidth - 10;
-    ImGui::BeginChild("TabsArea", ImVec2(tabsWidth, windowHeight), true);
-    renderNoteTabs(tabsWidth, windowHeight);
+    // Let ImGui compute exact remaining width to avoid h-scroll.
+    ImGui::BeginChild("##Tabs", ImVec2(0.f, fullH), true,
+                      ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+    renderTabsArea_(/*unused*/ 0.f, fullH);
     ImGui::EndChild();
 
     ImGui::End();
+    ImGui::PopStyleColor(1); // <-- only 1 was pushed
+
+    if (!open)
+        visible_ = false;
+
+    // ---- CREATE NOTE MODAL ----
+    if (showCreatePopup_)
+        ImGui::OpenPopup("Create Note"); // one-shot
+
+    bool createOpen = true;
+    if (ImGui::BeginPopupModal("Create Note", &createOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::InputText("Title", createTitle_, sizeof(createTitle_));
+        ImGui::InputText("Author", createAuthor_, sizeof(createAuthor_));
+
+        if (ImGui::Button("Create"))
+        {
+            std::string title = createTitle_[0] ? createTitle_ : "Untitled";
+            std::string author = createAuthor_[0] ? createAuthor_ : "unknown";
+            auto id = notes_manager->createNote(title, author);
+            openOrFocusTab(id);
+            createTitle_[0] = 0;
+            createAuthor_[0] = 0;
+            showCreatePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            showCreatePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+    else
+    {
+        // If not visible anymore (closed via ESC or X), clear flag
+        showCreatePopup_ = false;
+    }
+
+    // ---- DELETE NOTE MODAL ----
+    if (showDeletePopup_)
+        ImGui::OpenPopup("Delete Note?");
+
+    bool delOpen = true;
+    if (ImGui::BeginPopupModal("Delete Note?", &delOpen, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static bool alsoDisk = false;
+        ImGui::Checkbox("Also delete from disk", &alsoDisk);
+
+        if (ImGui::Button("Delete"))
+        {
+            if (!pendingDeleteUuid_.empty())
+            {
+                notes_manager->deleteNote(pendingDeleteUuid_, alsoDisk);
+                auto it = std::find(openTabs_.begin(), openTabs_.end(), pendingDeleteUuid_);
+                if (it != openTabs_.end())
+                {
+                    int idx = (int)std::distance(openTabs_.begin(), it);
+                    closeTab_(idx);
+                }
+            }
+            pendingDeleteUuid_.clear();
+            alsoDisk = false;
+            showDeletePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            pendingDeleteUuid_.clear();
+            showDeletePopup_ = false;
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+    else
+    {
+        // ESC or close -> reset state
+        if (!delOpen)
+        {
+            pendingDeleteUuid_.clear();
+            showDeletePopup_ = false;
+        }
+    }
+}
+void NoteEditorUI::renderDirectory_(float /*height*/)
+{
+    if (ImGui::Button("New"))
+    {
+        showCreatePopup_ = true;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Reload"))
+    {
+        notes_manager->loadAllFromDisk();
+    }
+    ImGui::Separator();
+
+    ImGui::SetNextItemWidth(-1);
+    ImGui::InputTextWithHint("##search", "Search title/author/text...", searchBuf_, sizeof(searchBuf_));
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("My Notes", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto mine = notes_manager->listMyNotes();
+        if (mine.empty())
+        {
+            ImGui::TextDisabled("(none)");
+        }
+        else
+        {
+            for (auto& n : mine)
+            {
+                if (!n || !filterMatch_(*n))
+                    continue;
+                ImGui::PushID(n->uuid.c_str());
+
+                const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
+                const std::string label = n->title.empty() ? n->uuid : n->title; // ← no '*' or '(unsaved)'
+                if (ImGui::Selectable(label.c_str(), selected))
+                    openOrFocusTab(n->uuid);
+
+                ImGui::PopID();
+            }
+        }
+    }
+
+    ImGui::Separator();
+
+    if (ImGui::CollapsingHeader("Shared Inbox", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto inbox = notes_manager->listInbox();
+        if (inbox.empty())
+        {
+            ImGui::TextDisabled("(empty)");
+        }
+        else
+        {
+            for (auto& n : inbox)
+            {
+                if (!n || !filterMatch_(*n))
+                    continue;
+                ImGui::PushID(n->uuid.c_str());
+
+                const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
+                const std::string label = (n->title.empty() ? n->uuid : n->title) + "  [from: " + (n->shared_from ? *n->shared_from : "?") + "]";
+                if (ImGui::Selectable(label.c_str(), selected))
+                    openOrFocusTab(n->uuid);
+
+                ImGui::SameLine();
+                if (ImGui::SmallButton("Save locally"))
+                    actSaveInboxToLocal_(n->uuid);
+
+                ImGui::PopID();
+            }
+        }
+    }
 }
 
-void NoteEditorUI::renderNoteTabs(float availableWidth, float height)
+void NoteEditorUI::renderTabsArea_(float /*width*/, float /*height*/)
 {
-    if (ImGui::BeginTabBar("NoteTabs", ImGuiTabBarFlags_Reorderable))
+    if (openTabs_.empty())
     {
-        m_world->each<NoteComponent>([&](flecs::entity e, NoteComponent& note)
-                                     {
-            if (note.selected) {
-                // Tab with close button
-                bool open = true;
-                std::string label = note.title + "###" + note.uuid;
+        ImGui::TextDisabled("No notes open. Select a note on the left or create a new one.");
+        return;
+    }
 
-                if (ImGui::BeginTabItem(label.c_str(), &open)) {
-                    renderNoteTab(note); // Editor + markdown preview
-                    ImGui::EndTabItem();
-                }
+    if (ImGui::BeginTabBar("##NoteTabs",
+                           ImGuiTabBarFlags_AutoSelectNewTabs |
+                               ImGuiTabBarFlags_Reorderable))
+    {
+        for (int i = 0; i < (int)openTabs_.size(); ++i)
+        {
+            const std::string& uuid = openTabs_[i];
+            auto n = notes_manager->getNote(uuid);
+            if (!n)
+            {
+                if (currentTabIndex_ == i)
+                    currentTabIndex_ = -1;
+                closeTab_(i);
+                --i;
+                continue;
+            }
 
-                if (!open) {
-                    note.selected = false;
-                }
-            } });
+            // Visible label stays constant; ID is after '###'
+            const std::string visible = n->title.empty() ? n->uuid : n->title;
+            const std::string label = visible + "###" + uuid;
 
+            ImGuiTabItemFlags tif = 0;
+            if (n->dirty)
+                tif |= ImGuiTabItemFlags_UnsavedDocument;
+
+            bool open = true;
+            if (ImGui::BeginTabItem(label.c_str(), &open, tif))
+            {
+                currentTabIndex_ = i;
+
+                const float availW = ImGui::GetContentRegionAvail().x;
+                const float availH = ImGui::GetContentRegionAvail().y;
+                renderOneTab_(uuid, availW, availH);
+
+                ImGui::EndTabItem();
+            }
+            if (!open)
+            {
+                closeTab_(i);
+                if (currentTabIndex_ >= (int)openTabs_.size())
+                    currentTabIndex_ = (int)openTabs_.size() - 1;
+                --i;
+            }
+        }
         ImGui::EndTabBar();
     }
 }
 
-void NoteEditorUI::renderNoteTab(NoteComponent& note)
+void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float /*availH*/)
 {
-    float height = ImGui::GetContentRegionAvail().y;
+    auto n = notes_manager->getNote(uuid);
+    if (!n)
+        return;
 
-    float editorWidth = note.open_editor ? ImGui::GetContentRegionAvail().x * 0.5f : 0.0f;
-    float viewerWidth = note.open_editor ? ImGui::GetContentRegionAvail().x * 0.5f : ImGui::GetContentRegionAvail().x;
+    ImGuiIO& io = ImGui::GetIO();
+    const bool windowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootAndChildWindows);
+    if (windowFocused && io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S, false))
+        actSaveNote_(uuid);
 
-    if (note.open_editor)
+    if (ImGui::Button(n->open_editor ? "Hide Editor" : "Show Editor"))
+        toggleOpenEditor_(uuid);
+    ImGui::SameLine();
+    if (ImGui::Button("Save"))
+        actSaveNote_(uuid);
+    ImGui::SameLine();
+    if (ImGui::Button("Delete"))
     {
-        ImGui::BeginChild("Editor", ImVec2(editorWidth, height), true);
-        static std::vector<char> buffer(8192);
-        if (note.markdown_text.size() + 1 > buffer.size())
-            buffer.resize(note.markdown_text.size() + 256);
-        strcpy(buffer.data(), note.markdown_text.c_str());
+        pendingDeleteUuid_ = uuid;
+        showDeletePopup_ = true;
+        return;
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("%s", n->saved_locally ? n->file_path.filename().string().c_str() : "(unsaved)");
+    ImGui::Separator();
 
-        if (ImGui::InputTextMultiline("##Editor", buffer.data(), buffer.size(), ImVec2(-1, height - 40)))
+    const float spacing = ImGui::GetStyle().ItemSpacing.x;
+    const float splitterW = 6.f;
+
+    float editorW = 0.f, viewerW = 0.f;
+    if (n->open_editor)
+    {
+        const float shared = availW - splitterW - spacing;
+        editorW = floorf(shared * 0.5f);
+        viewerW = shared - editorW; // exact remainder => no 1px overflow
+    }
+    else
+    {
+        viewerW = availW;
+    }
+
+    // --- Editor ---
+    if (n->open_editor)
+    {
+        ImGui::BeginChild("##editor", ImVec2(editorW, 0.f), true); // 0 height => fill
+        auto& ts = tabState_[uuid];
+        if (!ts.bufferInit)
         {
-            note.markdown_text = buffer.data();
+            ts.editBuffer = n->markdown_text;
+            ts.bufferInit = true;
         }
 
-        if (ImGui::Button("Hide Editor"))
-        {
-            note.open_editor = false;
-        }
+        ImVec2 editorSize = ImGui::GetContentRegionAvail();
+        float wrap_px = editorSize.x - ImGui::GetStyle().FramePadding.x * 2.0f;
 
+        // hard-wrap (inserts '\n' when exceeding width)
+        InputTextMultilineString_HardWrap("##NoteEdit",
+                                          &ts.editBuffer,
+                                          editorSize,
+                                          wrap_px,
+                                          ImGuiInputTextFlags_AllowTabInput);
         ImGui::EndChild();
 
         ImGui::SameLine();
-        ImGui::InvisibleButton("splitter2", ImVec2(5, height));
+        ImGui::InvisibleButton("##split2", ImVec2(splitterW, 0.f));
         ImGui::SameLine();
     }
 
-    ImGui::BeginChild("MarkdownPreview", ImVec2(viewerWidth, height), true);
-    if (!note.markdown_text.empty())
+    // --- Viewer ---
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8.f, 8.f)); // padding to avoid clipped glyphs
+    ImGui::BeginChild("##viewer", ImVec2(viewerW, 0.f), true);
     {
-        m_renderer.print(note.markdown_text.c_str(), note.markdown_text.c_str() + note.markdown_text.size());
-    }
+        const auto toMs = NotesManager::toEpochMillis;
+        ImGui::TextDisabled("Author: %s", n->author.c_str());
+        ImGui::SameLine();
+        ImGui::TextDisabled("Created: %lld", (long long)toMs(n->creation_ts));
+        ImGui::SameLine();
+        ImGui::TextDisabled("Updated: %lld", (long long)toMs(n->last_update_ts));
+        ImGui::Separator();
 
-    if (!note.open_editor)
-    {
-        if (ImGui::Button("Show Editor"))
+        // only set handlers we need; leave external open to MarkdownRenderer default
+        md_.onRoll = [this](const std::string& expr)
         {
-            note.open_editor = true;
-        }
-    }
+            if (chat_manager)
+                chat_manager->tryHandleSlashCommand(chat_manager->generalGroupId_, "/roll " + expr);
+            //if (toaster_)
+            //toaster_->Push(ImGuiToaster::Level::Good, "Roll: " + expr);
+        };
+        md_.resolveNoteRef = [this](const std::string& ref) -> std::string
+        {
+            return notes_manager->resolveRef(ref);
+        };
+        md_.onNoteOpen = [this](const std::string& id)
+        { openTabByUuid(id); };
 
+        const std::string& md = n->open_editor ? tabState_[uuid].editBuffer : n->markdown_text;
+
+        ImGui::PushTextWrapPos(0.f); // wrap md to viewer width (safety; imgui_md usually wraps, this enforces)
+        if (!md.empty())
+            md_.print(md.c_str(), md.c_str() + md.size());
+        else
+            ImGui::TextDisabled("(empty)");
+        ImGui::PopTextWrapPos();
+    }
     ImGui::EndChild();
+    ImGui::PopStyleVar();
+
+    // Propagate editor changes to manager
+    if (n->open_editor)
+    {
+        auto& ts = tabState_[uuid];
+        if (ts.bufferInit && ts.editBuffer != n->markdown_text)
+            notes_manager->setContent(uuid, ts.editBuffer);
+    }
 }
 
-void NoteEditorUI::renderDirectoryPanel(float height, float& leftWidth)
+void NoteEditorUI::actCreateNote_()
 {
-    ImGui::BeginChild("Directory", ImVec2(leftWidth, height), true);
-
-    ImGui::Text("📓 My Notes");
-    ImGui::Separator();
-
-    if (ImGui::Button("+ New Note"))
+    static char titleBuf[128] = {0};
+    static char authorBuf[128] = {0};
+    ImGui::OpenPopup("Create Note");
+    if (ImGui::BeginPopupModal("Create Note", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
-        NoteComponent note = m_noteManager->createNewNote("local");
-        m_noteManager->saveNoteToDisk(note);
-
-        // Deselect others
-        m_world->each<NoteComponent>([](flecs::entity, NoteComponent& n)
-                                     { n.selected = false; });
-
-        // Auto-select the new note
-        flecs::entity new_note = m_world->lookup(note.uuid.c_str());
-        if (new_note.is_alive())
+        ImGui::InputText("Title", titleBuf, sizeof(titleBuf));
+        ImGui::InputText("Author", authorBuf, sizeof(authorBuf));
+        if (ImGui::Button("Create"))
         {
-            new_note.get_mut<NoteComponent>()->selected = true;
+            std::string title = titleBuf[0] ? titleBuf : "Untitled";
+            std::string author = authorBuf[0] ? authorBuf : "unknown";
+            auto id = notes_manager->createNote(title, author);
+            openOrFocusTab(id);
+            titleBuf[0] = 0;
+            authorBuf[0] = 0;
+            ImGui::CloseCurrentPopup();
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
+}
 
-    // Render local notes
-    m_world->each<NoteComponent>([&](flecs::entity e, NoteComponent& note)
-                                 {
-        if (note.shared) return;
+void NoteEditorUI::actSaveNote_(const std::string& uuid)
+{
+    notes_manager->saveNote(uuid);
+}
 
-        if (ImGui::Selectable(note.title.c_str(), note.selected)) {
-            note.selected = !note.selected;
-        } });
-
-    ImGui::Spacing();
-    ImGui::Text("🌐 Shared with Me");
-    ImGui::Separator();
-
-    m_world->each<NoteComponent>([&](flecs::entity e, NoteComponent& note)
-                                 {
-        if (!note.shared) return;
-
-        std::string label = note.title + " (@" + note.shared_from + ")";
-        if (ImGui::Selectable(label.c_str(), note.selected)) {
-            note.selected = !note.selected;
-        }
-
-        if (!note.saved_locally) {
-            ImGui::SameLine();
-            std::string saveBtnID = "##SaveBtn_" + note.uuid;
-            if (ImGui::SmallButton(("💾 Save" + saveBtnID).c_str())) {
-                m_noteManager->saveNoteToDisk(note);
-                note.saved_locally = true;
-                note.shared = false; // Move it to "My Notes"
+void NoteEditorUI::actDeleteNote_(const std::string& uuid)
+{
+    ImGui::OpenPopup("Delete Note?");
+    if (ImGui::BeginPopupModal("Delete Note?", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        static bool alsoDisk = false;
+        ImGui::Checkbox("Also delete from disk", &alsoDisk);
+        if (ImGui::Button("Delete"))
+        {
+            notes_manager->deleteNote(uuid, alsoDisk);
+            auto it = std::find(openTabs_.begin(), openTabs_.end(), uuid);
+            if (it != openTabs_.end())
+            {
+                int idx = (int)std::distance(openTabs_.begin(), it);
+                closeTab_(idx);
             }
-        } });
-
-    ImGui::EndChild();
-}
-
-//imgui_md renderer--------------------------------------------------------------------
-
-extern ImFont* g_font_regular = nullptr;
-extern ImFont* g_font_bold = nullptr;
-extern ImFont* g_font_bold_large = nullptr;
-extern ImTextureID g_texture1 = nullptr;
-
-ImFont* NoteEditorUI::MarkdownRenderer::get_font() const
-{
-    // Default fallback
-    ImFont* default_font = ImGui::GetFont();
-
-    if (m_is_table_header && g_font_bold)
-        return g_font_bold;
-
-    switch (m_hlevel)
-    {
-        case 0:
-            return m_is_strong && g_font_bold ? g_font_bold : (g_font_regular ? g_font_regular : default_font);
-        case 1:
-            return g_font_bold_large ? g_font_bold_large : default_font;
-        default:
-            return g_font_bold ? g_font_bold : default_font;
+            alsoDisk = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
     }
 }
 
-bool NoteEditorUI::MarkdownRenderer::get_image(image_info& nfo) const
+void NoteEditorUI::actSaveInboxToLocal_(const std::string& uuid)
 {
-    if (!g_texture1)
+    notes_manager->saveInboxToLocal(uuid, std::nullopt);
+}
+
+void NoteEditorUI::toggleOpenEditor_(const std::string& uuid)
+{
+    auto n = notes_manager->getNote(uuid);
+    if (!n)
+        return;
+    n->open_editor = !n->open_editor;
+    if (n->open_editor)
+    {
+        auto& ts = tabState_[uuid];
+        ts.bufferInit = false;
+    }
+}
+
+void NoteEditorUI::addTabIfMissing_(const std::string& uuid)
+{
+    if (std::find(openTabs_.begin(), openTabs_.end(), uuid) == openTabs_.end())
+    {
+        openTabs_.push_back(uuid);
+        currentTabIndex_ = (int)openTabs_.size() - 1;
+        if (auto n = notes_manager->getNote(uuid))
+        {
+            auto& ts = tabState_[uuid];
+            ts.editBuffer = n->markdown_text;
+            ts.bufferInit = true;
+        }
+    }
+    else
+    {
+        currentTabIndex_ = (int)std::distance(openTabs_.begin(),
+                                              std::find(openTabs_.begin(), openTabs_.end(), uuid));
+    }
+}
+
+void NoteEditorUI::openOrFocusTab(const std::string& uuid)
+{
+    auto it = std::find(openTabs_.begin(), openTabs_.end(), uuid);
+    if (it == openTabs_.end())
+    {
+        addTabIfMissing_(uuid); // opens and selects
+    }
+    else
+    {
+        currentTabIndex_ = (int)std::distance(openTabs_.begin(), it);
+        // ImGui will focus the item with BeginTabItem anyway; this ensures index is correct
+    }
+}
+
+void NoteEditorUI::closeTab_(int tabIndex)
+{
+    if (tabIndex < 0 || tabIndex >= (int)openTabs_.size())
+        return;
+    tabState_.erase(openTabs_[tabIndex]);
+    openTabs_.erase(openTabs_.begin() + tabIndex);
+}
+
+bool NoteEditorUI::filterMatch_(const Note& n) const
+{
+    if (searchBuf_[0] == 0)
+        return true;
+    std::string needle = searchBuf_;
+    std::transform(needle.begin(), needle.end(), needle.begin(), ::tolower);
+    auto contains = [&](const std::string& hay)
+    {
+        std::string low = hay;
+        std::transform(low.begin(), low.end(), low.begin(), ::tolower);
+        return low.find(needle) != std::string::npos;
+    };
+    return contains(n.title) || contains(n.author) || contains(n.markdown_text);
+}
+
+void NoteEditorUI::openNoteTab(const std::string& uuid)
+{
+    openOrFocusTab(uuid);
+}
+
+bool NoteEditorUI::openTabByUuid(const std::string& uuid)
+{
+    if (!notes_manager)
         return false;
 
-    nfo.texture_id = g_texture1;
-    nfo.size = {40, 20}; // Placeholder size
-    nfo.uv0 = {0, 0};
-    nfo.uv1 = {1, 1};
-    nfo.col_tint = {1, 1, 1, 1};
-    nfo.col_border = {0, 0, 0, 0};
-    return true;
-}
+    // must exist
+    auto n = notes_manager->getNote(uuid);
+    if (!n)
+        return false;
 
-void NoteEditorUI::MarkdownRenderer::open_url() const
-{
-#if defined(_WIN32)
-    ShellExecuteA(NULL, "open", m_href.c_str(), NULL, NULL, SW_SHOWNORMAL);
-#elif defined(__APPLE__)
-    std::string command = "open " + m_href;
-    system(command.c_str());
-#elif defined(__linux__)
-    std::string command = "xdg-open " + m_href;
-    system(command.c_str());
-#else
-    // Unsupported platform
-    std::cerr << "Opening URLs not supported on this platform.\n";
-#endif
-}
-
-void NoteEditorUI::MarkdownRenderer::html_div(const std::string& dclass, bool e)
-{
-    if (dclass == "red")
+    // focus if already open
+    auto it = std::find(openTabs_.begin(), openTabs_.end(), uuid);
+    if (it != openTabs_.end())
     {
-        if (e)
-        {
-            m_table_border = false;
-            ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 0, 0, 255));
-        }
-        else
-        {
-            ImGui::PopStyleColor();
-            m_table_border = true;
-        }
+        currentTabIndex_ = static_cast<int>(std::distance(openTabs_.begin(), it));
+        visible_ = true;
+        return true;
     }
+
+    // otherwise open a new tab
+    openOrFocusTab(uuid);
+    visible_ = true;
+    return true;
 }
