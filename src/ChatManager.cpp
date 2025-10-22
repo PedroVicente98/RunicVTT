@@ -1443,7 +1443,7 @@ void ChatManager::renderDeleteGroupPopup()
 
             // Compute permissions
             const bool isOwner = (!g.ownerUniqueId.empty() && g.ownerUniqueId == meUid);
-            const bool canDelete = (isOwner || (iAmGM && iParticipate));
+            const bool canDelete = isOwner;
             const bool canLeave = (iParticipate && !isOwner); // owners cannot leave by rule
 
             ImGui::PushID((int)id);
