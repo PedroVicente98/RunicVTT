@@ -205,40 +205,40 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
 {
     ImGuiWindowFlags toolbar_child_flags =
         ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoMove |
-        ImGuiWindowFlags_NoResize   | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar |
+        ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoTitleBar |
         ImGuiWindowFlags_AlwaysAutoResize;
 
-    auto panel_color      = ImVec4(0.18f, 0.22f, 0.27f, 1.00f); // toolbar panel
-    auto bg_color         = ImVec4(0.12f, 0.14f, 0.17f, 1.00f);
-    auto old_bg_color     = ImVec4(0.2f, 0.3f, 0.4f, 1.0f);
+    auto panel_color = ImVec4(0.18f, 0.22f, 0.27f, 1.00f); // toolbar panel
+    auto bg_color = ImVec4(0.12f, 0.14f, 0.17f, 1.00f);
+    auto old_bg_color = ImVec4(0.2f, 0.3f, 0.4f, 1.0f);
 
-    auto green_light_color= ImVec4(0.55f, 0.95f, 0.65f, 1.00f);
-    auto green_mid_color  = ImVec4(0.20f, 0.75f, 0.35f, 1.00f);
+    auto green_light_color = ImVec4(0.55f, 0.95f, 0.65f, 1.00f);
+    auto green_mid_color = ImVec4(0.20f, 0.75f, 0.35f, 1.00f);
     auto green_dark_color = ImVec4(0.12f, 0.45f, 0.22f, 1.00f);
-    auto mint_color       = ImVec4(0.50f, 0.95f, 0.85f, 1.00f);
+    auto mint_color = ImVec4(0.50f, 0.95f, 0.85f, 1.00f);
 
     auto blue_light_color = ImVec4(0.55f, 0.75f, 1.00f, 1.00f);
-    auto blue_mid_color   = ImVec4(0.28f, 0.50f, 0.92f, 1.00f);
-    auto blue_dark_color  = ImVec4(0.15f, 0.30f, 0.55f, 1.00f);
+    auto blue_mid_color = ImVec4(0.28f, 0.50f, 0.92f, 1.00f);
+    auto blue_dark_color = ImVec4(0.15f, 0.30f, 0.55f, 1.00f);
 
-    auto purple_color     = ImVec4(0.70f, 0.45f, 0.95f, 1.00f);
-    auto violet_color     = ImVec4(0.55f, 0.35f, 0.85f, 1.00f);
+    auto purple_color = ImVec4(0.70f, 0.45f, 0.95f, 1.00f);
+    auto violet_color = ImVec4(0.55f, 0.35f, 0.85f, 1.00f);
     auto mid_purple_color = ImVec4(0.45f, 0.28f, 0.70f, 1.00f);
 
-    auto orange_color     = ImVec4(0.98f, 0.60f, 0.20f, 1.00f);
-    auto amber_color      = ImVec4(1.00f, 0.78f, 0.25f, 1.00f);
-    auto yellow_color     = ImVec4(0.95f, 0.90f, 0.30f, 1.00f);
+    auto orange_color = ImVec4(0.98f, 0.60f, 0.20f, 1.00f);
+    auto amber_color = ImVec4(1.00f, 0.78f, 0.25f, 1.00f);
+    auto yellow_color = ImVec4(0.95f, 0.90f, 0.30f, 1.00f);
 
-    auto button_toggled_color  = amber_color;
-    auto button_toggled_hover  = orange_color;
+    auto button_toggled_color = amber_color;
+    auto button_toggled_hover = orange_color;
     auto button_toggled_active = yellow_color;
 
-    auto button_untoggled_color  = blue_mid_color;
-    auto button_untoggled_hover  = blue_light_color;
+    auto button_untoggled_color = blue_mid_color;
+    auto button_untoggled_hover = blue_light_color;
     auto button_untoggled_active = yellow_color;
 
-    auto button_popup_color  = green_dark_color;
-    auto button_popup_hover  = green_mid_color;
+    auto button_popup_color = green_dark_color;
+    auto button_popup_hover = green_mid_color;
     auto button_popup_active = mint_color;
 
     ImGui::SetCursorPos(window_position);
@@ -251,8 +251,8 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
         throw std::exception("[BoardManager] NetworkManager Expired");
 
     ImGuiIO& io = ImGui::GetIO();
-    const bool isGM = (nm->getPeerRole() == Role::GAMEMASTER);
-    const bool allowHotkeys = !(io.WantTextInput || io.WantCaptureKeyboard);
+    bool isGM = (nm->getPeerRole() == Role::GAMEMASTER);
+    bool allowHotkeys = true; // !(io.WantTextInput || io.WantCaptureKeyboard);
 
     // We need a tiny bit of state for Space-hold override
     static bool s_spaceHoldActive = false;
@@ -261,9 +261,10 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     // Helper to change tool and always record previousTool
     auto setTool = [&](Tool t)
     {
-        if (currentTool != t) {
+        if (currentTool != t)
+        {
             previousTool = currentTool; // remember where we came from
-            currentTool  = t;
+            currentTool = t;
         }
     };
 
@@ -272,12 +273,13 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
         // Space: press => temp Move; release => restore the tool that was active at press time
         if (ImGui::IsKeyPressed(ImGuiKey_Space))
         {
-            if (!s_spaceHoldActive) {
+            if (!s_spaceHoldActive)
+            {
                 s_spaceHoldActive = true;
                 s_spaceReturnTool = currentTool; // snapshot tool active at press time
-                if (currentTool != Tool::MOVE) {
-                    previousTool = currentTool;  // also record previous for your future "swap" ideas
-                    currentTool  = Tool::MOVE;
+                if (currentTool != Tool::MOVE)
+                {
+                    currentTool = Tool::MOVE;
                 }
             }
         }
@@ -290,10 +292,21 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
         // Regular hotkeys (don’t fire while Space-hold is active)
         if (!s_spaceHoldActive)
         {
-            if (ImGui::IsKeyPressed(ImGuiKey_M)) setTool(Tool::MOVE);
-            if (isGM && ImGui::IsKeyPressed(ImGuiKey_F)) setTool(Tool::FOG);
-            if (isGM && ImGui::IsKeyPressed(ImGuiKey_S)) setTool(Tool::SELECT);
-            if (ImGui::IsKeyPressed(ImGuiKey_Q)) std::swap(currentTool, previousTool);
+            if (ImGui::IsKeyPressed(ImGuiKey_M))
+                setTool(Tool::MOVE);
+            if (isGM && ImGui::IsKeyPressed(ImGuiKey_F))
+                setTool(Tool::FOG);
+            if (isGM && ImGui::IsKeyPressed(ImGuiKey_S))
+                setTool(Tool::SELECT);
+
+            if (isGM && ImGui::IsKeyPressed(ImGuiKey_C))
+                showCameraSettings = !showCameraSettings;
+
+            if (isGM && ImGui::IsKeyPressed(ImGuiKey_G))
+                showGridSettings = !showGridSettings;
+
+            if (ImGui::IsKeyPressed(ImGuiKey_Q))
+                std::swap(currentTool, previousTool);
         }
     }
     // -------------------------------------------------------------------------
@@ -301,11 +314,22 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     ImGui::PushStyleColor(ImGuiCol_WindowBg, panel_color);
     ImGui::BeginChild("ToolbarChild", toolbar_size, false, toolbar_child_flags);
 
+    // Tool: Previous (Q)
+    ImGui::PushStyleColor(ImGuiCol_Button, purple_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, violet_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, mid_purple_color);
+    if (ImGui::Button("Prev.(Q)", ImVec2(65, 40)))
+    {
+        std::swap(currentTool, previousTool);
+    }
+    ImGui::PopStyleColor(3);
+    ImGui::SameLine();
+
     // Tool: Move (M)
-    ImGui::PushStyleColor(ImGuiCol_Button,        currentTool == Tool::MOVE ? button_toggled_color  : button_untoggled_color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::MOVE ? button_toggled_hover  : button_untoggled_hover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  currentTool == Tool::MOVE ? button_toggled_active : button_untoggled_active);
-    if (ImGui::Button("Move (M)", ImVec2(100, 40)))
+    ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::MOVE ? button_toggled_color : button_untoggled_color);
+    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::MOVE ? button_toggled_hover : button_untoggled_hover);
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::MOVE ? button_toggled_active : button_untoggled_active);
+    if (ImGui::Button("  Move (M)\n(Hold Space)", ImVec2(100, 40)))
     {
         setTool(Tool::MOVE);
     }
@@ -315,9 +339,9 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     if (isGM)
     {
         // Tool: Fog (F)
-        ImGui::PushStyleColor(ImGuiCol_Button,        currentTool == Tool::FOG ? button_toggled_color  : button_untoggled_color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::FOG ? button_toggled_hover  : button_untoggled_hover);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  currentTool == Tool::FOG ? button_toggled_active : button_untoggled_active);
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::FOG ? button_toggled_color : button_untoggled_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::FOG ? button_toggled_hover : button_untoggled_hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::FOG ? button_toggled_active : button_untoggled_active);
         if (ImGui::Button("Fog (F)", ImVec2(100, 40)))
         {
             setTool(Tool::FOG);
@@ -326,9 +350,9 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
         ImGui::SameLine();
 
         // Tool: Select (S)
-        ImGui::PushStyleColor(ImGuiCol_Button,        currentTool == Tool::SELECT ? button_toggled_color  : button_untoggled_color);
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::SELECT ? button_toggled_hover  : button_untoggled_hover);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  currentTool == Tool::SELECT ? button_toggled_active : button_untoggled_active);
+        ImGui::PushStyleColor(ImGuiCol_Button, currentTool == Tool::SELECT ? button_toggled_color : button_untoggled_color);
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, currentTool == Tool::SELECT ? button_toggled_hover : button_untoggled_hover);
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, currentTool == Tool::SELECT ? button_toggled_active : button_untoggled_active);
         if (ImGui::Button("Select (S)", ImVec2(100, 40)))
         {
             setTool(Tool::SELECT);
@@ -338,10 +362,10 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     }
 
     // Camera Settings (no hotkey here)
-    ImGui::PushStyleColor(ImGuiCol_Button,        button_popup_color);
+    ImGui::PushStyleColor(ImGuiCol_Button, button_popup_color);
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_popup_hover);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive,  button_popup_active);
-    if (ImGui::Button("Camera Settings", ImVec2(110, 40)))
+    ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
+    if (ImGui::Button("Camera Settings (C)", ImVec2(150, 40)))
     {
         showCameraSettings = !showCameraSettings;
     }
@@ -350,10 +374,10 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     if (isGM)
     {
         ImGui::SameLine();
-        ImGui::PushStyleColor(ImGuiCol_Button,        button_popup_color);
+        ImGui::PushStyleColor(ImGuiCol_Button, button_popup_color);
         ImGui::PushStyleColor(ImGuiCol_ButtonHovered, button_popup_hover);
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  button_popup_active);
-        if (ImGui::Button("Grid Settings", ImVec2(110, 40)))
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive, button_popup_active);
+        if (ImGui::Button("Grid Settings (G)", ImVec2(150, 40)))
         {
             showGridSettings = !showGridSettings;
         }

@@ -634,7 +634,7 @@ void ApplicationHandler::renderMainMenuBar()
     {
         if (ImGui::MenuItem("Add Marker (from file)"))
         {
-            std::filesystem::path dst;
+            std::vector<std::filesystem::path> dst;
             std::string err;
             if (!AssetIO::importManyFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
             {
@@ -649,7 +649,7 @@ void ApplicationHandler::renderMainMenuBar()
         }
         if (ImGui::MenuItem("Add Map (from file)"))
         {
-            std::filesystem::path dst;
+            std::vector<std::filesystem::path> dst;
             std::string err;
             if (!AssetIO::importManyFromPicker(AssetIO::AssetKind::Map, &dst, &err))
             {
@@ -659,7 +659,7 @@ void ApplicationHandler::renderMainMenuBar()
             }
             else
             {
-                toaster_->Push(ImGuiToaster::Level::Good, "Imported Map Successfully!!" + err);
+                toaster_->Push(ImGuiToaster::Level::Good, "Imported Map Successfully!! " + err);
             }
         }
         if (ImGui::MenuItem("Remove Assets..."))

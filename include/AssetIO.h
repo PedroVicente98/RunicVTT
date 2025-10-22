@@ -187,36 +187,96 @@ namespace AssetIO
         return importFromPath(kind, *p, outDst, outError);
     }
 
+    // NEW: pick multiple files
+    inline std::vector<std::filesystem::path> pickImageFilesWin32()
+    {
+        std::vector<std::filesystem::path> out;
+        ComInit com;
+        if (!com.ok())
+            return out;
+
+        IFileOpenDialog* pDlg = nullptr;
+        if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDlg))) || !pDlg)
+            return out;
+
+        COMDLG_FILTERSPEC filters[] = {
+            {L"Images (*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga)", L"*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga"},
+            {L"All files (*.*)", L"*.*"}};
+        pDlg->SetFileTypes(2, filters);
+        pDlg->SetFileTypeIndex(1);
+
+        DWORD opts = FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST | FOS_ALLOWMULTISELECT; // <- key change
+        pDlg->SetOptions(opts);
+
+        if (SUCCEEDED(pDlg->Show(nullptr)))
+        {
+            IShellItemArray* pArray = nullptr;
+            if (SUCCEEDED(pDlg->GetResults(&pArray)) && pArray)
+            {
+                DWORD count = 0;
+                pArray->GetCount(&count);
+                for (DWORD i = 0; i < count; ++i)
+                {
+                    IShellItem* pItem = nullptr;
+                    if (SUCCEEDED(pArray->GetItemAt(i, &pItem)) && pItem)
+                    {
+                        PWSTR psz = nullptr;
+                        if (SUCCEEDED(pItem->GetDisplayName(SIGDN_FILESYSPATH, &psz)) && psz)
+                        {
+                            out.emplace_back(psz);
+                            CoTaskMemFree(psz);
+                        }
+                        pItem->Release();
+                    }
+                }
+                pArray->Release();
+            }
+        }
+        pDlg->Release();
+        return out;
+    }
+
     // NEW: import many picked files
     inline bool importManyFromPicker(AssetKind kind,
                                      std::vector<std::filesystem::path>* outDsts = nullptr,
                                      std::string* outError = nullptr)
     {
         auto files = pickImageFilesWin32();
-        if (files.empty()) {
-            if (outError) *outError = "User cancelled";
+        if (files.empty())
+        {
+            if (outError)
+                *outError = "User cancelled";
             return false;
         }
-    
+
         size_t ok = 0, fail = 0;
         std::vector<std::filesystem::path> dsts_local;
-        for (auto& f : files) {
+        for (auto& f : files)
+        {
             std::filesystem::path dst;
             std::string err;
-            if (importFromPath(kind, f, &dst, &err)) {
+            if (importFromPath(kind, f, &dst, &err))
+            {
                 ++ok;
-                if (outDsts) outDsts->push_back(dst);
-                else dsts_local.push_back(dst);
-            } else {
+                if (outDsts)
+                    outDsts->push_back(dst);
+                else
+                    dsts_local.push_back(dst);
+            }
+            else
+            {
                 ++fail;
             }
         }
-    
-        if (ok == 0) {
-            if (outError) *outError = "All imports failed";
+
+        if (ok == 0)
+        {
+            if (outError)
+                *outError = "All imports failed";
             return false;
         }
-        if (fail > 0 && outError) {
+        if (fail > 0 && outError)
+        {
             *outError = "Imported " + std::to_string(ok) + " file(s), " + std::to_string(fail) + " failed";
         }
         return true;
@@ -280,104 +340,63 @@ namespace AssetIO
         return v;
     }
 
-
     inline bool deleteAsset(AssetKind kind, const std::filesystem::path& file,
                             std::string* outError = nullptr)
     {
         std::error_code ec;
-    
+
         // Resolve and validate root
         auto root = std::filesystem::weakly_canonical(assetsDir(kind), ec);
-        if (ec || root.empty() || !std::filesystem::exists(root) || !std::filesystem::is_directory(root)) {
-            if (outError) *outError = "Invalid assets root";
+        if (ec || root.empty() || !std::filesystem::exists(root) || !std::filesystem::is_directory(root))
+        {
+            if (outError)
+                *outError = "Invalid assets root";
             return false;
         }
-    
+
         // Resolve the target (weakly_canonical lets non-existing leaf still resolve)
         auto target = std::filesystem::weakly_canonical(file, ec);
-        if (ec || target.empty()) {
-            if (outError) *outError = "Path canonicalization failed";
+        if (ec || target.empty())
+        {
+            if (outError)
+                *outError = "Path canonicalization failed";
             return false;
         }
-    
+
         // Safety: target must be under root (and on same root/drive)
         // lexically_relative returns a path that does not start with ".." if target is inside root.
         auto rel = target.lexically_relative(root);
-        if (rel.empty() || rel.native().starts_with(L"..") || rel.is_absolute()) {
-            if (outError) *outError = "Refusing to delete outside assets dir";
+        if (rel.empty() || rel.native().starts_with(L"..") || rel.is_absolute())
+        {
+            if (outError)
+                *outError = "Refusing to delete outside assets dir";
             return false;
         }
-    
+
         // Validate file
-        if (!std::filesystem::exists(target)) {
-            if (outError) *outError = "File not found";
+        if (!std::filesystem::exists(target))
+        {
+            if (outError)
+                *outError = "File not found";
             return false;
         }
-        if (!std::filesystem::is_regular_file(target)) {
-            if (outError) *outError = "Not a file";
+        if (!std::filesystem::is_regular_file(target))
+        {
+            if (outError)
+                *outError = "Not a file";
             return false;
         }
-    
+
         // Delete
         std::filesystem::remove(target, ec);
-        if (ec) {
-            if (outError) *outError = "Delete failed: " + ec.message();
+        if (ec)
+        {
+            if (outError)
+                *outError = "Delete failed: " + ec.message();
             return false;
         }
         return true;
     }
-
-   // NEW: pick multiple files
-    inline std::vector<std::filesystem::path> pickImageFilesWin32()
-    {
-        std::vector<std::filesystem::path> out;
-        ComInit com;
-        if (!com.ok()) return out;
-    
-        IFileOpenDialog* pDlg = nullptr;
-        if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDlg))) || !pDlg)
-            return out;
-    
-        COMDLG_FILTERSPEC filters[] = {
-            {L"Images (*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga)", L"*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga"},
-            {L"All files (*.*)", L"*.*"}
-        };
-        pDlg->SetFileTypes(2, filters);
-        pDlg->SetFileTypeIndex(1);
-    
-        DWORD opts = FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST | FOS_ALLOWMULTISELECT; // <- key change
-        pDlg->SetOptions(opts);
-    
-        if (SUCCEEDED(pDlg->Show(nullptr)))
-        {
-            IShellItemArray* pArray = nullptr;
-            if (SUCCEEDED(pDlg->GetResults(&pArray)) && pArray)
-            {
-                DWORD count = 0;
-                pArray->GetCount(&count);
-                for (DWORD i = 0; i < count; ++i)
-                {
-                    IShellItem* pItem = nullptr;
-                    if (SUCCEEDED(pArray->GetItemAt(i, &pItem)) && pItem)
-                    {
-                        PWSTR psz = nullptr;
-                        if (SUCCEEDED(pItem->GetDisplayName(SIGDN_FILESYSPATH, &psz)) && psz)
-                        {
-                            out.emplace_back(psz);
-                            CoTaskMemFree(psz);
-                        }
-                        pItem->Release();
-                    }
-                }
-                pArray->Release();
-            }
-        }
-        pDlg->Release();
-        return out;
-    }
-
-   
-
 
     inline void openDeleteAssetPopUp(std::weak_ptr<ImGuiToaster> toaster_)
     {
@@ -418,7 +437,8 @@ namespace AssetIO
                     }
                 }
                 ImGui::PopID();
-                if (deletedThisFrame) break;
+                if (deletedThisFrame)
+                    break;
             }
             ImGui::EndChild();
             ImGui::Separator();
@@ -439,10 +459,9 @@ namespace AssetIO
             ImGui::RadioButton("Maps", &tab, 1);
             auto kind = (tab == 0) ? AssetKind::Marker : AssetKind::Map;
             ImGui::Separator();
-            auto url_color = (kind == AssetKind::Marker) ? ImVec4(0.60f, 0.80f, 1.00f, 1.0f) /*BLUE*/ :
-                ImVec4(0.45f, 0.95f, 0.55f, 1.0f) /*GREEN*/;
+            auto url_color = (kind == AssetKind::Marker) ? ImVec4(0.60f, 0.80f, 1.00f, 1.0f) /*BLUE*/ : ImVec4(0.45f, 0.95f, 0.55f, 1.0f) /*GREEN*/;
             std::wstring url = L"https://example.com/some.png";
-            std::filesystem::path dst = assetsDir(kind) ;
+            std::filesystem::path dst = assetsDir(kind);
             std::string err;
             ImGui::PushStyleColor(ImGuiCol_Text, url_color);
             //ImGui::InputText("",url_color, url);
