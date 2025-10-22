@@ -547,42 +547,42 @@ bool BoardManager::canMoveMarker(const MarkerComponent* mc, flecs::entity marker
     if (!mc->ownerPeerUsername.empty() && mc->ownerPeerUsername == me)
         return true;
 
-    // --- Fog rule for players ---
-    // Player can move if the marker is NOT visible AND is fully covered by a VISIBLE fog.
-    if (auto vis = markerEnt.get<Visibility>(); vis && !vis->isVisible)
-    {
-        // Compute marker AABB
-        auto pos = markerEnt.get<Position>();
-        auto siz = markerEnt.get<Size>();
-        if (pos && siz)
-        {
-            const float mx1 = pos->x - siz->width * 0.5f;
-            const float mx2 = pos->x + siz->width * 0.5f;
-            const float my1 = pos->y - siz->height * 0.5f;
-            const float my2 = pos->y + siz->height * 0.5f;
+    //// --- Fog rule for players ---
+    //// Player can move if the marker is NOT visible AND is fully covered by a VISIBLE fog.
+    //if (auto vis = markerEnt.get<Visibility>(); vis && !vis->isVisible)
+    //{
+    //    // Compute marker AABB
+    //    auto pos = markerEnt.get<Position>();
+    //    auto siz = markerEnt.get<Size>();
+    //    if (pos && siz)
+    //    {
+    //        const float mx1 = pos->x - siz->width * 0.5f;
+    //        const float mx2 = pos->x + siz->width * 0.5f;
+    //        const float my1 = pos->y - siz->height * 0.5f;
+    //        const float my2 = pos->y + siz->height * 0.5f;
 
-            bool covered = false;
-            active_board.children([&](flecs::entity child)
-                                  {
-                if (!child.has<FogOfWar>()) return;
-                if (auto fvis = child.get<Visibility>(); !fvis || !fvis->isVisible) return; // fog must be visible
+    //        bool covered = false;
+    //        active_board.children([&](flecs::entity child)
+    //                              {
+    //            if (!child.has<FogOfWar>()) return;
+    //            if (auto fvis = child.get<Visibility>(); !fvis || !fvis->isVisible) return; // fog must be visible
 
-                auto fpos = child.get<Position>();
-                auto fsz  = child.get<Size>();
-                if (!fpos || !fsz) return;
+    //            auto fpos = child.get<Position>();
+    //            auto fsz  = child.get<Size>();
+    //            if (!fpos || !fsz) return;
 
-                const float fx1 = fpos->x - fsz->width * 0.5f;
-                const float fx2 = fpos->x + fsz->width * 0.5f;
-                const float fy1 = fpos->y - fsz->height * 0.5f;
-                const float fy2 = fpos->y + fsz->height * 0.5f;
+    //            const float fx1 = fpos->x - fsz->width * 0.5f;
+    //            const float fx2 = fpos->x + fsz->width * 0.5f;
+    //            const float fy1 = fpos->y - fsz->height * 0.5f;
+    //            const float fy2 = fpos->y + fsz->height * 0.5f;
 
-                // full containment
-                if (mx1 >= fx1 && mx2 <= fx2 && my1 >= fy1 && my2 <= fy2)
-                    covered = true; });
-            if (covered)
-                return true;
-        }
-    }
+    //            // full containment
+    //            if (mx1 >= fx1 && mx2 <= fx2 && my1 >= fy1 && my2 <= fy2)
+    //                covered = true; });
+    //        if (covered)
+    //            return true;
+    //    }
+    //}
 
     return false;
 }
@@ -674,6 +674,23 @@ void BoardManager::resnapAllMarkersToNearest(const Grid& grid)
         } });
     ecs.defer_end();
 }
+//
+//void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
+//{
+//    mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
+//    mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
+//    if (currentTool == Tool::MOVE)
+//    {
+//        if (draggingMap)
+//        {
+//            active_board.set<Panning>({true});
+//        }
+//    }
+//    else if (currentTool == Tool::FOG)
+//    {
+//        is_creating_fog = true;
+//    }
+//}
 
 bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 {
@@ -712,23 +729,6 @@ bool BoardManager::isMouseOverMarker(glm::vec2 world_position)
 
     return hovered;
 }
-//
-//void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
-//{
-//    mouse_start_world_pos = mousePos; // Captura a posiÃ§Ã£o inicial do mouse
-//    mouse_start_screen_pos = camera.worldToScreenPosition(mousePos);
-//    if (currentTool == Tool::MOVE)
-//    {
-//        if (draggingMap)
-//        {
-//            active_board.set<Panning>({true});
-//        }
-//    }
-//    else if (currentTool == Tool::FOG)
-//    {
-//        is_creating_fog = true;
-//    }
-//}
 
 void BoardManager::startMouseDrag(glm::vec2 mousePos, bool draggingMap)
 {
