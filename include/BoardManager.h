@@ -297,6 +297,7 @@ private:
 
     bool is_creating_fog = false;
     Tool currentTool; // Active tool for interaction
+    Tool previousTool;
 };
 /*ENTITY MANAGER
 
