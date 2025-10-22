@@ -187,6 +187,40 @@ namespace AssetIO
         return importFromPath(kind, *p, outDst, outError);
     }
 
+    // NEW: import many picked files
+    inline bool importManyFromPicker(AssetKind kind,
+                                     std::vector<std::filesystem::path>* outDsts = nullptr,
+                                     std::string* outError = nullptr)
+    {
+        auto files = pickImageFilesWin32();
+        if (files.empty()) {
+            if (outError) *outError = "User cancelled";
+            return false;
+        }
+    
+        size_t ok = 0, fail = 0;
+        std::vector<std::filesystem::path> dsts_local;
+        for (auto& f : files) {
+            std::filesystem::path dst;
+            std::string err;
+            if (importFromPath(kind, f, &dst, &err)) {
+                ++ok;
+                if (outDsts) outDsts->push_back(dst);
+                else dsts_local.push_back(dst);
+            } else {
+                ++fail;
+            }
+        }
+    
+        if (ok == 0) {
+            if (outError) *outError = "All imports failed";
+            return false;
+        }
+        if (fail > 0 && outError) {
+            *outError = "Imported " + std::to_string(ok) + " file(s), " + std::to_string(fail) + " failed";
+        }
+        return true;
+    }
     // Download a URL directly into assets dir (uses URLMon; supports http/https)
     inline bool importFromUrl(AssetKind kind, const std::wstring& urlW,
                               std::filesystem::path* outDst = nullptr,
@@ -293,50 +327,57 @@ namespace AssetIO
         return true;
     }
 
-    // Delete asset (safely ensure it's inside folder)
-    /*inline bool deleteAsset(AssetKind kind, const std::filesystem::path& file,
-                            std::string* outError = nullptr)
+   // NEW: pick multiple files
+    inline std::vector<std::filesystem::path> pickImageFilesWin32()
     {
-        std::error_code ec;
-        auto root = std::filesystem::weakly_canonical(assetsDir(kind), ec);
-        auto target = std::filesystem::weakly_canonical(file, ec);
-        if (ec)
+        std::vector<std::filesystem::path> out;
+        ComInit com;
+        if (!com.ok()) return out;
+    
+        IFileOpenDialog* pDlg = nullptr;
+        if (FAILED(CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pDlg))) || !pDlg)
+            return out;
+    
+        COMDLG_FILTERSPEC filters[] = {
+            {L"Images (*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga)", L"*.png;*.jpg;*.jpeg;*.bmp;*.gif;*.webp;*.tga"},
+            {L"All files (*.*)", L"*.*"}
+        };
+        pDlg->SetFileTypes(2, filters);
+        pDlg->SetFileTypeIndex(1);
+    
+        DWORD opts = FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST | FOS_ALLOWMULTISELECT; // <- key change
+        pDlg->SetOptions(opts);
+    
+        if (SUCCEEDED(pDlg->Show(nullptr)))
         {
-            if (outError)
-                *outError = "Path canonicalization failed";
-            return false;
+            IShellItemArray* pArray = nullptr;
+            if (SUCCEEDED(pDlg->GetResults(&pArray)) && pArray)
+            {
+                DWORD count = 0;
+                pArray->GetCount(&count);
+                for (DWORD i = 0; i < count; ++i)
+                {
+                    IShellItem* pItem = nullptr;
+                    if (SUCCEEDED(pArray->GetItemAt(i, &pItem)) && pItem)
+                    {
+                        PWSTR psz = nullptr;
+                        if (SUCCEEDED(pItem->GetDisplayName(SIGDN_FILESYSPATH, &psz)) && psz)
+                        {
+                            out.emplace_back(psz);
+                            CoTaskMemFree(psz);
+                        }
+                        pItem->Release();
+                    }
+                }
+                pArray->Release();
+            }
         }
+        pDlg->Release();
+        return out;
+    }
 
-        // Safety: target must be under root
-        auto mismatch = std::mismatch(root.begin(), root.end(), target.begin(), target.end());
-        if (mismatch.first != root.end())
-        {
-            if (outError)
-                *outError = "Refusing to delete outside assets dir";
-            return false;
-        }
+   
 
-        if (!std::filesystem::exists(target))
-        {
-            if (outError)
-                *outError = "File not found";
-            return false;
-        }
-        if (!std::filesystem::is_regular_file(target))
-        {
-            if (outError)
-                *outError = "Not a file";
-            return false;
-        }
-        std::filesystem::remove(target, ec);
-        if (ec)
-        {
-            if (outError)
-                *outError = "Delete failed: " + ec.message();
-            return false;
-        }
-        return true;
-    }*/
 
     inline void openDeleteAssetPopUp(std::weak_ptr<ImGuiToaster> toaster_)
     {
