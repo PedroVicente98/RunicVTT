@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include "PathManager.h"
 
 using std::string;
 
@@ -15,11 +16,11 @@ static constexpr const int kBOOK_VER = 1;
 
 const char* IdentityManager::kMeFile()
 {
-    return "identity_me.runic";
+    return (PathManager::getConfigPath() / "identity_me.runic").string().s_str();
 }
 const char* IdentityManager::kBookFile()
 {
-    return "identity_book.runic";
+    return (PathManager::getConfigPath() / "identity_book.runic").string().s_str();
 }
 
 // ------------------ public: my identity ------------------
