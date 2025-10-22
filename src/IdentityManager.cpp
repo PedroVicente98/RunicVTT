@@ -14,15 +14,14 @@ static constexpr const int kME_VER = 1;
 static constexpr const char* kBOOK_MAGIC = "RUNIC-BOOK";
 static constexpr const int kBOOK_VER = 1;
 
-const char* IdentityManager::kMeFile()
-{
-    return (PathManager::getConfigPath() / "identity_me.runic").string().s_str();
+const char* IdentityManager::kMeFile() {
+    static const std::string s_me = (PathManager::getConfigPath() / "identity_me.runic").string();
+    return s_me.c_str();
 }
-const char* IdentityManager::kBookFile()
-{
-    return (PathManager::getConfigPath() / "identity_book.runic").string().s_str();
+const char* IdentityManager::kBookFile() {
+    static const std::string s_book = (PathManager::getConfigPath() / "identity_book.runic").string();
+    return s_book.c_str();
 }
-
 // ------------------ public: my identity ------------------
 
 bool IdentityManager::loadMyIdentityFromFile()
