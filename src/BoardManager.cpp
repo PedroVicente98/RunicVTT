@@ -293,6 +293,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
             if (ImGui::IsKeyPressed(ImGuiKey_M)) setTool(Tool::MOVE);
             if (isGM && ImGui::IsKeyPressed(ImGuiKey_F)) setTool(Tool::FOG);
             if (isGM && ImGui::IsKeyPressed(ImGuiKey_S)) setTool(Tool::SELECT);
+            if (ImGui::IsKeyPressed(ImGuiKey_Q)) std::swap(currentTool, previousTool);
         }
     }
     // -------------------------------------------------------------------------
