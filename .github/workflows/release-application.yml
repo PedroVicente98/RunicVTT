@@ -26,50 +26,7 @@ jobs:
       - name: Install NSIS
         run: choco install nsis -y
         shell: pwsh
-
-      - name: Ensure signtool is available
-        id: signtool
-        shell: pwsh
-        run: |
-          function Find-SignTool {
-            $roots = @(
-              'C:\Program Files (x86)\Windows Kits\10\bin',
-              'C:\Program Files\Windows Kits\10\bin'
-            )
-            foreach ($root in $roots) {
-              if (Test-Path $root) {
-                $hit = Get-ChildItem $root -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
-                       Sort-Object FullName -Descending | Select-Object -First 1
-                if ($hit) { return $hit.FullName }
-              }
-            }
-            return $null
-          }
-
-          $sig = Find-SignTool
-          if (-not $sig) {
-            Write-Host "signtool not found; installing Windows 10 SDK via Chocolatey..."
-            choco install windows-sdk-10-version-2004-all -y
-            $sig = Find-SignTool
-          }
-
-          if ($sig) {
-            "SIGNTOOL=$sig" | Out-File -FilePath $env:GITHUB_ENV -Append
-            Write-Host "Found signtool at $sig"
-          } else {
-            Write-Host "WARNING: signtool still not found; signing will be skipped."
-          }
-
-      - name: Write PFX from secret
-        if: env.SIGNTOOL != ''
-        shell: pwsh
-        run: |
-          $bytes = [Convert]::FromBase64String("${{ secrets.SIGN_PFX_B64 }}")
-          $pfxPath = Join-Path $env:RUNNER_TEMP "RunicVTT.pfx"
-          [IO.File]::WriteAllBytes($pfxPath, $bytes)
-          "SIGN_PFX=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
-          "SIGN_PWD=${{ secrets.SIGN_PWD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
-
+        
       - name: CMake Configure
         run: >
           cmake -S . -B out/build/ -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }}
@@ -79,26 +36,6 @@ jobs:
       - name: CMake Build (Release)
         run: cmake --build out/build/ --config Release --parallel
         shell: pwsh
-
-      - name: Code sign RunicVTT.exe
-        if: env.SIGNTOOL != ''
-        shell: pwsh
-        run: |
-          $candidates = @(
-            Join-Path $env:GITHUB_WORKSPACE 'bin\RunicVTT.exe',
-            'out\build\Release\RunicVTT.exe',
-            'out\build\RunicVTT\Release\RunicVTT.exe'
-          )
-          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
-          if (-not $exe) {
-            Write-Host "RunicVTT.exe not found in expected locations; skipping signing."
-            exit 0
-          }
-          & "${{ env.SIGNTOOL }}" sign `
-            /fd SHA256 /tr "http://timestamp.sectigo.com" /td SHA256 `
-            /f "${{ env.SIGN_PFX }}" /p "${{ env.SIGN_PWD }}" `
-            "$exe"
-          Write-Host "Signed $exe"
 
       - name: Package (CPack Release)
         run: cmake --build out/build/ --config Release --target package
