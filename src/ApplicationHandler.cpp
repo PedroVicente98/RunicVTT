@@ -636,7 +636,7 @@ void ApplicationHandler::renderMainMenuBar()
         {
             std::filesystem::path dst;
             std::string err;
-            if (!AssetIO::importFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
+            if (!AssetIO::importManyFromPicker(AssetIO::AssetKind::Marker, &dst, &err))
             {
                 // toast/log error if needed
                 std::cerr << "Import marker failed: " << err << "\n";
@@ -651,7 +651,7 @@ void ApplicationHandler::renderMainMenuBar()
         {
             std::filesystem::path dst;
             std::string err;
-            if (!AssetIO::importFromPicker(AssetIO::AssetKind::Map, &dst, &err))
+            if (!AssetIO::importManyFromPicker(AssetIO::AssetKind::Map, &dst, &err))
             {
                 // toast/log error if needed
                 std::cerr << "Import map failed: " << err << "\n";

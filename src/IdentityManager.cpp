@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
+#include "PathManager.h"
 
 using std::string;
 
@@ -13,15 +14,14 @@ static constexpr const int kME_VER = 1;
 static constexpr const char* kBOOK_MAGIC = "RUNIC-BOOK";
 static constexpr const int kBOOK_VER = 1;
 
-const char* IdentityManager::kMeFile()
-{
-    return "identity_me.runic";
+const char* IdentityManager::kMeFile() {
+    static const std::string s_me = (PathManager::getConfigPath() / "identity_me.runic").string();
+    return s_me.c_str();
 }
-const char* IdentityManager::kBookFile()
-{
-    return "identity_book.runic";
+const char* IdentityManager::kBookFile() {
+    static const std::string s_book = (PathManager::getConfigPath() / "identity_book.runic").string();
+    return s_book.c_str();
 }
-
 // ------------------ public: my identity ------------------
 
 bool IdentityManager::loadMyIdentityFromFile()
