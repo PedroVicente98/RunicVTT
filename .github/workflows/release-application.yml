@@ -2,7 +2,7 @@ name: Build & Package (Windows)
 
 on:
   push:
-    tags: ['v*']                 # e.g. v1.2.3
+    tags: ['v*']   # e.g. v1.2.3
 
 permissions:
   contents: write
@@ -32,36 +32,34 @@ jobs:
         shell: pwsh
         run: |
           function Find-SignTool {
-            $candidates = @(
+            $roots = @(
               'C:\Program Files (x86)\Windows Kits\10\bin',
               'C:\Program Files\Windows Kits\10\bin'
             )
-            foreach ($root in $candidates) {
+            foreach ($root in $roots) {
               if (Test-Path $root) {
-                Get-ChildItem $root -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
-                  Sort-Object FullName -Descending | Select-Object -First 1
+                $hit = Get-ChildItem $root -Recurse -Filter signtool.exe -ErrorAction SilentlyContinue |
+                       Sort-Object FullName -Descending | Select-Object -First 1
+                if ($hit) { return $hit.FullName }
               }
             }
+            return $null
           }
 
           $sig = Find-SignTool
           if (-not $sig) {
             Write-Host "signtool not found; installing Windows 10 SDK via Chocolatey..."
             choco install windows-sdk-10-version-2004-all -y
-            # Fallback package names if needed:
-            # choco install windows-sdk-10.0 -y
-            # choco install windows-sdk-10-version-1809-all -y
             $sig = Find-SignTool
           }
 
           if ($sig) {
-            "SIGNTOOL=$($sig.FullName)" | Out-File -FilePath $env:GITHUB_ENV -Append
-            Write-Host "Found signtool at $($sig.FullName)"
+            "SIGNTOOL=$sig" | Out-File -FilePath $env:GITHUB_ENV -Append
+            Write-Host "Found signtool at $sig"
           } else {
-            Write-Host "WARNING: signtool still not found; builds will skip code signing."
+            Write-Host "WARNING: signtool still not found; signing will be skipped."
           }
 
-      # Rehydrate your PFX from a base64 secret into a temporary path
       - name: Write PFX from secret
         if: env.SIGNTOOL != ''
         shell: pwsh
@@ -72,21 +70,54 @@ jobs:
           "SIGN_PFX=$pfxPath" | Out-File -FilePath $env:GITHUB_ENV -Append
           "SIGN_PWD=${{ secrets.SIGN_PWD }}" | Out-File -FilePath $env:GITHUB_ENV -Append
 
-     # - name: CMake Configure
-     #   run: cmake -S . -B build -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }} -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-
       - name: CMake Configure
         run: >
           cmake -S . -B out/build/ -G "${{ env.GENERATOR }}" -A ${{ env.ARCH }}
           -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
-          -DSIGNTOOL="${{ env.SIGNTOOL }}"
-          -DSIGNING_PFX="${{ env.SIGN_PFX }}"
-          -DSIGNING_PWD="${{ env.SIGN_PWD }}"
         shell: pwsh
 
-      - name: CMake Build
-        run: cmake --build out/build/ --parallel
+      - name: CMake Build (Release)
+        run: cmake --build out/build/ --config Release --parallel
         shell: pwsh
+
+      - name: Code sign RunicVTT.exe
+        if: env.SIGNTOOL != ''
+        shell: pwsh
+        run: |
+          $candidates = @(
+            Join-Path $env:GITHUB_WORKSPACE 'bin\RunicVTT.exe',
+            'out\build\Release\RunicVTT.exe',
+            'out\build\RunicVTT\Release\RunicVTT.exe'
+          )
+          $exe = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if (-not $exe) {
+            Write-Host "RunicVTT.exe not found in expected locations; skipping signing."
+            exit 0
+          }
+          & "${{ env.SIGNTOOL }}" sign `
+            /fd SHA256 /tr "http://timestamp.sectigo.com" /td SHA256 `
+            /f "${{ env.SIGN_PFX }}" /p "${{ env.SIGN_PWD }}" `
+            "$exe"
+          Write-Host "Signed $exe"
+
+      - name: Package (CPack Release)
+        run: cmake --build out/build/ --config Release --target package
+        shell: pwsh
+
+      - name: Code sign NSIS installer
+        if: env.SIGNTOOL != ''
+        shell: pwsh
+        run: |
+          $inst = Get-ChildItem -Path "dist" -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
+          if ($inst) {
+            & "${{ env.SIGNTOOL }}" sign `
+              /fd SHA256 /tr "http://timestamp.sectigo.com" /td SHA256 `
+              /f "${{ env.SIGN_PFX }}" /p "${{ env.SIGN_PWD }}" `
+              "$($inst.FullName)"
+            Write-Host "Signed installer $($inst.FullName)"
+          } else {
+            Write-Host "No NSIS installer found (ZIP-only) — skipping installer signing."
+          }
 
       - name: Upload artifacts (packages)
         uses: actions/upload-artifact@v4
@@ -105,7 +136,6 @@ jobs:
           name: release-assets
           path: to-release
 
-      # Use softprops to create/update the release and upload assets
       - name: Create/Update GitHub Release (auto notes) and upload assets
         uses: softprops/action-gh-release@v2
         with:
