@@ -117,7 +117,7 @@ set(NO_TESTS ON CACHE BOOL "Disable libdatachannel tests build" FORCE)
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "Disable GLFW documentation" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "Disable GLFW test programs" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "Disable GLFW example programs" FORCE)
-set(GLFW_INSTALL ON CACHE BOOL "Disable GLFW installation target" FORCE) # To prevent install rules
+set(GLFW_INSTALL OFF CACHE BOOL "Disable GLFW installation target" FORCE) # To prevent install rules
 
 # Precise disabling for Flecs, based on its options
 set(FLECS_TESTS OFF CACHE BOOL "Build flecs tests" FORCE)
