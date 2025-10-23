@@ -109,6 +109,12 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
             signalingClient->connect("127.0.0.1", port);
             break;
         }
+        case ConnectionType::CUSTOM:
+        {
+            //signalingClient->connect(getCustomHost(), port);
+            signalingClient->connect("127.0.0.1", port);
+            break;
+        }
     }
     pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
     //startRawDrainWorker();
