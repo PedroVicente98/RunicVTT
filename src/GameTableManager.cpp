@@ -315,7 +315,7 @@ void GameTableManager::processReceivedMessages()
                         break;
 
                     if (m.pos)
-                        markerEnt.set<Position>(*m.pos);  // authoritative final pos
+                        markerEnt.set<Position>(*m.pos);
                     markerEnt.set<Moving>(Moving{false}); // ensure drag ends
                 }
                 break;
@@ -340,7 +340,13 @@ void GameTableManager::processReceivedMessages()
                 if (m.vis)
                     markerEnt.set<Visibility>(*m.vis);
                 if (m.markerComp)
+                {
+                    std::string oldOwnerUid = markerEnt.get<MarkerComponent>()->ownerUniqueId;
+                    if (oldOwnerUid != m.markerComp->ownerUniqueId)
+                        network_manager->drag_.erase(*m.markerId);
                     markerEnt.set<MarkerComponent>(*m.markerComp);
+                }
+
                 break;
             }
 

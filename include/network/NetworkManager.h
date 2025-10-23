@@ -290,6 +290,8 @@ public:
         return identity_manager;
     }
 
+    std::unordered_map<uint64_t /*markerId*/, DragState> drag_;
+
 private:
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
@@ -298,7 +300,6 @@ private:
 
     //MARKER STUFF--------------------------------------------------------------------------------
     std::string decodingFromPeer_;
-    std::unordered_map<uint64_t /*markerId*/, DragState> drag_;
     uint32_t sendMoveMinPeriodMs_{50}; // pacing target (~20Hz)
     uint32_t getSendMoveMinPeriodMs() const
     {

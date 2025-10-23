@@ -1220,12 +1220,27 @@ void NetworkManager::sendMarkerMoveState(uint64_t boardId, const flecs::entity& 
     broadcastGameFrame(frame, toPeerIds);
 }
 
+//bool NetworkManager::amIDragging(uint64_t markerId) const
+//{
+//    auto it = drag_.find(markerId);
+//    if (it == drag_.end())
+//        return false;
+//    const auto& s = it->second;
+//    return !s.closed && s.ownerPeerId == getMyPeerId();
+//}
+
 bool NetworkManager::amIDragging(uint64_t markerId) const
 {
     auto it = drag_.find(markerId);
     if (it == drag_.end())
         return false;
     const auto& s = it->second;
+
+    // If we started the drag locally, trust the local flag.
+    if (!s.closed && s.locallyDragging)
+        return true;
+
+    // Otherwise fall back to peer-id ownership (remote handoff cases).
     return !s.closed && s.ownerPeerId == getMyPeerId();
 }
 
