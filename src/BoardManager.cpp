@@ -732,14 +732,14 @@ bool BoardManager::canMoveMarker(const MarkerComponent* mc, flecs::entity marker
     if (role == Role::GAMEMASTER)
         return true;
 
-    // base ownership rules
     if (mc->locked)
         return false;
+
     if (mc->allowAllPlayersMove)
         return true;
 
-    const std::string me = nm->getMyUsername();
-    if (!mc->ownerPeerUsername.empty() && mc->ownerPeerUsername == me)
+    const std::string unique_id = identity_manager->myUniqueId();
+    if (!mc->ownerUniqueId.empty() && mc->ownerUniqueId == unique_id)
         return true;
 
     //// --- Fog rule for players ---
