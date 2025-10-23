@@ -531,6 +531,7 @@ void ApplicationHandler::renderMainMenuBar()
 {
     // one-shot flags to open popups
     bool open_host_gametable = false;
+    bool open_manage_gametable = false;
     bool connect_to_gametable = false;
     bool close_current_gametable = false;
 
@@ -558,6 +559,10 @@ void ApplicationHandler::renderMainMenuBar()
         if (ImGui::MenuItem("Connect..."))
         {
             connect_to_gametable = true;
+        }
+        if (ImGui::MenuItem("Manage..."))
+        {
+            open_manage_gametable = true;
         }
 
         if (game_table_manager->isGameTableActive() && game_table_manager->network_manager->getPeerRole() == Role::GAMEMASTER)
@@ -703,6 +708,11 @@ void ApplicationHandler::renderMainMenuBar()
         ImGui::OpenPopup("Host GameTable");
     if (ImGui::IsPopupOpen("Host GameTable"))
         game_table_manager->hostGameTablePopUp();
+
+    if (open_manage_gametable)
+        ImGui::OpenPopup("Manage GameTables");
+    if (ImGui::IsPopupOpen("Manage GameTables"))
+        game_table_manager->manageGameTablesPopUp();
 
     if (connect_to_gametable)
         ImGui::OpenPopup("ConnectToGameTable");

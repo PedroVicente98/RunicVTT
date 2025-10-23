@@ -294,6 +294,7 @@ public:
     // NetworkManager.h
     std::string debugIdentitySnapshot() const;
     void clearDragState(uint64_t markerId);
+    void housekeepPeers();
 
 private:
     // build

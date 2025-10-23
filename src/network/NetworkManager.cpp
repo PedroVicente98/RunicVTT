@@ -604,6 +604,88 @@ void NetworkManager::onPeerLocalCandidate(const std::string& peerId, const rtc::
 }
 
 //NECESSARY NETWORK OPERATIONS -------------------------------------------------------------------------------------------
+void NetworkManager::housekeepPeers()
+{
+    const uint64_t now = nowMs();
+    const uint64_t kGraceMs = 10'000; // disconnect grace period
+
+    static std::unordered_map<std::string, uint64_t> firstDiscPeerAt;
+    static std::unordered_map<std::string, uint64_t> firstDiscWsAt;
+
+    // ---- PeerLink cleanup ----
+    for (auto it = peers.begin(); it != peers.end();)
+    {
+        const std::string& pid = it->first;
+        auto& link = it->second;
+
+        const bool connected = (link && link->isConnected());
+        if (connected)
+        {
+            firstDiscPeerAt.erase(pid);
+            ++it;
+            continue;
+        }
+
+        uint64_t& t0 = firstDiscPeerAt[pid];
+        if (t0 == 0)
+            t0 = now;
+
+        if (now - t0 >= kGraceMs)
+        {
+            try
+            {
+                if (link)
+                    link->close();
+            }
+            catch (...)
+            {
+            }
+            it = peers.erase(it);
+            firstDiscPeerAt.erase(pid);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+
+    // ---- WebSocket cleanup (server side) ----
+    auto wsClients = signalingServer->authClients();
+    for (auto it = wsClients.begin(); it != wsClients.end();)
+    {
+        const std::string& cid = it->first;
+        auto& ws = it->second;
+
+        const bool open = (ws && ws->isOpen()); // if your API is different, change this check
+        if (open)
+        {
+            firstDiscWsAt.erase(cid);
+            ++it;
+            continue;
+        }
+
+        uint64_t& t0 = firstDiscWsAt[cid];
+        if (t0 == 0)
+            t0 = now;
+
+        if (now - t0 >= kGraceMs)
+        {
+            try
+            {
+                NetworkUtilities::safeCloseWebSocket(ws);
+            }
+            catch (...)
+            {
+            }
+            it = wsClients.erase(it);
+            firstDiscWsAt.erase(cid);
+        }
+        else
+        {
+            ++it;
+        }
+    }
+}
 
 void NetworkManager::upsertPeerIdentityWithUnique(const std::string& peerId,
                                                   const std::string& uniqueId,

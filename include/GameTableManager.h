@@ -32,6 +32,7 @@ public:
     void renderNetworkCenterGM();
     void connectToGameTablePopUp();
     void closeGameTablePopUp();
+    void manageGameTablesPopUp();
 
     void renderUsernameChangePopup();
     void createBoardPopUp();
@@ -266,5 +267,12 @@ private:
         if (auto id = child.get<Identifier>(); id && id->id == markerId)
             out = child; });
         return out;
+    }
+
+    static uint64_t nowMs()
+    {
+        using Clock = std::chrono::steady_clock;
+        using namespace std::chrono;
+        return duration_cast<milliseconds>(Clock::now().time_since_epoch()).count();
     }
 };

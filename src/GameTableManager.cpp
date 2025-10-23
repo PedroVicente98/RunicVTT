@@ -110,6 +110,14 @@ void GameTableManager::processReceivedMessages()
 {
     constexpr int kMaxPerFrame = 32; // avoid long stalls
 
+    static uint64_t last = 0;
+    uint64_t t = nowMs();
+    if (t - last >= 1000)
+    {
+        network_manager->housekeepPeers();
+        last = t;
+    }
+
     network_manager->drainInboundRaw(kMaxPerFrame);
     network_manager->drainEvents();
     int processed = 0;
@@ -1414,6 +1422,177 @@ void GameTableManager::hostGameTablePopUp()
         // Note: Share/copyable connection strings live in Network Center (as you prefer)
         ImGui::EndPopup();
     }
+}
+void GameTableManager::manageGameTablesPopUp()
+{
+    namespace fs = std::filesystem;
+    if (!ImGui::BeginPopupModal("Manage GameTables", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        return;
+
+    // --- local UI state ---
+    static bool refreshFS = true;
+    static std::vector<std::string> tables;  // folder names under GameTables/
+    static std::vector<std::string> boards;  // *.runic in GameTables/<table>/Boards
+    static std::string selectedTable;        // folder name
+    static std::string pendingBoardToRename; // filename (with .runic)
+    static std::string pendingBoardToDelete; // filename (with .runic)
+    static char tableRenameBuf[128] = {0};
+    static char boardRenameBuf[128] = {0};
+
+    const fs::path root = PathManager::getGameTablesPath();
+
+    // inline "reload" blocks so we don't create helpers
+    if (refreshFS)
+    {
+        tables.clear();
+        if (fs::exists(root))
+        {
+            for (auto& e : fs::directory_iterator(root))
+                if (e.is_directory())
+                    tables.emplace_back(e.path().filename().string());
+            std::sort(tables.begin(), tables.end());
+        }
+        // ensure selection is valid
+        if (!selectedTable.empty() && !fs::exists(root / selectedTable))
+            selectedTable.clear();
+
+        boards.clear();
+        if (!selectedTable.empty())
+        {
+            const fs::path boardsDir = root / selectedTable / "Boards";
+            if (fs::exists(boardsDir))
+            {
+                for (auto& e : fs::directory_iterator(boardsDir))
+                    if (e.is_regular_file() && e.path().extension() == ".runic")
+                        boards.emplace_back(e.path().filename().string());
+                std::sort(boards.begin(), boards.end());
+            }
+        }
+        refreshFS = false;
+    }
+
+    const float leftW = 260.f;
+
+    // LEFT panel: tables
+    ImGui::BeginChild("tables-left", ImVec2(leftW, 420), true);
+    ImGui::TextUnformatted("GameTables");
+    ImGui::Separator();
+
+    for (const auto& t : tables)
+    {
+        const bool sel = (t == selectedTable);
+        if (ImGui::Selectable(t.c_str(), sel))
+        {
+            selectedTable = t;
+            std::snprintf(tableRenameBuf, IM_ARRAYSIZE(tableRenameBuf), "%s", t.c_str());
+            // refresh boards for this selection
+            refreshFS = true;
+        }
+    }
+
+    ImGui::Separator();
+    ImGui::TextUnformatted("Selected Table:");
+    ImGui::SameLine();
+    ImGui::TextColored(ImVec4(0.8f, 0.9f, 1.f, 1.f), "%s", selectedTable.empty() ? "(none)" : selectedTable.c_str());
+
+    ImGui::BeginDisabled(selectedTable.empty());
+    if (ImGui::Button("Delete Table"))
+        ImGui::OpenPopup("DeleteTable");
+    ImGui::EndDisabled();
+
+    // Delete table popup
+    if (ImGui::BeginPopupModal("DeleteTable", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Delete table '%s'?\nThis removes the folder permanently.", selectedTable.c_str());
+        ImGui::Separator();
+        if (ImGui::Button("Delete", ImVec2(120, 0)))
+        {
+            try
+            {
+                const fs::path dir = root / selectedTable;
+                if (fs::exists(dir))
+                    fs::remove_all(dir);
+                selectedTable.clear();
+                refreshFS = true;
+            }
+            catch (...)
+            { /* ignore */
+            }
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+            ImGui::CloseCurrentPopup();
+        ImGui::EndPopup();
+    }
+
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+
+    // RIGHT panel: boards in selected table
+    ImGui::BeginChild("boards-right", ImVec2(540, 420), true);
+    ImGui::TextUnformatted("Boards");
+    ImGui::Separator();
+
+    if (selectedTable.empty())
+    {
+        ImGui::TextDisabled("Select a table to see its boards.");
+    }
+    else
+    {
+        for (const auto& f : boards)
+        {
+            ImGui::PushID(f.c_str());
+            ImGui::TextUnformatted(f.c_str());
+            ImGui::SameLine();
+
+            ImGui::SameLine();
+            if (ImGui::Button("Delete"))
+            {
+                pendingBoardToDelete = f;
+                ImGui::OpenPopup("DeleteBoard");
+            }
+
+            // Delete board popup
+            if (ImGui::BeginPopupModal("DeleteBoard", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+            {
+                ImGui::Text("Delete board '%s'?", pendingBoardToDelete.c_str());
+                ImGui::Separator();
+                if (ImGui::Button("Delete", ImVec2(120, 0)))
+                {
+                    try
+                    {
+                        const fs::path boardsDir = root / selectedTable / "Boards";
+                        const fs::path p = boardsDir / pendingBoardToDelete;
+                        if (fs::exists(p))
+                            fs::remove(p);
+                        refreshFS = true;
+                    }
+                    catch (...)
+                    { /* ignore */
+                    }
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Cancel", ImVec2(120, 0)))
+                    ImGui::CloseCurrentPopup();
+                ImGui::EndPopup();
+            }
+
+            ImGui::PopID();
+        }
+        if (boards.empty())
+            ImGui::TextDisabled("(no boards in this table)");
+    }
+
+    ImGui::EndChild();
+
+    ImGui::Separator();
+    if (ImGui::Button("Close", ImVec2(120, 0)))
+        ImGui::CloseCurrentPopup();
+
+    ImGui::EndPopup();
 }
 
 void GameTableManager::renderUsernameChangePopup()
