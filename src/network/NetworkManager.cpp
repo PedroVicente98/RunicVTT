@@ -2428,19 +2428,6 @@ void NetworkManager::bootstrapPeerIfReady(const std::string& peerId)
             sendBoard(boardEnt, {peerId}); // this sends meta + image chunks + commit
             Logger::instance().log("localtunnel", Logger::Level::Info, "SentBoard");
         }
-
-        boardEnt.children([&](flecs::entity child)
-                          {
-			if (child.has<MarkerComponent>()) {
-				uint64_t bid = boardEnt.get<Identifier>()->id;
-				sendMarker(bid, child, { peerId });
-                Logger::instance().log("localtunnel", Logger::Level::Info, "SentMarker");
-			}
-			else if (child.has<FogOfWar>()) {
-				uint64_t bid = boardEnt.get<Identifier>()->id;
-				sendFog(bid, child, { peerId });
-                Logger::instance().log("localtunnel", Logger::Level::Info, "SentFog");
-			} });
     }
 
     link->markBootstrapSent();

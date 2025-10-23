@@ -284,6 +284,7 @@ inline flecs::entity Serializer::deserializeBoardEntity(const std::vector<unsign
 inline void Serializer::serializeMarkerComponent(std::vector<unsigned char>& b, const MarkerComponent* marker_component)
 {
     serializeString(b, marker_component->ownerPeerUsername);
+    serializeString(b, marker_component->ownerUniqueId);
     serializeBool(b, marker_component->allowAllPlayersMove);
     serializeBool(b, marker_component->locked);
 }
@@ -292,6 +293,7 @@ inline MarkerComponent Serializer::deserializeMarkerComponent(const std::vector<
 {
     MarkerComponent marker_component{};
     marker_component.ownerPeerUsername = deserializeString(b, off);
+    marker_component.ownerUniqueId = deserializeString(b, off);
     marker_component.allowAllPlayersMove = deserializeBool(b, off);
     marker_component.locked = deserializeBool(b, off);
     return marker_component;
