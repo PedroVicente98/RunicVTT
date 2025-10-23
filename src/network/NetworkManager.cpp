@@ -337,6 +337,11 @@ std::string NetworkManager::getNetworkInfo(ConnectionType type)
         const auto url = getLocalTunnelURL(); // e.g., https://sub.loca.lt
         return url + "?" + pwd;               // no port needed (LT handles it)
     }
+    else if (type == ConnectionType::CUSTOM)
+    { // public IP
+        const auto customHost = getCustomHost();
+        return "runic:" + customHost  + ":" + std::to_string(port) + "?" + pwd;
+    }
     return {};
 }
 
