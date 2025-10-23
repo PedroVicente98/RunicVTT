@@ -249,19 +249,9 @@ public:
     {
         if (showEditWindow && edit_window_entity.is_valid())
             return;
-        is_edit_hovered = show;
         showEditWindow = show;
         edit_window_entity = edit_entity;
     };
-
-    bool getIsNonMapWindowHovered() const
-    {
-        return is_non_map_window_hovered;
-    }
-    void setIsNonMapWindowHovered(bool is_non_map_window_hovered)
-    {
-        this->is_non_map_window_hovered = is_non_map_window_hovered;
-    }
 
     BoardImageData LoadTextureFromMemory(const unsigned char* bytes, size_t sizeBytes);
 
@@ -273,11 +263,6 @@ public:
     void onUsernameChanged(const std::string& uniqueId, const std::string& newUsername);
 
 private:
-    bool is_non_map_window_hovered = false;
-    bool is_camera_hovered = false;
-    bool is_grid_hovered = false;
-    bool is_edit_hovered = false;
-
     bool showEditWindow = false;
     bool showGridSettings = false;
     bool showCameraSettings = false;

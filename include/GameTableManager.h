@@ -86,15 +86,14 @@ public:
             toaster_->Push(lvl, msg, durationSec);
     }
 
-    void processMouseInput(bool is_mouse_within_image_bounds)
+    void processMouseInput(bool is_mouse_within_image_bounds, bool is_map_window_hovered)
     {
 
         ImGuiIO& io = ImGui::GetIO();
 
         mouse_wheel_delta = io.MouseWheel;
-        auto is_non_map_window_hovered = board_manager->getIsNonMapWindowHovered();
 
-        if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds && !is_non_map_window_hovered)
+        if ((io.MouseClicked[0] || io.MouseClicked[1] || io.MouseClicked[2]) && !is_mouse_within_image_bounds && is_map_window_hovered)
         {
             ignore_mouse_until_release = true;
         }
@@ -108,7 +107,7 @@ public:
 
         if (!ignore_mouse_until_release)
         {
-            if (is_mouse_within_image_bounds && !is_non_map_window_hovered)
+            if (is_mouse_within_image_bounds && is_map_window_hovered)
             {
                 if (io.MouseClicked[0])
                 { // LEFT mouse button just clicked

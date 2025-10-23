@@ -456,6 +456,7 @@ void ApplicationHandler::renderActiveGametable()
 
         ImGui::SetNextWindowSizeConstraints(ImVec2(800, 600), ImVec2(FLT_MAX, FLT_MAX));
         ImGui::Begin("MapWindow", nullptr, window_flags);
+        auto is_map_window_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem | ImGuiHoveredFlags_AllowWhenOverlappedByItem | ImGuiHoveredFlags_RootAndChildWindows);
         ImVec2 content_size = ImGui::GetContentRegionAvail();
 
         if (content_size.x > 0 && content_size.y > 0)
@@ -486,7 +487,7 @@ void ApplicationHandler::renderActiveGametable()
                                                      mouse_pos_global.x < (image_min_screen_pos.x + displayed_image_size.x) &&
                                                      mouse_pos_global.y >= image_min_screen_pos.y &&
                                                      mouse_pos_global.y < (image_min_screen_pos.y + displayed_image_size.y));
-                game_table_manager->processMouseInput(is_mouse_within_image_bounds);
+                game_table_manager->processMouseInput(is_mouse_within_image_bounds, is_map_window_hovered);
 
                 if (is_mouse_within_image_bounds)
                 {

@@ -387,10 +387,6 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
     ImGui::PopStyleColor(); // toolbar bg
     ImGui::EndChild();
 
-    if (!showCameraSettings && !showGridSettings && !showEditWindow)
-    {
-        setIsNonMapWindowHovered(false);
-    }
     renderGridWindow();
     renderCameraWindow();
 }
@@ -1336,23 +1332,12 @@ bool BoardManager::isEditWindowOpen() const
 
 void BoardManager::renderEditWindow()
 {
-    if (!showEditWindow)
-    {
-        is_edit_hovered = false;
-        return; // If the window is closed, skip rendering it
-    }
     bool is_hovered = false;
     // Get the current mouse position to set the window position
     ImVec2 mousePos = ImGui::GetMousePos();
     ImGui::SetNextWindowPos(mousePos, ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.2f, 0.3f, 0.4f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("EditEntity", &showEditWindow, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoMove);
-    is_edit_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
-    /*if (edit_window_hover)
-    {
-        setIsNonMapWindowHovered(true);
-    }*/
 
     // Retrieve the Size and Visibility components of the entity
     is_hovered = ImGui::IsWindowHovered();
@@ -1643,7 +1628,6 @@ void BoardManager::renderCameraWindow()
     // Check if the window should be shown
     if (!showCameraSettings)
     {
-        is_camera_hovered = false;
         return;
     }
 
@@ -1652,12 +1636,6 @@ void BoardManager::renderCameraWindow()
     ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Camera", &showCameraSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    is_camera_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
-    /*if (camera_hovered)
-    {
-        setIsNonMapWindowHovered(true);
-    }*/
     ImGui::PopStyleColor();
     auto zoom = camera.getZoom();
 
@@ -1689,7 +1667,6 @@ void BoardManager::renderGridWindow()
     // Check if the window should be shown
     if (!showGridSettings)
     {
-        is_grid_hovered = false;
         return;
     }
 
@@ -1698,12 +1675,6 @@ void BoardManager::renderGridWindow()
     ImGui::SetNextWindowPos(ImVec2(mouse_pos.x, mouse_pos.y + ImGui::GetFrameHeightWithSpacing()), ImGuiCond_Appearing);
     ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.0f, 0.1f, 0.2f, 1.0f)); // Set the background color (RGBA)
     ImGui::Begin("Grid", &showGridSettings, ImGuiWindowFlags_AlwaysAutoResize);
-    is_grid_hovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem);
-    setIsNonMapWindowHovered(is_camera_hovered || is_grid_hovered || is_edit_hovered);
-    /* if (grid_hovered)
-    {
-        setIsNonMapWindowHovered(true);
-    }*/
 
     ImGui::PopStyleColor();
     // Get a mutable reference to the Grid component from the active board
