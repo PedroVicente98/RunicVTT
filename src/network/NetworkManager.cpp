@@ -49,7 +49,7 @@ NetworkManager::~NetworkManager()
     closeServer();
     disconnectAllPeers();
 }
-
+/*
 void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool tryUpnp)
 {
     peer_role = Role::GAMEMASTER;
@@ -118,6 +118,66 @@ void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool 
     }
     pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
     //startRawDrainWorker();
+}
+*/
+void NetworkManager::startServer(ConnectionType mode, unsigned short port, bool tryUpnp)
+{
+    peer_role = Role::GAMEMASTER;
+
+    if (!signalingServer)
+        signalingServer = std::make_shared<SignalingServer>(shared_from_this());
+    if (!signalingClient)
+        signalingClient = std::make_shared<SignalingClient>(shared_from_this());
+
+    // Bind WS to all interfaces (overlay/LAN/etc.)
+    signalingServer->start(port);
+    setPort(port);
+
+    const std::string localIp = getLocalIPAddress();
+
+    // Mode-specific side effects (no client connect here)
+    switch (mode)
+    {
+        case ConnectionType::LOCALTUNNEL:
+        {
+            // Expose to the world; GM still connects locally below
+            try {
+                (void)NetworkUtilities::startLocalTunnel("runic-" + localIp, static_cast<int>(port));
+            } catch (...) {
+                pushStatusToast("LocalTunnel failed to start.", ImGuiToaster::Level::Error, 4);
+            }
+            break;
+        }
+
+        case ConnectionType::EXTERNAL:
+        {
+            if (tryUpnp)
+            {
+                try
+                {
+                    (void)UPnPManager::addPortMapping(localIp, port, port, "TCP", "RunicVTT");
+                }
+                catch (...)
+                {
+                    pushStatusToast("UPnP port mapping failed — check router config.", ImGuiToaster::Level::Error, 4);
+                }
+            }
+            // Players will connect via public IP:port; GM still connects locally below
+            break;
+        }
+
+        case ConnectionType::LOCAL:
+        case ConnectionType::CUSTOM:
+        default:
+            // No special side-effect needed; GM still connects locally below
+            break;
+    }
+
+    // GM always connects locally to the server it just started.
+    signalingClient->connect("127.0.0.1", port);
+
+    pushStatusToast("Signalling Server Started!!", ImGuiToaster::Level::Good, 4);
+    // startRawDrainWorker(); // if/when you want it
 }
 
 //RECONNECT
