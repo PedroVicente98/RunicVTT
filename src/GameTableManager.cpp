@@ -995,7 +995,8 @@ void GameTableManager::renderNetworkCenterGM()
     copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
     copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
     const auto cs_custom = network_manager->getNetworkInfo(ConnectionType::CUSTOM);
-    if (!cs_custom.empty()) {
+    if (!cs_custom.empty())
+    {
         copyRow("Custom Connection String:", cs_custom, "Copy##custom", "toast-custom");
     }
     // ---------- PLAYERS (P2P) ----------
@@ -1242,24 +1243,22 @@ void GameTableManager::hostGameTablePopUp()
                                                                           : ConnectionType::EXTERNAL);
                 */
                 ImGui::TextUnformatted("Connection Mode:");
-                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
-                        hostMode == ConnectionType::LOCAL       ? 1 :
-                        hostMode == ConnectionType::EXTERNAL    ? 2 : 3);
-                if (ImGui::RadioButton("LocalTunnel", m == 0)) 
-                    m = 0; 
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL  ? 1
+                                                                   : hostMode == ConnectionType::EXTERNAL ? 2
+                                                                                                          : 3);
+                if (ImGui::RadioButton("LocalTunnel", m == 0))
+                    m = 0;
                 ImGui::SameLine();
-                if (ImGui::RadioButton("Local (LAN)", m == 1)) 
-                    m = 1; 
+                if (ImGui::RadioButton("Local (LAN)", m == 1))
+                    m = 1;
                 ImGui::SameLine();
-                if (ImGui::RadioButton("External (Internet)", m == 2)) 
-                    m = 2; 
+                if (ImGui::RadioButton("External (Internet)", m == 2))
+                    m = 2;
                 ImGui::SameLine();
-                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3)) 
+                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3))
                     m = 3;
-                
-                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL :
-                           (m == 1 ? ConnectionType::LOCAL :
-                           (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
+
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : (m == 1 ? ConnectionType::LOCAL : (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
 
                 // Explanations
                 if (hostMode == ConnectionType::LOCALTUNNEL)
@@ -1274,12 +1273,16 @@ void GameTableManager::hostGameTablePopUp()
                     ImGui::TextDisabled("Local (LAN): works only on the same local network.\n"
                                         "Share your LAN IP + port with players.");
                     tryUpnp = false;
-                } else if (hostMode == ConnectionType::EXTERNAL) {
+                }
+                else if (hostMode == ConnectionType::EXTERNAL)
+                {
                     ImGui::TextDisabled("External: reachable from the Internet.\n"
                                         "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
                                         "It might not work depending on your network.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
-                } else { // CUSTOM
+                }
+                else
+                { // CUSTOM
                     ImGui::TextDisabled("Custom IP (Overlay/Other): share a specific address (e.g. overlay adapter IP).\n"
                                         "Server still binds 0.0.0.0; this only builds a copyable connection string.");
                     ImGui::InputText("Custom Host/IP", custom_host_buf, sizeof(custom_host_buf));
@@ -1353,7 +1356,7 @@ void GameTableManager::hostGameTablePopUp()
 
                 ImGui::SameLine();
 
-                ImGui::BeginChild("GTDetails", ImVec2(420, 360), true);
+                ImGui::BeginChild("GTDetails", ImVec2(620, 360), true, ImGuiWindowFlags_AlwaysAutoResize);
                 ImGui::Text("Selected:");
                 ImGui::SameLine();
                 ImGui::TextUnformatted(buffer[0] ? buffer : "(none)");
@@ -1368,11 +1371,11 @@ void GameTableManager::hostGameTablePopUp()
 
                 // Mode
                 ImGui::Separator();
-                /*
                 ImGui::TextUnformatted("Connection Mode:");
-                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL ? 1
-                                                                                                         : 2);
-                if (ImGui::RadioButton("LocalTunnel (Recommended)", m == 0))
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL  ? 1
+                                                                   : hostMode == ConnectionType::EXTERNAL ? 2
+                                                                                                          : 3);
+                if (ImGui::RadioButton("LocalTunnel", m == 0))
                     m = 0;
                 ImGui::SameLine();
                 if (ImGui::RadioButton("Local (LAN)", m == 1))
@@ -1380,28 +1383,12 @@ void GameTableManager::hostGameTablePopUp()
                 ImGui::SameLine();
                 if (ImGui::RadioButton("External (Internet)", m == 2))
                     m = 2;
-                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL
-                                                                          : ConnectionType::EXTERNAL);*/
-                ImGui::TextUnformatted("Connection Mode:");
-                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
-                        hostMode == ConnectionType::LOCAL       ? 1 :
-                        hostMode == ConnectionType::EXTERNAL    ? 2 : 3);
-                if (ImGui::RadioButton("LocalTunnel", m == 0)) 
-                    m = 0; 
                 ImGui::SameLine();
-                if (ImGui::RadioButton("Local (LAN)", m == 1)) 
-                    m = 1; 
-                ImGui::SameLine();
-                if (ImGui::RadioButton("External (Internet)", m == 2)) 
-                    m = 2; 
-                ImGui::SameLine();
-                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3)) 
+                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3))
                     m = 3;
-                
-                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL :
-                           (m == 1 ? ConnectionType::LOCAL :
-                           (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
-                
+
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : (m == 1 ? ConnectionType::LOCAL : (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
+
                 if (hostMode == ConnectionType::LOCALTUNNEL)
                 {
                     ImGui::TextDisabled("LocalTunnel: URL appears after server starts.\n"
@@ -1412,14 +1399,15 @@ void GameTableManager::hostGameTablePopUp()
                 {
                     ImGui::TextDisabled("Local (LAN): for players on the same network.");
                     tryUpnp = false;
-                } 
-                else if (hostMode == ConnectionType::EXTERNAL) {
+                }
+                else if (hostMode == ConnectionType::EXTERNAL)
+                {
                     ImGui::TextDisabled("External: reachable from the Internet.\n"
                                         "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
                                         "It might not work depending on your network.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
                 }
-                else 
+                else
                 { // CUSTOM
                     ImGui::TextDisabled("Custom IP (Overlay/Other): share a specific address (e.g. overlay adapter IP).\n"
                                         "Server still binds 0.0.0.0; this only builds a copyable connection string.");
@@ -1456,6 +1444,7 @@ void GameTableManager::hostGameTablePopUp()
                     auto my_unique = identity_manager->myUniqueId();
                     identity_manager->setMyIdentity(my_unique, username_buffer);
                     network_manager->setNetworkPassword(pass_buffer);
+                    network_manager->setCustomHost(custom_host_buf);
                     const unsigned p = static_cast<unsigned>(atoi(port_buffer));
                     network_manager->startServer(hostMode, static_cast<unsigned short>(p), tryUpnp);
 
