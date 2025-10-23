@@ -110,13 +110,13 @@ void GameTableManager::processReceivedMessages()
 {
     constexpr int kMaxPerFrame = 32; // avoid long stalls
 
-    static uint64_t last = 0;
+    /* static uint64_t last = 0;
     uint64_t t = nowMs();
-    if (t - last >= 1000)
+    if (t - last >= 30000)
     {
         network_manager->housekeepPeers();
         last = t;
-    }
+    }*/
 
     network_manager->drainInboundRaw(kMaxPerFrame);
     network_manager->drainEvents();
@@ -648,6 +648,7 @@ std::vector<std::string> GameTableManager::listGameTableFiles()
 void GameTableManager::createBoardPopUp()
 {
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowSizeConstraints(ImVec2(800, 600), ImVec2(FLT_MAX, FLT_MAX));
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
     if (ImGui::BeginPopupModal("CreateBoard"))
     {
