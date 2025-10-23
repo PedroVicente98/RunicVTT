@@ -20,7 +20,8 @@ enum class ConnectionType
 {
     EXTERNAL,
     LOCAL,
-    LOCALTUNNEL
+    LOCALTUNNEL,
+    CUSTOM
 };
 
 namespace msg
