@@ -994,7 +994,10 @@ void GameTableManager::renderNetworkCenterGM()
     copyRow("LocalTunnel URL:", cs_lt, "Copy##lt", "toast-lt");
     copyRow("Local Connection String:", cs_local, "Copy##loc", "toast-loc");
     copyRow("External Connection String:", cs_external, "Copy##ext", "toast-ext");
-
+    const auto cs_custom = network_manager->getNetworkInfo(ConnectionType::CUSTOM);
+    if (!cs_custom.empty()) {
+        copyRow("Custom Connection String:", cs_custom, "Copy##custom", "toast-custom");
+    }
     // ---------- PLAYERS (P2P) ----------
     ImGui::Separator();
     ImGui::Text("Players (P2P)");
