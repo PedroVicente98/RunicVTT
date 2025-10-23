@@ -1274,13 +1274,16 @@ void GameTableManager::hostGameTablePopUp()
                     ImGui::TextDisabled("Local (LAN): works only on the same local network.\n"
                                         "Share your LAN IP + port with players.");
                     tryUpnp = false;
-                }
-                else
-                { // EXTERNAL
+                } else if (hostMode == ConnectionType::EXTERNAL) {
                     ImGui::TextDisabled("External: reachable from the Internet.\n"
                                         "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
                                         "It might not work depending on your network.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
+                } else { // CUSTOM
+                    ImGui::TextDisabled("Custom IP (Overlay/Other): share a specific address (e.g. overlay adapter IP).\n"
+                                        "Server still binds 0.0.0.0; this only builds a copyable connection string.");
+                    ImGui::InputText("Custom Host/IP", custom_host_buf, sizeof(custom_host_buf));
+                    tryUpnp = false;
                 }
 
                 ImGui::Separator();
@@ -1409,11 +1412,19 @@ void GameTableManager::hostGameTablePopUp()
                 {
                     ImGui::TextDisabled("Local (LAN): for players on the same network.");
                     tryUpnp = false;
-                }
-                else
-                {
-                    ImGui::TextDisabled("External: requires port forward (UPnP/manual) and may not work.");
+                } 
+                else if (hostMode == ConnectionType::EXTERNAL) {
+                    ImGui::TextDisabled("External: reachable from the Internet.\n"
+                                        "Requires a public IP and port forwarding on your router (UPnP or manual).\n"
+                                        "It might not work depending on your network.");
                     ImGui::Checkbox("Try UPnP (auto port forward)", &tryUpnp);
+                }
+                else 
+                { // CUSTOM
+                    ImGui::TextDisabled("Custom IP (Overlay/Other): share a specific address (e.g. overlay adapter IP).\n"
+                                        "Server still binds 0.0.0.0; this only builds a copyable connection string.");
+                    ImGui::InputText("Custom Host/IP", custom_host_buf, sizeof(custom_host_buf));
+                    tryUpnp = false;
                 }
 
                 ImGui::Separator();
