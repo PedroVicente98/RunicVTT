@@ -560,7 +560,7 @@ void ApplicationHandler::renderMainMenuBar()
             connect_to_gametable = true;
         }
 
-        if (game_table_manager->isGameTableActive())
+        if (game_table_manager->isGameTableActive() && game_table_manager->network_manager->getPeerRole() == Role::GAMEMASTER)
         {
             if (ImGui::MenuItem("Save"))
             {
@@ -605,7 +605,7 @@ void ApplicationHandler::renderMainMenuBar()
             {
                 load_active_board = true;
             }
-            if (game_table_manager->board_manager->isBoardActive())
+            if (game_table_manager->board_manager->isBoardActive() && game_table_manager->network_manager->getPeerRole() == Role::GAMEMASTER)
             {
                 if (ImGui::MenuItem("Save"))
                 {

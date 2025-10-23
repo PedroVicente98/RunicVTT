@@ -108,6 +108,7 @@ private:
     std::array<char, 512> input_{};
     bool focusInput_ = false;
     bool followScroll_ = true;
+    bool jumpToBottom_ = false;
     bool chatWindowFocused_ = false;
 
     // Popups
@@ -118,7 +119,7 @@ private:
     // Create popup state
     std::array<char, 128> newGroupName_{};
     std::set<std::string> newGroupSel_; // peer ids selected
-
+    float leftWidth_ = 170.0f;
     // --- Edit popup state ---
     bool openEditPopup_ = false;
     uint64_t editGroupId_ = 0;

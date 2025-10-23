@@ -155,7 +155,7 @@ void NoteEditorUI::render()
     ImGui::EndChild();
 
     ImGui::SameLine();
-    ImGui::InvisibleButton("##splitter", ImVec2(3, fullH));
+    ImGui::InvisibleButton("##splitter", ImVec2(6, fullH));
     if (ImGui::IsItemActive())
     {
         leftWidth_ += ImGui::GetIO().MouseDelta.x;

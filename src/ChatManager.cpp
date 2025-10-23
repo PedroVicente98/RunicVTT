@@ -584,6 +584,23 @@ void ChatManager::replaceUsernameForUnique(const std::string& uniqueId,
 }
 
 // ====== UI ======
+/*
+const float fullW = ImGui::GetContentRegionAvail().x;
+    const float fullH = ImGui::GetContentRegionAvail().y;
+
+    ImGui::BeginChild("##Dir", ImVec2(leftWidth_, fullH), true);
+    renderDirectory_(fullH);
+    ImGui::EndChild();
+
+    ImGui::SameLine();
+    ImGui::InvisibleButton("##splitter", ImVec2(3, fullH));
+    if (ImGui::IsItemActive())
+    {
+        leftWidth_ += ImGui::GetIO().MouseDelta.x;
+        leftWidth_ = std::clamp(leftWidth_, 180.0f, fullW - 240.0f);
+    }
+    ImGui::SameLine();
+*/
 void ChatManager::render()
 {
     if (!hasCurrent())
@@ -592,15 +609,26 @@ void ChatManager::render()
     ImGui::Begin("ChatWindow");
     chatWindowFocused_ = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow);
 
-    const float leftW = 200.f;
-    ImGui::BeginChild("Left", ImVec2(leftW, 0), true);
-    renderLeftPanel(leftW);
+    const float leftWmin = 170.0f;
+
+    const float fullW = ImGui::GetContentRegionAvail().x;
+    const float fullH = ImGui::GetContentRegionAvail().y;
+
+    ImGui::BeginChild("Left", ImVec2(leftWidth_, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize);
+    renderLeftPanel(leftWidth_);
     ImGui::EndChild();
 
     ImGui::SameLine();
+    ImGui::InvisibleButton("##splitter", ImVec2(6, fullH));
+    if (ImGui::IsItemActive())
+    {
+        leftWidth_ += ImGui::GetIO().MouseDelta.x;
+        leftWidth_ = std::clamp(leftWidth_, leftWmin, fullW - 240.0f);
+    }
+    ImGui::SameLine();
 
     ImGui::BeginChild("Right", ImVec2(0, 0), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_AlwaysAutoResize);
-    renderRightPanel(leftW);
+    renderRightPanel(leftWidth_);
     ImGui::EndChild();
 
     ImGui::End();
@@ -887,7 +915,7 @@ void ChatManager::renderRightPanel(float /*leftW*/)
     const float footerRowH = ImGui::GetFrameHeightWithSpacing() * 2.0f;
 
     ImVec2 avail = ImGui::GetContentRegionAvail();
-    ImGui::BeginChild("Messages", ImVec2(0, avail.y - footerRowH), true, ImGuiWindowFlags_HorizontalScrollbar);
+    ImGui::BeginChild("Messages", ImVec2(0, avail.y - footerRowH), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
     if (g)
     {
         if (ImGui::GetScrollY() < ImGui::GetScrollMaxY() - 1.0f)
@@ -911,6 +939,11 @@ void ChatManager::renderRightPanel(float /*leftW*/)
         }
         if (followScroll_)
             ImGui::SetScrollHereY(1.0f);
+        if (jumpToBottom_)
+        {
+            ImGui::SetScrollHereY(1.0f);
+            jumpToBottom_ = false;
+        }
     }
     ImGui::EndChild();
 
@@ -974,7 +1007,9 @@ void ChatManager::renderRightPanel(float /*leftW*/)
 
     ImGui::BeginDisabled(followScroll_);
     if (ImGui::Button("Go to bottom"))
-        followScroll_ = true;
+    {
+        jumpToBottom_ = true;
+    }
     ImGui::EndDisabled();
     ImGui::SameLine();
     if (ImGui::Button("Roll Dice"))

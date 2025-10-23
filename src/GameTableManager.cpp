@@ -1028,22 +1028,7 @@ void GameTableManager::renderNetworkCenterGM()
             const bool dcOpen = link->isDataChannelOpen();
             ImGui::TextUnformatted(dcOpen ? "Open" : "Closed");
 
-            // Actions
             ImGui::TableSetColumnIndex(4);
-            /*ImGui::PushID(peerId.c_str());
-            if (ImGui::SmallButton("Disconnect")) {
-                link->close(); // your existing teardown (pc/dc + optional unregister)
-            }
-            ImGui::SameLine();
-            if (ImGui::SmallButton("Refresh")) {
-                // Optional renegotiation (your logic)
-                network_manager->removePeer(peerId);
-                auto l2 = network_manager->ensurePeerLink(peerId);
-                //l2->createPeerConnection();
-                l2->createDataChannel("game");
-                l2->createOffer();
-            }
-            ImGui::PopID();*/
 
             ImGui::PushID(peerId.c_str());
             if (ImGui::SmallButton("Disconnect"))
