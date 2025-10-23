@@ -668,6 +668,7 @@ void GameTableManager::createBoardPopUp()
         ImGui::Text("Create a new board");
 
         ImGui::InputText("Board Name", buffer, sizeof(buffer));
+        UiTypingGuard::TrackThisInput();
         std::string board_name(buffer);
 
         ImGui::NewLine();
@@ -848,6 +849,7 @@ void GameTableManager::connectToGameTablePopUp()
         // Username
         ImGui::TextUnformatted("Enter your username and the connection string you received from the host.");
         ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
+        UiTypingGuard::TrackThisInput();
 
         ImGui::Separator();
 
@@ -857,10 +859,11 @@ void GameTableManager::connectToGameTablePopUp()
         //   runic:wss://host[:port/path]?PASSWORD
         //   runic:<host>:<port>?PASSWORD
         ImGui::InputText("Connection String", buffer, sizeof(buffer), ImGuiInputTextFlags_AutoSelectAll);
-
+        UiTypingGuard::TrackThisInput();
         // Small helper row
         ImGui::BeginDisabled(true);
         ImGui::InputText("Example", (char*)"runic:https://xyz.loca.lt?mypwd", 64);
+        UiTypingGuard::TrackThisInput();
         ImGui::EndDisabled();
 
         ImGui::Separator();
@@ -1210,11 +1213,14 @@ void GameTableManager::hostGameTablePopUp()
             {
 
                 ImGui::InputText("GameTable Name", buffer, sizeof(buffer));
+                UiTypingGuard::TrackThisInput();
                 ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
+                UiTypingGuard::TrackThisInput();
                 ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
+                UiTypingGuard::TrackThisInput();
                 ImGui::InputText("Port", port_buffer, sizeof(port_buffer),
                                  ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
-
+                UiTypingGuard::TrackThisInput();
                 // Mode selection
                 ImGui::Separator();
                 ImGui::TextUnformatted("Connection Mode:");
@@ -1327,9 +1333,11 @@ void GameTableManager::hostGameTablePopUp()
 
                 ImGui::Separator();
                 ImGui::InputText("Username", username_buffer, sizeof(username_buffer));
+                UiTypingGuard::TrackThisInput();
                 ImGui::InputText("Password", pass_buffer, sizeof(pass_buffer), ImGuiInputTextFlags_Password);
-                ImGui::InputText("Port", port_buffer, sizeof(port_buffer),
-                                 ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+                UiTypingGuard::TrackThisInput();
+                ImGui::InputText("Port", port_buffer, sizeof(port_buffer), ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+                UiTypingGuard::TrackThisInput();
 
                 // Mode
                 ImGui::Separator();
@@ -1611,6 +1619,7 @@ void GameTableManager::renderUsernameChangePopup()
 
         ImGui::TextUnformatted("Username for this table:");
         ImGui::InputText("##uname", usernameBuf, (int)sizeof(usernameBuf));
+        UiTypingGuard::TrackThisInput();
         ImGui::Separator();
 
         const bool hasTable = active_game_table.is_alive() && active_game_table.has<Identifier>();

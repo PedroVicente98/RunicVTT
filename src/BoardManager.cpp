@@ -1,7 +1,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "BoardManager.h"
-
+#include "UiTypingGuard.h"
 #include "Renderer.h"
 #include "Shader.h"
 #include "VertexBuffer.h"
@@ -252,7 +252,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
 
     ImGuiIO& io = ImGui::GetIO();
     bool isGM = (nm->getPeerRole() == Role::GAMEMASTER);
-    bool allowHotkeys = true; // !(io.WantTextInput || io.WantCaptureKeyboard);
+    bool allowHotkeys = !UiTypingGuard::IsTyping();
 
     // We need a tiny bit of state for Space-hold override
     static bool s_spaceHoldActive = false;

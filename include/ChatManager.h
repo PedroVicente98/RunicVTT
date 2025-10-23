@@ -14,6 +14,7 @@
 #include "imgui.h"
 #include "IdentityManager.h"
 #include "Message.h"
+#include "UiTypingGuard.h"
 
 class NetworkManager; // fwd
 class PeerLink;       // fwd

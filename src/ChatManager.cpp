@@ -984,6 +984,7 @@ void ChatManager::renderRightPanel(float /*leftW*/)
             markGroupRead(g->id);
         }
     }
+    UiTypingGuard::TrackThisInput();
     ImGui::SameLine();
     if (ImGui::Button("Send") && g)
     {
@@ -1111,7 +1112,7 @@ void ChatManager::renderCreateGroupPopup()
     {
         ImGui::TextUnformatted("Group name (unique):");
         ImGui::InputText("##gname", newGroupName_.data(), (int)newGroupName_.size());
-
+        UiTypingGuard::TrackThisInput();
         // list peers
         ImGui::Separator();
         ImGui::TextUnformatted("Participants:");
@@ -1320,6 +1321,7 @@ void ChatManager::renderEditGroupPopup()
         ImGui::TextUnformatted("Group name:");
         ImGui::BeginDisabled(!canEdit);
         ImGui::InputText("##edit_gname", editGroupName_.data(), (int)editGroupName_.size());
+        UiTypingGuard::TrackThisInput();
         ImGui::EndDisabled();
 
         // Participants list (pre-checked)
@@ -1560,8 +1562,11 @@ void ChatManager::renderDicePopup()
         ImGui::Separator();
 
         ImGui::InputInt("Number", &diceN_);
+        UiTypingGuard::TrackThisInput();
         ImGui::InputInt("Sides", &diceSides_);
+        UiTypingGuard::TrackThisInput();
         ImGui::InputInt("Modifier", &diceMod_);
+        UiTypingGuard::TrackThisInput();
         ImGui::Checkbox("Apply modifier per die", &diceModPerDie_);
 
         if (ImGui::Button("d4"))

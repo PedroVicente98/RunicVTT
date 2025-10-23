@@ -183,7 +183,9 @@ void NoteEditorUI::render()
     if (ImGui::BeginPopupModal("Create Note", &createOpen, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::InputText("Title", createTitle_, sizeof(createTitle_));
+        UiTypingGuard::TrackThisInput();
         ImGui::InputText("Author", createAuthor_, sizeof(createAuthor_));
+        UiTypingGuard::TrackThisInput();
 
         if (ImGui::Button("Create"))
         {
@@ -273,6 +275,7 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
 
     ImGui::SetNextItemWidth(-1);
     ImGui::InputTextWithHint("##search", "Search title/author/text...", searchBuf_, sizeof(searchBuf_));
+    UiTypingGuard::TrackThisInput();
     ImGui::Separator();
 
     if (ImGui::CollapsingHeader("My Notes", ImGuiTreeNodeFlags_DefaultOpen))
@@ -450,6 +453,7 @@ void NoteEditorUI::renderOneTab_(const std::string& uuid, float availW, float /*
                                           editorSize,
                                           wrap_px,
                                           ImGuiInputTextFlags_AllowTabInput);
+        UiTypingGuard::TrackThisInput();
         ImGui::EndChild();
 
         ImGui::SameLine();
@@ -513,7 +517,9 @@ void NoteEditorUI::actCreateNote_()
     if (ImGui::BeginPopupModal("Create Note", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
     {
         ImGui::InputText("Title", titleBuf, sizeof(titleBuf));
+        UiTypingGuard::TrackThisInput();
         ImGui::InputText("Author", authorBuf, sizeof(authorBuf));
+        UiTypingGuard::TrackThisInput();
         if (ImGui::Button("Create"))
         {
             std::string title = titleBuf[0] ? titleBuf : "Untitled";

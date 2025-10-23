@@ -1,6 +1,6 @@
 #pragma once
 #include "BoardManager.h"
-//#include "Chat.h"
+#include "UiTypingGuard.h"
 #include <vector>
 #include "flecs.h"
 #include "Components.h"
@@ -198,8 +198,9 @@ public:
                                   char* passBuf, size_t passBufSize)
     {
         ImGui::InputText("Password", passBuf, passBufSize, ImGuiInputTextFlags_Password);
-        ImGui::InputText("Port", portBuf, portBufSize,
-                         ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+        UiTypingGuard::TrackThisInput();
+        ImGui::InputText("Port", portBuf, portBufSize, ImGuiInputTextFlags_CharsDecimal | ImGuiInputTextFlags_CharsNoBlank);
+        UiTypingGuard::TrackThisInput();
         return true;
     }
 

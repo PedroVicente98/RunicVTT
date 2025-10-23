@@ -7,6 +7,7 @@
 #include <memory>
 #include "ImGuiToaster.h"
 #include "ChatManager.h"
+#include "UiTypingGuard.h"
 
 class NoteEditorUI
 {
