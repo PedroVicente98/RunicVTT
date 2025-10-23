@@ -1198,6 +1198,7 @@ void GameTableManager::hostGameTablePopUp()
 {
     static ConnectionType hostMode = ConnectionType::LOCALTUNNEL;
     static bool tryUpnp = false; // only used for EXTERNAL
+    static char custom_host_buf[64] = "";
 
     ImVec2 center = ImGui::GetMainViewport()->GetCenter();
     ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -1223,7 +1224,7 @@ void GameTableManager::hostGameTablePopUp()
                 UiTypingGuard::TrackThisInput();
                 // Mode selection
                 ImGui::Separator();
-                ImGui::TextUnformatted("Connection Mode:");
+                /*ImGui::TextUnformatted("Connection Mode:");
                 int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL ? 1
                                                                                                          : 2);
                 if (ImGui::RadioButton("LocalTunnel", m == 0))
@@ -1236,6 +1237,26 @@ void GameTableManager::hostGameTablePopUp()
                     m = 2;
                 hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL
                                                                           : ConnectionType::EXTERNAL);
+                */
+                ImGui::TextUnformatted("Connection Mode:");
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
+                        hostMode == ConnectionType::LOCAL       ? 1 :
+                        hostMode == ConnectionType::EXTERNAL    ? 2 : 3);
+                if (ImGui::RadioButton("LocalTunnel", m == 0)) 
+                    m = 0; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Local (LAN)", m == 1)) 
+                    m = 1; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("External (Internet)", m == 2)) 
+                    m = 2; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3)) 
+                    m = 3;
+                
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL :
+                           (m == 1 ? ConnectionType::LOCAL :
+                           (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
 
                 // Explanations
                 if (hostMode == ConnectionType::LOCALTUNNEL)
@@ -1285,7 +1306,7 @@ void GameTableManager::hostGameTablePopUp()
                     // Identity + network
                     auto my_unique = identity_manager->myUniqueId();
                     identity_manager->setMyIdentity(my_unique, username_buffer);
-
+                    network_manager->setCustomHost(custom_host_buf);
                     network_manager->setNetworkPassword(pass_buffer);
                     const unsigned p = static_cast<unsigned>(atoi(port_buffer));
                     network_manager->startServer(hostMode, static_cast<unsigned short>(p), tryUpnp);
@@ -1341,6 +1362,7 @@ void GameTableManager::hostGameTablePopUp()
 
                 // Mode
                 ImGui::Separator();
+                /*
                 ImGui::TextUnformatted("Connection Mode:");
                 int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 : hostMode == ConnectionType::LOCAL ? 1
                                                                                                          : 2);
@@ -1353,8 +1375,27 @@ void GameTableManager::hostGameTablePopUp()
                 if (ImGui::RadioButton("External (Internet)", m == 2))
                     m = 2;
                 hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL : m == 1 ? ConnectionType::LOCAL
-                                                                          : ConnectionType::EXTERNAL);
-
+                                                                          : ConnectionType::EXTERNAL);*/
+                ImGui::TextUnformatted("Connection Mode:");
+                int m = (hostMode == ConnectionType::LOCALTUNNEL ? 0 :
+                        hostMode == ConnectionType::LOCAL       ? 1 :
+                        hostMode == ConnectionType::EXTERNAL    ? 2 : 3);
+                if (ImGui::RadioButton("LocalTunnel", m == 0)) 
+                    m = 0; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Local (LAN)", m == 1)) 
+                    m = 1; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("External (Internet)", m == 2)) 
+                    m = 2; 
+                ImGui::SameLine();
+                if (ImGui::RadioButton("Custom IP (Overlay/Other)", m == 3)) 
+                    m = 3;
+                
+                hostMode = (m == 0 ? ConnectionType::LOCALTUNNEL :
+                           (m == 1 ? ConnectionType::LOCAL :
+                           (m == 2 ? ConnectionType::EXTERNAL : ConnectionType::CUSTOM)));
+                
                 if (hostMode == ConnectionType::LOCALTUNNEL)
                 {
                     ImGui::TextDisabled("LocalTunnel: URL appears after server starts.\n"
