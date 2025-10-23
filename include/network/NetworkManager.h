@@ -295,8 +295,12 @@ public:
     std::string debugIdentitySnapshot() const;
     void clearDragState(uint64_t markerId);
     void housekeepPeers();
+    // public:
+    void setCustomHost(const std::string& h) { customHost_ = h; }
+    const std::string& getCustomHost() const { return customHost_; }
 
 private:
+    std::string customHost_; // empty = unset
     // build
     std::vector<unsigned char> buildGridUpdateFrame(uint64_t boardId, const Grid& grid);
     // handle
