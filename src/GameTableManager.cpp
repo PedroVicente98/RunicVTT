@@ -370,6 +370,27 @@ void GameTableManager::processReceivedMessages()
                 break;
             }
 
+            // GameTableManager.cpp — inside processReceivedMessages() switch:
+            case msg::DCType::UserNameUpdate:
+            {
+                if (!m.tableId || !m.userUniqueId || !m.name || !m.text)
+                    break;
+                if (*m.tableId != chat_manager->currentTableId_)
+                    break;
+
+                const std::string uniqueId = *m.userUniqueId; // now uniqueId
+                const std::string fromPeerId = m.fromPeerId;
+                const std::string newU = *m.name;
+
+                // 1) record in address book
+                network_manager->upsertPeerIdentityWithUnique(/*peerId=*/m.fromPeerId, /*uniqueId=*/uniqueId, /*username=*/newU);
+                identity_manager->setUsernameForUnique(uniqueId, newU);
+                board_manager->onUsernameChanged(uniqueId, newU);
+                chat_manager->replaceUsernameForUnique(uniqueId, newU);
+
+                break;
+            }
+
             case msg::DCType::ChatGroupCreate:
             {
                 chat_manager->applyReady(m);
@@ -401,27 +422,6 @@ void GameTableManager::processReceivedMessages()
                     break;
 
                 boardEnt.set<Grid>(*m.grid);
-                break;
-            }
-
-            // GameTableManager.cpp — inside processReceivedMessages() switch:
-            case msg::DCType::UserNameUpdate:
-            {
-                if (!m.tableId || !m.userUniqueId || !m.name || !m.text)
-                    break;
-                if (*m.tableId != chat_manager->currentTableId_)
-                    break;
-
-                const std::string uniqueId = *m.userUniqueId; // now uniqueId
-                const std::string fromPeerId = m.fromPeerId;
-                const std::string newU = *m.name;
-
-                // 1) record in address book
-                network_manager->upsertPeerIdentityWithUnique(/*peerId=*/m.fromPeerId, /*uniqueId=*/uniqueId, /*username=*/newU);
-                identity_manager->setUsernameForUnique(uniqueId, newU);
-                board_manager->onUsernameChanged(uniqueId, newU);
-                chat_manager->replaceUsernameForUnique(uniqueId, newU);
-
                 break;
             }
 

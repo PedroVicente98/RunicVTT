@@ -27,6 +27,11 @@ public:
         Logger::instance().log("localtunnel", Logger::Level::Success, "Start and Stop Handlers Set!!!");
     }
 
+    static void setIdentityLogger(std::function<std::string()> identityLogger)
+    {
+        identityLogger_ = std::move(identityLogger);
+    }
+
     // Add/remove toggle entries for the left panel.
     static void addToggle(const DebugToggle& t)
     {
@@ -209,7 +214,7 @@ private:
             }
             else
             {
-                Logger::instance().log("localtunnel",Logger::Level::Error, "Start handler not set");
+                Logger::instance().log("localtunnel", Logger::Level::Error, "Start handler not set");
             }
         }
         ImGui::SameLine();
@@ -229,6 +234,21 @@ private:
         ImGui::Dummy(ImVec2(0, 6));
         ImGui::Separator();
 
+        if (ImGui::Button("Print Identity"))
+        {
+            if (identityLogger_)
+            {
+                auto log = identityLogger_();
+                Logger::instance().log("identity", log);
+            }
+            else
+            {
+                Logger::instance().log("localtunnel", "Identity handler not set");
+            }
+        }
+
+        ImGui::Dummy(ImVec2(0, 6));
+        ImGui::Separator();
         // Master switch for executing debug actions per-frame
         ImGui::Checkbox("Run Debug Actions", &debugExecEnabled_);
         ImGui::SetItemTooltip("When ON, the per-frame debug callbacks of active toggles will run.");
@@ -270,9 +290,8 @@ private:
                 if (e.tsStr.empty())
                     e.tsStr = Logger::formatTs(e.tsMs);
                 ImGui::PushStyleColor(ImGuiCol_Text, colorForLevel_(e.level)); // if you color by level
-                ImGui::TextWrapped("%s", e.text.c_str());                 // wraps at window edge
+                ImGui::TextWrapped("%s", e.text.c_str());                      // wraps at window edge
                 ImGui::PopStyleColor();
-
             }
             else
             {
@@ -310,6 +329,7 @@ private:
     inline static bool autoScroll_ = true;
 
     inline static std::function<std::string()> ltStart_;
+    inline static std::function<std::string()> identityLogger_;
     inline static std::function<void()> ltStop_;
     inline static std::vector<DebugToggle> toggles_;
     inline static bool debugExecEnabled_ = false;

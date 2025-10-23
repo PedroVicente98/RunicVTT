@@ -91,7 +91,7 @@ bool SignalingClient::connect(const std::string& ip, unsigned short port)
 
 void SignalingClient::send(const std::string& message)
 {
-    if (ws)
+    if (ws && !ws->isClosed())
     {
         ws->send(message);
     }

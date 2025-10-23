@@ -14,11 +14,13 @@ static constexpr const int kME_VER = 1;
 static constexpr const char* kBOOK_MAGIC = "RUNIC-BOOK";
 static constexpr const int kBOOK_VER = 1;
 
-const char* IdentityManager::kMeFile() {
+const char* IdentityManager::kMeFile()
+{
     static const std::string s_me = (PathManager::getConfigPath() / "identity_me.runic").string();
     return s_me.c_str();
 }
-const char* IdentityManager::kBookFile() {
+const char* IdentityManager::kBookFile()
+{
     static const std::string s_book = (PathManager::getConfigPath() / "identity_book.runic").string();
     return s_book.c_str();
 }
@@ -68,15 +70,57 @@ bool IdentityManager::saveAddressBookToFile() const
 {
     return writeBookFile();
 }
+//
+//void IdentityManager::bindPeer(const std::string& peerId,
+//                               const std::string& uniqueId,
+//                               const std::string& username)
+//{
+//    // session binding
+//    peerToUnique_[peerId] = uniqueId;
+//
+//    auto& pi = byUnique_[uniqueId];
+//    pi.uniqueId = uniqueId;
+//    pi.peerId = peerId;
+//
+//    if (!pi.username.empty() && pi.username != username)
+//    {
+//        pi.usernamesHistory.emplace_back(pi.username);
+//        if (pi.usernamesHistory.size() > 10)
+//            pi.usernamesHistory.erase(pi.usernamesHistory.begin());
+//    }
+//    pi.username = username;
+//
+//    (void)saveAddressBookToFile(); // optional: you can defer saving if you prefer
+//}
 
 void IdentityManager::bindPeer(const std::string& peerId,
                                const std::string& uniqueId,
                                const std::string& username)
 {
-    // session binding
+    // 1) If this peerId was previously mapped to some unique, clear that first.
+    if (auto it = peerToUnique_.find(peerId); it != peerToUnique_.end())
+    {
+        const std::string& oldUid = it->second;
+        if (oldUid != uniqueId)
+        {
+            // Unlink old mapping (the old unique keeps its record, but without this peerId)
+            auto bit = byUnique_.find(oldUid);
+            if (bit != byUnique_.end() && bit->second.peerId == peerId)
+                bit->second.peerId.clear();
+        }
+        peerToUnique_.erase(it);
+    }
+
+    // 2) If this uniqueId already had a different peerId, remove that stale reverse mapping.
+    auto& pi = byUnique_[uniqueId];
+    if (!pi.peerId.empty() && pi.peerId != peerId)
+    {
+        peerToUnique_.erase(pi.peerId); // remove old peerId -> uniqueId
+    }
+
+    // 3) Set the fresh links (one-to-one at a time)
     peerToUnique_[peerId] = uniqueId;
 
-    auto& pi = byUnique_[uniqueId];
     pi.uniqueId = uniqueId;
     pi.peerId = peerId;
 
@@ -88,55 +132,22 @@ void IdentityManager::bindPeer(const std::string& peerId,
     }
     pi.username = username;
 
-    (void)saveAddressBookToFile(); // optional: you can defer saving if you prefer
+    (void)saveAddressBookToFile();
 }
 
 void IdentityManager::erasePeer(const std::string& peerId)
 {
-    peerToUnique_.erase(peerId);
+    if (auto it = peerToUnique_.find(peerId); it != peerToUnique_.end())
+    {
+        const std::string uid = it->second;
+        peerToUnique_.erase(it);
+        auto bit = byUnique_.find(uid);
+        if (bit != byUnique_.end() && bit->second.peerId == peerId)
+            bit->second.peerId.clear();
+    }
 }
 
 // ------------------ public: lookups ------------------
-
-std::string IdentityManager::usernameForUnique(const std::string& uniqueId) const
-{
-    auto it = byUnique_.find(uniqueId);
-    if (it != byUnique_.end() && !it->second.username.empty())
-        return it->second.username;
-
-    if (uniqueId == myUniqueId_ && !myUsername_.empty())
-        return myUsername_;
-
-    // fallback: show truncated uniqueId if unknown
-    if (uniqueId.size() > 8)
-        return uniqueId.substr(0, 8);
-    return uniqueId;
-}
-
-std::optional<std::string> IdentityManager::uniqueForPeer(const std::string& peerId) const
-{
-    auto it = peerToUnique_.find(peerId);
-    if (it == peerToUnique_.end())
-        return std::nullopt;
-    return it->second;
-}
-
-std::optional<std::string> IdentityManager::peerForUnique(const std::string& uniqueId) const
-{
-    for (const auto& kv : peerToUnique_)
-        if (kv.second == uniqueId)
-            return kv.first;
-    return std::nullopt;
-}
-
-std::optional<std::string> IdentityManager::usernameForPeer(const std::string& peerId) const
-{
-    for (const auto& kv : peerToUnique_)
-        if (kv.first == peerId)
-            return usernameForUnique(kv.second);
-    return std::nullopt;
-}
-
 void IdentityManager::setUsernameForUnique(const std::string& uniqueId, const std::string& username)
 {
     if (uniqueId == myUniqueId_)
@@ -158,6 +169,59 @@ void IdentityManager::setUsernameForUnique(const std::string& uniqueId, const st
     pi.uniqueId = uniqueId;
     pi.username = username;
     (void)saveAddressBookToFile();
+}
+
+std::string IdentityManager::usernameForUnique(const std::string& uniqueId) const
+{
+    auto it = byUnique_.find(uniqueId);
+    if (it != byUnique_.end() && !it->second.username.empty())
+        return it->second.username;
+
+    if (uniqueId == myUniqueId_ && !myUsername_.empty())
+        return myUsername_;
+
+    // fallback: show truncated uniqueId if unknown
+    if (uniqueId.size() > 8)
+        return uniqueId.substr(0, 8);
+    return uniqueId;
+}
+
+std::optional<std::string> IdentityManager::uniqueForPeer(const std::string& peerId) const
+{
+    if (auto it = peerToUnique_.find(peerId); it != peerToUnique_.end())
+        return it->second;
+    return std::nullopt;
+}
+
+std::optional<std::string> IdentityManager::peerForUnique(const std::string& uniqueId) const
+{
+    if (auto it = byUnique_.find(uniqueId); it != byUnique_.end() && !it->second.peerId.empty())
+        return it->second.peerId;
+    return std::nullopt;
+}
+
+//std::optional<std::string> IdentityManager::uniqueForPeer(const std::string& peerId) const
+//{
+//    auto it = peerToUnique_.find(peerId);
+//    if (it == peerToUnique_.end())
+//        return std::nullopt;
+//    return it->second;
+//}
+//
+//std::optional<std::string> IdentityManager::peerForUnique(const std::string& uniqueId) const
+//{
+//    for (const auto& kv : peerToUnique_)
+//        if (kv.second == uniqueId)
+//            return kv.first;
+//    return std::nullopt;
+//}
+
+std::optional<std::string> IdentityManager::usernameForPeer(const std::string& peerId) const
+{
+    for (const auto& kv : peerToUnique_)
+        if (kv.first == peerId)
+            return usernameForUnique(kv.second);
+    return std::nullopt;
 }
 
 // ------------------ private: files ------------------

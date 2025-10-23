@@ -291,6 +291,9 @@ public:
     }
 
     std::unordered_map<uint64_t /*markerId*/, DragState> drag_;
+    // NetworkManager.h
+    std::string debugIdentitySnapshot() const;
+    void clearDragState(uint64_t markerId);
 
 private:
     // build

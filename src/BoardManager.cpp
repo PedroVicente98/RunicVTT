@@ -1473,50 +1473,69 @@ void BoardManager::renderEditWindow()
     {
         auto nm = network_manager.lock();
         auto mc = edit_window_entity.get_mut<MarkerComponent>();
-
-        // Build options: index 0 = (none), then connected peers, then offline owner (if any)
-        std::vector<std::string> options;
-        options.emplace_back(""); // 0 => (none)
-
-        // unique connected peers
-        std::set<std::string> uniq;
-        if (nm)
-        {
-            for (const auto& pid : nm->getConnectedUsernames())
-            {
-                if (uniq.insert(pid).second)
-                    options.emplace_back(pid);
-            }
-        }
-        // include offline owner if not already in the list
-        if (!mc->ownerPeerUsername.empty() && !uniq.count(mc->ownerPeerUsername))
-        {
-            options.emplace_back(mc->ownerPeerUsername);
-        }
-
-        // Find current selection
-        int selectedIndex = 0;
-        for (int i = 1; i < (int)options.size(); ++i)
-        {
-            if (options[i] == mc->ownerPeerUsername)
-            {
-                selectedIndex = i;
-                break;
-            }
-        }
+        auto idm = identity_manager; // you already have this in BoardManager
 
         ImGui::Separator();
         ImGui::TextUnformatted("Owner");
         ImGui::Spacing();
 
-        // Pagination (no child, no scroll)
+        // Build options as (uniqueId, displayName). Index 0 = (none)
+        struct Opt
+        {
+            std::string uid;
+            std::string label;
+        };
+        std::vector<Opt> options;
+        options.push_back(Opt{"", "(none)"}); // index 0
+
+        // Collect connected peers -> uniqueId (dedup by uid)
+        std::set<std::string> seenUids;
+        if (nm && idm)
+        {
+            for (auto& [peerId, link] : nm->getPeers())
+            {
+                if (!link)
+                    continue;
+                auto uidOpt = idm->uniqueForPeer(peerId);
+                if (!uidOpt || uidOpt->empty())
+                    continue;
+
+                const std::string& uid = *uidOpt;
+                if (!seenUids.insert(uid).second)
+                    continue; // dedup
+
+                // label = current username for that uid
+                std::string label = idm->usernameForUnique(uid);
+                if (label.empty())
+                    label = uid.substr(0, std::min<size_t>(8, uid.size()));
+                options.push_back(Opt{uid, label});
+            }
+        }
+
+        // If current owner is offline, include them so the selection stays visible
+        if (idm && !mc->ownerUniqueId.empty() && !seenUids.count(mc->ownerUniqueId))
+        {
+            std::string label = idm->usernameForUnique(mc->ownerUniqueId);
+            if (label.empty())
+                label = mc->ownerUniqueId.substr(0, std::min<size_t>(8, mc->ownerUniqueId.size()));
+            options.push_back(Opt{mc->ownerUniqueId, label});
+        }
+
+        // Find current selection by ownerUniqueId
+        int selectedIndex = 0;
+        for (int i = 1; i < (int)options.size(); ++i)
+            if (options[i].uid == mc->ownerUniqueId)
+            {
+                selectedIndex = i;
+                break;
+            }
+
+        // Pagination (unchanged UI)
         static int ownerPage = 0;
         const int rowsPerPage = 6;
         const int totalRows = (int)options.size();
         const int totalPages = (totalRows + rowsPerPage - 1) / rowsPerPage;
         ownerPage = std::clamp(ownerPage, 0, std::max(0, totalPages - 1));
-
-        // Helper: toggle-style full-width button
         auto ToggleRow = [&](const char* label, bool selected, int id) -> bool
         {
             ImGui::PushID(id);
@@ -1532,68 +1551,75 @@ void BoardManager::renderEditWindow()
                 ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.30f, 0.33f, 0.38f, 1.0f));
                 ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0.22f, 0.25f, 0.29f, 1.0f));
             }
-
-            bool clicked = ImGui::Button(label, ImVec2(-FLT_MIN, 0)); // full width
+            bool clicked = ImGui::Button(label, ImVec2(-FLT_MIN, 0));
             ImGui::PopStyleColor(3);
             ImGui::PopID();
             return clicked;
         };
 
-        // Compute visible slice
-        int start = ownerPage * rowsPerPage;
-        int end = std::min(start + rowsPerPage, totalRows);
+        const int start = ownerPage * rowsPerPage;
+        const int end = std::min(start + rowsPerPage, totalRows);
 
         // Render visible rows
         for (int i = start; i < end; ++i)
         {
-            const std::string& pid = options[i];
             const bool isSel = (selectedIndex == i);
-            const char* label = (i == 0) ? "(none)" : pid.c_str();
+            const char* label = options[i].label.c_str();
             if (ToggleRow(label, isSel, i))
             {
                 selectedIndex = i;
+
+                // APPLY IMMEDIATELY (no "Apply Ownership" button)
+                const std::string prevOwnerUid = mc->ownerUniqueId;
+                mc->ownerUniqueId = options[i].uid; // << authoritative owner
+                mc->ownerPeerUsername.clear();
+                if (idm && !mc->ownerUniqueId.empty())
+                    mc->ownerPeerUsername = idm->usernameForUnique(mc->ownerUniqueId); // display only
+
+                // If owner changed, clear drag state so new owner can take over smoothly
+                if (edit_window_entity.has<Identifier>() && nm)
+                {
+                    const auto mid = edit_window_entity.get<Identifier>()->id;
+                    if (prevOwnerUid != mc->ownerUniqueId)
+                        nm->clearDragState(mid); // small helper: drag_.erase(mid)
+                }
+
+                // Broadcast the change now
+                if (nm)
+                {
+                    auto boardEnt = getActiveBoard();
+                    if (boardEnt.is_valid())
+                        nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
+                }
             }
         }
 
-        // Pagination controls (only show if needed)
+        // Pagination controls
         if (totalPages > 1)
         {
             ImGui::Spacing();
             ImGui::BeginDisabled(ownerPage <= 0);
             if (ImGui::Button("< Prev"))
-            {
                 ownerPage--;
-            }
             ImGui::EndDisabled();
             ImGui::SameLine();
             ImGui::Text("Page %d / %d", ownerPage + 1, std::max(1, totalPages));
             ImGui::SameLine();
             ImGui::BeginDisabled(ownerPage >= totalPages - 1);
             if (ImGui::Button("Next >"))
-            {
                 ownerPage++;
-            }
             ImGui::EndDisabled();
         }
 
-        // Apply selection back to component
-        if (selectedIndex == 0)
-            mc->ownerPeerUsername.clear();
-        else
-            mc->ownerPeerUsername = options[selectedIndex];
-
-        ImGui::Checkbox("Allow all players to move", &mc->allowAllPlayersMove);
-        ImGui::Checkbox("Locked (players cannot move)", &mc->locked);
-
-        if (ImGui::Button("Apply Ownership"))
+        // Flags — apply immediately when toggled
+        bool flagsChanged = false;
+        flagsChanged |= ImGui::Checkbox("Allow all players to move", &mc->allowAllPlayersMove);
+        flagsChanged |= ImGui::Checkbox("Locked (players cannot move)", &mc->locked);
+        if (flagsChanged && nm)
         {
-
             auto boardEnt = getActiveBoard();
-            // broadcast a full marker update (GM op)
-            if (nm && boardEnt.is_valid())
-            {
+            if (boardEnt.is_valid())
                 nm->broadcastMarkerUpdate(boardEnt.get<Identifier>()->id, edit_window_entity);
-            }
         }
     }
 

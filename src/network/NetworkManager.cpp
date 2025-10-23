@@ -40,6 +40,8 @@ void NetworkManager::setup(std::weak_ptr<BoardManager> board_manager, std::weak_
             NetworkUtilities::stopLocalTunnel();
             Logger::instance().log("localtunnel", Logger::Level::Info, "Stop requested");
         });
+    DebugConsole::setIdentityLogger([this]() -> std::string
+                                    { return debugIdentitySnapshot(); });
 }
 
 NetworkManager::~NetworkManager()
@@ -745,6 +747,69 @@ std::vector<std::string> NetworkManager::getConnectedUsernames() const
         }
     }
     return user_names;
+}
+
+// NetworkManager.cpp
+std::string NetworkManager::debugIdentitySnapshot() const
+{
+    std::ostringstream os;
+    os << "[Identity Snapshot]\n";
+
+    os << "self.peerId=" << (getMyPeerId().empty() ? "(none)" : getMyPeerId()) << "\n";
+    if (identity_manager)
+    {
+        os << "self.uniqueId=" << identity_manager->myUniqueId()
+           << "  username=\"" << identity_manager->myUsername() << "\"\n";
+    }
+    // GM (if tracked)
+    if (!getGMId().empty())
+    {
+        os << "gm.uniqueId=" << getGMId()
+           << "  username=\"" << (identity_manager ? identity_manager->usernameForUnique(getGMId()) : std::string{}) << "\"\n";
+    }
+
+    os << "\n[Peers]\n";
+    for (const auto& [peerId, link] : peers)
+    {
+        os << "- peerId=" << peerId;
+
+        std::string uid, uname;
+        if (identity_manager)
+        {
+            if (auto u = identity_manager->uniqueForPeer(peerId))
+                uid = *u;
+            if (!uid.empty())
+                uname = identity_manager->usernameForUnique(uid);
+        }
+
+        if (!uid.empty())
+            os << "  uniqueId=" << uid;
+        if (!uname.empty())
+            os << "  username=\"" << uname << "\"";
+
+        if (link)
+            os << "  link.display=\"" << link->displayName() << "\"";
+
+        os << "\n";
+    }
+
+    // Optionally: dump address-book keys too
+    if (identity_manager)
+    {
+        os << "\n[Peer→Unique map]\n";
+        // If you don’t expose an accessor, add one that returns a copy or iterate via a friend.
+        for (const auto& pid : getConnectedPeerIds())
+        {
+            if (auto u = identity_manager->uniqueForPeer(pid))
+                os << "  " << pid << " -> " << *u << "\n";
+        }
+    }
+
+    return os.str();
+}
+void NetworkManager::clearDragState(uint64_t markerId)
+{
+    drag_.erase(markerId);
 }
 
 // ----------- GAME MESSAGE BROADCASTERS -------------------------------------------------------------------------------- -----------
