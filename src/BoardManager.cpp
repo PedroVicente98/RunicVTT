@@ -299,7 +299,7 @@ void BoardManager::renderToolbar(const ImVec2& window_position)
             if (isGM && ImGui::IsKeyPressed(ImGuiKey_S))
                 setTool(Tool::SELECT);
 
-            if (isGM && ImGui::IsKeyPressed(ImGuiKey_C))
+            if (ImGui::IsKeyPressed(ImGuiKey_C))
                 showCameraSettings = !showCameraSettings;
 
             if (isGM && ImGui::IsKeyPressed(ImGuiKey_G))
