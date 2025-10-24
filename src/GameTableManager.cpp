@@ -1727,9 +1727,9 @@ void GameTableManager::guidePopUp()
             "Connecting to a Game",
             "Game Tables",
             "Boards",
+            "Toolbar & Interface",
             "Markers",
             "Fog of War",
-            "Toolbar & Interface",
             "Networking & Security",
             "Known Issues",
             "Appendix"};
@@ -1837,17 +1837,25 @@ void GameTableManager::guidePopUp()
                 break;
             }
 
-            case 4: // Markers
+            case 4: // Toolbar & Interface
             {
-                ImGui::SeparatorText("Create Markers");
-                Para("Use the Marker directory to place tokens. Drag markers to the board from the Markers directory window.");
+                ImGui::SeparatorText("Toolbar Overview");
+                Para("- Move Tool: pan map or drag owned markers.\n"
+                     "- Fog Tool: create fog areas.\n"
+                     "- Edit/Delete: open edit window or remove entities.\n"
+                     "- Zoom/Pan: mouse wheel and drag (when panning).\n"
+                     "- Grid: open grid window to configure it.\n"
+                     "- Camera: open camera window to configure it.\n");
 
-                ImGui::SeparatorText("Edit & Ownership");
-                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. \n"
-                     "Players can only move owned/unlocked markers; the GM can always move.");
+                ImGui::SeparatorText("Windows & Panels");
+                Para("- Chat Window: General chat + dice roller (/roll).\n"
+                     "- Edit Window: per-entity size/visibility/ownership.\n"
+                     "- Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
+                     "- Camera Window: per-board camera zoom via button and sliders and reset.\n"
+                     "- Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
+                     "- Connect Window: connect to hosted gametable, connection string and credential.\n"
+                     "- Network Center: peers, connection strings, status.");
 
-                ImGui::SeparatorText("Movement");
-                Para("Drag markers to move. Updates are broadcast at a limited rate to reduce spam.");
                 break;
             }
 
@@ -1864,27 +1872,17 @@ void GameTableManager::guidePopUp()
                 break;
             }
 
-            case 6: // Toolbar & Interface
+            case 6: // Markers
             {
-                ImGui::SeparatorText("Toolbar Overview");
-                Para("- Move Tool: pan map or drag owned markers.\n"
-                     "- Fog Tool: create fog areas.\n"
-                     "- Edit/Delete: open edit window or remove entities.\n"
-                     "- Zoom/Pan: mouse wheel and drag (when panning)."
-                     "- Grid: open grid window to configure it.\n"
-                     "- Camera: open camera window to configure it.\n");
+                ImGui::SeparatorText("Create Markers");
+                Para("Use the Marker directory to place tokens. Drag markers to the board from the Markers directory window.");
 
-                ImGui::SeparatorText("Windows & Panels");
-                Para("- Chat Window: General chat + dice roller (/roll).\n"
-                     "- Edit Window: per-entity size/visibility/ownership.\n"
-                     "- Grid Window: per-board grid cell size/offset/visibility/snap to grid.\n"
-                     "- Camera Window: per-board camera zoom via button and sliders and reset.\n"
-                     "- Host Window: create or load gametable with credentials and port, start network and sets active gametable.\n"
-                     "- Connect Window: connect to hosted gametable, connection string and credential.\n"
-                     "- Network Center: peers, connection strings, status.");
+                ImGui::SeparatorText("Edit & Ownership");
+                Para("Edit window lets the GM set: owner peer ID, allow-all-players move, and locked state. \n"
+                     "Players can only move owned/unlocked markers; the GM can always move.");
 
-                //ImGui::SeparatorText("Hotkeys (examples)");
-                //Para("Zoom: Mouse Wheel\nPan: Middle Drag\nEdit: Right-Click on entity");
+                ImGui::SeparatorText("Movement");
+                Para("Drag markers to move. Updates are broadcast at a limited rate to reduce spam.");
                 break;
             }
 
