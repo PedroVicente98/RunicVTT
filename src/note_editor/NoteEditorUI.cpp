@@ -305,34 +305,34 @@ void NoteEditorUI::renderDirectory_(float /*height*/)
 
     ImGui::Separator();
 
-    if (ImGui::CollapsingHeader("Shared Inbox", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        auto inbox = notes_manager->listInbox();
-        if (inbox.empty())
-        {
-            ImGui::TextDisabled("(empty)");
-        }
-        else
-        {
-            for (auto& n : inbox)
-            {
-                if (!n || !filterMatch_(*n))
-                    continue;
-                ImGui::PushID(n->uuid.c_str());
+    //if (ImGui::CollapsingHeader("Shared Inbox", ImGuiTreeNodeFlags_DefaultOpen))
+    //{
+    //    auto inbox = notes_manager->listInbox();
+    //    if (inbox.empty())
+    //    {
+    //        ImGui::TextDisabled("(empty)");
+    //    }
+    //    else
+    //    {
+    //        for (auto& n : inbox)
+    //        {
+    //            if (!n || !filterMatch_(*n))
+    //                continue;
+    //            ImGui::PushID(n->uuid.c_str());
 
-                const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
-                const std::string label = (n->title.empty() ? n->uuid : n->title) + "  [from: " + (n->shared_from ? *n->shared_from : "?") + "]";
-                if (ImGui::Selectable(label.c_str(), selected))
-                    openOrFocusTab(n->uuid);
+    //            const bool selected = (std::find(openTabs_.begin(), openTabs_.end(), n->uuid) != openTabs_.end());
+    //            const std::string label = (n->title.empty() ? n->uuid : n->title) + "  [from: " + (n->shared_from ? *n->shared_from : "?") + "]";
+    //            if (ImGui::Selectable(label.c_str(), selected))
+    //                openOrFocusTab(n->uuid);
 
-                ImGui::SameLine();
-                if (ImGui::SmallButton("Save locally"))
-                    actSaveInboxToLocal_(n->uuid);
+    //            ImGui::SameLine();
+    //            if (ImGui::SmallButton("Save locally"))
+    //                actSaveInboxToLocal_(n->uuid);
 
-                ImGui::PopID();
-            }
-        }
-    }
+    //            ImGui::PopID();
+    //        }
+    //    }
+    //}
 }
 
 void NoteEditorUI::renderTabsArea_(float /*width*/, float /*height*/)
