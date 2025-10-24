@@ -10,7 +10,6 @@ It enables direct peer-to-peer sessions without the need for centralized servers
 - Entity-Component System (ECS) with `flecs`
 - Modern UI built on `ImGui`
 - OpenGL-based rendering with `GLEW`, `GLFW`, and `GLM`
-- Cross-platform architecture (primary target: Windows)
 
 ---
 
@@ -46,7 +45,6 @@ The project uses the following libraries:
 - Windows 10/11  
 - C++20 compatible compiler  
 - [CMake](https://cmake.org/) ≥ 3.16  
-- [OpenSSL](https://www.openssl.org/) (required by `libdatachannel`)  
 - Visual Studio 2022 (recommended)  
 
 ### Clone & Build
@@ -59,19 +57,9 @@ cmake --build build --config Release
 # The resulting binaries will be located in build/Release
 ```
 
-## Usage
-- Launch the application from the build folder.  
-- Create or join a session by exchanging peer connection details.  
-- Use the UI to load maps, place tokens, and manage game state.  
-
-*(A step-by-step usage guide with screenshots will go here TODO.)*
-
----
-
 ## Releases & Downloads
 - Stable builds are available on the [Releases page](https://github.com/PedroVicente98/RunicVTT/releases).  
 - Each release includes:
-  - Windows executable installer   
   - A portable application folder (Installer contents already configured)
   - A source code zip (tagged version)
 
@@ -92,7 +80,7 @@ Contributions are welcome!
 - Follow existing coding style and include documentation/comments where appropriate.
 ---
 
-## Roadmap / How it Works
+## Roadmap / To do 
 - Markdown Notes Editor.  
 - No Grid Distance Measures.  
 - Hexagonal Grid.  
