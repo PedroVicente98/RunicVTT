@@ -60,8 +60,8 @@ cmake --build build --config Release
 ## Releases & Downloads
 - Stable builds are available on the [Releases page](https://github.com/PedroVicente98/RunicVTT/releases).  
 - Each release includes:
-  - A portable application folder (Installer contents already configured)
-  - A source code zip (tagged version)
+  - A portable application zip (Executable on the bin/ folder)
+  - A source code zip 
 
 ---
 
