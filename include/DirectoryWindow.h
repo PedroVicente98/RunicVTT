@@ -113,8 +113,7 @@ public:
 
         ImGui::Separator();
 
-        float imageSize = 128.0f;
-        float minScale = 25.0f, maxScale = 1080.0f;
+        float minScale = 25.0f, maxScale = 550.0f;
         ImGui::Separator();
         ImGui::TextUnformatted("Directory Thumb Pixel Size");
         ImGui::SameLine();
@@ -342,7 +341,7 @@ private:
     std::shared_mutex imagesMutex;
     DirectoryKind kind_;
     float global_size_slider = 1.0f;
-
+    float imageSize = 128.0f;
     std::mutex pendingMtx;
     std::vector<std::string> pendingRemovals; // filenames to remove
     std::vector<std::pair<std::string, std::string>> pendingAddPaths;
