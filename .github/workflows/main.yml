@@ -1,0 +1,29 @@
+name: Build Doxygen and publish to pages repo
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:        # <-- manual run
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+      - name: Build docs
+        run: doxygen Doxyfile
+
+      - name: Push to pages repo
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          external_repository: PedroVicente98/runicvtt.github.io
+          publish_branch: main
+          publish_dir: ./docs/html 
+          personal_token: ${{ secrets.PAGES_TOKEN }}
+          user_name: github-actions[bot]
+          user_email: github-actions[bot]@users.noreply.github.com
