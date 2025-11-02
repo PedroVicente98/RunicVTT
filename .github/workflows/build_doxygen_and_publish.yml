@@ -8,7 +8,7 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    environment: RunicVTT Distribution
+    environment: RunicVTT Distribuition
 
     steps:
       - name: Checkout source
