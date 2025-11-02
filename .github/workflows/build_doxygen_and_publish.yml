@@ -20,17 +20,51 @@ jobs:
       - name: Build docs
         run: doxygen Doxyfile
 
-      - name: Copy assets
+      # create extra files in the publish dir
+      - name: Prepare publish dir
         run: |
-          mkdir -p docs/html/res
-          cp -r res/* docs/html/res/
+          # make root-level folders inside docs/
+          mkdir -p docs/res
+          # copy ONLY the icon you want
+          cp res/RunicVTTIcon_64.png docs/res/RunicVTTIcon_64.png
+
+          # add README with the public URL
+          cat > docs/README.md << 'EOF'
+# RunicVTT – Doxygen docs
+
+Published at: https://pedrovicente98.github.io/html/
+EOF
+
+          cat > docs/LICENSE << 'EOF'
+MIT License
+
+Copyright (c) 2025 Pedro Vicente
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOF
 
       - name: Push to pages repo
         uses: peaceiris/actions-gh-pages@v4
         with:
           external_repository: PedroVicente98/runicvtt.github.io
           publish_branch: main
-          publish_dir: ./docs        # 👈 push folder that contains html/
+          publish_dir: ./docs       
           personal_token: ${{ secrets.PAGES_TOKEN }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
