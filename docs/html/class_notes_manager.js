@@ -1,0 +1,26 @@
+var class_notes_manager =
+[
+    [ "NotesManager", "class_notes_manager.html#a51e327ea0262e84dfbdaabae5f25b4a6", null ],
+    [ "createNote", "class_notes_manager.html#a25028064b2467e9eea064a1c4ef91ba8", null ],
+    [ "defaultSavePath", "class_notes_manager.html#af6399f8298df19714e8d528e42afe429", null ],
+    [ "deleteNote", "class_notes_manager.html#a749f1affa717e6a63048d85b989d5cc5", null ],
+    [ "getByUuid", "class_notes_manager.html#a6372efd2afacbfbc7ff4fef84091ce1c", null ],
+    [ "getNote", "class_notes_manager.html#ada2f515ddef89ab5c5e0be49704aba08", null ],
+    [ "getNote", "class_notes_manager.html#a0b4d459240dcd83be41fe6122bc37662", null ],
+    [ "indexNote", "class_notes_manager.html#a7c91b60e13ba3e35fa5a2ebd5083568d", null ],
+    [ "listAll", "class_notes_manager.html#ac194a9a01a8807c99ae8495c6ba13ab0", null ],
+    [ "listInbox", "class_notes_manager.html#a4ac32d89a073db3184fc88a2293581dd", null ],
+    [ "listMyNotes", "class_notes_manager.html#a81c51abbe95a013b99beead259212b54", null ],
+    [ "loadAllFromDisk", "class_notes_manager.html#ad27f8593eb58d8f778818bf4921574f3", null ],
+    [ "loadFromGlobal", "class_notes_manager.html#aa1f004250dedc1e84ec8926c0283a450", null ],
+    [ "loadFromTable", "class_notes_manager.html#af4a6dd97ecee332425ca422fb84bfc1f", null ],
+    [ "removeFromIndex", "class_notes_manager.html#a67532abcfd3583ebafb017ba72da5319", null ],
+    [ "resolveRef", "class_notes_manager.html#a53184b2383dddf0006df9293d7588a8b", null ],
+    [ "saveInboxToLocal", "class_notes_manager.html#a03806d2e472d4d7a4aa16159fddfbb94", null ],
+    [ "saveNote", "class_notes_manager.html#a89f1c0c8537a6d0224a81f3989f01064", null ],
+    [ "saveNoteAs", "class_notes_manager.html#a91b824469d0c7b59abc82b536265049b", null ],
+    [ "setAuthor", "class_notes_manager.html#a9fbc3a1e60d48f6492261966e9b2c6dd", null ],
+    [ "setContent", "class_notes_manager.html#a8edd43c1ad973dbb228029e5000840f8", null ],
+    [ "setTitle", "class_notes_manager.html#a1e496b468cfe47b66ff6071696a03660", null ],
+    [ "upsertSharedIncoming", "class_notes_manager.html#ab0a278cd688dcd64ae25cb91d1a2fe34", null ]
+];

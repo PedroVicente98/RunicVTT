@@ -1,0 +1,21 @@
+var searchData=
+[
+  ['beg_0',['beg',['../struct_m_d___l_i_n_e___a_n_a_l_y_s_i_s__tag.html#ad6464ae0dbe697356b7ee4641cdef1e5',1,'MD_LINE_ANALYSIS_tag::beg'],['../struct_m_d___l_i_n_e__tag.html#ae47080b71e1a1a4417a8c279ade3aa55',1,'MD_LINE_tag::beg'],['../struct_m_d___v_e_r_b_a_t_i_m_l_i_n_e__tag.html#a17a0e9b4b6027fbbf05d3889a635547f',1,'MD_VERBATIMLINE_tag::beg'],['../struct_m_d___m_a_r_k__tag.html#a567f161479ed207074fcc1f0034e84b8',1,'MD_MARK_tag::beg']]],
+  ['bgopacity_1',['bgOpacity',['../struct_im_gui_toaster_1_1_config.html#a2b3c91d2b377c2b0436ad525e1d65efe',1,'ImGuiToaster::Config']]],
+  ['block_5fbyte_5foff_2',['block_byte_off',['../struct_m_d___c_o_n_t_a_i_n_e_r__tag.html#a9d7dd52bb44b90c3099392f8c4034f97',1,'MD_CONTAINER_tag']]],
+  ['block_5fbytes_3',['block_bytes',['../struct_m_d___c_t_x__tag.html#a8a30c8dfc0a0d9ee5ac9f8095fa2de76',1,'MD_CTX_tag']]],
+  ['board_5fmanager_4',['board_manager',['../class_game_table_manager.html#abcf641b16377e492fb753036434d4386',1,'GameTableManager']]],
+  ['board_5fname_5',['board_name',['../class_board_manager.html#a7d9eb9d3ed774e08c35a4ac62a40bdf9',1,'BoardManager::board_name'],['../struct_board.html#ade3985ffb8086df9a16e99ee7c52e37c',1,'Board::board_name']]],
+  ['boardid_6',['boardId',['../structmsg_1_1_marker_meta.html#a23ade06da3af9e163fa81d5516fd871e',1,'msg::MarkerMeta::boardId'],['../structmsg_1_1_board_meta.html#a83f7dc99e5f147e7128910ef86c20318',1,'msg::BoardMeta::boardId'],['../structmsg_1_1_ready_message.html#aafcb0269761241bb23f3c97c737af307',1,'msg::ReadyMessage::boardId'],['../struct_pending_image.html#ac78058f54436aa07eb9b2981696d3c1a',1,'PendingImage::boardId']]],
+  ['boardmeta_7',['boardMeta',['../structmsg_1_1_ready_message.html#aa23caf8b489522d94e1e0c9a4364f0df',1,'msg::ReadyMessage::boardMeta'],['../struct_pending_image.html#a07d855a0dfc6e6db057f37136c041e7f',1,'PendingImage::boardMeta']]],
+  ['boardname_8',['boardName',['../structmsg_1_1_board_meta.html#a8db127039f347be02ab036f162bfc758',1,'msg::BoardMeta']]],
+  ['body_5frow_5fcount_9',['body_row_count',['../struct_m_d___b_l_o_c_k___t_a_b_l_e___d_e_t_a_i_l.html#a3e9b735ffe82c820cfd9f198a916b79b',1,'MD_BLOCK_TABLE_DETAIL']]],
+  ['bordercolor_10',['borderColor',['../struct_im_gui_toaster_1_1_config.html#a770c5b574e177eac5df07c1fe62023dd',1,'ImGuiToaster::Config']]],
+  ['bordersize_11',['borderSize',['../struct_im_gui_toaster_1_1_config.html#a2191ac4aa632bbd0bf3bebe5cd273fd5',1,'ImGuiToaster::Config']]],
+  ['broadcast_12',['Broadcast',['../namespacemsg_1_1key.html#af900ce19bf5b639f11a4b0e9df407d92',1,'msg::key']]],
+  ['buf_13',['buf',['../struct_input_text_wrap_ctx.html#a581adaf3ecb2ace6cb5c6c3a75007cde',1,'InputTextWrapCtx::buf'],['../struct_pending_image.html#a03ba5746710dc78c40934f330d25442b',1,'PendingImage::buf']]],
+  ['buffer_14',['buffer',['../struct_m_d___c_t_x__tag.html#a62c2806a5e5eb915c72412b9c804d9c5',1,'MD_CTX_tag']]],
+  ['bytes_15',['bytes',['../structmsg_1_1_ready_message.html#a2c0addb2d1f502f087011622b237c1fb',1,'msg::ReadyMessage::bytes'],['../structmsg_1_1_inbound_raw.html#a696b876aafbc2c24a8f6c7bc5b17b66b',1,'msg::InboundRaw::bytes']]],
+  ['bytesoffset_16',['BytesOffset',['../namespacemsg_1_1key.html#ab3393732294c8ba8cec847442a62f543',1,'msg::key']]],
+  ['bytestotal_17',['BytesTotal',['../namespacemsg_1_1key.html#a17925c1f0d907556e6fe3e2bcdb22f84',1,'msg::key']]]
+];

@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['saved_5flocally_0',['saved_locally',['../struct_note_component.html#a4c119852d4eff7a20ce4e42b6e95d19f',1,'NoteComponent::saved_locally'],['../struct_note.html#a6d7cb4bcd1ba70c561bd74a12dcca0b1',1,'Note::saved_locally']]],
+  ['sdp_1',['Sdp',['../namespacemsg_1_1key.html#aaf25a7932664870334cee0231ca65dff',1,'msg::key']]],
+  ['sdpmid_2',['SdpMid',['../namespacemsg_1_1key.html#ab67ad493019504885933eb40e2cd8ffe',1,'msg::key']]],
+  ['selected_3',['selected',['../struct_note_component.html#af765f5cf78836158a1ae4eb40a74a056',1,'NoteComponent']]],
+  ['senderrole_4',['senderRole',['../structmsg_1_1_ready_message.html#a341db34141aa4806b3ddccad7f04caac',1,'msg::ReadyMessage']]],
+  ['senderuniqueid_5',['senderUniqueId',['../struct_chat_message_model.html#acd12338e30a73f08f5e183fbdb3217f5',1,'ChatMessageModel']]],
+  ['seq_6',['seq',['../structmsg_1_1_ready_message.html#a95c31aae70035e3a1a8a5f9b0dc786bf',1,'msg::ReadyMessage']]],
+  ['serverdisconnect_7',['ServerDisconnect',['../namespacemsg_1_1signaling.html#a0951a4f31de36080a13fc1a046de4b41',1,'msg::signaling']]],
+  ['shared_8',['shared',['../struct_note_component.html#ae978dcd70077a3578cb198c4762b96a3',1,'NoteComponent::shared'],['../struct_note.html#a2810e708f71040636db3e95ce79c15af',1,'Note::shared']]],
+  ['shared_5ffrom_9',['shared_from',['../struct_note_component.html#a2afa75f7c211dcc78c9a7e832f0cdef9',1,'NoteComponent::shared_from'],['../struct_note.html#a16b6c19f178a209174596e57ed345cf4',1,'Note::shared_from']]],
+  ['showborder_10',['showBorder',['../struct_im_gui_toaster_1_1_config.html#ab0bd0e5aca3b1c7cc6f072e8f77c3114',1,'ImGuiToaster::Config']]],
+  ['size_11',['size',['../struct_m_d___c_t_x__tag.html#aaf7eef4d41a6dd885f8194dfb7ea6d46',1,'MD_CTX_tag::size'],['../struct_board_image_data.html#a2962fd614ee3f8e3487aa9639d30fcec',1,'BoardImageData::size'],['../struct_texture_component.html#a1590c3f89927757ff523aa51ed398090',1,'TextureComponent::size'],['../struct_directory_window_1_1_image_data.html#a96ae2e1b80338e1ce7366302b2946cac',1,'DirectoryWindow::ImageData::size'],['../structmsg_1_1_marker_meta.html#a8890244fddfa89e9076247be340582d3',1,'msg::MarkerMeta::size'],['../structmsg_1_1_board_meta.html#aea50e8fb91a72d4e046000ada7c8e955',1,'msg::BoardMeta::size'],['../structmsg_1_1_ready_message.html#ab1eeb46b2550553b1315430af4c63b7f',1,'msg::ReadyMessage::size'],['../structimgui__md_1_1image__info.html#a4cf5c699a97a682140db1ab0203a4dc2',1,'imgui_md::image_info::size'],['../struct_m_d___a_t_t_r_i_b_u_t_e.html#a20cd7e479ab1e36639923908665268ae',1,'MD_ATTRIBUTE::size']]],
+  ['snap_5fto_5fgrid_12',['snap_to_grid',['../struct_grid.html#a0113992e0f72002553d150045c54ec07',1,'Grid']]],
+  ['src_13',['src',['../struct_m_d___s_p_a_n___i_m_g___d_e_t_a_i_l.html#acdb71146f3aa3f6d84bfe8faadd49189',1,'MD_SPAN_IMG_DETAIL']]],
+  ['start_14',['start',['../struct_m_d___c_o_n_t_a_i_n_e_r__tag.html#a9b57cf00d1472e98ee77e261c6851072',1,'MD_CONTAINER_tag::start'],['../struct_m_d___b_l_o_c_k___o_l___d_e_t_a_i_l.html#aaeeca461e14020f605c1c4c912e27f9b',1,'MD_BLOCK_OL_DETAIL::start']]],
+  ['substr_5falloc_15',['substr_alloc',['../struct_m_d___a_t_t_r_i_b_u_t_e___b_u_i_l_d__tag.html#afc477e73cf667771e2a252b8752856d8',1,'MD_ATTRIBUTE_BUILD_tag']]],
+  ['substr_5fcount_16',['substr_count',['../struct_m_d___a_t_t_r_i_b_u_t_e___b_u_i_l_d__tag.html#a6baf6aa0ef09350927c7f0d9cf9a7c91',1,'MD_ATTRIBUTE_BUILD_tag']]],
+  ['substr_5foffsets_17',['substr_offsets',['../struct_m_d___a_t_t_r_i_b_u_t_e___b_u_i_l_d__tag.html#a0b78f82a9ab72a6a0a64397ad7774aa2',1,'MD_ATTRIBUTE_BUILD_tag::substr_offsets'],['../struct_m_d___a_t_t_r_i_b_u_t_e.html#a748196b366726c033b92cee8a09ce8d3',1,'MD_ATTRIBUTE::substr_offsets']]],
+  ['substr_5ftypes_18',['substr_types',['../struct_m_d___a_t_t_r_i_b_u_t_e___b_u_i_l_d__tag.html#a46828ba8b3906fd5f53b8c1ee190863d',1,'MD_ATTRIBUTE_BUILD_tag::substr_types'],['../struct_m_d___a_t_t_r_i_b_u_t_e.html#a70ef679bd5a5aca46dce7fd624b8a1bb',1,'MD_ATTRIBUTE::substr_types']]],
+  ['syntax_19',['syntax',['../struct_m_d___p_a_r_s_e_r.html#a7e81af7911a1696bdc59220594155fae',1,'MD_PARSER']]]
+];
