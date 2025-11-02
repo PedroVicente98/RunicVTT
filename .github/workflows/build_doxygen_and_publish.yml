@@ -9,6 +9,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     environment: RunicVTT Distribuition
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -19,12 +20,17 @@ jobs:
       - name: Build docs
         run: doxygen Doxyfile
 
+      - name: Copy assets
+        run: |
+          mkdir -p docs/html/res
+          cp -r res/* docs/html/res/
+
       - name: Push to pages repo
         uses: peaceiris/actions-gh-pages@v4
         with:
           external_repository: PedroVicente98/runicvtt.github.io
           publish_branch: main
-          publish_dir: ./docs/html
+          publish_dir: ./docs        # 👈 push folder that contains html/
           personal_token: ${{ secrets.PAGES_TOKEN }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
