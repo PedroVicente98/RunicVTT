@@ -3,11 +3,12 @@ name: Build Doxygen and publish to pages repo
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:        # <-- manual run
+  workflow_dispatch:
 
 jobs:
   docs:
     runs-on: ubuntu-latest
+    environment: RunicVTT Distribution   
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -23,7 +24,7 @@ jobs:
         with:
           external_repository: PedroVicente98/runicvtt.github.io
           publish_branch: main
-          publish_dir: ./docs/html 
+          publish_dir: ./docs/html
           personal_token: ${{ secrets.PAGES_TOKEN }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
