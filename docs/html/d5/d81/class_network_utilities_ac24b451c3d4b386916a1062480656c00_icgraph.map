@@ -1,0 +1,11 @@
+<map id="NetworkUtilities::safeCloseWebSocket" name="NetworkUtilities::safeCloseWebSocket">
+<area shape="rect" id="Node000001" title=" " alt="" coords="474,56,655,99"/>
+<area shape="rect" id="Node000002" href="$d4/d9e/class_signaling_client.html#ac3db9617d91d271ba18bde81f24b5c97" title=" " alt="" coords="257,5,404,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="462,54,386,35,387,30,463,49"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a8e0d2dcd98ddaf7e2546508c44dd804e" title=" " alt="" coords="235,56,426,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="459,80,426,80,426,75,459,75"/>
+<area shape="rect" id="Node000004" href="$d7/d85/class_signaling_server.html#ad1eb7f34bf1ee45ab24d16020ffcb889" title=" " alt="" coords="258,123,403,149"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="463,105,387,125,386,119,462,100"/>
+<area shape="rect" id="Node000005" href="$d7/d85/class_signaling_server.html#a257d9fcbdd01ef29c2c4b093a79b023a" title=" " alt="" coords="5,115,187,157"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="243,139,187,139,187,133,243,133"/>
+</map>

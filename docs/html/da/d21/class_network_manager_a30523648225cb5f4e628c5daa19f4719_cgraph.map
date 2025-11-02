@@ -1,0 +1,18 @@
+<map id="NetworkManager::sendMarkerMove" name="NetworkManager::sendMarkerMove">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,234,83"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#ab8fd392b2bcef38aa4c9ab92a7d73fe3" title=" " alt="" coords="282,88,477,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,81,267,89,266,95,210,86"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a1ca85e76187f45d46596a1d04d713f0f" title=" " alt="" coords="529,5,699,32"/>
+<area shape="poly" id="edge8_Node000001_Node000003" title=" " alt="" coords="234,55,513,26,514,32,235,60"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="424,85,524,42,545,34,546,39,526,46,426,90"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a9552a2e71fe480af903507fb148c8964" title=" " alt="" coords="525,56,703,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="477,90,516,83,517,89,478,95"/>
+<area shape="rect" id="Node000006" href="$d0/dc2/class_serializer.html#ac0cbc3ff6cc924221db1eebb6bb6b33b" title=" " alt="" coords="529,107,699,133"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="478,111,514,113,513,118,477,116"/>
+<area shape="rect" id="Node000007" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="529,157,699,184"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="465,129,546,150,545,155,463,134"/>
+<area shape="rect" id="Node000008" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="532,208,696,235"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="413,129,465,162,526,194,543,200,541,205,524,198,462,166,410,133"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a92ffe65857abd6eea6a393056a9bb533" title=" " alt="" coords="751,56,912,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="703,67,736,67,736,72,703,72"/>
+</map>

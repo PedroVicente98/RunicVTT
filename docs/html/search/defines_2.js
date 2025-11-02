@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['bracket_5fopeners_0',['BRACKET_OPENERS',['../md4c_8c.html#ac2bb91b49c128494c957e3fe1f344517',1,'md4c.c']]]
+  ['nominmax_0',['NOMINMAX',['../d4/dd7/_asset_i_o_8h.html#a9f918755b601cf4bffca775992e6fb90',1,'NOMINMAX:&#160;AssetIO.h'],['../d4/da8/_network_utilities_8h.html#a9f918755b601cf4bffca775992e6fb90',1,'NOMINMAX:&#160;NetworkUtilities.h']]]
 ];

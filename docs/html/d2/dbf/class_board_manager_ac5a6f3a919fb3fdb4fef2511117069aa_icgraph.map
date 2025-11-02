@@ -1,0 +1,7 @@
+<map id="BoardManager::resnapAllMarkersToNearest" name="BoardManager::resnapAllMarkersToNearest">
+<area shape="rect" id="Node000001" title=" " alt="" coords="466,5,680,48"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#aa3991452f739c572a483f72672382fa9" title=" " alt="" coords="245,5,418,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="450,29,419,29,419,24,450,24"/>
+<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#a2aad7a42521772a965571ce188decae8" title=" " alt="" coords="5,13,197,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
+</map>

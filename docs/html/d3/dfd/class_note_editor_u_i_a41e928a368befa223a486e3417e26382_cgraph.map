@@ -1,0 +1,17 @@
+<map id="NoteEditorUI::renderOneTab_" name="NoteEditorUI::renderOneTab_">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,107,199,133"/>
+<area shape="rect" id="Node000002" href="$d3/dfd/class_note_editor_u_i.html#a1bf409f46d4db716685a06b0474edf72" title=" " alt="" coords="251,5,440,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="124,104,178,73,246,42,266,34,268,39,248,46,181,78,127,109"/>
+<area shape="rect" id="Node000003" href="$d3/dfd/class_note_editor_u_i.html#aecb8f4275999ce387668ca2db3acd2e5" title=" " alt="" coords="247,56,444,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="169,103,262,84,263,89,170,109"/>
+<area shape="rect" id="Node000006" href="$de/d23/class_notes_manager.html#adc59a0ee5716f09b1ed47e0c0fe5f4ec" title=" " alt="" coords="249,107,442,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="199,117,234,117,234,123,199,123"/>
+<area shape="rect" id="Node000007" href="$d3/dfd/class_note_editor_u_i.html#a443c48e18d7f3f4ad45f36263805b700" title=" " alt="" coords="260,157,431,200"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="161,131,245,152,244,157,160,136"/>
+<area shape="rect" id="Node000008" href="$db/d4e/namespace_ui_typing_guard.html#a63a23afb57376e34f2fac5999eb9f1d9" title=" " alt="" coords="259,224,432,267"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="123,132,178,169,248,210,261,215,258,220,245,214,175,174,120,136"/>
+<area shape="rect" id="Node000004" href="$d3/dfd/class_note_editor_u_i.html#ae6cdb065e2d7f4eb4633cf81c21d8cad" title=" " alt="" coords="492,56,696,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="445,67,477,67,477,72,445,72"/>
+<area shape="rect" id="Node000005" href="$d3/dfd/class_note_editor_u_i.html#a818ddcd070082f3d89964a77ec669601" title=" " alt="" coords="744,56,952,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="697,67,729,67,729,72,697,72"/>
+</map>

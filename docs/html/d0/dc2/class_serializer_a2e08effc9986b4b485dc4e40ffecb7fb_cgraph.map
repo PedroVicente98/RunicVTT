@@ -1,0 +1,12 @@
+<map id="Serializer::serializeTextureComponent" name="Serializer::serializeTextureComponent">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,180,65"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="448,5,594,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="180,23,227,16,334,11,433,12,432,17,334,16,228,21,181,28"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c" title=" " alt="" coords="228,31,393,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="180,41,212,41,212,47,180,47"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a52943821c1686ae47c30586ec7f9bc7e" title=" " alt="" coords="230,81,390,108"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="181,62,236,75,235,80,179,67"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="393,31,432,27,433,32,394,37"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a92ffe65857abd6eea6a393056a9bb533" title=" " alt="" coords="441,81,601,108"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="391,92,425,92,425,97,391,97"/>
+</map>

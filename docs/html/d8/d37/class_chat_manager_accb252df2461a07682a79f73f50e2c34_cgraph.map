@@ -1,0 +1,12 @@
+<map id="ChatManager::loadLog" name="ChatManager::loadLog">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,158,83"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="445,5,605,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,53,152,32,205,16,263,8,321,4,429,6,429,12,321,10,263,13,206,21,154,37,109,58"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a47d1b2e09aaa99426b40f965ef2bf284" title=" " alt="" coords="212,31,391,57"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="158,58,196,53,197,59,158,63"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="209,81,394,108"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="158,75,194,80,193,85,158,81"/>
+<area shape="rect" id="Node000005" href="$d8/d37/class_chat_manager.html#abcfd0eeee4aff13b5230a991670ffb5d" title=" " alt="" coords="206,132,397,159"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="114,81,207,117,230,125,228,130,205,123,112,86"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="391,31,429,27,430,32,392,36"/>
+</map>

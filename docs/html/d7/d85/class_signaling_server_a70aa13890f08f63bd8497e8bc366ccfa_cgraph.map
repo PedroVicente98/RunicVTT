@@ -1,0 +1,8 @@
+<map id="SignalingServer::disconnectAllClients" name="SignalingServer::disconnectAllClients">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,189,77"/>
+<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="237,5,354,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,36,221,30,222,35,190,41"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="253,80,338,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="190,71,238,80,237,85,189,76"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="262,81,256,71,260,62,273,55,295,53,319,56,332,62,329,67,317,61,295,59,275,61,263,65,261,71,266,78"/>
+</map>

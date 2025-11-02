@@ -1,0 +1,11 @@
+<map id="include/note_editor/NoteEditorUI.h" name="include/note_editor/NoteEditorUI.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="210,5,340,48"/>
+<area shape="rect" id="Node000002" href="$d0/da4/_application_handler_8h.html" title=" " alt="" coords="81,104,267,131"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="242,60,190,106,187,102,239,56"/>
+<area shape="rect" id="Node000005" href="$d9/d67/_note_editor_u_i_8cpp.html" title=" " alt="" coords="291,96,465,139"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="312,56,356,93,352,97,309,60"/>
+<area shape="rect" id="Node000003" href="$df/d43/_application_handler_8cpp.html" title=" " alt="" coords="5,187,183,213"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="153,144,108,188,104,185,149,140"/>
+<area shape="rect" id="Node000004" href="$df/d0a/main_8cpp.html" title=" " alt="" coords="207,187,304,213"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="199,140,245,185,241,188,196,144"/>
+</map>

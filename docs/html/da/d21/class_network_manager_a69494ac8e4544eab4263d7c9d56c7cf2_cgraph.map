@@ -1,0 +1,16 @@
+<map id="NetworkManager::buildGridUpdateFrame" name="NetworkManager::buildGridUpdateFrame">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,99,185,141"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#ad0d31f7afee6b62ebc3c4f05bfef6bf2" title=" " alt="" coords="240,56,396,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,97,241,84,242,89,186,102"/>
+<area shape="rect" id="Node000006" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="233,107,403,133"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="185,117,217,117,217,123,185,123"/>
+<area shape="rect" id="Node000007" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="236,157,400,184"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="186,138,242,151,241,156,185,143"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a2a407c3a379b680296ee190ed625f05f" title=" " alt="" coords="452,5,610,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="377,53,457,34,458,39,378,58"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a92ffe65857abd6eea6a393056a9bb533" title=" " alt="" coords="659,81,820,108"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="396,71,644,86,644,92,396,77"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a52943821c1686ae47c30586ec7f9bc7e" title=" " alt="" coords="451,107,611,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="378,81,458,100,457,105,377,86"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="611,108,643,104,644,109,612,113"/>
+</map>

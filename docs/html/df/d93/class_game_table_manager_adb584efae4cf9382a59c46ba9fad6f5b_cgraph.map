@@ -1,0 +1,14 @@
+<map id="GameTableManager::loadBoardPopUp" name="GameTableManager::loadBoardPopUp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,53,209,96"/>
+<area shape="rect" id="Node000002" href="$de/d2f/class_path_manager.html#a38ea96d0a74f2dbf21e811dbdbe43fb4" title=" " alt="" coords="510,5,716,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,50,256,39,379,26,495,19,495,24,380,31,257,44,196,55"/>
+<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#a0d0b5aaffbd1abcc9311015183990396" title=" " alt="" coords="257,53,453,96"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="209,72,241,72,241,77,209,77"/>
+<area shape="rect" id="Node000006" href="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549" title=" " alt="" coords="275,120,434,163"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="190,94,261,113,259,119,188,99"/>
+<area shape="rect" id="Node000003" href="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd" title=" " alt="" coords="773,32,991,59"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="717,26,758,30,758,36,716,32"/>
+<area shape="rect" id="Node000005" href="$de/d2f/class_path_manager.html#a6be0a95403caf375f4d7b642f0f90061" title=" " alt="" coords="501,57,725,84"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="454,70,485,70,486,75,454,76"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="726,57,758,54,758,60,726,63"/>
+</map>

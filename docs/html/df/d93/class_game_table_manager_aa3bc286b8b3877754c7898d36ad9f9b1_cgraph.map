@@ -1,0 +1,7 @@
+<map id="GameTableManager::createBoardPopUp" name="GameTableManager::createBoardPopUp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,187,81"/>
+<area shape="rect" id="Node000002" href="$db/d4e/namespace_ui_typing_guard.html#a63a23afb57376e34f2fac5999eb9f1d9" title=" " alt="" coords="235,5,408,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,44,219,39,220,44,188,49"/>
+<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549" title=" " alt="" coords="242,72,401,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,71,227,77,226,82,187,76"/>
+</map>

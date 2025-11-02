@@ -1,0 +1,19 @@
+<map id="NetworkUtilities::closeHandleIf" name="NetworkUtilities::closeHandleIf">
+<area shape="rect" id="Node000001" title=" " alt="" coords="958,43,1160,69"/>
+<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567" title=" " alt="" coords="495,5,674,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="942,52,675,35,675,30,943,46"/>
+<area shape="rect" id="Node000006" href="$d5/d81/class_network_utilities.html#a1aff5744053044b32a0b910f02abc05a" title=" " alt="" coords="731,64,910,107"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="942,73,910,77,910,72,942,68"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e" title=" " alt="" coords="262,64,422,91"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="480,51,410,66,409,61,479,46"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="246,13,438,40"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="479,29,438,29,438,24,479,24"/>
+<area shape="rect" id="Node000005" href="$da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="5,13,198,40"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="230,29,198,29,198,24,230,24"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="717,62,673,51,674,46,718,57"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="716,86,422,81,422,76,716,81"/>
+<area shape="rect" id="Node000007" href="$da/d21/class_network_manager.html#a798b9a15475708f233e2d82f4ba0ff12" title=" " alt="" coords="486,123,683,149"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="717,110,651,125,650,119,716,105"/>
+<area shape="rect" id="Node000008" href="$da/d21/class_network_manager.html#a2cfe4223139cf58587a9f066b956cb23" title=" " alt="" coords="249,115,434,157"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="471,139,435,139,435,133,471,133"/>
+</map>

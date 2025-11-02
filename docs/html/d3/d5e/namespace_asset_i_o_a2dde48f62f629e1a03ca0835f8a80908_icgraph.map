@@ -1,0 +1,13 @@
+<map id="AssetIO::importFromPath" name="AssetIO::importFromPath">
+<area shape="rect" id="Node000001" title=" " alt="" coords="761,31,931,57"/>
+<area shape="rect" id="Node000002" href="$d3/d5e/namespace_asset_i_o.html#a0fd129212ac4835f913af0761824df9a" title=" " alt="" coords="516,5,697,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="745,36,697,31,697,26,745,31"/>
+<area shape="rect" id="Node000003" href="$d3/d5e/namespace_asset_i_o.html#ad87dd90acfa0487b69d4a53c32e1940d" title=" " alt="" coords="500,56,713,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="745,57,713,61,713,55,745,52"/>
+<area shape="rect" id="Node000004" href="$d4/d97/class_application_handler.html#a98e49f0d6038bf4caeed77b4d03b003c" title=" " alt="" coords="307,48,452,91"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="485,72,453,72,453,67,485,67"/>
+<area shape="rect" id="Node000005" href="$d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,56,259,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="291,72,259,72,259,67,291,67"/>
+<area shape="rect" id="Node000006" href="$df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,56,55,83"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="87,72,55,72,55,67,87,67"/>
+</map>

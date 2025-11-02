@@ -1,0 +1,9 @@
+<map id="PathManager::getNotesPath" name="PathManager::getNotesPath">
+<area shape="rect" id="Node000001" title=" " alt="" coords="359,43,545,69"/>
+<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="138,5,276,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="343,46,276,38,277,32,344,40"/>
+<area shape="rect" id="Node000003" href="$de/d2f/class_path_manager.html#a8ab36dc1c3f37bc603cb61f4ba6a90b7" title=" " alt="" coords="103,72,311,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="344,72,312,76,311,70,343,66"/>
+<area shape="rect" id="Node000004" href="$df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,72,55,99"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="87,88,55,88,55,83,87,83"/>
+</map>

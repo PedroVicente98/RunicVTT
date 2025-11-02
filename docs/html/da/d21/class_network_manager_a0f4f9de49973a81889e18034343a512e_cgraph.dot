@@ -1,0 +1,56 @@
+digraph "NetworkManager::setup"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="NetworkManager::setup",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkManager::debugIdentity\lSnapshot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a9b53362bce9f94b5d75f8b0ccae52cc7",tooltip=" "];
+  Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="NetworkManager::getConnected\lPeerIds",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a2127afec206b45126dff36ca21ffde3d",tooltip=" "];
+  Node2 -> Node4 [id="edge3_Node000002_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="NetworkManager::getGMId",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a1278e316ee962616fcae67294d53fac0",tooltip=" "];
+  Node2 -> Node5 [id="edge4_Node000002_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="NetworkManager::getMyPeerId",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a18a48f401ea5dea0ceb2bcecf0be521a",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="NetworkUtilities::getLocal\lIPv4Address",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#aa1a4875844765ed6487082867f6a832f",tooltip=" "];
+  Node1 -> Node7 [id="edge6_Node000001_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="Logger::instance",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f",tooltip=" "];
+  Node1 -> Node8 [id="edge7_Node000001_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="Logger::log",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370",tooltip=" "];
+  Node8 -> Node8 [id="edge8_Node000008_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node9 [id="edge9_Node000001_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node9 [id="Node000009",label="DebugConsole::setIdentity\lLogger",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d7c/class_debug_console.html#ae83ee3a2a09c1a5c0d04c9c1b6d0cbd2",tooltip=" "];
+  Node1 -> Node10 [id="edge10_Node000001_Node000010",color="steelblue1",style="solid",tooltip=" "];
+  Node10 [id="Node000010",label="DebugConsole::setLocalTunnel\lHandlers",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d7c/class_debug_console.html#a27b571593133576a069d69756f889d6b",tooltip=" "];
+  Node10 -> Node7 [id="edge11_Node000010_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node10 -> Node8 [id="edge12_Node000010_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node11 [id="edge13_Node000001_Node000011",color="steelblue1",style="solid",tooltip=" "];
+  Node11 [id="Node000011",label="NetworkUtilities::startLocal\lTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567",tooltip=" "];
+  Node11 -> Node12 [id="edge14_Node000011_Node000012",color="steelblue1",style="solid",tooltip=" "];
+  Node12 [id="Node000012",label="NetworkUtilities::assign\lToJob",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ace9b13371f4e6ffa2594682ada0f4e0c",tooltip=" "];
+  Node12 -> Node13 [id="edge15_Node000012_Node000013",color="steelblue1",style="solid",tooltip=" "];
+  Node13 [id="Node000013",label="NetworkUtilities::create\lKillJobIfNeeded",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#a829777d7022ecf7433b66afbae859800",tooltip=" "];
+  Node11 -> Node14 [id="edge16_Node000011_Node000014",color="steelblue1",style="solid",tooltip=" "];
+  Node14 [id="Node000014",label="NetworkUtilities::closeHandleIf",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#a9bb500d7c81ea448babc07ac94e6bd65",tooltip=" "];
+  Node11 -> Node15 [id="edge17_Node000011_Node000015",color="steelblue1",style="solid",tooltip=" "];
+  Node15 [id="Node000015",label="PathManager::getLocalTunnel\lControllerPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a84566186a965025393fe31a9cfb50299",tooltip=" "];
+  Node15 -> Node16 [id="edge18_Node000015_Node000016",color="steelblue1",style="solid",tooltip=" "];
+  Node16 [id="Node000016",label="PathManager::getExternalPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a8bc07ea0ad8692223d1743e442b48e26",tooltip=" "];
+  Node16 -> Node17 [id="edge19_Node000016_Node000017",color="steelblue1",style="solid",tooltip=" "];
+  Node17 [id="Node000017",label="PathManager::getExecutableRoot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd",tooltip=" "];
+  Node11 -> Node18 [id="edge20_Node000011_Node000018",color="steelblue1",style="solid",tooltip=" "];
+  Node18 [id="Node000018",label="PathManager::getNodeExePath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a8995cf2a53dfcf82d99d80695396031a",tooltip=" "];
+  Node18 -> Node16 [id="edge21_Node000018_Node000016",color="steelblue1",style="solid",tooltip=" "];
+  Node11 -> Node7 [id="edge22_Node000011_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node11 -> Node19 [id="edge23_Node000011_Node000019",color="steelblue1",style="solid",tooltip=" "];
+  Node19 [id="Node000019",label="NetworkUtilities::lastError\lToString",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ad620dd61d9d41d13af77219ffd1d937e",tooltip=" "];
+  Node11 -> Node8 [id="edge24_Node000011_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node11 -> Node20 [id="edge25_Node000011_Node000020",color="steelblue1",style="solid",tooltip=" "];
+  Node20 [id="Node000020",label="NetworkUtilities::stopLocal\lTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#a1aff5744053044b32a0b910f02abc05a",tooltip=" "];
+  Node20 -> Node14 [id="edge26_Node000020_Node000014",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node20 [id="edge27_Node000001_Node000020",color="steelblue1",style="solid",tooltip=" "];
+}

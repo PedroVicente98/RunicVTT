@@ -1,0 +1,17 @@
+digraph "Camera::setZoom"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="RL";
+  Node1 [id="Node000001",label="Camera::setZoom",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="BoardManager::renderCamera\lWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#aa78dbda1a719e20ebd433c876451bf59",tooltip=" "];
+  Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="BoardManager::renderToolbar",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a2aad7a42521772a965571ce188decae8",tooltip=" "];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="BoardManager::resetCamera",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#aa8cc85933ca8f36804277702fa568079",tooltip=" "];
+  Node4 -> Node2 [id="edge4_Node000004_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+}

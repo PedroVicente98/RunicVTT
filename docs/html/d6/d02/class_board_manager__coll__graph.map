@@ -1,0 +1,9 @@
+<map id="BoardManager" name="BoardManager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="100,661,359,1680"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,259,185,344"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,359,154,661,148,662,101,359"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="208,267,251,336"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="232,336,232,645,227,645,227,336"/>
+<area shape="rect" id="Node000004" href="$da/dbb/class_camera.html" title=" " alt="" coords="276,5,494,597"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="335,598,326,645,321,644,329,597"/>
+</map>

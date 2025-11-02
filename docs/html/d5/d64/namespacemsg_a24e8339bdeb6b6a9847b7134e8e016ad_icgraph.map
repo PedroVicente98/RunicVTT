@@ -1,0 +1,16 @@
+<map id="msg::makeChatGroupUpdate" name="msg::makeChatGroupUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="950,47,1141,73"/>
+<area shape="rect" id="Node000002" href="$d8/d37/class_chat_manager.html#a545045ad462d96e87d64a52e37b4e6df" title=" " alt="" coords="696,17,898,44"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="933,49,898,45,899,40,934,44"/>
+<area shape="rect" id="Node000006" href="$d8/d37/class_chat_manager.html#a727bf7136a525639a887a400f45f28d7" title=" " alt="" coords="692,72,902,99"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="934,74,902,77,902,72,934,69"/>
+<area shape="rect" id="Node000003" href="$d8/d37/class_chat_manager.html#a9526a187231f0c74492dfc0c575f3afa" title=" " alt="" coords="453,5,634,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="680,31,635,31,635,25,680,26"/>
+<area shape="rect" id="Node000004" href="$d8/d37/class_chat_manager.html#afb35f5cfd70af565c23555f8652cacf3" title=" " alt="" coords="197,47,395,73"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="438,44,396,49,395,44,437,38"/>
+<area shape="rect" id="Node000005" href="$d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,47,149,73"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="181,63,149,63,149,57,181,57"/>
+<area shape="rect" id="Node000007" href="$d8/d37/class_chat_manager.html#a2a7f8794c7ba31096eba399192bba538" title=" " alt="" coords="443,72,644,115"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="677,92,645,93,645,87,677,86"/>
+<area shape="poly" id="edge7_Node000007_Node000004" title=" " alt="" coords="427,80,395,76,396,71,428,75"/>
+</map>

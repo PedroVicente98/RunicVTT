@@ -1,0 +1,26 @@
+var class_identity_manager =
+[
+    [ "all", "d4/d55/class_identity_manager.html#ae8f52588de8e9e345c248596f6129154", null ],
+    [ "bindPeer", "d4/d55/class_identity_manager.html#a22e3ee5efe1fc4e1df1363b9490390fb", null ],
+    [ "erasePeer", "d4/d55/class_identity_manager.html#a3865c83acdb1586d0a3e1a9dd2f7c9fb", null ],
+    [ "loadAddressBookFromFile", "d4/d55/class_identity_manager.html#a8ab84e3c1abaf38a289c276666ca52ad", null ],
+    [ "loadMyIdentityFromFile", "d4/d55/class_identity_manager.html#af2952d782e6078643da4c28d90c87504", null ],
+    [ "myUniqueId", "d4/d55/class_identity_manager.html#a0bef3f576e242a1da3e26a137b6066f0", null ],
+    [ "myUsername", "d4/d55/class_identity_manager.html#aef80c2abaadd4c845d9082652fe7a992", null ],
+    [ "peerForUnique", "d4/d55/class_identity_manager.html#a1e8c8c55258ba677d5ec1028bb157354", null ],
+    [ "readBookFile", "d4/d55/class_identity_manager.html#a11610f8f56c0df45a6fe25b0a2299e58", null ],
+    [ "readMeFile", "d4/d55/class_identity_manager.html#a03e0bcd4a09304e6f8e4d9b7b3fa7736", null ],
+    [ "saveAddressBookToFile", "d4/d55/class_identity_manager.html#a18c85a39c82ac2918657286498bbe8da", null ],
+    [ "saveMyIdentityToFile", "d4/d55/class_identity_manager.html#a1869a9c4eeaabc2a70e422ae5c685a9b", null ],
+    [ "setMyIdentity", "d4/d55/class_identity_manager.html#a06c9f1224957dbb9d2680a5c0d595ebd", null ],
+    [ "setUsernameForUnique", "d4/d55/class_identity_manager.html#a2545919ba7d19962e6b4f147940cd3d9", null ],
+    [ "uniqueForPeer", "d4/d55/class_identity_manager.html#a369a318fb9af6f42672aabfccc03efac", null ],
+    [ "usernameForPeer", "d4/d55/class_identity_manager.html#a81faadb9db8aaccdc760594dfb430e75", null ],
+    [ "usernameForUnique", "d4/d55/class_identity_manager.html#a3e462e3795ff7cdbff0cca233f75e733", null ],
+    [ "writeBookFile", "d4/d55/class_identity_manager.html#a6423b50955b5c9937b4e3c928ce86dff", null ],
+    [ "writeMeFile", "d4/d55/class_identity_manager.html#a39c326ae35bbfd58d73cae32d8793174", null ],
+    [ "byUnique_", "d4/d55/class_identity_manager.html#a916f133fe2d87f0351f7104983b3f686", null ],
+    [ "myUniqueId_", "d4/d55/class_identity_manager.html#a74fb1cd43ada251e6de34fc99e6e34a7", null ],
+    [ "myUsername_", "d4/d55/class_identity_manager.html#aa2f499a221664b1775b49b4a8d0d4b65", null ],
+    [ "peerToUnique_", "d4/d55/class_identity_manager.html#ae17c1e4e1b465ab576f2f1657024e8c7", null ]
+];

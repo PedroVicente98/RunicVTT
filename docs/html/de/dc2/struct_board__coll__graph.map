@@ -1,0 +1,5 @@
+<map id="Board" name="Board">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,50,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="6,5,49,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="30,75,30,122,25,122,25,75"/>
+</map>

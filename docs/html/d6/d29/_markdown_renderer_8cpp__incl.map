@@ -1,0 +1,21 @@
+<map id="src/note_editor/MarkdownRenderer.cpp" name="src/note_editor/MarkdownRenderer.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="342,5,514,48"/>
+<area shape="rect" id="Node000002" href="$df/d96/_markdown_renderer_8h.html" title=" " alt="" coords="217,96,362,123"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="394,51,325,90,323,86,391,46"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="386,96,470,123"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="431,49,431,80,426,80,426,49"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="494,96,570,123"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="457,46,506,84,502,88,453,51"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,171,94,197"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="248,126,107,168,106,163,247,121"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="118,171,195,197"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="268,126,194,165,191,161,265,121"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="219,171,272,197"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="284,125,263,159,259,156,280,122"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="296,171,371,197"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="299,122,320,156,316,159,295,125"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="395,171,456,197"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="314,121,390,161,387,165,312,126"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="479,171,540,197"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="329,121,465,165,463,170,327,126"/>
+</map>

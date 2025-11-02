@@ -1,0 +1,5 @@
+<map id="BoardManager::canMoveMarker" name="BoardManager::canMoveMarker">
+<area shape="rect" id="Node000001" title=" " alt="" coords="260,5,466,32"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#a764873bdfd49e6b2a150a33f0eacff99" title=" " alt="" coords="5,5,212,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,21,212,21,212,16,244,16"/>
+</map>

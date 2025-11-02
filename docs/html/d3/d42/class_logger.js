@@ -1,0 +1,37 @@
+var class_logger =
+[
+    [ "LineToLoggerBuf", "db/d80/class_logger_1_1_line_to_logger_buf.html", "db/d80/class_logger_1_1_line_to_logger_buf" ],
+    [ "LogEntry", "d0/db6/struct_logger_1_1_log_entry.html", "d0/db6/struct_logger_1_1_log_entry" ],
+    [ "OstreamRedirect", "dd/d43/class_logger_1_1_ostream_redirect.html", "dd/d43/class_logger_1_1_ostream_redirect" ],
+    [ "Sink", "d3/d42/class_logger.html#a34c716f89c46c6cbf9c4b0955ca6d920", null ],
+    [ "Level", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cc", [
+      [ "Trace", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccadd4ec0ac4e58f7c32a01244ae91150b1", null ],
+      [ "Debug", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba", null ],
+      [ "Info", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875", null ],
+      [ "Warn", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17", null ],
+      [ "Error", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd", null ],
+      [ "Success", "d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca505a83f220c02df2f85c3810cd9ceb38", null ]
+    ] ],
+    [ "Logger", "d3/d42/class_logger.html#ac45b6ef7069b222c094da3724d1aa8fb", null ],
+    [ "addSink", "d3/d42/class_logger.html#a908e0c4479e0b156b6ffd548617ad89e", null ],
+    [ "channels", "d3/d42/class_logger.html#ab3787eeb00f65f63877f1c7a5e681d66", null ],
+    [ "clearChannel", "d3/d42/class_logger.html#af98b620264a3be3cf1df7b7265a7ac88", null ],
+    [ "clearSinks", "d3/d42/class_logger.html#ac1cc3290b75a8012a9fd35ec3735ee8e", null ],
+    [ "commit_", "d3/d42/class_logger.html#a5e5b35187416e687bc57384c386360c9", null ],
+    [ "ensureSeed_", "d3/d42/class_logger.html#a4e5e5f780d0d088fb2c8152755bc2dfb", null ],
+    [ "getChannel", "d3/d42/class_logger.html#a20bc2511969750adca340e0a1fe7ce93", null ],
+    [ "installStdCapture", "d3/d42/class_logger.html#ac0754e12de89078ec1fb60a7f8493f08", null ],
+    [ "log", "d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370", null ],
+    [ "log", "d3/d42/class_logger.html#a0bc3a507d60c66ff594379aa4196f861", null ],
+    [ "removeSink", "d3/d42/class_logger.html#af24a972618064be221b4085e311c0211", null ],
+    [ "setChannelCapacity", "d3/d42/class_logger.html#aa5f277e7a2c780a518e7d5232556c4c2", null ],
+    [ "uninstallStdCapture", "d3/d42/class_logger.html#a9a5430b63e73ed117ca620542a9a733c", null ],
+    [ "capacity_", "d3/d42/class_logger.html#aad9420d4c33539f6f276af6588b21fe0", null ],
+    [ "cerrRedirect_", "d3/d42/class_logger.html#a099d6f760e3d28ce7b4d3aae0005d956", null ],
+    [ "channels_", "d3/d42/class_logger.html#aacfccded4172d4e18daa25452446aab4", null ],
+    [ "coutRedirect_", "d3/d42/class_logger.html#a5c39f01ef0292da019287955b849ac2c", null ],
+    [ "m_", "d3/d42/class_logger.html#acc3ac4fd1f6e5e58a5e65609824e5d6b", null ],
+    [ "nextSinkId_", "d3/d42/class_logger.html#af36fedfb4431684cdc126f017badbaa6", null ],
+    [ "seeded_", "d3/d42/class_logger.html#a93b80c59fd796816ad1f33ca3eead846", null ],
+    [ "sinks_", "d3/d42/class_logger.html#a149a7f0562ed9ec3ae14e31c2beb9f0d", null ]
+];

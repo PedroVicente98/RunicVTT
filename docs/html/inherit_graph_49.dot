@@ -1,9 +1,10 @@
 digraph "Graphical Class Hierarchy"
 {
+ // INTERACTIVE_SVG=YES
  // LATEX_PDF_SIZE
   bgcolor="transparent";
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node0 [id="Node000000",label="MD_SPAN_IMG_DETAIL",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$struct_m_d___s_p_a_n___i_m_g___d_e_t_a_i_l.html",tooltip=" "];
+  Node0 [id="Node000000",label="PathManager",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html",tooltip=" "];
 }

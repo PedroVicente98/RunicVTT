@@ -1,13 +1,18 @@
 var searchData=
 [
-  ['edgepadding_0',['edgePadding',['../struct_im_gui_toaster_1_1_config.html#a4a700943a2904c7f3514e156f222aa3f',1,'ImGuiToaster::Config']]],
-  ['end_1',['end',['../struct_m_d___l_i_n_e___a_n_a_l_y_s_i_s__tag.html#ab35673eb790cf78278e17081561e7340',1,'MD_LINE_ANALYSIS_tag::end'],['../struct_m_d___l_i_n_e__tag.html#a79fec7c4af0ac2c14f3c5da226de8156',1,'MD_LINE_tag::end'],['../struct_m_d___v_e_r_b_a_t_i_m_l_i_n_e__tag.html#abefdc806a128b74c0c812eb2a0b619af',1,'MD_VERBATIMLINE_tag::end'],['../struct_m_d___m_a_r_k__tag.html#af5da4a3aa3a605a10fb48399035b624b',1,'MD_MARK_tag::end']]],
-  ['enforce_5fnew_5fblock_2',['enforce_new_block',['../struct_m_d___l_i_n_e___a_n_a_l_y_s_i_s__tag.html#adac0e3e94389669320b50522039a031c',1,'MD_LINE_ANALYSIS_tag']]],
-  ['enter_5fblock_3',['enter_block',['../struct_m_d___p_a_r_s_e_r.html#a6daf051c28127e97b28b888178c0c4cd',1,'MD_PARSER']]],
-  ['enter_5fspan_4',['enter_span',['../struct_m_d___p_a_r_s_e_r.html#a1e100bc9d4083fdcf63926f6b427e5f4',1,'MD_PARSER']]],
-  ['entityid_5',['EntityId',['../namespacemsg_1_1key.html#a635b860a9f70534df3756a9cde327bad',1,'msg::key']]],
-  ['epoch_6',['epoch',['../struct_drag_state.html#aa45d0e2a52b3c83c22b32b54cd3f9521',1,'DragState']]],
-  ['epochopenedms_7',['epochOpenedMs',['../struct_drag_state.html#aac5b65d600758bf43936439b35fb83da',1,'DragState']]],
-  ['event_8',['Event',['../namespacemsg_1_1key.html#a30c9e0fc6a1e9dcff5c0a764cee03ea6',1,'msg::key']]],
-  ['events_5f_9',['events_',['../class_network_manager.html#ac466b1c92d506e3bf94e32595a55d402',1,'NetworkManager']]]
+  ['ecs_0',['ecs',['../d4/d97/class_application_handler.html#aacf4b014017342f3a575907fe246c5a3',1,'ApplicationHandler::ecs'],['../d2/dbf/class_board_manager.html#ac0c77461923a3dbdf28d30c3d1f1ad6e',1,'BoardManager::ecs'],['../df/d93/class_game_table_manager.html#adb0d8d7d0062ab0bc13ff0fa0ae4be3b',1,'GameTableManager::ecs'],['../da/d21/class_network_manager.html#a8c56b86dae64901486664a6f990c6c3a',1,'NetworkManager::ecs']]],
+  ['edgepadding_1',['edgePadding',['../d2/dd0/struct_im_gui_toaster_1_1_config.html#a4a700943a2904c7f3514e156f222aa3f',1,'ImGuiToaster::Config']]],
+  ['edit_5fwindow_5fentity_2',['edit_window_entity',['../d2/dbf/class_board_manager.html#a5a9c223a6f8b14211e10e30f3d3bc563',1,'BoardManager']]],
+  ['editbuffer_3',['editBuffer',['../d1/dd4/struct_note_editor_u_i_1_1_tab_state.html#a43d6a4e0b0509b61980f7fb2ef95cd17',1,'NoteEditorUI::TabState']]],
+  ['editgroupid_5f_4',['editGroupId_',['../d8/d37/class_chat_manager.html#aba234879a51d9f504a598b436fb1a7bc',1,'ChatManager']]],
+  ['editgroupname_5f_5',['editGroupName_',['../d8/d37/class_chat_manager.html#a44dc4678bcfb247bccda15798d9ca191',1,'ChatManager']]],
+  ['editgroupsel_5f_6',['editGroupSel_',['../d8/d37/class_chat_manager.html#a6ed580965cdbcfe596551dac5caad3e4',1,'ChatManager']]],
+  ['entityid_7',['EntityId',['../de/d1c/namespacemsg_1_1key.html#a635b860a9f70534df3756a9cde327bad',1,'msg::key']]],
+  ['epoch_8',['epoch',['../d6/deb/struct_drag_state.html#aa45d0e2a52b3c83c22b32b54cd3f9521',1,'DragState']]],
+  ['epochopenedms_9',['epochOpenedMs',['../d6/deb/struct_drag_state.html#aac5b65d600758bf43936439b35fb83da',1,'DragState']]],
+  ['event_10',['Event',['../de/d1c/namespacemsg_1_1key.html#a30c9e0fc6a1e9dcff5c0a764cee03ea6',1,'msg::key']]],
+  ['events_5f_11',['events_',['../da/d21/class_network_manager.html#ac466b1c92d506e3bf94e32595a55d402',1,'NetworkManager']]],
+  ['executabledir_12',['executableDir',['../de/d2f/class_path_manager.html#aa67ba5456e1f6d9367e3f5c515bfaf74',1,'PathManager']]],
+  ['expiresat_13',['expiresAt',['../d7/d8b/struct_im_gui_toaster_1_1_toast.html#a743c1c1cb51f64dcfed883a4493602d8',1,'ImGuiToaster::Toast']]],
+  ['external_5fip_5faddress_14',['external_ip_address',['../da/d21/class_network_manager.html#a2e6cc48832d1db24692c53222b1b9493',1,'NetworkManager']]]
 ];

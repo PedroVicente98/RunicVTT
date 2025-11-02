@@ -1,0 +1,18 @@
+digraph "NotesManager::saveNoteAs"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="NotesManager::saveNoteAs",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="NotesManager::toastError",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#aa8325acde2b7361287a1f77510bb537b",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="NotesManager::toastGood",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#a16aa5064191ddce447cb059609f2501e",tooltip=" "];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="NotesManager::writeMarkdownFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#af75002653d61b6835f1eebc29fd328e1",tooltip=" "];
+  Node4 -> Node5 [id="edge4_Node000004_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="NotesManager::toEpochMillis",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#adc59a0ee5716f09b1ed47e0c0fe5f4ec",tooltip=" "];
+}

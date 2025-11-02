@@ -1,0 +1,16 @@
+<map id="AssetIO::importFromUrl" name="AssetIO::importFromUrl">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,166,108"/>
+<area shape="rect" id="Node000002" href="$d3/d5e/namespace_asset_i_o.html#a8f3732300c549d06588e8fb8e0b08c4b" title=" " alt="" coords="222,31,356,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,78,217,59,218,64,143,83"/>
+<area shape="rect" id="Node000006" href="$d3/d5e/namespace_asset_i_o.html#acf8b171b169e716e2c2fbf610f8ef1b2" title=" " alt="" coords="231,81,346,108"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="166,92,216,92,216,97,166,97"/>
+<area shape="rect" id="Node000007" href="$d3/d5e/namespace_asset_i_o.html#a8eaed1f8d660f69ca123e48b89432ef8" title=" " alt="" coords="214,132,364,159"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="143,106,218,125,217,130,142,111"/>
+<area shape="rect" id="Node000003" href="$de/d2f/class_path_manager.html#ae75b72eb67617d77136a829eb73c7e8f" title=" " alt="" coords="420,5,603,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="356,34,404,28,405,33,356,39"/>
+<area shape="rect" id="Node000005" href="$de/d2f/class_path_manager.html#a220ff032714c927e1a2a8ea81d863331" title=" " alt="" coords="412,56,610,83"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="356,49,397,54,396,59,356,54"/>
+<area shape="rect" id="Node000004" href="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd" title=" " alt="" coords="658,31,876,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="603,25,643,29,643,34,603,30"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="610,57,642,54,643,59,611,62"/>
+</map>

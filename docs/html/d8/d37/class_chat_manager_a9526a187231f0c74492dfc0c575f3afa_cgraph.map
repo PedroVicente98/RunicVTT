@@ -1,0 +1,22 @@
+<map id="ChatManager::renderDeleteGroupPopup" name="ChatManager::renderDeleteGroupPopup">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,103,187,145"/>
+<area shape="rect" id="Node000002" href="$d8/d37/class_chat_manager.html#afc539f60f939c905374f1f4e937b94fe" title=" " alt="" coords="238,59,443,85"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,102,259,87,260,92,188,107"/>
+<area shape="rect" id="Node000007" href="$d8/d37/class_chat_manager.html#a545045ad462d96e87d64a52e37b4e6df" title=" " alt="" coords="239,111,442,137"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="187,121,223,121,223,127,187,127"/>
+<area shape="rect" id="Node000009" href="$d8/d37/class_chat_manager.html#a8dd3d4db6f921d383091ab2ff73174d7" title=" " alt="" coords="235,161,446,188"/>
+<area shape="poly" id="edge11_Node000001_Node000009" title=" " alt="" coords="188,140,258,155,257,160,187,145"/>
+<area shape="rect" id="Node000003" href="$d8/d37/class_chat_manager.html#aecdeceb9be9b9b14c31f11526dbfd5a7" title=" " alt="" coords="504,56,675,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="443,68,488,68,488,73,443,74"/>
+<area shape="rect" id="Node000004" href="$d5/d64/namespacemsg.html#afe9573aed063a0e6b1aa59c451c26e9e" title=" " alt="" coords="496,5,683,32"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="405,56,508,33,509,38,406,61"/>
+<area shape="rect" id="Node000006" href="$d8/d37/class_chat_manager.html#a355992faeefc4f8695bfe76f2c7f295e" title=" " alt="" coords="502,107,678,149"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="404,83,487,102,486,107,403,89"/>
+<area shape="rect" id="Node000005" href="$d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33" title=" " alt="" coords="733,89,878,116"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="651,30,686,42,768,79,765,84,684,46,649,35"/>
+<area shape="poly" id="edge7_Node000007_Node000003" title=" " alt="" coords="404,107,510,84,511,89,405,113"/>
+<area shape="poly" id="edge10_Node000007_Node000006" title=" " alt="" coords="442,123,486,124,486,129,442,128"/>
+<area shape="rect" id="Node000008" href="$d5/d64/namespacemsg.html#a24e8339bdeb6b6a9847b7134e8e016ad" title=" " alt="" coords="494,173,685,200"/>
+<area shape="poly" id="edge8_Node000007_Node000008" title=" " alt="" coords="400,135,447,147,522,166,521,171,445,152,399,140"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="649,170,684,159,765,121,768,126,686,164,651,175"/>
+</map>

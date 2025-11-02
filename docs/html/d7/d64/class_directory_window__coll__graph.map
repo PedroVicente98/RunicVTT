@@ -1,0 +1,8 @@
+<map id="DirectoryWindow" name="DirectoryWindow">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,293,242,1179"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="102,5,145,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="123,75,117,139,117,229,118,276,113,276,112,229,112,139,117,74"/>
+<area shape="rect" id="Node000003" href="$d0/d92/struct_directory_window_1_1_image_data.html" title=" " alt="" coords="223,139,406,229"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="147,55,244,127,240,131,143,59"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="302,230,251,378,245,376,297,228"/>
+</map>

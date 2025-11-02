@@ -1,0 +1,7 @@
+<map id="BoardManager::resetCamera" name="BoardManager::resetCamera">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,194,57"/>
+<area shape="rect" id="Node000002" href="$da/dbb/class_camera.html#a68011392c392f16827b18793f5d8272a" title=" " alt="" coords="242,5,382,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,30,226,26,227,31,194,35"/>
+<area shape="rect" id="Node000003" href="$da/dbb/class_camera.html#a2c2387705de7f2189756fe55b4e4ca2c" title=" " alt="" coords="249,56,375,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="194,53,233,57,233,63,194,58"/>
+</map>

@@ -1,0 +1,20 @@
+digraph "UPnPManager"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  Node1 [id="Node000001",shape=plain,label=<<TABLE CELLBORDER="0" BORDER="1"><TR><TD COLSPAN="2" CELLPADDING="1" CELLSPACING="0">UPnPManager</TD></TR>
+<HR/>
+<TR><TD COLSPAN="2" CELLPADDING="1" CELLSPACING="0">&nbsp;</TD></TR>
+<HR/>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> getExternalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> getLocalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static bool addPortMapping<BR ALIGN="LEFT"/>(const std::string &amp;internalIp,<BR ALIGN="LEFT"/> unsigned short internalPort,<BR ALIGN="LEFT"/> unsigned short externalPort,<BR ALIGN="LEFT"/> const std::string &amp;protocol,<BR ALIGN="LEFT"/> const std::string &amp;description<BR ALIGN="LEFT"/>=&quot;&quot;, unsigned int duration=0)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static bool removePortMapping<BR ALIGN="LEFT"/>(unsigned short externalPort,<BR ALIGN="LEFT"/> const std::string &amp;protocol)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::wstring<BR ALIGN="LEFT"/> stringToWString(const<BR ALIGN="LEFT"/> std::string &amp;s)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> toUpper(std::string s)<BR ALIGN="LEFT"/></TD></TR>
+</TABLE>>
+,height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+}

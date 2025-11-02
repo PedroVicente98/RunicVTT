@@ -1,0 +1,26 @@
+<map id="NetworkManager::ensureRemaining" name="NetworkManager::ensureRemaining">
+<area shape="rect" id="Node000001" title=" " alt="" coords="814,146,1044,173"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a53df93ad0cb0498c82f866a921e7b285" title=" " alt="" coords="283,105,480,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="905,136,846,80,808,53,765,33,701,14,648,8,594,15,529,33,494,47,461,66,408,106,404,102,458,62,491,42,527,28,593,10,648,3,702,9,767,28,811,49,850,76,909,133"/>
+<area shape="rect" id="Node000005" href="$da/d21/class_network_manager.html#adea6a8bf4c034a65775aa7a8f9d2e8a2" title=" " alt="" coords="283,172,480,214"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="800,170,481,190,480,184,799,165"/>
+<area shape="rect" id="Node000006" href="$da/d21/class_network_manager.html#a40a38591b24f2d04217a8df97c2fbe72" title=" " alt="" coords="283,238,480,281"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="903,186,844,230,807,252,767,267,693,283,618,288,545,286,480,279,481,274,546,280,618,282,693,277,766,262,805,247,841,226,900,181"/>
+<area shape="rect" id="Node000007" href="$da/d21/class_network_manager.html#a5974165ef6da3b0a8e954c3219310212" title=" " alt="" coords="552,42,742,85"/>
+<area shape="poly" id="edge10_Node000001_Node000007" title=" " alt="" coords="880,142,765,99,729,88,731,83,767,94,882,138"/>
+<area shape="rect" id="Node000008" href="$da/d21/class_network_manager.html#afc9a1534cbb3b4b950796094d4e97775" title=" " alt="" coords="528,226,766,253"/>
+<area shape="poly" id="edge12_Node000001_Node000008" title=" " alt="" coords="868,180,767,210,701,228,700,223,766,205,866,175"/>
+<area shape="rect" id="Node000009" href="$da/d21/class_network_manager.html#a4e57df88fc7446d22630aacb5a31dfc1" title=" " alt="" coords="544,109,750,152"/>
+<area shape="poly" id="edge14_Node000001_Node000009" title=" " alt="" coords="798,149,751,144,751,138,799,143"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="5,150,235,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="268,145,218,152,218,147,267,140"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="29,201,211,244"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="297,156,284,162,260,177,236,191,206,203,204,198,233,186,257,172,281,157,295,151"/>
+<area shape="poly" id="edge5_Node000005_Node000003" title=" " alt="" coords="267,183,235,179,236,174,267,177"/>
+<area shape="poly" id="edge6_Node000005_Node000004" title=" " alt="" coords="268,208,211,215,211,209,267,203"/>
+<area shape="poly" id="edge8_Node000006_Node000003" title=" " alt="" coords="292,234,281,228,257,209,248,200,234,191,203,180,205,175,236,186,251,196,261,205,284,224,294,229"/>
+<area shape="poly" id="edge9_Node000006_Node000004" title=" " alt="" coords="267,246,211,238,212,233,268,241"/>
+<area shape="poly" id="edge11_Node000007_Node000002" title=" " alt="" coords="540,92,475,107,474,102,539,86"/>
+<area shape="poly" id="edge13_Node000008_Node000005" title=" " alt="" coords="552,226,480,213,481,208,553,220"/>
+<area shape="poly" id="edge15_Node000009_Node000002" title=" " alt="" coords="528,131,480,130,480,125,528,126"/>
+</map>

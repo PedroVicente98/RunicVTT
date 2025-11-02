@@ -1,0 +1,18 @@
+<map id="NetworkManager::sendImageChunks" name="NetworkManager::sendImageChunks">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,144,198,187"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#ad6d9928959397e1cfa4f6c0f322a20fd" title=" " alt="" coords="253,48,444,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="148,141,245,100,262,94,264,99,247,105,150,146"/>
+<area shape="rect" id="Node000006" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="290,115,407,141"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="198,148,274,136,275,142,199,153"/>
+<area shape="rect" id="Node000007" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="306,189,391,216"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="199,177,291,191,290,197,198,183"/>
+<area shape="rect" id="Node000008" href="$da/d21/class_network_manager.html#a8f97d83ec35ea68c1e37d6837c1c8b4c" title=" " alt="" coords="246,240,451,267"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="148,185,247,225,270,233,269,238,245,231,146,190"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="511,5,657,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="444,46,503,33,504,38,445,51"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="499,56,669,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="445,67,484,67,484,72,445,72"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="502,107,666,133"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="445,87,504,100,503,105,444,93"/>
+<area shape="poly" id="edge7_Node000007_Node000007" title=" " alt="" coords="309,191,302,181,306,171,322,165,348,163,377,165,392,172,389,177,375,170,348,168,324,170,310,175,307,180,313,187"/>
+</map>

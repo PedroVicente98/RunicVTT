@@ -1,0 +1,12 @@
+<map id="NetworkManager::housekeepPeers" name="NetworkManager::housekeepPeers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,27,197,69"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a1ca85e76187f45d46596a1d04d713f0f" title=" " alt="" coords="250,5,420,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,33,234,29,235,34,198,39"/>
+<area shape="rect" id="Node000003" href="$d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00" title=" " alt="" coords="245,56,426,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,57,230,61,229,67,197,63"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="474,27,591,53"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="426,57,458,51,459,57,427,63"/>
+<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="490,101,575,128"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="427,92,475,101,474,106,426,97"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="499,102,493,93,497,83,511,77,533,75,556,77,569,84,566,88,555,82,533,80,512,82,501,87,498,92,504,99"/>
+</map>

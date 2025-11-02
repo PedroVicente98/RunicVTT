@@ -1,0 +1,17 @@
+<map id="NetworkManager::buildImageChunkFrame" name="NetworkManager::buildImageChunkFrame">
+<area shape="rect" id="Node000001" title=" " alt="" coords="969,105,1160,148"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#ab54b0f1b56efebcaeaf9a34a0af6194c" title=" " alt="" coords="728,105,921,148"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="953,129,921,129,921,124,953,124"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a9faf2055aa0370adbffaa46b7f7181c1" title=" " alt="" coords="487,80,677,107"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="712,114,677,109,678,104,713,109"/>
+<area shape="rect" id="Node000007" href="$da/d21/class_network_manager.html#a88303e860c818888a1cdd7d40bc19bf3" title=" " alt="" coords="484,139,680,165"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="713,141,681,144,681,139,713,136"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#ac5104e38077637eeeab41e078fa51a5b" title=" " alt="" coords="252,5,434,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="516,78,422,51,423,46,517,73"/>
+<area shape="rect" id="Node000006" href="$da/d21/class_network_manager.html#a8104f62e2e6c3197832dbfe7753853de" title=" " alt="" coords="251,72,436,115"/>
+<area shape="poly" id="edge5_Node000003_Node000006" title=" " alt="" coords="471,96,437,96,437,91,471,91"/>
+<area shape="rect" id="Node000005" href="$da/d21/class_network_manager.html#a9211bd133aed2e5ec776b4d4308b30c4" title=" " alt="" coords="5,13,203,40"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="236,29,203,29,203,24,236,24"/>
+<area shape="rect" id="Node000008" href="$da/d21/class_network_manager.html#a1548090a456937ffafda64318f21ba40" title=" " alt="" coords="251,139,436,181"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="468,158,437,160,436,154,468,153"/>
+</map>

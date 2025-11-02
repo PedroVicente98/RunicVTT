@@ -1,0 +1,10 @@
+<map id="DebugConsole::addToggle" name="DebugConsole::addToggle">
+<area shape="rect" id="Node000001" title=" " alt="" coords="443,47,617,73"/>
+<area shape="rect" id="Node000002" href="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba" title=" " alt="" coords="206,5,381,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="428,48,381,42,382,36,429,43"/>
+<area shape="rect" id="Node000004" href="$d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd" title=" " alt="" coords="192,72,395,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="428,77,396,82,395,76,428,72"/>
+<area shape="rect" id="Node000003" href="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="5,39,144,81"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="191,45,145,52,144,47,190,40"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="176,78,144,73,144,68,177,73"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="PeerLink::attachChannelHandlers" name="PeerLink::attachChannelHandlers">
+<area shape="rect" id="Node000001" title=" " alt="" coords="404,31,620,57"/>
+<area shape="rect" id="Node000002" href="$df/d24/class_peer_link.html#ae5d0cabfe7fa586a5907928b44075973" title=" " alt="" coords="185,5,356,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="388,34,356,30,357,25,389,28"/>
+<area shape="rect" id="Node000003" href="$df/d24/class_peer_link.html#a67877f56504862a1c8a4f3ed41cbb91d" title=" " alt="" coords="185,56,356,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="389,60,356,63,356,58,388,54"/>
+<area shape="rect" id="Node000004" href="$df/d24/class_peer_link.html#ab667cc4b6267a871d6751185ff3d5d25" title=" " alt="" coords="5,56,137,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="170,72,137,72,137,67,170,67"/>
+</map>

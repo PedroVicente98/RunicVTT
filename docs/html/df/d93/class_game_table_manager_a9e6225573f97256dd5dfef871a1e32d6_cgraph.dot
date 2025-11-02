@@ -1,0 +1,54 @@
+digraph "GameTableManager::saveGameTable"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="GameTableManager::saveGame\lTable",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="GameTableManager::create\lGameTableFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a172cce8920ef8672b5508fdbca0108fa",tooltip=" "];
+  Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="PathManager::getGameTablesPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a6be0a95403caf375f4d7b642f0f90061",tooltip=" "];
+  Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="PathManager::getExecutableRoot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd",tooltip=" "];
+  Node2 -> Node5 [id="edge4_Node000002_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="Serializer::serializeGame\lTableEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a88ec96a4390db20ecce812518dd2622c",tooltip=" "];
+  Node5 -> Node6 [id="edge5_Node000005_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="Serializer::serializeBoard\lEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a33c1046417ab5077d907baac823e7194",tooltip=" "];
+  Node6 -> Node7 [id="edge6_Node000006_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="Serializer::serializeBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a9555132c02190d9a832a360fb236e954",tooltip=" "];
+  Node7 -> Node8 [id="edge7_Node000007_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="Serializer::serializeString",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c",tooltip=" "];
+  Node8 -> Node9 [id="edge8_Node000008_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node9 [id="Node000009",label="Serializer::serializeInt",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f",tooltip=" "];
+  Node6 -> Node10 [id="edge9_Node000006_Node000010",color="steelblue1",style="solid",tooltip=" "];
+  Node10 [id="Node000010",label="Serializer::serializeGrid",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#ad0d31f7afee6b62ebc3c4f05bfef6bf2",tooltip=" "];
+  Node10 -> Node11 [id="edge10_Node000010_Node000011",color="steelblue1",style="solid",tooltip=" "];
+  Node11 [id="Node000011",label="Serializer::serializeBool",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a2a407c3a379b680296ee190ed625f05f",tooltip=" "];
+  Node10 -> Node12 [id="edge11_Node000010_Node000012",color="steelblue1",style="solid",tooltip=" "];
+  Node12 [id="Node000012",label="Serializer::serializeFloat",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a92ffe65857abd6eea6a393056a9bb533",tooltip=" "];
+  Node10 -> Node13 [id="edge12_Node000010_Node000013",color="steelblue1",style="solid",tooltip=" "];
+  Node13 [id="Node000013",label="Serializer::serializeVec2",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a52943821c1686ae47c30586ec7f9bc7e",tooltip=" "];
+  Node13 -> Node12 [id="edge13_Node000013_Node000012",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node9 [id="edge14_Node000006_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node14 [id="edge15_Node000006_Node000014",color="steelblue1",style="solid",tooltip=" "];
+  Node14 [id="Node000014",label="Serializer::serializePanning",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a05ba0aafb8b9ccd2050b1d61f9525ded",tooltip=" "];
+  Node14 -> Node11 [id="edge16_Node000014_Node000011",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node15 [id="edge17_Node000006_Node000015",color="steelblue1",style="solid",tooltip=" "];
+  Node15 [id="Node000015",label="Serializer::serializeSize",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a6be006b0cf99a37c2146723395013b76",tooltip=" "];
+  Node15 -> Node12 [id="edge18_Node000015_Node000012",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node16 [id="edge19_Node000006_Node000016",color="steelblue1",style="solid",tooltip=" "];
+  Node16 [id="Node000016",label="Serializer::serializeTexture\lComponent",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a2e08effc9986b4b485dc4e40ffecb7fb",tooltip=" "];
+  Node16 -> Node9 [id="edge20_Node000016_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node16 -> Node8 [id="edge21_Node000016_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node16 -> Node13 [id="edge22_Node000016_Node000013",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node17 [id="edge23_Node000006_Node000017",color="steelblue1",style="solid",tooltip=" "];
+  Node17 [id="Node000017",label="Serializer::serializeUInt64",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5",tooltip=" "];
+  Node5 -> Node18 [id="edge24_Node000005_Node000018",color="steelblue1",style="solid",tooltip=" "];
+  Node18 [id="Node000018",label="Serializer::serializeGame\lTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a776a157c2ae2e009d25025e0ed151fcb",tooltip=" "];
+  Node18 -> Node8 [id="edge25_Node000018_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node5 -> Node9 [id="edge26_Node000005_Node000009",color="steelblue1",style="solid",tooltip=" "];
+  Node5 -> Node17 [id="edge27_Node000005_Node000017",color="steelblue1",style="solid",tooltip=" "];
+}

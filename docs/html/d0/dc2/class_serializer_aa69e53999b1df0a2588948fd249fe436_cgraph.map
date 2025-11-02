@@ -1,0 +1,16 @@
+<map id="Serializer::deserializeFogEntity" name="Serializer::deserializeFogEntity">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,173,116"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a5eb5ab1b9f7566eaf2486df0e536d82b" title=" " alt="" coords="222,5,414,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="142,70,220,41,244,34,246,39,222,47,143,75"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a24d123353bde4bfadc162b244ee4e9d5" title=" " alt="" coords="232,56,404,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,83,216,78,217,83,174,88"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="226,107,410,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="174,101,210,105,210,111,173,107"/>
+<area shape="rect" id="Node000006" href="$d0/dc2/class_serializer.html#a2defbb75a244dc241a5eb1b342ba50ac" title=" " alt="" coords="221,157,415,184"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="143,114,222,143,246,150,244,155,220,148,142,119"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a4281872677d0169f97044b8708014adb" title=" " alt="" coords="463,31,637,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="415,27,448,30,447,35,414,32"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="404,57,447,53,448,58,404,63"/>
+<area shape="rect" id="Node000007" href="$d0/dc2/class_serializer.html#a6fded0442115eb736f46d377cf37c563" title=" " alt="" coords="464,157,636,184"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="415,168,449,168,449,173,415,173"/>
+</map>

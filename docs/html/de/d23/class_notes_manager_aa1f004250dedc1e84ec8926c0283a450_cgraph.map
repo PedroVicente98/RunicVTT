@@ -1,0 +1,13 @@
+<map id="NotesManager::loadFromGlobal" name="NotesManager::loadFromGlobal">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,60,211,87"/>
+<area shape="rect" id="Node000002" href="$de/d23/class_notes_manager.html#ab3b787865dc553f59e3e5d8c6cd44402" title=" " alt="" coords="259,23,437,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="211,58,243,54,243,59,212,63"/>
+<area shape="rect" id="Node000006" href="$de/d23/class_notes_manager.html#ac80d118ff9b4d60588936093c67766bf" title=" " alt="" coords="265,89,430,116"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="212,83,250,88,249,93,211,89"/>
+<area shape="rect" id="Node000003" href="$de/d23/class_notes_manager.html#a037463bcba85b07e00958d45ba6dbd60" title=" " alt="" coords="485,31,712,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="437,41,469,41,469,47,437,47"/>
+<area shape="rect" id="Node000004" href="$de/d23/class_notes_manager.html#ad0d8672d88e2eef61fb90dfce9bc18d9" title=" " alt="" coords="760,5,968,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="713,30,745,27,745,33,713,36"/>
+<area shape="rect" id="Node000005" href="$de/d23/class_notes_manager.html#aafac8c0a547a63f95440d0ab7bdbe4ef" title=" " alt="" coords="765,56,963,83"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="713,52,749,56,749,61,713,58"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="NetworkUtilities::lastErrorToString" name="NetworkUtilities::lastErrorToString">
+<area shape="rect" id="Node000001" title=" " alt="" coords="713,23,885,65"/>
+<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567" title=" " alt="" coords="486,23,665,65"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="698,47,666,47,666,41,698,41"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e" title=" " alt="" coords="262,5,422,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="470,35,422,30,423,25,471,30"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="246,56,438,83"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="471,58,439,62,438,56,470,53"/>
+<area shape="rect" id="Node000005" href="$da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="5,56,198,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="230,72,198,72,198,67,230,67"/>
+</map>

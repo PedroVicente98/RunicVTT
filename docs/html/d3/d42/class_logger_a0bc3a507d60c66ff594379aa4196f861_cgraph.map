@@ -1,0 +1,9 @@
+<map id="Logger::log" name="Logger::log">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,91,83"/>
+<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#adbbb6d7e9049625c19c72a8329ce123c" title=" " alt="" coords="139,5,278,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="90,53,149,35,150,40,92,58"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#a5e5b35187416e687bc57384c386360c9" title=" " alt="" coords="149,56,268,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="91,67,134,67,134,72,91,72"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aef47611fd5e84cf8dac6dd8ebc750576" title=" " alt="" coords="150,107,267,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="92,80,150,99,149,104,90,85"/>
+</map>

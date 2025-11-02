@@ -1,0 +1,18 @@
+<map id="NetworkManager::handleUserNameUpdate" name="NetworkManager::handleUserNameUpdate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,124,200,167"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a47d1b2e09aaa99426b40f965ef2bf284" title=" " alt="" coords="250,5,430,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="128,121,180,81,246,42,262,35,264,40,249,46,183,85,131,125"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="248,56,432,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="163,121,247,92,271,85,273,90,248,97,164,126"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a9eea566a2f6dcb71ee0ecd06052b9252" title=" " alt="" coords="251,107,428,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="200,132,235,128,236,134,201,138"/>
+<area shape="rect" id="Node000006" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="281,157,398,184"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="201,153,266,160,266,165,200,158"/>
+<area shape="rect" id="Node000007" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="297,232,382,259"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="156,165,293,223,291,228,154,170"/>
+<area shape="rect" id="Node000008" href="$d2/d0a/class_message_queue.html#ae18e8febb6e78fadd1fc56332a4b7ba2" title=" " alt="" coords="266,283,414,309"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="125,165,178,217,212,245,249,268,261,274,259,279,246,273,209,249,174,221,121,169"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="480,5,640,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,16,464,16,464,21,430,21"/>
+<area shape="poly" id="edge7_Node000007_Node000007" title=" " alt="" coords="303,233,296,223,301,213,315,207,340,205,366,208,380,214,378,219,365,213,340,211,317,213,304,217,301,223,307,230"/>
+</map>

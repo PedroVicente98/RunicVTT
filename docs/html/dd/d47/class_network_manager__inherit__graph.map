@@ -1,0 +1,5 @@
+<map id="NetworkManager" name="NetworkManager">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,260,1963"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="36,5,230,91"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,106,136,139,130,139,130,106"/>
+</map>

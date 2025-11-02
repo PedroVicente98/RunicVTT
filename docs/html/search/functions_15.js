@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zoom_0',['zoom',['../class_camera.html#a1f0aabd140c7de0a0090c11d375aa56e',1,'Camera']]]
+  ['xsputn_0',['xsputn',['../db/d80/class_logger_1_1_line_to_logger_buf.html#a274c06eec4ad000418b4b5ddf623b93e',1,'Logger::LineToLoggerBuf']]]
 ];

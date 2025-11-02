@@ -1,0 +1,26 @@
+<map id="include/network/NetworkManager.h" name="include/network/NetworkManager.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="760,5,986,32"/>
+<area shape="rect" id="Node000002" href="$d9/d4e/_game_table_manager_8h.html" title=" " alt="" coords="332,80,525,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="781,38,507,82,506,77,780,32"/>
+<area shape="rect" id="Node000007" href="$da/d82/_network_manager_8cpp.html" title=" " alt="" coords="500,155,717,181"/>
+<area shape="poly" id="edge9_Node000001_Node000007" title=" " alt="" coords="745,37,664,55,633,67,613,82,605,99,602,118,607,154,602,155,597,118,600,97,609,78,630,63,662,50,744,32"/>
+<area shape="rect" id="Node000008" href="$de/d99/_board_manager_8cpp.html" title=" " alt="" coords="623,80,776,107"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="830,41,731,82,729,77,828,36"/>
+<area shape="rect" id="Node000009" href="$d1/d1e/_chat_manager_8cpp.html" title=" " alt="" coords="800,80,946,107"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="875,48,875,80,870,80,870,48"/>
+<area shape="rect" id="Node000010" href="$d8/d6b/_peer_link_8cpp.html" title=" " alt="" coords="969,80,1139,107"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="919,36,1023,77,1021,82,917,41"/>
+<area shape="rect" id="Node000011" href="$d3/d55/_signaling_client_8cpp.html" title=" " alt="" coords="1163,80,1369,107"/>
+<area shape="poly" id="edge11_Node000001_Node000011" title=" " alt="" coords="957,33,1198,77,1197,82,956,38"/>
+<area shape="rect" id="Node000012" href="$d1/ddf/_signaling_server_8cpp.html" title=" " alt="" coords="1393,80,1603,107"/>
+<area shape="poly" id="edge12_Node000001_Node000012" title=" " alt="" coords="998,32,1393,77,1392,83,997,37"/>
+<area shape="rect" id="Node000003" href="$d0/da4/_application_handler_8h.html" title=" " alt="" coords="81,155,267,181"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,114,219,157,218,151,369,109"/>
+<area shape="rect" id="Node000006" href="$d1/d06/_game_table_manager_8cpp.html" title=" " alt="" coords="291,155,476,181"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="415,122,393,156,389,153,410,119"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="475,110,578,152,576,157,473,115"/>
+<area shape="rect" id="Node000004" href="$df/d43/_application_handler_8cpp.html" title=" " alt="" coords="5,229,183,256"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="151,194,110,231,106,227,147,190"/>
+<area shape="rect" id="Node000005" href="$df/d0a/main_8cpp.html" title=" " alt="" coords="207,229,304,256"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="201,190,243,227,240,231,198,194"/>
+</map>

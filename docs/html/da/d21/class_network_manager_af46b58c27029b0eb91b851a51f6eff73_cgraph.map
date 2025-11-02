@@ -1,0 +1,13 @@
+<map id="NetworkManager::sendMarkerDelete" name="NetworkManager::sendMarkerDelete">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,202,81"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#aeb0d7937d1d825d09dc8c7b13e35a962" title=" " alt="" coords="255,5,440,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="202,44,239,39,240,44,203,49"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#ac6c048e2a5d14f1b709b3bb97e500cf5" title=" " alt="" coords="250,72,445,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="203,71,234,75,234,81,202,76"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a8f97d83ec35ea68c1e37d6837c1c8b4c" title=" " alt="" coords="493,13,698,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="440,24,478,24,478,29,440,29"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="510,72,681,99"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="445,88,495,86,495,91,445,93"/>
+<area shape="rect" id="Node000006" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="514,123,677,149"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="446,108,500,117,499,122,445,113"/>
+</map>

@@ -1,0 +1,112 @@
+# Doxyfile 1.10.0
+...
+#---------------------------------------------------------------------------
+# Project related configuration options
+#---------------------------------------------------------------------------
+
+DOXYFILE_ENCODING      = UTF-8
+
+PROJECT_NAME           = "RunicVTT"            # ### RunicVTT: nome do projeto
+PROJECT_NUMBER         = 
+PROJECT_BRIEF          =
+
+PROJECT_LOGO           = .\res\RunicVTTIcon_64.png
+PROJECT_ICON           = .\res\RunicVTTIcon_64.png
+
+OUTPUT_DIRECTORY       = docs                  # ### RunicVTT: gera em ./docs
+CREATE_SUBDIRS         = YES
+ALLOW_UNICODE_NAMES    = NO
+OUTPUT_LANGUAGE        = English
+BRIEF_MEMBER_DESC      = YES
+REPEAT_BRIEF           = YES
+
+#---------------------------------------------------------------------------
+# Build related configuration options
+#---------------------------------------------------------------------------
+
+EXTRACT_ALL            = YES   # ### RunicVTT: pega tudo, mesmo sem comentário
+EXTRACT_PRIVATE        = YES
+EXTRACT_PRIV_VIRTUAL   = NO
+EXTRACT_PACKAGE        = NO
+EXTRACT_STATIC         = NO
+EXTRACT_LOCAL_CLASSES  = YES
+EXTRACT_LOCAL_METHODS  = NO
+EXTRACT_ANON_NSPACES   = NO
+HIDE_UNDOC_MEMBERS     = NO
+HIDE_UNDOC_CLASSES     = NO
+SHOW_HEADERFILE        = YES
+#---------------------------------------------------------------------------
+# Configuration options related to the input files
+#---------------------------------------------------------------------------
+INPUT                  = src include           # ### RunicVTT: aponta pro teu código
+RECURSIVE              = YES                   # ### RunicVTT: entra em subpastas
+
+EXCLUDE_PATTERNS       = */thirdparty/* \
+                         */external/* \
+                         */imgui/* \
+                         */deps/* \
+                         */imgui_md/* \
+                         */md4c/*
+EXCLUDE_PATTERNS      += *md4c.c *md4c.h *imgui_md.cpp *imgui_md.h
+
+
+FILE_PATTERNS          = *.c \
+                         *.cc \
+                         *.cxx \
+                         *.cpp \
+                         *.h \
+                         *.hpp \
+                         *.ipp \
+                         *.inl \
+                         *.md
+
+#---------------------------------------------------------------------------
+# Configuration options related to source browsing
+#---------------------------------------------------------------------------
+
+SOURCE_BROWSER         = YES    # ### RunicVTT: útil pra navegar no HTML
+INLINE_SOURCES         = NO
+STRIP_CODE_COMMENTS    = YES
+REFERENCED_BY_RELATION = NO
+REFERENCES_RELATION    = NO
+#---------------------------------------------------------------------------
+# Configuration options related to the HTML output
+#---------------------------------------------------------------------------
+
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_TREEVIEW      = YES    # ### RunicVTT: deixa com menu lateral
+GENERATE_LATEX         = NO     # ### RunicVTT: não precisa LaTeX agora
+#---------------------------------------------------------------------------
+# Configuration options related to diagram generator tools
+#---------------------------------------------------------------------------
+
+HAVE_DOT               = YES    # ### RunicVTT: precisa do Graphviz instalado
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+GROUP_GRAPHS           = YES
+UML_LOOK               = YES    # ### RunicVTT: estilo UML
+UML_LIMIT_NUM_FIELDS   = 10
+DOT_UML_DETAILS        = YES    # ### RunicVTT: estilo UML
+INCLUDE_GRAPH          = YES
+INCLUDED_BY_GRAPH      = YES
+CALL_GRAPH             = YES     # ### RunicVTT: 
+CALLER_GRAPH           = YES     # ### RunicVTT:
+GRAPHICAL_HIERARCHY    = YES
+DIRECTORY_GRAPH        = YES
+DIR_GRAPH_MAX_DEPTH    = 1
+DOT_IMAGE_FORMAT       = png
+INTERACTIVE_SVG        = YES
+DOT_GRAPH_MAX_NODES    = 120    # ### RunicVTT: maior que o padrão p/ projeto grande
+MAX_DOT_GRAPH_DEPTH    = 0
+DOT_CLEANUP            = NO
+DOTFILE_DIRS           = 
+DIA_PATH               =
+DIAFILE_DIRS           =
+PLANTUML_JAR_PATH      =
+PLANTUML_CFG_FILE      =
+PLANTUML_INCLUDE_PATH  =
+DOT_MULTI_TARGETS      = NO
+GENERATE_LEGEND        = YES
+MSCGEN_TOOL            =
+MSCFILE_DIRS           =

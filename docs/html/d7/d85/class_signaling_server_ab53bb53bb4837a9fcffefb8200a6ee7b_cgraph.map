@@ -1,0 +1,7 @@
+<map id="SignalingServer::broadcastShutdown" name="SignalingServer::broadcastShutdown">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,183,65"/>
+<area shape="rect" id="Node000002" href="$d7/d85/class_signaling_server.html#a2630087e21a05bf01d3cd4b799183bd5" title=" " alt="" coords="244,5,421,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,32,228,27,229,32,183,37"/>
+<area shape="rect" id="Node000003" href="$d5/d64/namespacemsg.html#a3646ef374175fd6ca65233bf402f3704" title=" " alt="" coords="231,56,434,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="183,51,215,54,215,60,183,56"/>
+</map>

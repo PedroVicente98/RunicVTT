@@ -1,0 +1,13 @@
+<map id="Serializer::deserializeBoard" name="Serializer::deserializeBoard">
+<area shape="rect" id="Node000001" title=" " alt="" coords="967,47,1146,73"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#aff25e5361ee486db1fb453b6ec1f8acf" title=" " alt="" coords="739,39,919,81"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="951,63,919,63,919,57,951,57"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a0fa2fd5d94c71074a2a2d4d08fb2ddfd" title=" " alt="" coords="511,5,691,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="723,47,692,43,692,37,724,42"/>
+<area shape="rect" id="Node000006" href="$d2/dbf/class_board_manager.html#ae3c8d16dfa3b0e954475b6cf8e5e52f2" title=" " alt="" coords="514,72,688,115"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="724,78,689,83,688,78,723,73"/>
+<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#aedb2f2634710aeb401d6c7e1c2d6a96d" title=" " alt="" coords="259,5,463,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="496,29,463,29,463,24,496,24"/>
+<area shape="rect" id="Node000005" href="$df/d93/class_game_table_manager.html#a42414a5596a4e90a3f321f90e166f9a0" title=" " alt="" coords="5,5,211,48"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="243,29,211,29,211,24,243,24"/>
+</map>

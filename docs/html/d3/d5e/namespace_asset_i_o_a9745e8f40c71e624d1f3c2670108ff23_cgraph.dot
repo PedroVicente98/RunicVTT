@@ -1,0 +1,26 @@
+digraph "AssetIO::openUrlAssetPopUp"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="LR";
+  Node1 [id="Node000001",label="AssetIO::openUrlAssetPopUp",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="AssetIO::assetsDir",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#a8f3732300c549d06588e8fb8e0b08c4b",tooltip=" "];
+  Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="PathManager::getMapsPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#ae75b72eb67617d77136a829eb73c7e8f",tooltip=" "];
+  Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="PathManager::getExecutableRoot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd",tooltip=" "];
+  Node2 -> Node5 [id="edge4_Node000002_Node000005",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="PathManager::getMarkersPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a220ff032714c927e1a2a8ea81d863331",tooltip=" "];
+  Node5 -> Node4 [id="edge5_Node000005_Node000004",color="steelblue1",style="solid",tooltip=" "];
+  Node1 -> Node6 [id="edge6_Node000001_Node000006",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="AssetIO::importFromUrl",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#a59ef49474071594c07f8c4620b60ba92",tooltip=" "];
+  Node6 -> Node2 [id="edge7_Node000006_Node000002",color="steelblue1",style="solid",tooltip=" "];
+  Node6 -> Node7 [id="edge8_Node000006_Node000007",color="steelblue1",style="solid",tooltip=" "];
+  Node7 [id="Node000007",label="AssetIO::slugify",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#acf8b171b169e716e2c2fbf610f8ef1b2",tooltip=" "];
+  Node6 -> Node8 [id="edge9_Node000006_Node000008",color="steelblue1",style="solid",tooltip=" "];
+  Node8 [id="Node000008",label="AssetIO::uniqueName",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#a8eaed1f8d660f69ca123e48b89432ef8",tooltip=" "];
+}

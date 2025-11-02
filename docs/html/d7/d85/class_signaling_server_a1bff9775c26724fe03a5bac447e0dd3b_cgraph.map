@@ -1,0 +1,11 @@
+<map id="SignalingServer::onMessage" name="SignalingServer::onMessage">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,193,108"/>
+<area shape="rect" id="Node000002" href="$d7/d85/class_signaling_server.html#a2c6fdfc468ee96cdb28722a11664845a" title=" " alt="" coords="259,5,469,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="134,78,240,41,272,33,273,38,241,47,135,83"/>
+<area shape="rect" id="Node000003" href="$d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28" title=" " alt="" coords="278,56,450,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="193,83,262,76,263,82,193,88"/>
+<area shape="rect" id="Node000004" href="$d7/d85/class_signaling_server.html#a8d9fc20c0e4d459bb2c4058c2de70a74" title=" " alt="" coords="241,107,487,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="193,101,226,104,225,109,193,106"/>
+<area shape="rect" id="Node000005" href="$d7/d85/class_signaling_server.html#adf87cd0f47619053b3b8d14d3793028a" title=" " alt="" coords="283,157,445,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="135,106,241,143,273,151,272,156,240,148,134,111"/>
+</map>

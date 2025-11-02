@@ -1,0 +1,13 @@
+<map id="PathManager::isPathLike" name="PathManager::isPathLike">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,173,83"/>
+<area shape="rect" id="Node000002" href="$de/d2f/class_path_manager.html#a8ef0fd5fd2b9999b0037c1db402d4c50" title=" " alt="" coords="235,5,402,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,53,239,33,240,39,153,58"/>
+<area shape="rect" id="Node000003" href="$de/d2f/class_path_manager.html#abc27ded79e24f01da862f4e920ff57af" title=" " alt="" coords="221,56,416,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,67,206,67,206,72,173,72"/>
+<area shape="rect" id="Node000006" href="$de/d2f/class_path_manager.html#ac7b463a435e68be97b75fbd0f1ee0c8f" title=" " alt="" coords="221,107,416,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="153,81,240,100,239,105,152,86"/>
+<area shape="rect" id="Node000004" href="$de/d2f/class_path_manager.html#acb7f23b0e5687c88e3e32146cfcf315d" title=" " alt="" coords="464,31,662,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="416,57,448,53,449,59,416,62"/>
+<area shape="rect" id="Node000005" href="$de/d2f/class_path_manager.html#ab4625f00b403df325617c2af592e186f" title=" " alt="" coords="490,81,636,108"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="416,77,475,83,474,88,416,82"/>
+</map>

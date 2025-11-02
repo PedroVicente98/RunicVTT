@@ -1,0 +1,17 @@
+<map id="NetworkManager::sendGameTable" name="NetworkManager::sendGameTable">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,197,91"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#aeb0d7937d1d825d09dc8c7b13e35a962" title=" " alt="" coords="257,7,442,49"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,51,241,43,242,49,198,56"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#ad3a1202c87e5df7db27357a94194f9b3" title=" " alt="" coords="245,81,455,124"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,80,230,84,229,89,197,85"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a8f97d83ec35ea68c1e37d6837c1c8b4c" title=" " alt="" coords="503,5,708,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="443,22,488,20,488,26,443,27"/>
+<area shape="rect" id="Node000005" href="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c" title=" " alt="" coords="523,56,688,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="455,86,507,79,508,85,456,92"/>
+<area shape="rect" id="Node000007" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="520,107,691,133"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="456,107,505,111,505,116,455,112"/>
+<area shape="rect" id="Node000008" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="524,157,687,184"/>
+<area shape="poly" id="edge7_Node000004_Node000008" title=" " alt="" coords="428,122,504,143,534,151,532,156,502,148,427,127"/>
+<area shape="rect" id="Node000006" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="756,56,903,83"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="689,67,741,67,741,72,689,72"/>
+</map>

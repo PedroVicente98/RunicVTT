@@ -1,0 +1,18 @@
+digraph "NetworkUtilities::safeCloseWebSocket"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="RL";
+  Node1 [id="Node000001",label="NetworkUtilities::safeClose\lWebSocket",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="SignalingClient::close",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d9e/class_signaling_client.html#ac3db9617d91d271ba18bde81f24b5c97",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="NetworkManager::housekeep\lPeers",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a8e0d2dcd98ddaf7e2546508c44dd804e",tooltip=" "];
+  Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="SignalingServer::stop",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d7/d85/class_signaling_server.html#ad1eb7f34bf1ee45ab24d16020ffcb889",tooltip=" "];
+  Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="SignalingServer::~Signaling\lServer",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d7/d85/class_signaling_server.html#a257d9fcbdd01ef29c2c4b093a79b023a",tooltip=" "];
+}

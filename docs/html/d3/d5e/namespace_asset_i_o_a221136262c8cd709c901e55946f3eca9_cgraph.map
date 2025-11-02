@@ -1,0 +1,12 @@
+<map id="AssetIO::deleteAsset" name="AssetIO::deleteAsset">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,152,57"/>
+<area shape="rect" id="Node000002" href="$d3/d5e/namespace_asset_i_o.html#a8f3732300c549d06588e8fb8e0b08c4b" title=" " alt="" coords="200,31,333,57"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,41,184,41,184,47,152,47"/>
+<area shape="rect" id="Node000003" href="$de/d2f/class_path_manager.html#ae75b72eb67617d77136a829eb73c7e8f" title=" " alt="" coords="388,5,572,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="333,33,373,29,373,34,334,39"/>
+<area shape="rect" id="Node000005" href="$de/d2f/class_path_manager.html#a220ff032714c927e1a2a8ea81d863331" title=" " alt="" coords="381,56,579,83"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="334,49,366,53,365,58,333,55"/>
+<area shape="rect" id="Node000004" href="$de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd" title=" " alt="" coords="627,31,845,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="572,25,612,29,612,34,572,30"/>
+<area shape="poly" id="edge5_Node000005_Node000004" title=" " alt="" coords="579,57,611,54,612,59,580,62"/>
+</map>

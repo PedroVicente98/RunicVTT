@@ -1,0 +1,28 @@
+var structmsg_1_1_ready_message =
+[
+    [ "boardId", "d4/d5d/structmsg_1_1_ready_message.html#aafcb0269761241bb23f3c97c737af307", null ],
+    [ "boardMeta", "d4/d5d/structmsg_1_1_ready_message.html#aa23caf8b489522d94e1e0c9a4364f0df", null ],
+    [ "bytes", "d4/d5d/structmsg_1_1_ready_message.html#a2c0addb2d1f502f087011622b237c1fb", null ],
+    [ "dragEpoch", "d4/d5d/structmsg_1_1_ready_message.html#a930e68a791df066b58449e9dbb7fc3ee", null ],
+    [ "fogId", "d4/d5d/structmsg_1_1_ready_message.html#a18284d8045cc8dfd355dd5bf830c7661", null ],
+    [ "fromPeerId", "d4/d5d/structmsg_1_1_ready_message.html#a909e165bba40febf9219e1ad75439d18", null ],
+    [ "grid", "d4/d5d/structmsg_1_1_ready_message.html#a79d52b62174e4d1cd40cadbf247ba069", null ],
+    [ "kind", "d4/d5d/structmsg_1_1_ready_message.html#a271fd367ed16a31fdeb5318145b77997", null ],
+    [ "markerComp", "d4/d5d/structmsg_1_1_ready_message.html#a3aefdaec6fc908ab6e2f1b1bcd8337c9", null ],
+    [ "markerId", "d4/d5d/structmsg_1_1_ready_message.html#a2ffe279a22769529c1ddc69b4f4046fb", null ],
+    [ "markerMeta", "d4/d5d/structmsg_1_1_ready_message.html#a0eb61a3a820e575dfd806e62f9d06773", null ],
+    [ "mov", "d4/d5d/structmsg_1_1_ready_message.html#a56b26942f9620987e509f0976df56c3a", null ],
+    [ "name", "d4/d5d/structmsg_1_1_ready_message.html#ab719e8cbe914b1e1d4e9eebbaba65c9c", null ],
+    [ "participants", "d4/d5d/structmsg_1_1_ready_message.html#ae4a9c60ca168cb03f436bb8b5d465598", null ],
+    [ "pos", "d4/d5d/structmsg_1_1_ready_message.html#a5cd0f307194de3e0b3f1e7b2f6ff4a39", null ],
+    [ "rebound", "d4/d5d/structmsg_1_1_ready_message.html#a02518f6ed9e11576d133edda94105562", null ],
+    [ "senderRole", "d4/d5d/structmsg_1_1_ready_message.html#a341db34141aa4806b3ddccad7f04caac", null ],
+    [ "seq", "d4/d5d/structmsg_1_1_ready_message.html#a95c31aae70035e3a1a8a5f9b0dc786bf", null ],
+    [ "size", "d4/d5d/structmsg_1_1_ready_message.html#ab1eeb46b2550553b1315430af4c63b7f", null ],
+    [ "tableId", "d4/d5d/structmsg_1_1_ready_message.html#aefde8f3334c561fa3529dfd62fe32033", null ],
+    [ "text", "d4/d5d/structmsg_1_1_ready_message.html#a6d48db8087a3bc86b230da5a79df0c41", null ],
+    [ "threadId", "d4/d5d/structmsg_1_1_ready_message.html#ab4555e28086f41420b09c8edede63518", null ],
+    [ "ts", "d4/d5d/structmsg_1_1_ready_message.html#aa3d1efe9d96185746b530612a7f5822a", null ],
+    [ "userUniqueId", "d4/d5d/structmsg_1_1_ready_message.html#a8bd5e8adbc192153942583cc309581d6", null ],
+    [ "vis", "d4/d5d/structmsg_1_1_ready_message.html#a23ac237508e4b4906535541c84c49bbf", null ]
+];

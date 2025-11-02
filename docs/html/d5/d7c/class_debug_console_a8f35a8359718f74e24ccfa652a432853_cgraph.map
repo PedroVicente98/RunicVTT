@@ -1,0 +1,11 @@
+<map id="DebugConsole::renderRightPanel_" name="DebugConsole::renderRightPanel_">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,188,116"/>
+<area shape="rect" id="Node000002" href="$d5/d7c/class_debug_console.html#a6c116a8611b2542015fbfe9bc5d0730f" title=" " alt="" coords="236,5,436,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="152,70,235,41,261,34,262,39,236,47,154,75"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#a9fd06df40e80df63fc91cfc0ccd06788" title=" " alt="" coords="276,56,396,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="188,82,261,75,261,80,189,88"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#a20bc2511969750adca340e0a1fe7ce93" title=" " alt="" coords="269,107,403,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="189,102,254,109,253,114,188,107"/>
+<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="277,157,394,184"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="154,114,236,143,263,150,261,156,235,148,152,119"/>
+</map>
