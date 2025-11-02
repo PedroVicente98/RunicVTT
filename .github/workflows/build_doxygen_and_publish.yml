@@ -8,7 +8,7 @@ on:
 jobs:
   docs:
     runs-on: ubuntu-latest
-    environment: RunicVTT Distribuition
+    environment: RunicVTT Distribution   # <- use the exact env name
 
     steps:
       - name: Checkout source
@@ -20,22 +20,36 @@ jobs:
       - name: Build docs
         run: doxygen Doxyfile
 
-      # create extra files in the publish dir
       - name: Prepare publish dir
         run: |
-          # make root-level folders inside docs/
-          mkdir -p docs/res
-          # copy ONLY the icon you want
-          cp res/RunicVTTIcon_64.png docs/res/RunicVTTIcon_64.png
+          # create root-level dirs inside docs/
+          mkdir -p ./res
+          # copy ONLY the icon (path from repo root!)
+          cp ./res/RunicVTTIcon_64.png ./res/RunicVTTIcon_64.png
 
-          # add README with the public URL
-          cat > docs/README.md << 'EOF'
-# RunicVTT – Doxygen docs
-
-Published at: https://pedrovicente98.github.io/html/
+          cat <<'EOF' > ./docs/index.html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="refresh" content="0; url=./html/index.html">
+    <title>RunicVTT docs</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="./html/index.html">Doxygen docs</a>…</p>
+  </body>
+</html>
 EOF
 
-          cat > docs/LICENSE << 'EOF'
+          # README
+          cat <<'EOF' > ./README.md
+# RunicVTT – Doxygen docs
+
+Published at: https://pedrovicente98.github.io/
+Main docs are in /html.
+EOF
+
+          # LICENSE
+          cat <<'EOF' > ./LICENSE
 MIT License
 
 Copyright (c) 2025 Pedro Vicente
@@ -64,7 +78,7 @@ EOF
         with:
           external_repository: PedroVicente98/runicvtt.github.io
           publish_branch: main
-          publish_dir: ./docs       
+          publish_dir: ./docs          # <-- we push the whole docs/ (root + html/)
           personal_token: ${{ secrets.PAGES_TOKEN }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
