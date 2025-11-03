@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -104,10 +104,7 @@ $(function(){initNavTree('d4/d44/class_renderer.html','../../'); initResizable()
 <div class="dynheader">
 Collaboration diagram for Renderer:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/d74/class_renderer__coll__graph.png" border="0" usemap="#a_renderer_coll__map" alt="Collaboration graph"/></div>
-<map name="a_renderer_coll__map" id="a_renderer_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,229,107"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/d74/class_renderer__coll__graph.svg" width="235" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -144,33 +141,15 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d84/_renderer_8cpp_source.html#l00020">20</a> of file <a class="el" href="../../da/d84/_renderer_8cpp_source.html">Renderer.cpp</a>.</p>
-<div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_cgraph.png" border="0" usemap="#ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_cgraph" alt=""/></div>
-<map name="ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_cgraph" id="ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,81,119,108"/>
-<area shape="rect" href="../../d5/dc6/class_index_buffer.html#ac8bdd0495f718173fb46691ad1b7e4af" title=" " alt="" coords="182,5,303,32"/>
-<area shape="poly" title=" " alt="" coords="88,78,166,42,182,35,184,40,168,46,90,83"/>
-<area shape="rect" href="../../d1/d51/class_shader.html#a5a5a24f72050f46f03cb839b41490527" title=" " alt="" coords="194,56,290,83"/>
-<area shape="poly" title=" " alt="" coords="119,84,178,76,179,81,119,89"/>
-<area shape="rect" href="../../d9/d51/class_vertex_array.html#ad5059455f0864327028636c628d5a661" title=" " alt="" coords="181,107,304,133"/>
-<area shape="poly" title=" " alt="" coords="119,100,166,107,165,112,119,105"/>
-<area shape="rect" href="../../d5/dc6/class_index_buffer.html#a3ec4dba9cc97dfedac07d6375d25b3b6" title=" " alt="" coords="167,157,318,184"/>
-<area shape="poly" title=" " alt="" coords="90,106,168,143,184,149,182,154,166,148,88,111"/>
-</map>
-</div>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_icgraph.png" border="0" usemap="#ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_icgraph" alt=""/></div>
-<map name="ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_icgraph" id="ad4/d44/class_renderer_aed7ac4a042cf7c73ef53a0488531fc3e_icgraph">
-<area shape="rect" title=" " alt="" coords="237,5,350,32"/>
-<area shape="rect" href="../../d2/dbf/class_board_manager.html#a211d671937d1b0b2494b1d2810f0ad23" title=" " alt="" coords="5,5,189,32"/>
-<area shape="poly" title=" " alt="" coords="221,21,189,21,189,16,221,16"/>
-</map>
-</div>
-
+<div class="fragment"><div class="line"><span class="lineno">   21</span>{</div>
+<div class="line"><span class="lineno">   22</span>    shader.Bind();</div>
+<div class="line"><span class="lineno">   23</span>    va.Bind();</div>
+<div class="line"><span class="lineno">   24</span>    ib.Bind();</div>
+<div class="line"><span class="lineno">   25</span>    <span class="keywordtype">int</span> count = ib.GetCount();</div>
+<div class="line"><span class="lineno">   26</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, <span class="keyword">nullptr</span>));</div>
+<div class="line"><span class="lineno">   27</span>}</div>
+<div class="ttc" id="a_renderer_8h_html_a8cc1e1baeb83f3fa64a4aaa75baf3548"><div class="ttname"><a href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a></div><div class="ttdeci">#define GLCall(x)</div><div class="ttdef"><b>Definition</b> <a href="../../d3/da0/_renderer_8h_source.html#l00012">Renderer.h:12</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>

@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,24 +105,12 @@ $(function(){initNavTree('db/d80/class_logger_1_1_line_to_logger_buf.html','../.
 <div class="dynheader">
 Inheritance diagram for Logger::LineToLoggerBuf:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../de/d1d/class_logger_1_1_line_to_logger_buf__inherit__graph.png" border="0" usemap="#a_logger_1_1_line_to_logger_buf_inherit__map" alt="Inheritance graph"/></div>
-<map name="a_logger_1_1_line_to_logger_buf_inherit__map" id="a_logger_1_1_line_to_logger_buf_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,123,208,432"/>
-<area shape="rect" title=" " alt="" coords="60,5,154,75"/>
-<area shape="poly" title=" " alt="" coords="110,90,110,123,104,123,104,90"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../de/d1d/class_logger_1_1_line_to_logger_buf__inherit__graph.svg" width="214" height="438"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Collaboration diagram for Logger::LineToLoggerBuf:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d1a/class_logger_1_1_line_to_logger_buf__coll__graph.png" border="0" usemap="#a_logger_1_1_line_to_logger_buf_coll__map" alt="Collaboration graph"/></div>
-<map name="a_logger_1_1_line_to_logger_buf_coll__map" id="a_logger_1_1_line_to_logger_buf_coll__map">
-<area shape="rect" title=" " alt="" coords="5,155,208,421"/>
-<area shape="rect" title=" " alt="" coords="13,5,108,75"/>
-<area shape="poly" title=" " alt="" coords="72,89,84,154,79,155,67,90"/>
-<area shape="rect" title=" " alt="" coords="132,5,175,75"/>
-<area shape="poly" title=" " alt="" coords="150,75,138,138,133,137,145,74"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d1a/class_logger_1_1_line_to_logger_buf__coll__graph.svg" width="214" height="427"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -185,7 +173,11 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00159">159</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  159</span>                                                                                            :</div>
+<div class="line"><span class="lineno">  160</span>            <a class="code hl_variable" href="#a06532bb015f24747d4f8f858b66414bf">channel_</a>(std::move(channel)), <a class="code hl_variable" href="#a61a88d042664e21cccfadd7d477de908">forcedLevel_</a>(forced) {}</div>
+<div class="ttc" id="aclass_logger_1_1_line_to_logger_buf_html_a06532bb015f24747d4f8f858b66414bf"><div class="ttname"><a href="#a06532bb015f24747d4f8f858b66414bf">Logger::LineToLoggerBuf::channel_</a></div><div class="ttdeci">std::string channel_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00212">Logger.h:212</a></div></div>
+<div class="ttc" id="aclass_logger_1_1_line_to_logger_buf_html_a61a88d042664e21cccfadd7d477de908"><div class="ttname"><a href="#a61a88d042664e21cccfadd7d477de908">Logger::LineToLoggerBuf::forcedLevel_</a></div><div class="ttdeci">std::optional&lt; Level &gt; forcedLevel_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00214">Logger.h:214</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -213,30 +205,26 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00201">201</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  202</span>        {</div>
+<div class="line"><span class="lineno">  203</span>            <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.empty() &amp;&amp; <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.back() == <span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><span class="lineno">  204</span>                <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.pop_back();</div>
+<div class="line"><span class="lineno">  205</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a61a88d042664e21cccfadd7d477de908">forcedLevel_</a>)</div>
+<div class="line"><span class="lineno">  206</span>                <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<a class="code hl_variable" href="#a06532bb015f24747d4f8f858b66414bf">channel_</a>, *<a class="code hl_variable" href="#a61a88d042664e21cccfadd7d477de908">forcedLevel_</a>, <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>);</div>
+<div class="line"><span class="lineno">  207</span>            <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  208</span>                <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<a class="code hl_variable" href="#a06532bb015f24747d4f8f858b66414bf">channel_</a>, <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>);</div>
+<div class="line"><span class="lineno">  209</span>            <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.clear();</div>
+<div class="line"><span class="lineno">  210</span>        }</div>
+<div class="ttc" id="aclass_logger_1_1_line_to_logger_buf_html_a1bb7859beab9d9852e352c7cdd25db79"><div class="ttname"><a href="#a1bb7859beab9d9852e352c7cdd25db79">Logger::LineToLoggerBuf::buf_</a></div><div class="ttdeci">std::string buf_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00213">Logger.h:213</a></div></div>
+<div class="ttc" id="aclass_logger_html_aebb248e608f8e2724de20b482cb2a15f"><div class="ttname"><a href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a></div><div class="ttdeci">static Logger &amp; instance()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00039">Logger.h:39</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_cgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_cgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_cgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_cgraph">
-<area shape="rect" title=" " alt="" coords="5,35,171,77"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="219,5,336,32"/>
-<area shape="poly" title=" " alt="" coords="171,37,203,31,204,36,172,42"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="235,80,320,107"/>
-<area shape="poly" title=" " alt="" coords="172,70,220,79,219,85,171,75"/>
-<area shape="poly" title=" " alt="" coords="245,81,239,71,243,62,256,55,277,53,300,56,312,62,310,67,298,61,277,59,258,61,247,65,245,71,250,78"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_cgraph.svg" width="342" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_icgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_icgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_icgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_icgraph">
-<area shape="rect" title=" " alt="" coords="219,39,384,81"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a92248ba0deff6e257595b422c5a4443d" title=" " alt="" coords="5,5,171,48"/>
-<area shape="poly" title=" " alt="" coords="203,47,171,42,172,37,204,42"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a274c06eec4ad000418b4b5ddf623b93e" title=" " alt="" coords="5,72,171,115"/>
-<area shape="poly" title=" " alt="" coords="204,78,172,83,171,78,203,73"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a65604209f9adb1e9adf47388212c7cf8_icgraph.svg" width="390" height="120"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -265,24 +253,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00163">163</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  164</span>        {</div>
+<div class="line"><span class="lineno">  165</span>            <span class="keywordflow">if</span> (ch == traits_type::eof())</div>
+<div class="line"><span class="lineno">  166</span>                <span class="keywordflow">return</span> <a class="code hl_function" href="#a9dd164184038b0f6a7d1b3926d228d30">sync</a>();</div>
+<div class="line"><span class="lineno">  167</span>            <span class="keywordtype">char</span> c = <span class="keyword">static_cast&lt;</span><span class="keywordtype">char</span><span class="keyword">&gt;</span>(ch);</div>
+<div class="line"><span class="lineno">  168</span>            <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.push_back(c);</div>
+<div class="line"><span class="lineno">  169</span>            <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><span class="lineno">  170</span>                <a class="code hl_function" href="#a65604209f9adb1e9adf47388212c7cf8">flushLine_</a>();</div>
+<div class="line"><span class="lineno">  171</span>            <span class="keywordflow">return</span> ch;</div>
+<div class="line"><span class="lineno">  172</span>        }</div>
+<div class="ttc" id="aclass_logger_1_1_line_to_logger_buf_html_a65604209f9adb1e9adf47388212c7cf8"><div class="ttname"><a href="#a65604209f9adb1e9adf47388212c7cf8">Logger::LineToLoggerBuf::flushLine_</a></div><div class="ttdeci">void flushLine_()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00201">Logger.h:201</a></div></div>
+<div class="ttc" id="aclass_logger_1_1_line_to_logger_buf_html_a9dd164184038b0f6a7d1b3926d228d30"><div class="ttname"><a href="#a9dd164184038b0f6a7d1b3926d228d30">Logger::LineToLoggerBuf::sync</a></div><div class="ttdeci">int sync() override</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00185">Logger.h:185</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a92248ba0deff6e257595b422c5a4443d_cgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a92248ba0deff6e257595b422c5a4443d_cgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a92248ba0deff6e257595b422c5a4443d_cgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a92248ba0deff6e257595b422c5a4443d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,39,171,81"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="219,5,384,48"/>
-<area shape="poly" title=" " alt="" coords="170,44,203,39,203,45,171,50"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a9dd164184038b0f6a7d1b3926d228d30" title=" " alt="" coords="219,72,384,115"/>
-<area shape="poly" title=" " alt="" coords="171,70,203,75,203,81,170,76"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="432,9,549,36"/>
-<area shape="poly" title=" " alt="" coords="384,22,417,22,417,27,385,28"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="448,84,533,111"/>
-<area shape="poly" title=" " alt="" coords="362,46,439,75,437,80,360,51"/>
-<area shape="poly" title=" " alt="" coords="458,85,453,75,457,66,470,59,491,57,513,60,525,66,523,71,512,65,491,63,471,65,460,69,458,75,463,82"/>
-<area shape="poly" title=" " alt="" coords="360,69,437,40,439,45,362,74"/>
-<area shape="poly" title=" " alt="" coords="385,92,432,93,432,99,384,98"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a92248ba0deff6e257595b422c5a4443d_cgraph.svg" width="555" height="120"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -311,28 +296,28 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00185">185</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  186</span>        {</div>
+<div class="line"><span class="lineno">  187</span>            <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.empty())</div>
+<div class="line"><span class="lineno">  188</span>            {</div>
+<div class="line"><span class="lineno">  189</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.back() == <span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><span class="lineno">  190</span>                    <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.pop_back();</div>
+<div class="line"><span class="lineno">  191</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a61a88d042664e21cccfadd7d477de908">forcedLevel_</a>)</div>
+<div class="line"><span class="lineno">  192</span>                    <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<a class="code hl_variable" href="#a06532bb015f24747d4f8f858b66414bf">channel_</a>, *<a class="code hl_variable" href="#a61a88d042664e21cccfadd7d477de908">forcedLevel_</a>, <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>);</div>
+<div class="line"><span class="lineno">  193</span>                <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  194</span>                    <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<a class="code hl_variable" href="#a06532bb015f24747d4f8f858b66414bf">channel_</a>, <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>); <span class="comment">// auto-detect path</span></div>
+<div class="line"><span class="lineno">  195</span>                <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.clear();</div>
+<div class="line"><span class="lineno">  196</span>            }</div>
+<div class="line"><span class="lineno">  197</span>            <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">  198</span>        }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_cgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_cgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_cgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_cgraph">
-<area shape="rect" title=" " alt="" coords="5,35,171,77"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="219,5,336,32"/>
-<area shape="poly" title=" " alt="" coords="171,37,203,31,204,36,172,42"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="235,80,320,107"/>
-<area shape="poly" title=" " alt="" coords="172,70,220,79,219,85,171,75"/>
-<area shape="poly" title=" " alt="" coords="245,81,239,71,243,62,256,55,277,53,300,56,312,62,310,67,298,61,277,59,258,61,247,65,245,71,250,78"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_cgraph.svg" width="342" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_icgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_icgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_icgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_icgraph">
-<area shape="rect" title=" " alt="" coords="219,5,384,48"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a92248ba0deff6e257595b422c5a4443d" title=" " alt="" coords="5,5,171,48"/>
-<area shape="poly" title=" " alt="" coords="203,29,171,29,171,24,203,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a9dd164184038b0f6a7d1b3926d228d30_icgraph.svg" width="390" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -365,20 +350,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00173">173</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  174</span>        {</div>
+<div class="line"><span class="lineno">  175</span>            std::streamsize w = 0;</div>
+<div class="line"><span class="lineno">  176</span>            <span class="keywordflow">for</span> (; w &lt; count; ++w)</div>
+<div class="line"><span class="lineno">  177</span>            {</div>
+<div class="line"><span class="lineno">  178</span>                <span class="keywordtype">char</span> c = s[w];</div>
+<div class="line"><span class="lineno">  179</span>                <a class="code hl_variable" href="#a1bb7859beab9d9852e352c7cdd25db79">buf_</a>.push_back(c);</div>
+<div class="line"><span class="lineno">  180</span>                <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><span class="lineno">  181</span>                    <a class="code hl_function" href="#a65604209f9adb1e9adf47388212c7cf8">flushLine_</a>();</div>
+<div class="line"><span class="lineno">  182</span>            }</div>
+<div class="line"><span class="lineno">  183</span>            <span class="keywordflow">return</span> w;</div>
+<div class="line"><span class="lineno">  184</span>        }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d80/class_logger_1_1_line_to_logger_buf_a274c06eec4ad000418b4b5ddf623b93e_cgraph.png" border="0" usemap="#adb/d80/class_logger_1_1_line_to_logger_buf_a274c06eec4ad000418b4b5ddf623b93e_cgraph" alt=""/></div>
-<map name="adb/d80/class_logger_1_1_line_to_logger_buf_a274c06eec4ad000418b4b5ddf623b93e_cgraph" id="adb/d80/class_logger_1_1_line_to_logger_buf_a274c06eec4ad000418b4b5ddf623b93e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,35,171,77"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="219,35,384,77"/>
-<area shape="poly" title=" " alt="" coords="171,53,203,53,203,59,171,59"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="432,5,549,32"/>
-<area shape="poly" title=" " alt="" coords="384,37,416,31,417,36,385,42"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="448,80,533,107"/>
-<area shape="poly" title=" " alt="" coords="385,70,433,79,432,85,384,75"/>
-<area shape="poly" title=" " alt="" coords="458,81,453,71,457,62,470,55,491,53,513,56,525,62,523,67,512,61,491,59,471,61,460,65,458,71,463,78"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d80/class_logger_1_1_line_to_logger_buf_a274c06eec4ad000418b4b5ddf623b93e_cgraph.svg" width="555" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

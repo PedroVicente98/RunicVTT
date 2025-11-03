@@ -6,7 +6,7 @@ digraph "ApplicationHandler::renderMainMenuBar"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="ApplicationHandler\l::renderMainMenuBar",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="ApplicationHandler::renderMainMenuBar",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="PathManager::getGameTablesPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a6be0a95403caf375f4d7b642f0f90061",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
@@ -34,7 +34,7 @@ digraph "ApplicationHandler::renderMainMenuBar"
   Node1 -> Node13 [id="edge14_Node000001_Node000013",color="steelblue1",style="solid",tooltip=" "];
   Node13 [id="Node000013",label="DebugConsole::isVisible",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d7c/class_debug_console.html#a3d770310d0b1c21e14ce2925228fc756",tooltip=" "];
   Node1 -> Node14 [id="edge15_Node000001_Node000014",color="steelblue1",style="solid",tooltip=" "];
-  Node14 [id="Node000014",label="AssetIO::openDeleteAsset\lPopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#ab942f6ec954acc3ffa2d6d46fd3f8a66",tooltip=" "];
+  Node14 [id="Node000014",label="AssetIO::openDeleteAssetPopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#ab942f6ec954acc3ffa2d6d46fd3f8a66",tooltip=" "];
   Node14 -> Node15 [id="edge16_Node000014_Node000015",color="steelblue1",style="solid",tooltip=" "];
   Node15 [id="Node000015",label="AssetIO::deleteAsset",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d5e/namespace_asset_i_o.html#a221136262c8cd709c901e55946f3eca9",tooltip=" "];
   Node15 -> Node6 [id="edge17_Node000015_Node000006",color="steelblue1",style="solid",tooltip=" "];

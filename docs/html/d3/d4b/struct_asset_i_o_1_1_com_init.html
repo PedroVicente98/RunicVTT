@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,7 @@ $(function(){initNavTree('d3/d4b/struct_asset_i_o_1_1_com_init.html','../../'); 
 <div class="dynheader">
 Collaboration diagram for AssetIO::ComInit:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d0a/struct_asset_i_o_1_1_com_init__coll__graph.png" border="0" usemap="#a_asset_i_o_1_1_com_init_coll__map" alt="Collaboration graph"/></div>
-<map name="a_asset_i_o_1_1_com_init_coll__map" id="a_asset_i_o_1_1_com_init_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,118,117"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../db/d0a/struct_asset_i_o_1_1_com_init__coll__graph.svg" width="124" height="123"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -153,7 +150,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html#l00040">40</a> of file <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html">AssetIO.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   41</span>        {</div>
+<div class="line"><span class="lineno">   42</span>            <a class="code hl_variable" href="#a89303de5f410fcd42084c8a9e9fac50e">hr</a> = CoInitializeEx(<span class="keyword">nullptr</span>, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);</div>
+<div class="line"><span class="lineno">   43</span>        }</div>
+<div class="ttc" id="astruct_asset_i_o_1_1_com_init_html_a89303de5f410fcd42084c8a9e9fac50e"><div class="ttname"><a href="#a89303de5f410fcd42084c8a9e9fac50e">AssetIO::ComInit::hr</a></div><div class="ttdeci">HRESULT hr</div><div class="ttdef"><b>Definition</b> <a href="../../d4/dd7/_asset_i_o_8h_source.html#l00039">AssetIO.h:39</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a1422151a0ec2491944d5af49920eed96" name="a1422151a0ec2491944d5af49920eed96"></a>
@@ -180,7 +181,11 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html#l00044">44</a> of file <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html">AssetIO.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   45</span>        {</div>
+<div class="line"><span class="lineno">   46</span>            <span class="keywordflow">if</span> (SUCCEEDED(<a class="code hl_variable" href="#a89303de5f410fcd42084c8a9e9fac50e">hr</a>))</div>
+<div class="line"><span class="lineno">   47</span>                CoUninitialize();</div>
+<div class="line"><span class="lineno">   48</span>        }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -208,27 +213,13 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html#l00049">49</a> of file <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html">AssetIO.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   50</span>        {</div>
+<div class="line"><span class="lineno">   51</span>            <span class="keywordflow">return</span> SUCCEEDED(<a class="code hl_variable" href="#a89303de5f410fcd42084c8a9e9fac50e">hr</a>);</div>
+<div class="line"><span class="lineno">   52</span>        }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d4b/struct_asset_i_o_1_1_com_init_ad05d9709a6ecc066bf1f221f80260184_icgraph.png" border="0" usemap="#ad3/d4b/struct_asset_i_o_1_1_com_init_ad05d9709a6ecc066bf1f221f80260184_icgraph" alt=""/></div>
-<map name="ad3/d4b/struct_asset_i_o_1_1_com_init_ad05d9709a6ecc066bf1f221f80260184_icgraph" id="ad3/d4b/struct_asset_i_o_1_1_com_init_ad05d9709a6ecc066bf1f221f80260184_icgraph">
-<area shape="rect" title=" " alt="" coords="1011,39,1156,65"/>
-<area shape="rect" href="../../d3/d5e/namespace_asset_i_o.html#a3a9f35b3ec80b56eabe671a9fc6191c1" title=" " alt="" coords="761,13,963,40"/>
-<area shape="poly" title=" " alt="" coords="995,45,963,41,964,36,996,39"/>
-<area shape="rect" href="../../d3/d5e/namespace_asset_i_o.html#a5cba712df34d43b377cd1ccf1c17b5b2" title=" " alt="" coords="764,64,960,91"/>
-<area shape="poly" title=" " alt="" coords="996,65,960,69,959,64,995,59"/>
-<area shape="rect" href="../../d3/d5e/namespace_asset_i_o.html#ad87dd90acfa0487b69d4a53c32e1940d" title=" " alt="" coords="500,13,713,40"/>
-<area shape="poly" title=" " alt="" coords="745,29,713,29,713,24,745,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#a98e49f0d6038bf4caeed77b4d03b003c" title=" " alt="" coords="307,5,452,48"/>
-<area shape="poly" title=" " alt="" coords="485,29,453,29,453,24,485,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" title=" " alt="" coords="291,29,259,29,259,24,291,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-<area shape="rect" href="../../d3/d5e/namespace_asset_i_o.html#a0fd129212ac4835f913af0761824df9a" title=" " alt="" coords="516,64,697,91"/>
-<area shape="poly" title=" " alt="" coords="749,80,697,80,697,75,749,75"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d4b/struct_asset_i_o_1_1_com_init_ad05d9709a6ecc066bf1f221f80260184_icgraph.svg" width="100%" height="372"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -247,7 +238,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html#l00039">39</a> of file <a class="el" href="../../d4/dd7/_asset_i_o_8h_source.html">AssetIO.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   39</span>{E_FAIL};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>

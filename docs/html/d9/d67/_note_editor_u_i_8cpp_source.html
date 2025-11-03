@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -136,7 +136,8 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>};</div>
 </div>
 <div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span> </div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span><span class="keyword">static</span> <span class="keywordtype">int</span> InputTextMultilineWrapCallback(ImGuiInputTextCallbackData* data)</div>
+<div class="foldopen" id="foldopen00034" data-start="{" data-end="}">
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno"><a class="line" href="../../d9/d67/_note_editor_u_i_8cpp.html#a10b418a248e7bff57a91ed717dd09739">   34</a></span><span class="keyword">static</span> <span class="keywordtype">int</span> <a class="code hl_function" href="../../d9/d67/_note_editor_u_i_8cpp.html#a10b418a248e7bff57a91ed717dd09739">InputTextMultilineWrapCallback</a>(ImGuiInputTextCallbackData* data)</div>
 <div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>{</div>
 <div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>    <span class="keyword">auto</span>* ctx = <span class="keyword">static_cast&lt;</span><a class="code hl_struct" href="../../d5/dce/struct_input_text_wrap_ctx.html">InputTextWrapCtx</a>*<span class="keyword">&gt;</span>(data-&gt;UserData);</div>
 <div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    <span class="keywordflow">if</span> (!ctx || !ctx-&gt;buf)</div>
@@ -205,8 +206,10 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    }</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    <span class="keywordflow">return</span> 0;</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>}</div>
+</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span> </div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span><span class="keyword">static</span> <span class="keywordtype">bool</span> InputTextMultilineString_HardWrap(<span class="keyword">const</span> <span class="keywordtype">char</span>* label,</div>
+<div class="foldopen" id="foldopen00104" data-start="{" data-end="}">
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno"><a class="line" href="../../d9/d67/_note_editor_u_i_8cpp.html#a45d4ae7298891b5e82f640db9de87f35">  104</a></span><span class="keyword">static</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="../../d9/d67/_note_editor_u_i_8cpp.html#a45d4ae7298891b5e82f640db9de87f35">InputTextMultilineString_HardWrap</a>(<span class="keyword">const</span> <span class="keywordtype">char</span>* label,</div>
 <div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>                                              std::string* str,</div>
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>                                              <span class="keyword">const</span> ImVec2&amp; size,</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>                                              <span class="keywordtype">float</span> max_px_line,</div>
@@ -218,7 +221,7 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span> </div>
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <a class="code hl_struct" href="../../d5/dce/struct_input_text_wrap_ctx.html">InputTextWrapCtx</a> ctx;</div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    ctx.<a class="code hl_variable" href="../../d5/dce/struct_input_text_wrap_ctx.html#a581adaf3ecb2ace6cb5c6c3a75007cde">buf</a> = str;</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    ctx.<a class="code hl_variable" href="../../d5/dce/struct_input_text_wrap_ctx.html#ae1f10a6b826fc3676cedbf0ca24a8b8a">max_px</a> = std::max(0.0f, max_px_line);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>    ctx.max_px = std::max(0.0f, max_px_line);</div>
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span> </div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    flags |= ImGuiInputTextFlags_CallbackResize;</div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>    flags |= ImGuiInputTextFlags_CallbackEdit;</div>
@@ -229,9 +232,10 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>                                     str-&gt;capacity() + 1, <span class="comment">// bind to capacity; resize callback will keep this valid</span></div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>                                     size,</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>                                     flags,</div>
-<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                                     InputTextMultilineWrapCallback,</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>                                     <a class="code hl_function" href="../../d9/d67/_note_editor_u_i_8cpp.html#a10b418a248e7bff57a91ed717dd09739">InputTextMultilineWrapCallback</a>,</div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>                                     &amp;ctx);</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>}</div>
+</div>
 <div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span> </div>
 <div class="foldopen" id="foldopen00131" data-start="{" data-end="}">
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="../../d3/dfd/class_note_editor_u_i.html#a7660bfc95b619f960ddbfbc56f9f5782">  131</a></span><a class="code hl_function" href="../../d3/dfd/class_note_editor_u_i.html#a7660bfc95b619f960ddbfbc56f9f5782">NoteEditorUI::NoteEditorUI</a>(std::shared_ptr&lt;NotesManager&gt; notes_manager, std::shared_ptr&lt;ImGuiToaster&gt; toaster) :</div>
@@ -564,7 +568,7 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span>        <span class="keywordtype">float</span> wrap_px = editorSize.x - ImGui::GetStyle().FramePadding.x * 2.0f;</div>
 <div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span> </div>
 <div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>        <span class="comment">// hard-wrap (inserts &#39;\n&#39; when exceeding width)</span></div>
-<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>        InputTextMultilineString_HardWrap(<span class="stringliteral">&quot;##NoteEdit&quot;</span>,</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>        <a class="code hl_function" href="../../d9/d67/_note_editor_u_i_8cpp.html#a45d4ae7298891b5e82f640db9de87f35">InputTextMultilineString_HardWrap</a>(<span class="stringliteral">&quot;##NoteEdit&quot;</span>,</div>
 <div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>                                          &amp;ts.editBuffer,</div>
 <div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>                                          editorSize,</div>
 <div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span>                                          wrap_px,</div>
@@ -778,7 +782,7 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00644" name="l00644"></a><span class="lineno">  644</span>        std::transform(low.begin(), low.end(), low.begin(), ::tolower);</div>
 <div class="line"><a id="l00645" name="l00645"></a><span class="lineno">  645</span>        <span class="keywordflow">return</span> low.find(needle) != std::string::npos;</div>
 <div class="line"><a id="l00646" name="l00646"></a><span class="lineno">  646</span>    };</div>
-<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>    <span class="keywordflow">return</span> contains(n.<a class="code hl_variable" href="../../d1/d47/struct_note.html#a612eb1f5c7581483dc1bdb7109093812">title</a>) || contains(n.<a class="code hl_variable" href="../../d1/d47/struct_note.html#a7ffe61f9f6c27ae537214bace0ddab3f">author</a>) || contains(n.<a class="code hl_variable" href="../../d1/d47/struct_note.html#af3da78d99117ce8589d4976a3ec026ac">markdown_text</a>);</div>
+<div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>    <span class="keywordflow">return</span> contains(n.title) || contains(n.author) || contains(n.markdown_text);</div>
 <div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>}</div>
 </div>
 <div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span> </div>
@@ -816,6 +820,8 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="line"><a id="l00678" name="l00678"></a><span class="lineno">  678</span>}</div>
 </div>
 <div class="ttc" id="a_im_gui_toaster_8h_html"><div class="ttname"><a href="../../db/dd0/_im_gui_toaster_8h.html">ImGuiToaster.h</a></div></div>
+<div class="ttc" id="a_note_editor_u_i_8cpp_html_a10b418a248e7bff57a91ed717dd09739"><div class="ttname"><a href="../../d9/d67/_note_editor_u_i_8cpp.html#a10b418a248e7bff57a91ed717dd09739">InputTextMultilineWrapCallback</a></div><div class="ttdeci">static int InputTextMultilineWrapCallback(ImGuiInputTextCallbackData *data)</div><div class="ttdef"><b>Definition</b> <a href="#l00034">NoteEditorUI.cpp:34</a></div></div>
+<div class="ttc" id="a_note_editor_u_i_8cpp_html_a45d4ae7298891b5e82f640db9de87f35"><div class="ttname"><a href="../../d9/d67/_note_editor_u_i_8cpp.html#a45d4ae7298891b5e82f640db9de87f35">InputTextMultilineString_HardWrap</a></div><div class="ttdeci">static bool InputTextMultilineString_HardWrap(const char *label, std::string *str, const ImVec2 &amp;size, float max_px_line, ImGuiInputTextFlags flags=0)</div><div class="ttdef"><b>Definition</b> <a href="#l00104">NoteEditorUI.cpp:104</a></div></div>
 <div class="ttc" id="a_note_editor_u_i_8h_html"><div class="ttname"><a href="../../d1/ded/_note_editor_u_i_8h.html">NoteEditorUI.h</a></div></div>
 <div class="ttc" id="aclass_markdown_renderer_html_a411e6c8088509eea7626dff9e50bae1b"><div class="ttname"><a href="../../d5/d4a/class_markdown_renderer.html#a411e6c8088509eea7626dff9e50bae1b">MarkdownRenderer::resolveNoteRef</a></div><div class="ttdeci">std::function&lt; std::string(const std::string &amp;ref) resolveNoteRef)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00029">MarkdownRenderer.h:29</a></div></div>
 <div class="ttc" id="aclass_markdown_renderer_html_a80ae80341274643f67966e83d8bb81c6"><div class="ttname"><a href="../../d5/d4a/class_markdown_renderer.html#a80ae80341274643f67966e83d8bb81c6">MarkdownRenderer::onRoll</a></div><div class="ttdeci">std::function&lt; void(const std::string &amp;expr) onRoll)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00025">MarkdownRenderer.h:25</a></div></div>
@@ -857,9 +863,6 @@ $(function(){initNavTree('d9/d67/_note_editor_u_i_8cpp_source.html','../../'); i
 <div class="ttc" id="astruct_input_text_wrap_ctx_html_a581adaf3ecb2ace6cb5c6c3a75007cde"><div class="ttname"><a href="../../d5/dce/struct_input_text_wrap_ctx.html#a581adaf3ecb2ace6cb5c6c3a75007cde">InputTextWrapCtx::buf</a></div><div class="ttdeci">std::string * buf</div><div class="ttdef"><b>Definition</b> <a href="#l00030">NoteEditorUI.cpp:30</a></div></div>
 <div class="ttc" id="astruct_input_text_wrap_ctx_html_ae1f10a6b826fc3676cedbf0ca24a8b8a"><div class="ttname"><a href="../../d5/dce/struct_input_text_wrap_ctx.html#ae1f10a6b826fc3676cedbf0ca24a8b8a">InputTextWrapCtx::max_px</a></div><div class="ttdeci">float max_px</div><div class="ttdef"><b>Definition</b> <a href="#l00031">NoteEditorUI.cpp:31</a></div></div>
 <div class="ttc" id="astruct_note_html"><div class="ttname"><a href="../../d1/d47/struct_note.html">Note</a></div><div class="ttdef"><b>Definition</b> <a href="../../d7/d8b/_notes_manager_8h_source.html#l00015">NotesManager.h:16</a></div></div>
-<div class="ttc" id="astruct_note_html_a612eb1f5c7581483dc1bdb7109093812"><div class="ttname"><a href="../../d1/d47/struct_note.html#a612eb1f5c7581483dc1bdb7109093812">Note::title</a></div><div class="ttdeci">std::string title</div><div class="ttdef"><b>Definition</b> <a href="../../d7/d8b/_notes_manager_8h_source.html#l00023">NotesManager.h:23</a></div></div>
-<div class="ttc" id="astruct_note_html_a7ffe61f9f6c27ae537214bace0ddab3f"><div class="ttname"><a href="../../d1/d47/struct_note.html#a7ffe61f9f6c27ae537214bace0ddab3f">Note::author</a></div><div class="ttdeci">std::string author</div><div class="ttdef"><b>Definition</b> <a href="../../d7/d8b/_notes_manager_8h_source.html#l00024">NotesManager.h:24</a></div></div>
-<div class="ttc" id="astruct_note_html_af3da78d99117ce8589d4976a3ec026ac"><div class="ttname"><a href="../../d1/d47/struct_note.html#af3da78d99117ce8589d4976a3ec026ac">Note::markdown_text</a></div><div class="ttdeci">std::string markdown_text</div><div class="ttdef"><b>Definition</b> <a href="../../d7/d8b/_notes_manager_8h_source.html#l00029">NotesManager.h:29</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

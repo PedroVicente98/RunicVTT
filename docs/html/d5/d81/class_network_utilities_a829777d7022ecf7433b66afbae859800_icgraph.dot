@@ -6,11 +6,11 @@ digraph "NetworkUtilities::createKillJobIfNeeded"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="NetworkUtilities::create\lKillJobIfNeeded",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="NetworkUtilities::createKillJobIfNeeded",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NetworkUtilities::assign\lToJob",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ace9b13371f4e6ffa2594682ada0f4e0c",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkUtilities::assignToJob",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ace9b13371f4e6ffa2594682ada0f4e0c",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="NetworkUtilities::startLocal\lTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567",tooltip=" "];
+  Node3 [id="Node000003",label="NetworkUtilities::startLocalTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node4 [id="Node000004",label="NetworkManager::setup",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e",tooltip=" "];
   Node3 -> Node5 [id="edge4_Node000003_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];

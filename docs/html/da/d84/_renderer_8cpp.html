@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -103,37 +103,7 @@ $(function(){initNavTree('da/d84/_renderer_8cpp.html','../../'); initResizable()
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for Renderer.cpp:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d6/d7b/_renderer_8cpp__incl.png" border="0" usemap="#asrc_2renderer_2_renderer_8cpp" alt=""/></div>
-<map name="asrc_2renderer_2_renderer_8cpp" id="asrc_2renderer_2_renderer_8cpp">
-<area shape="rect" title=" " alt="" coords="365,5,538,32"/>
-<area shape="rect" href="../../d3/da0/_renderer_8h.html" title=" " alt="" coords="322,80,407,107"/>
-<area shape="poly" title=" " alt="" coords="438,35,393,72,389,68,435,30"/>
-<area shape="rect" title=" " alt="" coords="729,229,800,256"/>
-<area shape="poly" title=" " alt="" coords="471,30,736,218,733,222,468,35"/>
-<area shape="rect" title=" " alt="" coords="381,155,460,181"/>
-<area shape="poly" title=" " alt="" coords="377,106,404,141,400,144,372,109"/>
-<area shape="rect" title=" " alt="" coords="5,155,111,181"/>
-<area shape="poly" title=" " alt="" coords="322,107,126,153,125,148,321,102"/>
-<area shape="rect" href="../../d0/df4/_vertex_array_8h.html" title=" " alt="" coords="135,155,234,181"/>
-<area shape="poly" title=" " alt="" coords="334,110,231,151,229,146,332,105"/>
-<area shape="rect" href="../../df/ddc/_index_buffer_8h.html" title=" " alt="" coords="258,155,356,181"/>
-<area shape="poly" title=" " alt="" coords="357,109,329,144,325,141,353,106"/>
-<area shape="rect" href="../../d8/d34/_shader_8h.html" title=" " alt="" coords="484,155,557,181"/>
-<area shape="poly" title=" " alt="" coords="393,105,481,145,479,150,391,110"/>
-<area shape="rect" href="../../d4/d84/_vertex_buffer_8h.html" title=" " alt="" coords="92,229,195,256"/>
-<area shape="poly" title=" " alt="" coords="180,183,160,217,156,215,175,181"/>
-<area shape="poly" title=" " alt="" coords="558,178,715,224,713,229,557,183"/>
-<area shape="rect" title=" " alt="" coords="640,229,705,256"/>
-<area shape="poly" title=" " alt="" coords="548,179,633,220,631,225,546,184"/>
-<area shape="rect" title=" " alt="" coords="219,229,273,256"/>
-<area shape="poly" title=" " alt="" coords="484,181,288,231,287,226,483,176"/>
-<area shape="rect" title=" " alt="" coords="297,229,366,256"/>
-<area shape="poly" title=" " alt="" coords="489,184,380,226,378,221,487,179"/>
-<area shape="rect" title=" " alt="" coords="389,229,482,256"/>
-<area shape="poly" title=" " alt="" coords="508,184,463,221,460,217,504,180"/>
-<area shape="rect" title=" " alt="" coords="506,229,616,256"/>
-<area shape="poly" title=" " alt="" coords="530,181,549,214,544,217,525,183"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d6/d7b/_renderer_8cpp__incl.svg" width="100%" height="496"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 </div>
 <p><a href="../../da/d84/_renderer_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -162,7 +132,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d84/_renderer_8cpp_source.html#l00004">4</a> of file <a class="el" href="../../da/d84/_renderer_8cpp_source.html">Renderer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{</div>
+<div class="line"><span class="lineno">    6</span>    <span class="keywordflow">while</span> (glGetError() != GL_NO_ERROR)</div>
+<div class="line"><span class="lineno">    7</span>        ;</div>
+<div class="line"><span class="lineno">    8</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a0938526e2235478e088c2532d575094d" name="a0938526e2235478e088c2532d575094d"></a>
@@ -190,7 +164,15 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d84/_renderer_8cpp_source.html#l00010">10</a> of file <a class="el" href="../../da/d84/_renderer_8cpp_source.html">Renderer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   11</span>{</div>
+<div class="line"><span class="lineno">   12</span>    <span class="keywordflow">while</span> (GLenum error = glGetError())</div>
+<div class="line"><span class="lineno">   13</span>    {</div>
+<div class="line"><span class="lineno">   14</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;[OpenGl Error] (&quot;</span> &lt;&lt; error &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; function &lt;&lt; <span class="stringliteral">&quot; &quot;</span> &lt;&lt; file &lt;&lt; <span class="stringliteral">&quot;:&quot;</span> &lt;&lt; line &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   15</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   16</span>    }</div>
+<div class="line"><span class="lineno">   17</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   18</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

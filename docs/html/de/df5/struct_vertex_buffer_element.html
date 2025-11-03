@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,7 @@ $(function(){initNavTree('de/df5/struct_vertex_buffer_element.html','../../'); i
 <div class="dynheader">
 Collaboration diagram for VertexBufferElement:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/dbb/struct_vertex_buffer_element__coll__graph.png" border="0" usemap="#a_vertex_buffer_element_coll__map" alt="Collaboration graph"/></div>
-<map name="a_vertex_buffer_element_coll__map" id="a_vertex_buffer_element_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,178,149"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/dbb/struct_vertex_buffer_element__coll__graph.svg" width="184" height="155"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -153,21 +150,25 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/d3f/_vertex_buffer_layout_8h_source.html#l00014">14</a> of file <a class="el" href="../../df/d3f/_vertex_buffer_layout_8h_source.html">VertexBufferLayout.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   15</span>    {</div>
+<div class="line"><span class="lineno">   16</span>        <span class="keywordflow">switch</span> (<a class="code hl_variable" href="#aebaf924b86871f57f006846ba7443676">type</a>)</div>
+<div class="line"><span class="lineno">   17</span>        {</div>
+<div class="line"><span class="lineno">   18</span>            <span class="keywordflow">case</span> GL_FLOAT:</div>
+<div class="line"><span class="lineno">   19</span>                <span class="keywordflow">return</span> 4;</div>
+<div class="line"><span class="lineno">   20</span>            <span class="keywordflow">case</span> GL_UNSIGNED_INT:</div>
+<div class="line"><span class="lineno">   21</span>                <span class="keywordflow">return</span> 4;</div>
+<div class="line"><span class="lineno">   22</span>            <span class="keywordflow">case</span> GL_UNSIGNED_BYTE:</div>
+<div class="line"><span class="lineno">   23</span>                <span class="keywordflow">return</span> 1;</div>
+<div class="line"><span class="lineno">   24</span>        }</div>
+<div class="line"><span class="lineno">   25</span>        <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#aca68c0d4ac8df0838e209fb5300f7be3">ASSERT</a>(<span class="keyword">false</span>);</div>
+<div class="line"><span class="lineno">   26</span>        <span class="keywordflow">return</span> 0;</div>
+<div class="line"><span class="lineno">   27</span>    }</div>
+<div class="ttc" id="a_renderer_8h_html_aca68c0d4ac8df0838e209fb5300f7be3"><div class="ttname"><a href="../../d3/da0/_renderer_8h.html#aca68c0d4ac8df0838e209fb5300f7be3">ASSERT</a></div><div class="ttdeci">#define ASSERT(x)</div><div class="ttdef"><b>Definition</b> <a href="../../d3/da0/_renderer_8h_source.html#l00009">Renderer.h:9</a></div></div>
+<div class="ttc" id="astruct_vertex_buffer_element_html_aebaf924b86871f57f006846ba7443676"><div class="ttname"><a href="#aebaf924b86871f57f006846ba7443676">VertexBufferElement::type</a></div><div class="ttdeci">unsigned int type</div><div class="ttdef"><b>Definition</b> <a href="../../df/d3f/_vertex_buffer_layout_8h_source.html#l00010">VertexBufferLayout.h:10</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../de/df5/struct_vertex_buffer_element_a8465417a435f8bcd68a71bc414f1d0ee_icgraph.png" border="0" usemap="#ade/df5/struct_vertex_buffer_element_a8465417a435f8bcd68a71bc414f1d0ee_icgraph" alt=""/></div>
-<map name="ade/df5/struct_vertex_buffer_element_a8465417a435f8bcd68a71bc414f1d0ee_icgraph" id="ade/df5/struct_vertex_buffer_element_a8465417a435f8bcd68a71bc414f1d0ee_icgraph">
-<area shape="rect" title=" " alt="" coords="509,27,650,69"/>
-<area shape="rect" href="../../d9/d51/class_vertex_array.html#a994a9dc780ecc0c725b0814a9e7ab532" title=" " alt="" coords="307,5,461,32"/>
-<area shape="poly" title=" " alt="" coords="494,38,461,33,462,28,495,33"/>
-<area shape="rect" href="../../de/d17/class_vertex_buffer_layout.html#a0ac1e4373209bf1a2c5c3551f690724b" title=" " alt="" coords="318,56,450,99"/>
-<area shape="poly" title=" " alt="" coords="494,63,451,70,450,65,494,58"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,5,259,32"/>
-<area shape="poly" title=" " alt="" coords="291,21,259,21,259,16,291,16"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../de/df5/struct_vertex_buffer_element_a8465417a435f8bcd68a71bc414f1d0ee_icgraph.svg" width="655" height="104"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

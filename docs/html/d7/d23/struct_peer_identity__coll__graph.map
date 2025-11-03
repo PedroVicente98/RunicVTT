@@ -1,5 +1,7 @@
 <map id="PeerIdentity" name="PeerIdentity">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,171,161,256"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="62,5,105,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,75,86,154,81,154,81,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="41,171,122,240"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="30,74,34,109,44,146,48,155,43,157,39,148,29,110,25,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,5,200,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="131,75,109,148,106,156,101,154,104,146,126,74"/>
 </map>

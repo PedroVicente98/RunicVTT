@@ -8,5 +8,5 @@ digraph "IdentityManager::readBookFile"
   rankdir="RL";
   Node1 [id="Node000001",label="IdentityManager::readBookFile",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="IdentityManager::loadAddress\lBookFromFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a8ab84e3c1abaf38a289c276666ca52ad",tooltip=" "];
+  Node2 [id="Node000002",label="IdentityManager::loadAddressBookFromFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a8ab84e3c1abaf38a289c276666ca52ad",tooltip=" "];
 }

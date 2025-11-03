@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -106,12 +106,7 @@ $(function(){initNavTree('d2/d7f/class_texture.html','../../'); initResizable();
 <div class="dynheader">
 Collaboration diagram for Texture:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/da2/class_texture__coll__graph.png" border="0" usemap="#a_texture_coll__map" alt="Collaboration graph"/></div>
-<map name="a_texture_coll__map" id="a_texture_coll__map">
-<area shape="rect" title=" " alt="" coords="5,139,206,491"/>
-<area shape="rect" title=" " alt="" coords="84,5,127,75"/>
-<area shape="poly" title=" " alt="" coords="108,74,108,122,103,122,103,74"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/da2/class_texture__coll__graph.svg" width="212" height="496"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -171,7 +166,39 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00005">5</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">    5</span>                                      :</div>
+<div class="line"><span class="lineno">    6</span>    <a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>(0), <a class="code hl_variable" href="#a9d4481cb414758aa1dbfcd3d00f71659">m_FilePath</a>(path), <a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a>(<span class="keyword">nullptr</span>), <a class="code hl_variable" href="#ad5fdfa61997967621f06cea669f1fc45">m_Width</a>(0), <a class="code hl_variable" href="#a812d08761f477e09ccabcb64ef8e03ea">m_Height</a>(0), <a class="code hl_variable" href="#a79cab6a926eb0c3d8d84c12cad762a4c">m_BPP</a>(0)</div>
+<div class="line"><span class="lineno">    7</span>{</div>
+<div class="line"><span class="lineno">    8</span> </div>
+<div class="line"><span class="lineno">    9</span>    stbi_set_flip_vertically_on_load(1);</div>
+<div class="line"><span class="lineno">   10</span>    <a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a> = stbi_load(path.c_str(), &amp;<a class="code hl_variable" href="#ad5fdfa61997967621f06cea669f1fc45">m_Width</a>, &amp;<a class="code hl_variable" href="#a812d08761f477e09ccabcb64ef8e03ea">m_Height</a>, &amp;<a class="code hl_variable" href="#a79cab6a926eb0c3d8d84c12cad762a4c">m_BPP</a>, 4);</div>
+<div class="line"><span class="lineno">   11</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a> == NULL)</div>
+<div class="line"><span class="lineno">   12</span>    {</div>
+<div class="line"><span class="lineno">   13</span>        std::cout &lt;&lt; stbi_failure_reason();</div>
+<div class="line"><span class="lineno">   14</span>    }</div>
+<div class="line"><span class="lineno">   15</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glGenTextures(1, &amp;<a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   16</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindTexture(GL_TEXTURE_2D, <a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   17</span> </div>
+<div class="line"><span class="lineno">   18</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, <a class="code hl_variable" href="#ad5fdfa61997967621f06cea669f1fc45">m_Width</a>, <a class="code hl_variable" href="#a812d08761f477e09ccabcb64ef8e03ea">m_Height</a>, 0, GL_RGBA, GL_UNSIGNED_BYTE, <a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a>));</div>
+<div class="line"><span class="lineno">   19</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));</div>
+<div class="line"><span class="lineno">   20</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));</div>
+<div class="line"><span class="lineno">   21</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));</div>
+<div class="line"><span class="lineno">   22</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));</div>
+<div class="line"><span class="lineno">   23</span> </div>
+<div class="line"><span class="lineno">   24</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindTexture(GL_TEXTURE_2D, 0));</div>
+<div class="line"><span class="lineno">   25</span> </div>
+<div class="line"><span class="lineno">   26</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a>)</div>
+<div class="line"><span class="lineno">   27</span>        stbi_image_free(<a class="code hl_variable" href="#abaf199219963518e56d62c5997c0496e">m_LocalBuffer</a>);</div>
+<div class="line"><span class="lineno">   28</span>    stbi_set_flip_vertically_on_load(0);</div>
+<div class="line"><span class="lineno">   29</span>}</div>
+<div class="ttc" id="a_renderer_8h_html_a8cc1e1baeb83f3fa64a4aaa75baf3548"><div class="ttname"><a href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a></div><div class="ttdeci">#define GLCall(x)</div><div class="ttdef"><b>Definition</b> <a href="../../d3/da0/_renderer_8h_source.html#l00012">Renderer.h:12</a></div></div>
+<div class="ttc" id="aclass_texture_html_a79cab6a926eb0c3d8d84c12cad762a4c"><div class="ttname"><a href="#a79cab6a926eb0c3d8d84c12cad762a4c">Texture::m_BPP</a></div><div class="ttdeci">int m_BPP</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00009">Texture.h:9</a></div></div>
+<div class="ttc" id="aclass_texture_html_a812d08761f477e09ccabcb64ef8e03ea"><div class="ttname"><a href="#a812d08761f477e09ccabcb64ef8e03ea">Texture::m_Height</a></div><div class="ttdeci">int m_Height</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00009">Texture.h:9</a></div></div>
+<div class="ttc" id="aclass_texture_html_a9d4481cb414758aa1dbfcd3d00f71659"><div class="ttname"><a href="#a9d4481cb414758aa1dbfcd3d00f71659">Texture::m_FilePath</a></div><div class="ttdeci">std::string m_FilePath</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00013">Texture.h:13</a></div></div>
+<div class="ttc" id="aclass_texture_html_aa4f603596f1377ff0c4c066a30324181"><div class="ttname"><a href="#aa4f603596f1377ff0c4c066a30324181">Texture::m_RendererID</a></div><div class="ttdeci">unsigned int m_RendererID</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00010">Texture.h:10</a></div></div>
+<div class="ttc" id="aclass_texture_html_abaf199219963518e56d62c5997c0496e"><div class="ttname"><a href="#abaf199219963518e56d62c5997c0496e">Texture::m_LocalBuffer</a></div><div class="ttdeci">unsigned char * m_LocalBuffer</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00008">Texture.h:8</a></div></div>
+<div class="ttc" id="aclass_texture_html_ad5fdfa61997967621f06cea669f1fc45"><div class="ttname"><a href="#ad5fdfa61997967621f06cea669f1fc45">Texture::m_Width</a></div><div class="ttdeci">int m_Width</div><div class="ttdef"><b>Definition</b> <a href="../../de/dbf/_texture_8h_source.html#l00009">Texture.h:9</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a09c4bcb7462f64c1d20fa69dba3cee8a" name="a09c4bcb7462f64c1d20fa69dba3cee8a"></a>
@@ -190,7 +217,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00031">31</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   32</span>{</div>
+<div class="line"><span class="lineno">   33</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glDeleteTextures(1, &amp;<a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   34</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -210,7 +240,12 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00046">46</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   47</span>{</div>
+<div class="line"><span class="lineno">   48</span> </div>
+<div class="line"><span class="lineno">   49</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glActiveTexture(GL_TEXTURE0 + slot));</div>
+<div class="line"><span class="lineno">   50</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindTexture(GL_TEXTURE_2D, <a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   51</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a289701837e23c9272509f377524ee8f2" name="a289701837e23c9272509f377524ee8f2"></a>
@@ -237,7 +272,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../de/dbf/_texture_8h_source.html#l00026">26</a> of file <a class="el" href="../../de/dbf/_texture_8h_source.html">Texture.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   27</span>    {</div>
+<div class="line"><span class="lineno">   28</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#a812d08761f477e09ccabcb64ef8e03ea">m_Height</a>;</div>
+<div class="line"><span class="lineno">   29</span>    };</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="adbcc9f3ef3e3df6df1ebbdf9e5a68845" name="adbcc9f3ef3e3df6df1ebbdf9e5a68845"></a>
@@ -256,7 +294,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00036">36</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   37</span>{</div>
+<div class="line"><span class="lineno">   38</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#aa4f603596f1377ff0c4c066a30324181">m_RendererID</a>;</div>
+<div class="line"><span class="lineno">   39</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a7f5ee18c7466f904fa371bd97399a944" name="a7f5ee18c7466f904fa371bd97399a944"></a>
@@ -283,7 +324,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../de/dbf/_texture_8h_source.html#l00022">22</a> of file <a class="el" href="../../de/dbf/_texture_8h_source.html">Texture.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   23</span>    {</div>
+<div class="line"><span class="lineno">   24</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#ad5fdfa61997967621f06cea669f1fc45">m_Width</a>;</div>
+<div class="line"><span class="lineno">   25</span>    };</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a78fcceb890f6a0d84e0b5ffc596fee95" name="a78fcceb890f6a0d84e0b5ffc596fee95"></a>
@@ -302,7 +346,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00041">41</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   42</span>{</div>
+<div class="line"><span class="lineno">   43</span>    <a class="code hl_variable" href="#a9d4481cb414758aa1dbfcd3d00f71659">m_FilePath</a> = path;</div>
+<div class="line"><span class="lineno">   44</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a0bff249ecfb46e9b08c6ba52d64a921e" name="a0bff249ecfb46e9b08c6ba52d64a921e"></a>
@@ -321,7 +368,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../da/d26/_texture_8cpp_source.html#l00053">53</a> of file <a class="el" href="../../da/d26/_texture_8cpp_source.html">Texture.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   54</span>{</div>
+<div class="line"><span class="lineno">   55</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindTexture(GL_TEXTURE_2D, 0));</div>
+<div class="line"><span class="lineno">   56</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

@@ -8,7 +8,7 @@ digraph "NetworkManager::getGMId"
   rankdir="RL";
   Node1 [id="Node000001",label="NetworkManager::getGMId",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NetworkManager::debugIdentity\lSnapshot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a9b53362bce9f94b5d75f8b0ccae52cc7",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkManager::debugIdentitySnapshot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a9b53362bce9f94b5d75f8b0ccae52cc7",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="NetworkManager::setup",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e",tooltip=" "];
 }

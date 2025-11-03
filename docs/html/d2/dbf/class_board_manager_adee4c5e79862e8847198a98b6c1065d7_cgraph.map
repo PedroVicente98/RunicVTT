@@ -1,7 +1,7 @@
 <map id="BoardManager::createMarker" name="BoardManager::createMarker">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,195,69"/>
-<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ac37b3b762a2a08b4a8ff1919e80321f5" title=" " alt="" coords="249,5,452,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,42,233,38,233,43,196,48"/>
-<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#a2f084d03176076e9260e06df52e474fe" title=" " alt="" coords="243,72,458,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,64,227,68,227,74,195,70"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,195,57"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ac37b3b762a2a08b4a8ff1919e80321f5" title=" " alt="" coords="243,5,544,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="195,33,227,30,228,36,196,38"/>
+<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#a2f084d03176076e9260e06df52e474fe" title=" " alt="" coords="286,56,501,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="196,50,270,56,270,61,195,55"/>
 </map>

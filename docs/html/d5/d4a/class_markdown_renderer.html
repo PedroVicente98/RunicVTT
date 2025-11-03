@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -110,22 +110,12 @@ $(function(){initNavTree('d5/d4a/class_markdown_renderer.html','../../'); initRe
 <div class="dynheader">
 Inheritance diagram for MarkdownRenderer:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/db8/class_markdown_renderer__inherit__graph.png" border="0" usemap="#a_markdown_renderer_inherit__map" alt="Inheritance graph"/></div>
-<map name="a_markdown_renderer_inherit__map" id="a_markdown_renderer_inherit__map">
-<area shape="rect" title=" " alt="" coords="5,123,211,752"/>
-<area shape="rect" title=" " alt="" coords="75,5,142,75"/>
-<area shape="poly" title=" " alt="" coords="111,90,111,123,106,123,106,90"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/db8/class_markdown_renderer__inherit__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Collaboration diagram for MarkdownRenderer:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/d46/class_markdown_renderer__coll__graph.png" border="0" usemap="#a_markdown_renderer_coll__map" alt="Collaboration graph"/></div>
-<map name="a_markdown_renderer_coll__map" id="a_markdown_renderer_coll__map">
-<area shape="rect" title=" " alt="" coords="5,123,211,752"/>
-<area shape="rect" title=" " alt="" coords="75,5,142,75"/>
-<area shape="poly" title=" " alt="" coords="111,90,111,123,106,123,106,90"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d4/d46/class_markdown_renderer__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -216,7 +206,17 @@ Static Private Member Functions</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="../../df/d96/_markdown_renderer_8h_source.html#l00015">15</a> of file <a class="el" href="../../df/d96/_markdown_renderer_8h_source.html">MarkdownRenderer.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   16</span>    {</div>
+<div class="line"><span class="lineno">   17</span>        <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a8ba1c4f5970fd4faa9f2429a4c9c3303">OpenExternal</a>, <span class="comment">// http/https</span></div>
+<div class="line"><span class="lineno">   18</span>        <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65">RollExpr</a>,     <span class="comment">// roll:1d20+5 or roll://1d20+5</span></div>
+<div class="line"><span class="lineno">   19</span>        <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">NoteOpen</a>,     <span class="comment">// note://open/&lt;ref&gt;, note:/&lt;ref&gt;, note:&lt;ref&gt;</span></div>
+<div class="line"><span class="lineno">   20</span>        <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a88183b946cc5f0e8c96b2e66e1c74a7e">Unknown</a></div>
+<div class="line"><span class="lineno">   21</span>    };</div>
+<div class="ttc" id="aclass_markdown_renderer_html_a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1"><div class="ttname"><a href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">MarkdownRenderer::Action::NoteOpen</a></div><div class="ttdeci">@ NoteOpen</div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65"><div class="ttname"><a href="#a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65">MarkdownRenderer::Action::RollExpr</a></div><div class="ttdeci">@ RollExpr</div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_a08f71f9e648ddfddff238e54538ac3e2a88183b946cc5f0e8c96b2e66e1c74a7e"><div class="ttname"><a href="#a08f71f9e648ddfddff238e54538ac3e2a88183b946cc5f0e8c96b2e66e1c74a7e">MarkdownRenderer::Action::Unknown</a></div><div class="ttdeci">@ Unknown</div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_a08f71f9e648ddfddff238e54538ac3e2a8ba1c4f5970fd4faa9f2429a4c9c3303"><div class="ttname"><a href="#a08f71f9e648ddfddff238e54538ac3e2a8ba1c4f5970fd4faa9f2429a4c9c3303">MarkdownRenderer::Action::OpenExternal</a></div><div class="ttdeci">@ OpenExternal</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -270,21 +270,13 @@ Static Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00150">150</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  151</span>{</div>
+<div class="line"><span class="lineno">  152</span>    <span class="keywordflow">return</span> std::isxdigit(<span class="keyword">static_cast&lt;</span><span class="keywordtype">unsigned</span> <span class="keywordtype">char</span><span class="keyword">&gt;</span>(c)) != 0;</div>
+<div class="line"><span class="lineno">  153</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a8b7cf77d80919811153c4a285a16350e_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a8b7cf77d80919811153c4a285a16350e_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a8b7cf77d80919811153c4a285a16350e_icgraph" id="ad5/d4a/class_markdown_renderer_a8b7cf77d80919811153c4a285a16350e_icgraph">
-<area shape="rect" title=" " alt="" coords="722,47,906,73"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ad9b867b0035cea2f5757cc4c009c78fa" title=" " alt="" coords="477,5,674,48"/>
-<area shape="poly" title=" " alt="" coords="707,48,674,43,675,38,707,42"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20" title=" " alt="" coords="477,72,674,115"/>
-<area shape="poly" title=" " alt="" coords="707,78,675,82,674,77,707,72"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a51a347a6a77e068ca99755262fd88e29" title=" " alt="" coords="245,72,429,115"/>
-<area shape="poly" title=" " alt="" coords="461,96,429,96,429,91,461,91"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,80,197,107"/>
-<area shape="poly" title=" " alt="" coords="229,96,197,96,197,91,229,91"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a8b7cf77d80919811153c4a285a16350e_icgraph.svg" width="100%" height="390"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -313,15 +305,23 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00136">136</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  137</span>{</div>
+<div class="line"><span class="lineno">  138</span>    <span class="keywordflow">if</span> (s.size() &lt; 8)</div>
+<div class="line"><span class="lineno">  139</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  140</span>    <span class="keywordflow">for</span> (<span class="keywordtype">char</span> c : s)</div>
+<div class="line"><span class="lineno">  141</span>    {</div>
+<div class="line"><span class="lineno">  142</span>        <span class="keywordflow">if</span> (c == <span class="charliteral">&#39;-&#39;</span>)</div>
+<div class="line"><span class="lineno">  143</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  144</span>        <span class="keywordflow">if</span> (!<a class="code hl_function" href="#a8b7cf77d80919811153c4a285a16350e">isHex_</a>(c))</div>
+<div class="line"><span class="lineno">  145</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  146</span>    }</div>
+<div class="line"><span class="lineno">  147</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  148</span>}</div>
+<div class="ttc" id="aclass_markdown_renderer_html_a8b7cf77d80919811153c4a285a16350e"><div class="ttname"><a href="#a8b7cf77d80919811153c4a285a16350e">MarkdownRenderer::isHex_</a></div><div class="ttdeci">static bool isHex_(char c)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00150">MarkdownRenderer.cpp:150</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_ad9b867b0035cea2f5757cc4c009c78fa_cgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_ad9b867b0035cea2f5757cc4c009c78fa_cgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_ad9b867b0035cea2f5757cc4c009c78fa_cgraph" id="ad5/d4a/class_markdown_renderer_ad9b867b0035cea2f5757cc4c009c78fa_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,203,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a8b7cf77d80919811153c4a285a16350e" title=" " alt="" coords="251,13,434,40"/>
-<area shape="poly" title=" " alt="" coords="203,24,235,24,235,29,203,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_ad9b867b0035cea2f5757cc4c009c78fa_cgraph.svg" width="440" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -350,27 +350,33 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00116">116</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  117</span>{</div>
+<div class="line"><span class="lineno">  118</span>    <span class="keywordflow">if</span> (s.size() != 36)</div>
+<div class="line"><span class="lineno">  119</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  120</span>    <span class="keyword">const</span> <span class="keywordtype">int</span> dashPos[4] = {8, 13, 18, 23};</div>
+<div class="line"><span class="lineno">  121</span>    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 36; ++i)</div>
+<div class="line"><span class="lineno">  122</span>    {</div>
+<div class="line"><span class="lineno">  123</span>        <span class="keywordflow">if</span> (i == dashPos[0] || i == dashPos[1] || i == dashPos[2] || i == dashPos[3])</div>
+<div class="line"><span class="lineno">  124</span>        {</div>
+<div class="line"><span class="lineno">  125</span>            <span class="keywordflow">if</span> (s[i] != <span class="charliteral">&#39;-&#39;</span>)</div>
+<div class="line"><span class="lineno">  126</span>                <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  127</span>        }</div>
+<div class="line"><span class="lineno">  128</span>        <span class="keywordflow">else</span> <span class="keywordflow">if</span> (!<a class="code hl_function" href="#a8b7cf77d80919811153c4a285a16350e">isHex_</a>(s[i]))</div>
+<div class="line"><span class="lineno">  129</span>        {</div>
+<div class="line"><span class="lineno">  130</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  131</span>        }</div>
+<div class="line"><span class="lineno">  132</span>    }</div>
+<div class="line"><span class="lineno">  133</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  134</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_cgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_cgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_cgraph" id="ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,203,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a8b7cf77d80919811153c4a285a16350e" title=" " alt="" coords="251,13,434,40"/>
-<area shape="poly" title=" " alt="" coords="203,24,235,24,235,29,203,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_cgraph.svg" width="440" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_icgraph" id="ad5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_icgraph">
-<area shape="rect" title=" " alt="" coords="477,5,674,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a51a347a6a77e068ca99755262fd88e29" title=" " alt="" coords="245,5,429,48"/>
-<area shape="poly" title=" " alt="" coords="461,29,429,29,429,24,461,24"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,13,197,40"/>
-<area shape="poly" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_ae3b68ecd0ff19af580bda2cc0e21ff20_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -399,25 +405,47 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00008">8</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">    9</span>{</div>
+<div class="line"><span class="lineno">   10</span>    <span class="keyword">const</span> <span class="keyword">auto</span> a = <a class="code hl_function" href="#ae095c02db567dbe7a6050d69efe60a0d">parseHref_</a>(m_href);</div>
+<div class="line"><span class="lineno">   11</span>    <span class="keywordflow">switch</span> (a.kind)</div>
+<div class="line"><span class="lineno">   12</span>    {</div>
+<div class="line"><span class="lineno">   13</span>        <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a8ba1c4f5970fd4faa9f2429a4c9c3303">Action::OpenExternal</a>:</div>
+<div class="line"><span class="lineno">   14</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#ab34caaa4b2f76dbe9961eee386493c8c">onOpenExternal</a>)</div>
+<div class="line"><span class="lineno">   15</span>                <a class="code hl_variable" href="#ab34caaa4b2f76dbe9961eee386493c8c">onOpenExternal</a>(a.payload);</div>
+<div class="line"><span class="lineno">   16</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   17</span> </div>
+<div class="line"><span class="lineno">   18</span>        <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65">Action::RollExpr</a>:</div>
+<div class="line"><span class="lineno">   19</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a80ae80341274643f67966e83d8bb81c6">onRoll</a>)</div>
+<div class="line"><span class="lineno">   20</span>                <a class="code hl_variable" href="#a80ae80341274643f67966e83d8bb81c6">onRoll</a>(a.payload);</div>
+<div class="line"><span class="lineno">   21</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   22</span> </div>
+<div class="line"><span class="lineno">   23</span>        <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">Action::NoteOpen</a>:</div>
+<div class="line"><span class="lineno">   24</span>        {</div>
+<div class="line"><span class="lineno">   25</span>            std::string uuid = <a class="code hl_function" href="#a51a347a6a77e068ca99755262fd88e29">resolveNote_</a>(a.payload);</div>
+<div class="line"><span class="lineno">   26</span>            <span class="keywordflow">if</span> (!uuid.empty() &amp;&amp; <a class="code hl_variable" href="#ab489580eb95d639bf61bd5275b327eee">onNoteOpen</a>)</div>
+<div class="line"><span class="lineno">   27</span>                <a class="code hl_variable" href="#ab489580eb95d639bf61bd5275b327eee">onNoteOpen</a>(uuid);</div>
+<div class="line"><span class="lineno">   28</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   29</span>        }</div>
+<div class="line"><span class="lineno">   30</span> </div>
+<div class="line"><span class="lineno">   31</span>        <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">   32</span>            <span class="comment">// Fallback: try external open if handler present</span></div>
+<div class="line"><span class="lineno">   33</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#ab34caaa4b2f76dbe9961eee386493c8c">onOpenExternal</a>)</div>
+<div class="line"><span class="lineno">   34</span>                <a class="code hl_variable" href="#ab34caaa4b2f76dbe9961eee386493c8c">onOpenExternal</a>(m_href);</div>
+<div class="line"><span class="lineno">   35</span>            <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   36</span>                <a class="code hl_function" href="#a059491f4427f03c90d1d17c4fd14c0d0">openDefaultBrowser_</a>(m_href);</div>
+<div class="line"><span class="lineno">   37</span>            <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   38</span>    }</div>
+<div class="line"><span class="lineno">   39</span>}</div>
+<div class="ttc" id="aclass_markdown_renderer_html_a059491f4427f03c90d1d17c4fd14c0d0"><div class="ttname"><a href="#a059491f4427f03c90d1d17c4fd14c0d0">MarkdownRenderer::openDefaultBrowser_</a></div><div class="ttdeci">static void openDefaultBrowser_(const std::string &amp;url)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00088">MarkdownRenderer.cpp:88</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_a51a347a6a77e068ca99755262fd88e29"><div class="ttname"><a href="#a51a347a6a77e068ca99755262fd88e29">MarkdownRenderer::resolveNote_</a></div><div class="ttdeci">std::string resolveNote_(const std::string &amp;ref) const</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00076">MarkdownRenderer.cpp:76</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_a80ae80341274643f67966e83d8bb81c6"><div class="ttname"><a href="#a80ae80341274643f67966e83d8bb81c6">MarkdownRenderer::onRoll</a></div><div class="ttdeci">std::function&lt; void(const std::string &amp;expr) onRoll)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00025">MarkdownRenderer.h:25</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_ab34caaa4b2f76dbe9961eee386493c8c"><div class="ttname"><a href="#ab34caaa4b2f76dbe9961eee386493c8c">MarkdownRenderer::onOpenExternal</a></div><div class="ttdeci">std::function&lt; void(const std::string &amp;url) onOpenExternal)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00024">MarkdownRenderer.h:24</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_ab489580eb95d639bf61bd5275b327eee"><div class="ttname"><a href="#ab489580eb95d639bf61bd5275b327eee">MarkdownRenderer::onNoteOpen</a></div><div class="ttdeci">std::function&lt; void(const std::string &amp;uuid) onNoteOpen)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00026">MarkdownRenderer.h:26</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_ae095c02db567dbe7a6050d69efe60a0d"><div class="ttname"><a href="#ae095c02db567dbe7a6050d69efe60a0d">MarkdownRenderer::parseHref_</a></div><div class="ttdeci">Parsed parseHref_(const std::string &amp;href) const</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00051">MarkdownRenderer.cpp:51</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a4bd39f5d7124376cde81f15bed826f41_cgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a4bd39f5d7124376cde81f15bed826f41_cgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a4bd39f5d7124376cde81f15bed826f41_cgraph" id="ad5/d4a/class_markdown_renderer_a4bd39f5d7124376cde81f15bed826f41_cgraph">
-<area shape="rect" title=" " alt="" coords="5,72,197,99"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a059491f4427f03c90d1d17c4fd14c0d0" title=" " alt="" coords="245,5,457,48"/>
-<area shape="poly" title=" " alt="" coords="160,69,242,50,243,55,162,74"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ae095c02db567dbe7a6050d69efe60a0d" title=" " alt="" coords="248,72,454,99"/>
-<area shape="poly" title=" " alt="" coords="197,83,232,83,232,88,197,88"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a51a347a6a77e068ca99755262fd88e29" title=" " alt="" coords="259,124,443,167"/>
-<area shape="poly" title=" " alt="" coords="160,97,245,117,244,122,159,102"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a00e06634e163cb67e0880dfbc535dc52" title=" " alt="" coords="516,61,691,104"/>
-<area shape="poly" title=" " alt="" coords="455,82,501,81,501,86,455,87"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20" title=" " alt="" coords="505,128,702,171"/>
-<area shape="poly" title=" " alt="" coords="444,144,489,145,489,150,444,149"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a8b7cf77d80919811153c4a285a16350e" title=" " alt="" coords="750,136,934,163"/>
-<area shape="poly" title=" " alt="" coords="703,147,735,147,735,152,703,152"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a4bd39f5d7124376cde81f15bed826f41_cgraph.svg" width="100%" height="432"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -446,15 +474,29 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00088">88</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   89</span>{</div>
+<div class="line"><span class="lineno">   90</span>    <span class="keywordflow">if</span> (url.empty())</div>
+<div class="line"><span class="lineno">   91</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   92</span> </div>
+<div class="line"><span class="lineno">   93</span>    <span class="comment">// Use wide API for unicode URLs</span></div>
+<div class="line"><span class="lineno">   94</span>    <span class="keywordtype">int</span> wlen = MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, <span class="keyword">nullptr</span>, 0);</div>
+<div class="line"><span class="lineno">   95</span>    std::wstring wurl;</div>
+<div class="line"><span class="lineno">   96</span>    wurl.resize(wlen ? (wlen - 1) : 0);</div>
+<div class="line"><span class="lineno">   97</span>    <span class="keywordflow">if</span> (wlen &gt; 0)</div>
+<div class="line"><span class="lineno">   98</span>        MultiByteToWideChar(CP_UTF8, 0, url.c_str(), -1, wurl.data(), wlen);</div>
+<div class="line"><span class="lineno">   99</span> </div>
+<div class="line"><span class="lineno">  100</span>    HINSTANCE r = ShellExecuteW(<span class="keyword">nullptr</span>, L<span class="stringliteral">&quot;open&quot;</span>, wurl.c_str(), <span class="keyword">nullptr</span>, <span class="keyword">nullptr</span>, SW_SHOWNORMAL);</div>
+<div class="line"><span class="lineno">  101</span>    <span class="keywordflow">if</span> ((INT_PTR)r &lt;= 32)</div>
+<div class="line"><span class="lineno">  102</span>    {</div>
+<div class="line"><span class="lineno">  103</span>        <span class="comment">// Very dumb fallback</span></div>
+<div class="line"><span class="lineno">  104</span>        std::string cmd = <span class="stringliteral">&quot;start \&quot;\&quot; \&quot;&quot;</span> + url + <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  105</span>        std::system(cmd.c_str());</div>
+<div class="line"><span class="lineno">  106</span>    }</div>
+<div class="line"><span class="lineno">  107</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a059491f4427f03c90d1d17c4fd14c0d0_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a059491f4427f03c90d1d17c4fd14c0d0_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a059491f4427f03c90d1d17c4fd14c0d0_icgraph" id="ad5/d4a/class_markdown_renderer_a059491f4427f03c90d1d17c4fd14c0d0_icgraph">
-<area shape="rect" title=" " alt="" coords="245,5,457,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,13,197,40"/>
-<area shape="poly" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a059491f4427f03c90d1d17c4fd14c0d0_icgraph.svg" width="463" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -483,25 +525,39 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00051">51</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   52</span>{</div>
+<div class="line"><span class="lineno">   53</span>    <span class="comment">// external?</span></div>
+<div class="line"><span class="lineno">   54</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;http://&quot;</span>) || <a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;https://&quot;</span>))</div>
+<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a8ba1c4f5970fd4faa9f2429a4c9c3303">Action::OpenExternal</a>, href};</div>
+<div class="line"><span class="lineno">   56</span> </div>
+<div class="line"><span class="lineno">   57</span>    <span class="comment">// roll://expr or roll:expr</span></div>
+<div class="line"><span class="lineno">   58</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;roll://&quot;</span>))</div>
+<div class="line"><span class="lineno">   59</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65">Action::RollExpr</a>, href.substr(7)};</div>
+<div class="line"><span class="lineno">   60</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;roll:&quot;</span>))</div>
+<div class="line"><span class="lineno">   61</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3e61511dc10cefdacabcf39ab3d59a65">Action::RollExpr</a>, href.substr(5)};</div>
+<div class="line"><span class="lineno">   62</span> </div>
+<div class="line"><span class="lineno">   63</span>    <span class="comment">// note://open/&lt;ref&gt;</span></div>
+<div class="line"><span class="lineno">   64</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;note://open/&quot;</span>))</div>
+<div class="line"><span class="lineno">   65</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">Action::NoteOpen</a>, href.substr(std::string(<span class="stringliteral">&quot;note://open/&quot;</span>).size())};</div>
+<div class="line"><span class="lineno">   66</span> </div>
+<div class="line"><span class="lineno">   67</span>    <span class="comment">// Short forms: note:/&lt;ref&gt; / note:&lt;ref&gt;</span></div>
+<div class="line"><span class="lineno">   68</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;note:/&quot;</span>))</div>
+<div class="line"><span class="lineno">   69</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">Action::NoteOpen</a>, href.substr(6)};</div>
+<div class="line"><span class="lineno">   70</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#a00e06634e163cb67e0880dfbc535dc52">startsWith_</a>(href, <span class="stringliteral">&quot;note:&quot;</span>))</div>
+<div class="line"><span class="lineno">   71</span>        <span class="keywordflow">return</span> {<a class="code hl_enumvalue" href="#a08f71f9e648ddfddff238e54538ac3e2a3a5ef539eb26d000ce0c0cc2297a8ea1">Action::NoteOpen</a>, href.substr(5)};</div>
+<div class="line"><span class="lineno">   72</span> </div>
+<div class="line"><span class="lineno">   73</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">   74</span>}</div>
+<div class="ttc" id="aclass_markdown_renderer_html_a00e06634e163cb67e0880dfbc535dc52"><div class="ttname"><a href="#a00e06634e163cb67e0880dfbc535dc52">MarkdownRenderer::startsWith_</a></div><div class="ttdeci">static bool startsWith_(const std::string &amp;s, const char *pref)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00110">MarkdownRenderer.cpp:110</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_cgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_cgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_cgraph" id="ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,13,212,40"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a00e06634e163cb67e0880dfbc535dc52" title=" " alt="" coords="260,5,435,48"/>
-<area shape="poly" title=" " alt="" coords="212,24,244,24,244,29,212,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_cgraph.svg" width="440" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_icgraph" id="ad5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_icgraph">
-<area shape="rect" title=" " alt="" coords="245,5,451,32"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,5,197,32"/>
-<area shape="poly" title=" " alt="" coords="229,21,197,21,197,16,229,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_ae095c02db567dbe7a6050d69efe60a0d_icgraph.svg" width="456" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -530,27 +586,26 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00076">76</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   77</span>{</div>
+<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">if</span> (<a class="code hl_function" href="#ae3b68ecd0ff19af580bda2cc0e21ff20">looksLikeUuid_</a>(ref))</div>
+<div class="line"><span class="lineno">   79</span>        <span class="keywordflow">return</span> ref;</div>
+<div class="line"><span class="lineno">   80</span> </div>
+<div class="line"><span class="lineno">   81</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a411e6c8088509eea7626dff9e50bae1b">resolveNoteRef</a>)</div>
+<div class="line"><span class="lineno">   82</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#a411e6c8088509eea7626dff9e50bae1b">resolveNoteRef</a>(ref);</div>
+<div class="line"><span class="lineno">   83</span> </div>
+<div class="line"><span class="lineno">   84</span>    <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">   85</span>}</div>
+<div class="ttc" id="aclass_markdown_renderer_html_a411e6c8088509eea7626dff9e50bae1b"><div class="ttname"><a href="#a411e6c8088509eea7626dff9e50bae1b">MarkdownRenderer::resolveNoteRef</a></div><div class="ttdeci">std::function&lt; std::string(const std::string &amp;ref) resolveNoteRef)</div><div class="ttdef"><b>Definition</b> <a href="../../df/d96/_markdown_renderer_8h_source.html#l00029">MarkdownRenderer.h:29</a></div></div>
+<div class="ttc" id="aclass_markdown_renderer_html_ae3b68ecd0ff19af580bda2cc0e21ff20"><div class="ttname"><a href="#ae3b68ecd0ff19af580bda2cc0e21ff20">MarkdownRenderer::looksLikeUuid_</a></div><div class="ttdeci">static bool looksLikeUuid_(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00116">MarkdownRenderer.cpp:116</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_cgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_cgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_cgraph" id="ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,190,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20" title=" " alt="" coords="238,5,435,48"/>
-<area shape="poly" title=" " alt="" coords="190,24,222,24,222,29,190,29"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a8b7cf77d80919811153c4a285a16350e" title=" " alt="" coords="483,13,666,40"/>
-<area shape="poly" title=" " alt="" coords="436,24,467,24,467,29,436,29"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_cgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_icgraph" id="ad5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_icgraph">
-<area shape="rect" title=" " alt="" coords="245,5,429,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,13,197,40"/>
-<area shape="poly" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a51a347a6a77e068ca99755262fd88e29_icgraph.svg" width="435" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -579,7 +634,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00041">41</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   42</span>{</div>
+<div class="line"><span class="lineno">   43</span>    <span class="comment">// Turn Markdown soft-breaks into visible line breaks.</span></div>
+<div class="line"><span class="lineno">   44</span>    <span class="comment">// Either of these works; TextUnformatted(&quot;\n&quot;) is a common pattern with imgui_md.</span></div>
+<div class="line"><span class="lineno">   45</span>    ImGui::TextUnformatted(<span class="stringliteral">&quot;\n&quot;</span>);</div>
+<div class="line"><span class="lineno">   46</span>    <span class="comment">// Alternatively:</span></div>
+<div class="line"><span class="lineno">   47</span>    <span class="comment">// ImGui::NewLine();</span></div>
+<div class="line"><span class="lineno">   48</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a00e06634e163cb67e0880dfbc535dc52" name="a00e06634e163cb67e0880dfbc535dc52"></a>
@@ -610,17 +672,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00110">110</a> of file <a class="el" href="../../d4/d67/_markdown_renderer_8cpp_source.html">MarkdownRenderer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  111</span>{</div>
+<div class="line"><span class="lineno">  112</span>    <span class="keyword">const</span> <span class="keywordtype">size_t</span> n = std::strlen(pref);</div>
+<div class="line"><span class="lineno">  113</span>    <span class="keywordflow">return</span> s.size() &gt;= n &amp;&amp; std::equal(pref, pref + n, s.begin());</div>
+<div class="line"><span class="lineno">  114</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d4a/class_markdown_renderer_a00e06634e163cb67e0880dfbc535dc52_icgraph.png" border="0" usemap="#ad5/d4a/class_markdown_renderer_a00e06634e163cb67e0880dfbc535dc52_icgraph" alt=""/></div>
-<map name="ad5/d4a/class_markdown_renderer_a00e06634e163cb67e0880dfbc535dc52_icgraph" id="ad5/d4a/class_markdown_renderer_a00e06634e163cb67e0880dfbc535dc52_icgraph">
-<area shape="rect" title=" " alt="" coords="499,5,674,48"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#ae095c02db567dbe7a6050d69efe60a0d" title=" " alt="" coords="245,13,451,40"/>
-<area shape="poly" title=" " alt="" coords="483,29,452,29,452,24,483,24"/>
-<area shape="rect" href="../../d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41" title=" " alt="" coords="5,13,197,40"/>
-<area shape="poly" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d4a/class_markdown_renderer_a00e06634e163cb67e0880dfbc535dc52_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

@@ -26,7 +26,7 @@ var hierarchy =
     [ "Identifier", "d4/d18/struct_identifier.html", null ],
     [ "IdentityManager", "d4/d55/class_identity_manager.html", null ],
     [ "DirectoryWindow::ImageData", "d0/d92/struct_directory_window_1_1_image_data.html", null ],
-    [ "imgui_md", null, [
+    [ "imgui_md", "d7/ddd/classimgui__md.html", [
       [ "MarkdownRenderer", "d5/d4a/class_markdown_renderer.html", null ]
     ] ],
     [ "ImGuiToaster", "d4/d6c/class_im_gui_toaster.html", null ],
@@ -79,5 +79,8 @@ var hierarchy =
     [ "VertexBuffer", "d0/d2e/class_vertex_buffer.html", null ],
     [ "VertexBufferElement", "de/df5/struct_vertex_buffer_element.html", null ],
     [ "VertexBufferLayout", "de/d17/class_vertex_buffer_layout.html", null ],
-    [ "Visibility", "db/d70/struct_visibility.html", null ]
+    [ "Visibility", "db/d70/struct_visibility.html", null ],
+    [ "queue< msg::InboundRaw >", "d3/d85/classstd_1_1queue_3_01msg_1_1_inbound_raw_01_4.html", null ],
+    [ "queue< msg::NetEvent >", "d5/dfb/classstd_1_1queue_3_01msg_1_1_net_event_01_4.html", null ],
+    [ "queue< msg::ReadyMessage >", "d7/d4c/classstd_1_1queue_3_01msg_1_1_ready_message_01_4.html", null ]
 ];

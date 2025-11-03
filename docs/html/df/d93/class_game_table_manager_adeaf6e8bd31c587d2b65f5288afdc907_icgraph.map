@@ -1,5 +1,5 @@
 <map id="GameTableManager::renderNetworkCenterPlayer" name="GameTableManager::renderNetworkCenterPlayer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="245,5,426,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,5,197,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="324,5,630,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,5,276,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="308,21,276,21,276,16,308,16"/>
 </map>

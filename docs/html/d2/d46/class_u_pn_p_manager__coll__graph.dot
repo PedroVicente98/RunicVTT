@@ -9,12 +9,12 @@ digraph "UPnPManager"
 <HR/>
 <TR><TD COLSPAN="2" CELLPADDING="1" CELLSPACING="0">&nbsp;</TD></TR>
 <HR/>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> getExternalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> getLocalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static bool addPortMapping<BR ALIGN="LEFT"/>(const std::string &amp;internalIp,<BR ALIGN="LEFT"/> unsigned short internalPort,<BR ALIGN="LEFT"/> unsigned short externalPort,<BR ALIGN="LEFT"/> const std::string &amp;protocol,<BR ALIGN="LEFT"/> const std::string &amp;description<BR ALIGN="LEFT"/>=&quot;&quot;, unsigned int duration=0)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string getExternalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string getLocalIPv4Address()<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static bool addPortMapping<BR ALIGN="LEFT"/>(const std::string &amp;internalIp,<BR ALIGN="LEFT"/> unsigned short internalPort,<BR ALIGN="LEFT"/> unsigned short externalPort, const<BR ALIGN="LEFT"/> std::string &amp;protocol, const std<BR ALIGN="LEFT"/>::string &amp;description=&quot;&quot;, unsigned<BR ALIGN="LEFT"/> int duration=0)<BR ALIGN="LEFT"/></TD></TR>
 <TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static bool removePortMapping<BR ALIGN="LEFT"/>(unsigned short externalPort,<BR ALIGN="LEFT"/> const std::string &amp;protocol)<BR ALIGN="LEFT"/></TD></TR>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::wstring<BR ALIGN="LEFT"/> stringToWString(const<BR ALIGN="LEFT"/> std::string &amp;s)<BR ALIGN="LEFT"/></TD></TR>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string<BR ALIGN="LEFT"/> toUpper(std::string s)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::wstring stringToWString<BR ALIGN="LEFT"/>(const std::string &amp;s)<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">-</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">static std::string toUpper<BR ALIGN="LEFT"/>(std::string s)<BR ALIGN="LEFT"/></TD></TR>
 </TABLE>>
 ,height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
 }

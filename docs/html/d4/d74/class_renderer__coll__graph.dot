@@ -9,7 +9,7 @@ digraph "Renderer"
 <HR/>
 <TR><TD COLSPAN="2" CELLPADDING="1" CELLSPACING="0">&nbsp;</TD></TR>
 <HR/>
-<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">void Draw(const VertexArray<BR ALIGN="LEFT"/> &amp;va, const IndexBuffer<BR ALIGN="LEFT"/> &amp;ib, const Shader &amp;shader) const<BR ALIGN="LEFT"/></TD></TR>
+<TR><TD VALIGN="top" CELLPADDING="1" CELLSPACING="0">+</TD><TD VALIGN="top" ALIGN="LEFT" CELLPADDING="1" CELLSPACING="0">void Draw(const VertexArray<BR ALIGN="LEFT"/> &amp;va, const IndexBuffer &amp;ib,<BR ALIGN="LEFT"/> const Shader &amp;shader) const<BR ALIGN="LEFT"/></TD></TR>
 </TABLE>>
 ,height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
 }

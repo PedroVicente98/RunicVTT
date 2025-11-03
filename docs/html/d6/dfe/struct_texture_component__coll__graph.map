@@ -1,5 +1,9 @@
 <map id="TextureComponent" name="TextureComponent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,126,229"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="44,5,87,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="68,74,68,122,63,122,63,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="67,139,187,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,54,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="40,74,47,94,58,113,68,125,64,129,53,116,42,96,35,76"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="106,5,148,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,75,130,122,124,122,124,75"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="217,5,256,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="230,75,221,96,209,116,197,130,193,126,205,113,217,94,225,73"/>
 </map>

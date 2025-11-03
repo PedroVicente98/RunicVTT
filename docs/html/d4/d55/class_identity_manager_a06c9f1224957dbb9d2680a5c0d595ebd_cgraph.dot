@@ -8,7 +8,7 @@ digraph "IdentityManager::setMyIdentity"
   rankdir="LR";
   Node1 [id="Node000001",label="IdentityManager::setMyIdentity",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="IdentityManager::saveAddress\lBookToFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a18c85a39c82ac2918657286498bbe8da",tooltip=" "];
+  Node2 [id="Node000002",label="IdentityManager::saveAddressBookToFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a18c85a39c82ac2918657286498bbe8da",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="IdentityManager::writeBookFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a6423b50955b5c9937b4e3c928ce86dff",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
@@ -23,7 +23,7 @@ digraph "IdentityManager::setMyIdentity"
   Node8 [id="Node000008",label="Serializer::serializeString",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c",tooltip=" "];
   Node8 -> Node7 [id="edge8_Node000008_Node000007",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node9 [id="edge9_Node000001_Node000009",color="steelblue1",style="solid",tooltip=" "];
-  Node9 [id="Node000009",label="IdentityManager::saveMyIdentity\lToFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a1869a9c4eeaabc2a70e422ae5c685a9b",tooltip=" "];
+  Node9 [id="Node000009",label="IdentityManager::saveMyIdentityToFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a1869a9c4eeaabc2a70e422ae5c685a9b",tooltip=" "];
   Node9 -> Node10 [id="edge10_Node000009_Node000010",color="steelblue1",style="solid",tooltip=" "];
   Node10 [id="Node000010",label="IdentityManager::writeMeFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d55/class_identity_manager.html#a39c326ae35bbfd58d73cae32d8793174",tooltip=" "];
   Node10 -> Node11 [id="edge11_Node000010_Node000011",color="steelblue1",style="solid",tooltip=" "];

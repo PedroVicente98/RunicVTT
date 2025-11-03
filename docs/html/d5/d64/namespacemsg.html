@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -280,7 +280,58 @@ Functions</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00030">30</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   31</span>    {</div>
+<div class="line"><span class="lineno">   32</span>        <span class="comment">// Snapshots and Composite Operations</span></div>
+<div class="line"><span class="lineno">   33</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a418bd7a262182488f398f935a1896777">Snapshot_GameTable</a> = 100,</div>
+<div class="line"><span class="lineno">   34</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258af18a1b998b9701b778cb095e6184525c">Snapshot_Board</a> = 101,</div>
+<div class="line"><span class="lineno">   35</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae951b04263eead1e478d72d670328b4e">CommitMarker</a> = 102,</div>
+<div class="line"><span class="lineno">   36</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a5b158049db222ccd5d758b5ae841916c">CommitBoard</a> = 103,</div>
+<div class="line"><span class="lineno">   37</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a45826286cfe512c4e6967622048c2ee6">ImageChunk</a> = 104,</div>
+<div class="line"><span class="lineno">   38</span> </div>
+<div class="line"><span class="lineno">   39</span>        <span class="comment">//Operations</span></div>
+<div class="line"><span class="lineno">   40</span>        MarkerMove = 150,</div>
+<div class="line"><span class="lineno">   41</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a181b87cc1290f2e677cc9ef3962c4960">MarkerMoveState</a> = 151,</div>
+<div class="line"><span class="lineno">   42</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a62c7e043d5d0a2096261e5d7548b984d">MarkerCreate</a> = 1,</div>
+<div class="line"><span class="lineno">   43</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a1a1bfcd23543d1694ba5d9cc70fafd17">MarkerUpdate</a> = 2, <span class="comment">//Position and/or Visibility</span></div>
+<div class="line"><span class="lineno">   44</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19aae4b99da14ff157367e7eae9b6dde">MarkerDelete</a> = 3,</div>
+<div class="line"><span class="lineno">   45</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a161b9f3df700bd4e30558dcdb087eda7">FogCreate</a> = 4,</div>
+<div class="line"><span class="lineno">   46</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae35aecec6611116a8834959ec15e84b0">FogUpdate</a> = 5, <span class="comment">//Size and/or Visibility</span></div>
+<div class="line"><span class="lineno">   47</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19a3dbb1c569989768030617f6ec65ad">FogDelete</a> = 6,</div>
+<div class="line"><span class="lineno">   48</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a7641afcf51a6efb7aa13557251733a94">GridUpdate</a> = 7, <span class="comment">//Position, Size and/or Visibility</span></div>
+<div class="line"><span class="lineno">   49</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258afeefb128c43c58affab7d7e4602ec549">NoteCreate</a> = 8,</div>
+<div class="line"><span class="lineno">   50</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab4a586b71ce4cfa6ff05105a1629f525">NoteUpdate</a> = 9, <span class="comment">//Metadata and/or Content</span></div>
+<div class="line"><span class="lineno">   51</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258acebd9bd08b638f0fc1abfef306b97252">NoteDelete</a> = 10,</div>
+<div class="line"><span class="lineno">   52</span> </div>
+<div class="line"><span class="lineno">   53</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a6c6401c3c105115b426253a49de4ac57">UserNameUpdate</a> = 105, <span class="comment">// Game channel: broadcast username changes</span></div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>        <span class="comment">// chat ops (binary)</span></div>
+<div class="line"><span class="lineno">   56</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a05e3645f1d51d3114fe2897bf9bc6fa1">ChatGroupCreate</a> = 200,</div>
+<div class="line"><span class="lineno">   57</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a0dd203fbbe78a9231591240bb6dc29bd">ChatGroupUpdate</a> = 201,</div>
+<div class="line"><span class="lineno">   58</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a2c187aafc8b78f36fe637ff9fa9d20fe">ChatGroupDelete</a> = 202,</div>
+<div class="line"><span class="lineno">   59</span>        <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab604277fe3a4bb9f7344e25320b18727">ChatMessage</a> = 203</div>
+<div class="line"><span class="lineno">   60</span>    };</div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a05e3645f1d51d3114fe2897bf9bc6fa1"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a05e3645f1d51d3114fe2897bf9bc6fa1">msg::DCType::ChatGroupCreate</a></div><div class="ttdeci">@ ChatGroupCreate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a0dd203fbbe78a9231591240bb6dc29bd"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a0dd203fbbe78a9231591240bb6dc29bd">msg::DCType::ChatGroupUpdate</a></div><div class="ttdeci">@ ChatGroupUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a161b9f3df700bd4e30558dcdb087eda7"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a161b9f3df700bd4e30558dcdb087eda7">msg::DCType::FogCreate</a></div><div class="ttdeci">@ FogCreate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a181b87cc1290f2e677cc9ef3962c4960"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a181b87cc1290f2e677cc9ef3962c4960">msg::DCType::MarkerMoveState</a></div><div class="ttdeci">@ MarkerMoveState</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a19a3dbb1c569989768030617f6ec65ad"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19a3dbb1c569989768030617f6ec65ad">msg::DCType::FogDelete</a></div><div class="ttdeci">@ FogDelete</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a19aae4b99da14ff157367e7eae9b6dde"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19aae4b99da14ff157367e7eae9b6dde">msg::DCType::MarkerDelete</a></div><div class="ttdeci">@ MarkerDelete</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a1a1bfcd23543d1694ba5d9cc70fafd17"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a1a1bfcd23543d1694ba5d9cc70fafd17">msg::DCType::MarkerUpdate</a></div><div class="ttdeci">@ MarkerUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a2c187aafc8b78f36fe637ff9fa9d20fe"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a2c187aafc8b78f36fe637ff9fa9d20fe">msg::DCType::ChatGroupDelete</a></div><div class="ttdeci">@ ChatGroupDelete</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a418bd7a262182488f398f935a1896777"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a418bd7a262182488f398f935a1896777">msg::DCType::Snapshot_GameTable</a></div><div class="ttdeci">@ Snapshot_GameTable</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a45826286cfe512c4e6967622048c2ee6"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a45826286cfe512c4e6967622048c2ee6">msg::DCType::ImageChunk</a></div><div class="ttdeci">@ ImageChunk</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a5b158049db222ccd5d758b5ae841916c"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a5b158049db222ccd5d758b5ae841916c">msg::DCType::CommitBoard</a></div><div class="ttdeci">@ CommitBoard</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a62c7e043d5d0a2096261e5d7548b984d"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a62c7e043d5d0a2096261e5d7548b984d">msg::DCType::MarkerCreate</a></div><div class="ttdeci">@ MarkerCreate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a6c6401c3c105115b426253a49de4ac57"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a6c6401c3c105115b426253a49de4ac57">msg::DCType::UserNameUpdate</a></div><div class="ttdeci">@ UserNameUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258a7641afcf51a6efb7aa13557251733a94"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258a7641afcf51a6efb7aa13557251733a94">msg::DCType::GridUpdate</a></div><div class="ttdeci">@ GridUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258ab4a586b71ce4cfa6ff05105a1629f525"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab4a586b71ce4cfa6ff05105a1629f525">msg::DCType::NoteUpdate</a></div><div class="ttdeci">@ NoteUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258ab604277fe3a4bb9f7344e25320b18727"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab604277fe3a4bb9f7344e25320b18727">msg::DCType::ChatMessage</a></div><div class="ttdeci">@ ChatMessage</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258acebd9bd08b638f0fc1abfef306b97252"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258acebd9bd08b638f0fc1abfef306b97252">msg::DCType::NoteDelete</a></div><div class="ttdeci">@ NoteDelete</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258ae35aecec6611116a8834959ec15e84b0"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae35aecec6611116a8834959ec15e84b0">msg::DCType::FogUpdate</a></div><div class="ttdeci">@ FogUpdate</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258ae951b04263eead1e478d72d670328b4e"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae951b04263eead1e478d72d670328b4e">msg::DCType::CommitMarker</a></div><div class="ttdeci">@ CommitMarker</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258af18a1b998b9701b778cb095e6184525c"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258af18a1b998b9701b778cb095e6184525c">msg::DCType::Snapshot_Board</a></div><div class="ttdeci">@ Snapshot_Board</div></div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258afeefb128c43c58affab7d7e4602ec549"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258afeefb128c43c58affab7d7e4602ec549">msg::DCType::NoteCreate</a></div><div class="ttdeci">@ NoteCreate</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a3780491ac1184e4b586b86d887ff1bb7" name="a3780491ac1184e4b586b86d887ff1bb7"></a>
@@ -308,7 +359,12 @@ Functions</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00139">139</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  140</span>    {</div>
+<div class="line"><span class="lineno">  141</span>        <a class="code hl_struct" href="../../d6/dc2/struct_board.html">Board</a> = 0,</div>
+<div class="line"><span class="lineno">  142</span>        Marker = 1</div>
+<div class="line"><span class="lineno">  143</span>    };</div>
+<div class="ttc" id="astruct_board_html"><div class="ttname"><a href="../../d6/dc2/struct_board.html">Board</a></div><div class="ttdef"><b>Definition</b> <a href="../../da/d0a/_components_8h_source.html#l00074">Components.h:75</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
@@ -340,19 +396,33 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00322">322</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  323</span>    {</div>
+<div class="line"><span class="lineno">  324</span>        <span class="keywordflow">if</span> (s == <span class="stringliteral">&quot;ChatGroupCreate&quot;</span>)</div>
+<div class="line"><span class="lineno">  325</span>        {</div>
+<div class="line"><span class="lineno">  326</span>            out = DCType::ChatGroupCreate;</div>
+<div class="line"><span class="lineno">  327</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  328</span>        }</div>
+<div class="line"><span class="lineno">  329</span>        <span class="keywordflow">if</span> (s == <span class="stringliteral">&quot;ChatGroupUpdate&quot;</span>)</div>
+<div class="line"><span class="lineno">  330</span>        {</div>
+<div class="line"><span class="lineno">  331</span>            out = DCType::ChatGroupUpdate;</div>
+<div class="line"><span class="lineno">  332</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  333</span>        }</div>
+<div class="line"><span class="lineno">  334</span>        <span class="keywordflow">if</span> (s == <span class="stringliteral">&quot;ChatGroupDelete&quot;</span>)</div>
+<div class="line"><span class="lineno">  335</span>        {</div>
+<div class="line"><span class="lineno">  336</span>            out = DCType::ChatGroupDelete;</div>
+<div class="line"><span class="lineno">  337</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  338</span>        }</div>
+<div class="line"><span class="lineno">  339</span>        <span class="keywordflow">if</span> (s == <span class="stringliteral">&quot;ChatMessage&quot;</span>)</div>
+<div class="line"><span class="lineno">  340</span>        {</div>
+<div class="line"><span class="lineno">  341</span>            out = DCType::ChatMessage;</div>
+<div class="line"><span class="lineno">  342</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  343</span>        }</div>
+<div class="line"><span class="lineno">  344</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  345</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a0915c4c7cc452d107120fc351e96e234_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a0915c4c7cc452d107120fc351e96e234_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a0915c4c7cc452d107120fc351e96e234_icgraph" id="ad5/d64/namespacemsg_a0915c4c7cc452d107120fc351e96e234_icgraph">
-<area shape="rect" title=" " alt="" coords="528,35,688,61"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a91ae6eaae32ae463c033547f74080e36" title=" " alt="" coords="283,27,480,69"/>
-<area shape="poly" title=" " alt="" coords="513,51,481,51,481,45,513,45"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="5,5,235,32"/>
-<area shape="poly" title=" " alt="" coords="267,38,235,34,236,29,267,33"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="29,56,211,99"/>
-<area shape="poly" title=" " alt="" coords="268,63,211,70,211,64,267,58"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a0915c4c7cc452d107120fc351e96e234_icgraph.svg" width="100%" height="378"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -381,29 +451,87 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00061">61</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   62</span>    {</div>
+<div class="line"><span class="lineno">   63</span>        std::string type_str;</div>
+<div class="line"><span class="lineno">   64</span>        <span class="keywordflow">switch</span> (type)</div>
+<div class="line"><span class="lineno">   65</span>        {</div>
+<div class="line"><span class="lineno">   66</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a418bd7a262182488f398f935a1896777">msg::DCType::Snapshot_GameTable</a>:</div>
+<div class="line"><span class="lineno">   67</span>                type_str = <span class="stringliteral">&quot;Snapshot_GameTable&quot;</span>;</div>
+<div class="line"><span class="lineno">   68</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   69</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258af18a1b998b9701b778cb095e6184525c">msg::DCType::Snapshot_Board</a>:</div>
+<div class="line"><span class="lineno">   70</span>                type_str = <span class="stringliteral">&quot;Snapshot_Board&quot;</span>;</div>
+<div class="line"><span class="lineno">   71</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   72</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae951b04263eead1e478d72d670328b4e">msg::DCType::CommitMarker</a>:</div>
+<div class="line"><span class="lineno">   73</span>                type_str = <span class="stringliteral">&quot;CommitMarker&quot;</span>;</div>
+<div class="line"><span class="lineno">   74</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   75</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a5b158049db222ccd5d758b5ae841916c">msg::DCType::CommitBoard</a>:</div>
+<div class="line"><span class="lineno">   76</span>                type_str = <span class="stringliteral">&quot;CommitBoard&quot;</span>;</div>
+<div class="line"><span class="lineno">   77</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   78</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a45826286cfe512c4e6967622048c2ee6">msg::DCType::ImageChunk</a>:</div>
+<div class="line"><span class="lineno">   79</span>                type_str = <span class="stringliteral">&quot;ImageChunk&quot;</span>;</div>
+<div class="line"><span class="lineno">   80</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   81</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a62c7e043d5d0a2096261e5d7548b984d">msg::DCType::MarkerCreate</a>:</div>
+<div class="line"><span class="lineno">   82</span>                type_str = <span class="stringliteral">&quot;MarkerCreate&quot;</span>;</div>
+<div class="line"><span class="lineno">   83</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   84</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a1a1bfcd23543d1694ba5d9cc70fafd17">msg::DCType::MarkerUpdate</a>:</div>
+<div class="line"><span class="lineno">   85</span>                type_str = <span class="stringliteral">&quot;MarkerUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">   86</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   87</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19aae4b99da14ff157367e7eae9b6dde">msg::DCType::MarkerDelete</a>:</div>
+<div class="line"><span class="lineno">   88</span>                type_str = <span class="stringliteral">&quot;MarkerDelete&quot;</span>;</div>
+<div class="line"><span class="lineno">   89</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   90</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a161b9f3df700bd4e30558dcdb087eda7">msg::DCType::FogCreate</a>:</div>
+<div class="line"><span class="lineno">   91</span>                type_str = <span class="stringliteral">&quot;FogCreate&quot;</span>;</div>
+<div class="line"><span class="lineno">   92</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   93</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae35aecec6611116a8834959ec15e84b0">msg::DCType::FogUpdate</a>:</div>
+<div class="line"><span class="lineno">   94</span>                type_str = <span class="stringliteral">&quot;FogUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">   95</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   96</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a19a3dbb1c569989768030617f6ec65ad">msg::DCType::FogDelete</a>:</div>
+<div class="line"><span class="lineno">   97</span>                type_str = <span class="stringliteral">&quot;FogDelete&quot;</span>;</div>
+<div class="line"><span class="lineno">   98</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   99</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a7641afcf51a6efb7aa13557251733a94">msg::DCType::GridUpdate</a>:</div>
+<div class="line"><span class="lineno">  100</span>                type_str = <span class="stringliteral">&quot;GridUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">  101</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  102</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258afeefb128c43c58affab7d7e4602ec549">msg::DCType::NoteCreate</a>:</div>
+<div class="line"><span class="lineno">  103</span>                type_str = <span class="stringliteral">&quot;NoteCreate&quot;</span>;</div>
+<div class="line"><span class="lineno">  104</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  105</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab4a586b71ce4cfa6ff05105a1629f525">msg::DCType::NoteUpdate</a>:</div>
+<div class="line"><span class="lineno">  106</span>                type_str = <span class="stringliteral">&quot;NoteUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">  107</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  108</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258acebd9bd08b638f0fc1abfef306b97252">msg::DCType::NoteDelete</a>:</div>
+<div class="line"><span class="lineno">  109</span>                type_str = <span class="stringliteral">&quot;NoteDelete&quot;</span>;</div>
+<div class="line"><span class="lineno">  110</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  111</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a05e3645f1d51d3114fe2897bf9bc6fa1">msg::DCType::ChatGroupCreate</a>:</div>
+<div class="line"><span class="lineno">  112</span>                type_str = <span class="stringliteral">&quot;ChatThreadCreate&quot;</span>;</div>
+<div class="line"><span class="lineno">  113</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  114</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a0dd203fbbe78a9231591240bb6dc29bd">msg::DCType::ChatGroupUpdate</a>:</div>
+<div class="line"><span class="lineno">  115</span>                type_str = <span class="stringliteral">&quot;ChatThreadUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">  116</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  117</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a2c187aafc8b78f36fe637ff9fa9d20fe">msg::DCType::ChatGroupDelete</a>:</div>
+<div class="line"><span class="lineno">  118</span>                type_str = <span class="stringliteral">&quot;ChatThreadDelete&quot;</span>;</div>
+<div class="line"><span class="lineno">  119</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  120</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ab604277fe3a4bb9f7344e25320b18727">msg::DCType::ChatMessage</a>:</div>
+<div class="line"><span class="lineno">  121</span>                type_str = <span class="stringliteral">&quot;ChatMessage&quot;</span>;</div>
+<div class="line"><span class="lineno">  122</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  123</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae4478e2303e0a99169a9fd0a35bb2bd1">msg::DCType::MarkerMove</a>:</div>
+<div class="line"><span class="lineno">  124</span>                type_str = <span class="stringliteral">&quot;MarkerMove&quot;</span>;</div>
+<div class="line"><span class="lineno">  125</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  126</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a181b87cc1290f2e677cc9ef3962c4960">msg::DCType::MarkerMoveState</a>:</div>
+<div class="line"><span class="lineno">  127</span>                type_str = <span class="stringliteral">&quot;MarkerMoveState&quot;</span>;</div>
+<div class="line"><span class="lineno">  128</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  129</span>            <span class="keywordflow">case</span> <a class="code hl_enumvalue" href="#a3b7d7dd1956713e5dac5aa8c27d7e258a6c6401c3c105115b426253a49de4ac57">msg::DCType::UserNameUpdate</a>:</div>
+<div class="line"><span class="lineno">  130</span>                type_str = <span class="stringliteral">&quot;UserNameUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">  131</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  132</span>            <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  133</span>                type_str = <span class="stringliteral">&quot;UnkownType&quot;</span>;</div>
+<div class="line"><span class="lineno">  134</span>                <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  135</span>        }</div>
+<div class="line"><span class="lineno">  136</span>        <span class="keywordflow">return</span> type_str;</div>
+<div class="line"><span class="lineno">  137</span>    }</div>
+<div class="ttc" id="anamespacemsg_html_a3b7d7dd1956713e5dac5aa8c27d7e258ae4478e2303e0a99169a9fd0a35bb2bd1"><div class="ttname"><a href="#a3b7d7dd1956713e5dac5aa8c27d7e258ae4478e2303e0a99169a9fd0a35bb2bd1">msg::DCType::MarkerMove</a></div><div class="ttdeci">@ MarkerMove</div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_ad0d441d4fd6757bd6ae4637c3eb2409e_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_ad0d441d4fd6757bd6ae4637c3eb2409e_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_ad0d441d4fd6757bd6ae4637c3eb2409e_icgraph" id="ad5/d64/namespacemsg_ad0d441d4fd6757bd6ae4637c3eb2409e_icgraph">
-<area shape="rect" title=" " alt="" coords="528,113,661,140"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a53df93ad0cb0498c82f866a921e7b285" title=" " alt="" coords="283,5,480,48"/>
-<area shape="poly" title=" " alt="" coords="559,107,479,62,451,51,453,46,481,58,561,102"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adea6a8bf4c034a65775aa7a8f9d2e8a2" title=" " alt="" coords="283,72,480,115"/>
-<area shape="poly" title=" " alt="" coords="512,117,480,111,481,106,513,111"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a40a38591b24f2d04217a8df97c2fbe72" title=" " alt="" coords="283,139,480,181"/>
-<area shape="poly" title=" " alt="" coords="513,142,481,147,480,142,512,137"/>
-<area shape="rect" href="../../df/d93/class_game_table_manager.html#a8967546a2319d4f7a8e51c58bee4e469" title=" " alt="" coords="286,205,477,248"/>
-<area shape="poly" title=" " alt="" coords="561,151,481,196,453,207,451,202,479,191,559,146"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="5,51,235,77"/>
-<area shape="poly" title=" " alt="" coords="268,46,218,53,218,47,267,40"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="29,101,211,144"/>
-<area shape="poly" title=" " alt="" coords="297,56,284,62,260,77,236,92,206,103,204,98,233,87,257,73,281,58,295,52"/>
-<area shape="poly" title=" " alt="" coords="267,83,235,80,236,74,267,78"/>
-<area shape="poly" title=" " alt="" coords="268,109,211,115,211,110,267,103"/>
-<area shape="poly" title=" " alt="" coords="292,134,281,129,257,110,248,100,234,92,203,80,205,75,236,87,251,96,261,105,284,124,294,130"/>
-<area shape="poly" title=" " alt="" coords="267,146,211,138,212,133,268,141"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_ad0d441d4fd6757bd6ae4637c3eb2409e_icgraph.svg" width="667" height="254"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -432,53 +560,25 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00306">306</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  307</span>    {</div>
+<div class="line"><span class="lineno">  308</span>        <span class="keywordflow">switch</span> (t)</div>
+<div class="line"><span class="lineno">  309</span>        {</div>
+<div class="line"><span class="lineno">  310</span>            <span class="keywordflow">case</span> DCType::ChatGroupCreate:</div>
+<div class="line"><span class="lineno">  311</span>                <span class="keywordflow">return</span> <span class="stringliteral">&quot;ChatGroupCreate&quot;</span>;</div>
+<div class="line"><span class="lineno">  312</span>            <span class="keywordflow">case</span> DCType::ChatGroupUpdate:</div>
+<div class="line"><span class="lineno">  313</span>                <span class="keywordflow">return</span> <span class="stringliteral">&quot;ChatGroupUpdate&quot;</span>;</div>
+<div class="line"><span class="lineno">  314</span>            <span class="keywordflow">case</span> DCType::ChatGroupDelete:</div>
+<div class="line"><span class="lineno">  315</span>                <span class="keywordflow">return</span> <span class="stringliteral">&quot;ChatGroupDelete&quot;</span>;</div>
+<div class="line"><span class="lineno">  316</span>            <span class="keywordflow">case</span> DCType::ChatMessage:</div>
+<div class="line"><span class="lineno">  317</span>                <span class="keywordflow">return</span> <span class="stringliteral">&quot;ChatMessage&quot;</span>;</div>
+<div class="line"><span class="lineno">  318</span>            <span class="keywordflow">default</span>:</div>
+<div class="line"><span class="lineno">  319</span>                <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">  320</span>        }</div>
+<div class="line"><span class="lineno">  321</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_ad8139941ca11d8369f89b262890dad33_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_ad8139941ca11d8369f89b262890dad33_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_ad8139941ca11d8369f89b262890dad33_icgraph" id="ad5/d64/namespacemsg_ad8139941ca11d8369f89b262890dad33_icgraph">
-<area shape="rect" title=" " alt="" coords="1424,81,1569,108"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a986d7467e1d491d12ceeb5861dedbeab" title=" " alt="" coords="1186,5,1375,32"/>
-<area shape="poly" title=" " alt="" coords="1451,77,1375,47,1338,35,1340,30,1377,41,1453,72"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#afe9573aed063a0e6b1aa59c451c26e9e" title=" " alt="" coords="1187,56,1374,83"/>
-<area shape="poly" title=" " alt="" coords="1409,87,1374,83,1375,78,1409,82"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a24e8339bdeb6b6a9847b7134e8e016ad" title=" " alt="" coords="1185,107,1376,133"/>
-<area shape="poly" title=" " alt="" coords="1409,108,1377,111,1377,106,1409,102"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a0969cd8a8185332490b7ecde9021086a" title=" " alt="" coords="1197,187,1364,213"/>
-<area shape="poly" title=" " alt="" coords="1455,118,1311,189,1309,184,1452,113"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ac536f46038a4bf7d308ad8e01ce12c76" title=" " alt="" coords="927,5,1134,32"/>
-<area shape="poly" title=" " alt="" coords="1171,21,1134,21,1134,16,1171,16"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a39192cb28eae0d798fa923a30302afa0" title=" " alt="" coords="684,7,866,49"/>
-<area shape="poly" title=" " alt="" coords="912,26,867,27,867,22,911,20"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afb35f5cfd70af565c23555f8652cacf3" title=" " alt="" coords="424,119,622,145"/>
-<area shape="poly" title=" " alt="" coords="700,58,675,68,555,121,553,116,673,63,698,53"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,207,149,233"/>
-<area shape="poly" title=" " alt="" coords="437,151,149,209,148,203,436,146"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afc539f60f939c905374f1f4e937b94fe" title=" " alt="" coords="928,56,1133,83"/>
-<area shape="poly" title=" " alt="" coords="1171,72,1133,72,1133,67,1171,67"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a9526a187231f0c74492dfc0c575f3afa" title=" " alt="" coords="684,77,866,120"/>
-<area shape="poly" title=" " alt="" coords="913,86,866,91,866,86,912,80"/>
-<area shape="poly" title=" " alt="" coords="669,115,623,122,622,116,668,110"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a545045ad462d96e87d64a52e37b4e6df" title=" " alt="" coords="929,107,1132,133"/>
-<area shape="poly" title=" " alt="" coords="1170,123,1132,123,1132,117,1170,117"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a727bf7136a525639a887a400f45f28d7" title=" " alt="" coords="926,157,1135,184"/>
-<area shape="poly" title=" " alt="" coords="1197,140,1100,159,1099,154,1195,134"/>
-<area shape="poly" title=" " alt="" coords="913,113,866,109,866,104,914,108"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a2a7f8794c7ba31096eba399192bba538" title=" " alt="" coords="674,144,876,187"/>
-<area shape="poly" title=" " alt="" coords="910,171,876,170,876,165,910,165"/>
-<area shape="poly" title=" " alt="" coords="659,153,622,148,623,142,659,147"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5d3271287b7cf86e09500f25f93052dc" title=" " alt="" coords="924,208,1137,251"/>
-<area shape="poly" title=" " alt="" coords="1182,214,1138,219,1137,214,1181,209"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd" title=" " alt="" coords="197,228,371,271"/>
-<area shape="poly" title=" " alt="" coords="908,235,372,250,371,244,908,230"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451" title=" " alt="" coords="677,261,873,304"/>
-<area shape="poly" title=" " alt="" coords="911,257,874,265,873,260,910,252"/>
-<area shape="poly" title=" " alt="" coords="181,237,148,233,149,227,182,232"/>
-<area shape="poly" title=" " alt="" coords="661,278,371,258,372,253,662,272"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5b19f0632a911a519401b1b40e70db7c" title=" " alt="" coords="419,312,626,339"/>
-<area shape="poly" title=" " alt="" coords="662,304,606,314,605,309,661,299"/>
-<area shape="poly" title=" " alt="" coords="461,310,418,296,350,274,352,269,420,291,463,304"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_ad8139941ca11d8369f89b262890dad33_icgraph.svg" width="100%" height="558"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -516,7 +616,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00589">589</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  590</span>    {</div>
+<div class="line"><span class="lineno">  591</span>        <span class="keyword">auto</span> it = j.find(std::string(k));</div>
+<div class="line"><span class="lineno">  592</span>        <span class="keywordflow">return</span> (it != j.end() &amp;&amp; it-&gt;is_boolean()) ? it-&gt;get&lt;<span class="keywordtype">bool</span>&gt;() : def;</div>
+<div class="line"><span class="lineno">  593</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ab2e866d5371020d293aceb12ae33ff28" name="ab2e866d5371020d293aceb12ae33ff28"></a>
@@ -552,7 +656,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00584">584</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  585</span>    {</div>
+<div class="line"><span class="lineno">  586</span>        <span class="keyword">auto</span> it = j.find(std::string(k));</div>
+<div class="line"><span class="lineno">  587</span>        <span class="keywordflow">return</span> (it != j.end() &amp;&amp; it-&gt;is_number_integer()) ? it-&gt;get&lt;<span class="keywordtype">int</span>&gt;() : def;</div>
+<div class="line"><span class="lineno">  588</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a39dd2bfb772fa238610b01c77e9e1d05" name="a39dd2bfb772fa238610b01c77e9e1d05"></a>
@@ -588,19 +696,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00579">579</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  579</span>                                                                           {})</div>
+<div class="line"><span class="lineno">  580</span>    {</div>
+<div class="line"><span class="lineno">  581</span>        <span class="keyword">auto</span> it = j.find(std::string(k));</div>
+<div class="line"><span class="lineno">  582</span>        <span class="keywordflow">return</span> (it != j.end() &amp;&amp; it-&gt;is_string()) ? it-&gt;get&lt;std::string&gt;() : std::move(def);</div>
+<div class="line"><span class="lineno">  583</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a39dd2bfb772fa238610b01c77e9e1d05_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a39dd2bfb772fa238610b01c77e9e1d05_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a39dd2bfb772fa238610b01c77e9e1d05_icgraph" id="ad5/d64/namespacemsg_a39dd2bfb772fa238610b01c77e9e1d05_icgraph">
-<area shape="rect" title=" " alt="" coords="528,35,634,61"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a91ae6eaae32ae463c033547f74080e36" title=" " alt="" coords="283,27,480,69"/>
-<area shape="poly" title=" " alt="" coords="512,51,481,51,481,45,512,45"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="5,5,235,32"/>
-<area shape="poly" title=" " alt="" coords="267,38,235,34,236,29,267,33"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="29,56,211,99"/>
-<area shape="poly" title=" " alt="" coords="268,63,211,70,211,64,267,58"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a39dd2bfb772fa238610b01c77e9e1d05_icgraph.svg" width="640" height="104"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -633,7 +737,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00572">572</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  573</span>    {</div>
+<div class="line"><span class="lineno">  574</span>        <span class="keyword">auto</span> it = j.find(std::string(key::Type));</div>
+<div class="line"><span class="lineno">  575</span>        <span class="keywordflow">return</span> it != j.end() &amp;&amp; it-&gt;is_string() &amp;&amp; it-&gt;get_ref&lt;<span class="keyword">const</span> std::string&amp;&gt;() == t;</div>
+<div class="line"><span class="lineno">  576</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ac4fc3b229e6af29b442109fdc24e373e" name="ac4fc3b229e6af29b442109fdc24e373e"></a>
@@ -684,15 +792,22 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00433">433</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  437</span>    {</div>
+<div class="line"><span class="lineno">  438</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  439</span>            {std::string(key::Type), std::string(signaling::Answer)},</div>
+<div class="line"><span class="lineno">  440</span>            {std::string(key::From), from},</div>
+<div class="line"><span class="lineno">  441</span>            {std::string(key::To), to},</div>
+<div class="line"><span class="lineno">  442</span>            {std::string(key::Broadcast), broadcast},</div>
+<div class="line"><span class="lineno">  443</span>            {std::string(key::Sdp), sdp},</div>
+<div class="line"><span class="lineno">  444</span>            {std::string(key::Username), username},</div>
+<div class="line"><span class="lineno">  445</span>            {std::string(key::UniqueId), uniqueId},</div>
+<div class="line"><span class="lineno">  446</span>        };</div>
+<div class="line"><span class="lineno">  447</span>    }</div>
+<div class="ttc" id="anamespacemsg_html_a754f31ce5d84f81c57c88ace6f76b133"><div class="ttname"><a href="#a754f31ce5d84f81c57c88ace6f76b133">msg::Json</a></div><div class="ttdeci">nlohmann::json Json</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00363">Message.h:363</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_ac4fc3b229e6af29b442109fdc24e373e_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_ac4fc3b229e6af29b442109fdc24e373e_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_ac4fc3b229e6af29b442109fdc24e373e_icgraph" id="ad5/d64/namespacemsg_ac4fc3b229e6af29b442109fdc24e373e_icgraph">
-<area shape="rect" title=" " alt="" coords="254,13,384,40"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a70a4b940a6ceb973e2d8e4ffeeb62fe9" title=" " alt="" coords="5,5,206,48"/>
-<area shape="poly" title=" " alt="" coords="238,29,206,29,206,24,238,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_ac4fc3b229e6af29b442109fdc24e373e_icgraph.svg" width="390" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -730,15 +845,18 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00495">495</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  498</span>    {</div>
+<div class="line"><span class="lineno">  499</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  500</span>            {std::string(key::Type), std::string(signaling::Auth)},</div>
+<div class="line"><span class="lineno">  501</span>            {std::string(key::AuthToken), token},</div>
+<div class="line"><span class="lineno">  502</span>            {std::string(key::Username), username},</div>
+<div class="line"><span class="lineno">  503</span>            {std::string(key::UniqueId), uniqueId},</div>
+<div class="line"><span class="lineno">  504</span>        };</div>
+<div class="line"><span class="lineno">  505</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_ae3fbd79c8bd666c72f9953fdab5e6b34_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_ae3fbd79c8bd666c72f9953fdab5e6b34_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_ae3fbd79c8bd666c72f9953fdab5e6b34_icgraph" id="ad5/d64/namespacemsg_ae3fbd79c8bd666c72f9953fdab5e6b34_icgraph">
-<area shape="rect" title=" " alt="" coords="216,5,329,32"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a4d024810a54c16a402720bdad988631a" title=" " alt="" coords="5,5,168,32"/>
-<area shape="poly" title=" " alt="" coords="200,21,168,21,168,16,200,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_ae3fbd79c8bd666c72f9953fdab5e6b34_icgraph.svg" width="335" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -796,17 +914,30 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00506">506</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  508</span>                                                                                 {},</div>
+<div class="line"><span class="lineno">  509</span>                                           <span class="keyword">const</span> std::string&amp; gmPeerId = <span class="stringliteral">&quot;&quot;</span>,</div>
+<div class="line"><span class="lineno">  510</span>                                           <span class="keyword">const</span> std::string&amp; uniqueId = <span class="stringliteral">&quot;&quot;</span>)</div>
+<div class="line"><span class="lineno">  511</span>    {</div>
+<div class="line"><span class="lineno">  512</span>        <span class="keyword">auto</span> j = nlohmann::json{</div>
+<div class="line"><span class="lineno">  513</span>            {std::string(key::Type), std::string(signaling::AuthResponse)},</div>
+<div class="line"><span class="lineno">  514</span>            {std::string(key::AuthOk), ok},</div>
+<div class="line"><span class="lineno">  515</span>            {std::string(key::AuthMsg), <a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>},</div>
+<div class="line"><span class="lineno">  516</span>            {std::string(key::ClientId), clientId},</div>
+<div class="line"><span class="lineno">  517</span>            {std::string(key::Username), username}};</div>
+<div class="line"><span class="lineno">  518</span>        <span class="keywordflow">if</span> (!clients.empty())</div>
+<div class="line"><span class="lineno">  519</span>            j[std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#ad6094f2e0521e4c9d341e20bfb01ff0d">msg::key::Clients</a>)] = clients;</div>
+<div class="line"><span class="lineno">  520</span>        <span class="keywordflow">if</span> (!gmPeerId.empty())</div>
+<div class="line"><span class="lineno">  521</span>            j[key::GmId] = gmPeerId;</div>
+<div class="line"><span class="lineno">  522</span>        <span class="keywordflow">if</span> (!uniqueId.empty())</div>
+<div class="line"><span class="lineno">  523</span>            j[std::string(key::UniqueId)] = uniqueId;</div>
+<div class="line"><span class="lineno">  524</span>        <span class="keywordflow">return</span> j;</div>
+<div class="line"><span class="lineno">  525</span>    }</div>
+<div class="ttc" id="anamespacemsg_1_1key_html_ad6094f2e0521e4c9d341e20bfb01ff0d"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#ad6094f2e0521e4c9d341e20bfb01ff0d">msg::key::Clients</a></div><div class="ttdeci">constexpr std::string_view Clients</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00235">Message.h:235</a></div></div>
+<div class="ttc" id="anamespacemsg_html"><div class="ttname"><a href="../../d5/d64/namespacemsg.html">msg</a></div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00027">Message.h:28</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a86e3987841ce342ed4a4257a3ba2ff28_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a86e3987841ce342ed4a4257a3ba2ff28_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a86e3987841ce342ed4a4257a3ba2ff28_icgraph" id="ad5/d64/namespacemsg_a86e3987841ce342ed4a4257a3ba2ff28_icgraph">
-<area shape="rect" title=" " alt="" coords="435,5,607,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a1bff9775c26724fe03a5bac447e0dd3b" title=" " alt="" coords="200,5,387,32"/>
-<area shape="poly" title=" " alt="" coords="420,21,387,21,387,16,420,16"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a86e3987841ce342ed4a4257a3ba2ff28_icgraph.svg" width="614" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -835,15 +966,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00474">474</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  475</span>    {</div>
+<div class="line"><span class="lineno">  476</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  477</span>            {std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a21b57f64b4055cf5038d23c81d0273ae">msg::key::Type</a>), <a class="code hl_variable" href="../../dc/d03/namespacemsg_1_1signaling.html#a0951a4f31de36080a13fc1a046de4b41">msg::signaling::ServerDisconnect</a>},</div>
+<div class="line"><span class="lineno">  478</span>            {std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#af900ce19bf5b639f11a4b0e9df407d92">msg::key::Broadcast</a>), std::string(<a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a>)}};</div>
+<div class="line"><span class="lineno">  479</span>    }</div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a21b57f64b4055cf5038d23c81d0273ae"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a21b57f64b4055cf5038d23c81d0273ae">msg::key::Type</a></div><div class="ttdeci">constexpr std::string_view Type</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00229">Message.h:229</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_af900ce19bf5b639f11a4b0e9df407d92"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#af900ce19bf5b639f11a4b0e9df407d92">msg::key::Broadcast</a></div><div class="ttdeci">constexpr std::string_view Broadcast</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00232">Message.h:232</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1signaling_html_a0951a4f31de36080a13fc1a046de4b41"><div class="ttname"><a href="../../dc/d03/namespacemsg_1_1signaling.html#a0951a4f31de36080a13fc1a046de4b41">msg::signaling::ServerDisconnect</a></div><div class="ttdeci">constexpr std::string_view ServerDisconnect</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00281">Message.h:281</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1value_html_a5c9f830ef13e1b09033c5b1e6712d59c"><div class="ttname"><a href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a></div><div class="ttdeci">constexpr std::string True</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00288">Message.h:288</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a3646ef374175fd6ca65233bf402f3704_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a3646ef374175fd6ca65233bf402f3704_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a3646ef374175fd6ca65233bf402f3704_icgraph" id="ad5/d64/namespacemsg_a3646ef374175fd6ca65233bf402f3704_icgraph">
-<area shape="rect" title=" " alt="" coords="231,13,434,40"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#ab53bb53bb4837a9fcffefb8200a6ee7b" title=" " alt="" coords="5,5,183,48"/>
-<area shape="poly" title=" " alt="" coords="215,29,183,29,183,24,215,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a3646ef374175fd6ca65233bf402f3704_icgraph.svg" width="440" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -886,15 +1021,18 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00448">448</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  449</span>    {</div>
+<div class="line"><span class="lineno">  450</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  451</span>            {std::string(key::Type), std::string(signaling::Candidate)},</div>
+<div class="line"><span class="lineno">  452</span>            {std::string(key::From), from},</div>
+<div class="line"><span class="lineno">  453</span>            {std::string(key::To), to},</div>
+<div class="line"><span class="lineno">  454</span>            {std::string(key::Broadcast), broadcast},</div>
+<div class="line"><span class="lineno">  455</span>            {std::string(key::Candidate), cand}};</div>
+<div class="line"><span class="lineno">  456</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a8db08b8775d29e103e4c4f901e332655_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a8db08b8775d29e103e4c4f901e332655_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a8db08b8775d29e103e4c4f901e332655_icgraph" id="ad5/d64/namespacemsg_a8db08b8775d29e103e4c4f901e332655_icgraph">
-<area shape="rect" title=" " alt="" coords="254,13,399,40"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a0948166ce2018bd8603b033ac6b0319a" title=" " alt="" coords="5,5,206,48"/>
-<area shape="poly" title=" " alt="" coords="238,29,206,29,206,24,238,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a8db08b8775d29e103e4c4f901e332655_icgraph.svg" width="404" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -937,31 +1075,28 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00366">366</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  369</span>    {</div>
+<div class="line"><span class="lineno">  370</span>        <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a> j = {</div>
+<div class="line"><span class="lineno">  371</span>            {std::string(chatkey::Type), <a class="code hl_function" href="#ad8139941ca11d8369f89b262890dad33">DCTypeToJson</a>(DCType::ChatGroupCreate)},</div>
+<div class="line"><span class="lineno">  372</span>            {std::string(chatkey::TableId), tableId},</div>
+<div class="line"><span class="lineno">  373</span>            {std::string(chatkey::GroupId), groupId},</div>
+<div class="line"><span class="lineno">  374</span>            {std::string(chatkey::Name), name},</div>
+<div class="line"><span class="lineno">  375</span>            {std::string(chatkey::Parts), Json::array()}};</div>
+<div class="line"><span class="lineno">  376</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; p : participants)</div>
+<div class="line"><span class="lineno">  377</span>            j[std::string(chatkey::<a class="code hl_variable" href="../../d7/d7d/namespacemsg_1_1chatkey.html#a631bf7d704435b3db8cac453a8e39223">Parts</a>)].push_back(p);</div>
+<div class="line"><span class="lineno">  378</span>        <span class="keywordflow">return</span> j;</div>
+<div class="line"><span class="lineno">  379</span>    }</div>
+<div class="ttc" id="anamespacemsg_1_1chatkey_html_a631bf7d704435b3db8cac453a8e39223"><div class="ttname"><a href="../../d7/d7d/namespacemsg_1_1chatkey.html#a631bf7d704435b3db8cac453a8e39223">msg::chatkey::Parts</a></div><div class="ttdeci">constexpr std::string_view Parts</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00354">Message.h:354</a></div></div>
+<div class="ttc" id="anamespacemsg_html_ad8139941ca11d8369f89b262890dad33"><div class="ttname"><a href="#ad8139941ca11d8369f89b262890dad33">msg::DCTypeToJson</a></div><div class="ttdeci">const char * DCTypeToJson(DCType t)</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00306">Message.h:306</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_cgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_cgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_cgraph" id="ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,194,32"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33" title=" " alt="" coords="242,5,386,32"/>
-<area shape="poly" title=" " alt="" coords="194,16,226,16,226,21,194,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_cgraph.svg" width="392" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_icgraph" id="ad5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_icgraph">
-<area shape="rect" title=" " alt="" coords="928,13,1116,40"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ac536f46038a4bf7d308ad8e01ce12c76" title=" " alt="" coords="673,13,880,40"/>
-<area shape="poly" title=" " alt="" coords="912,29,880,29,880,24,912,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a39192cb28eae0d798fa923a30302afa0" title=" " alt="" coords="443,5,625,48"/>
-<area shape="poly" title=" " alt="" coords="658,29,626,29,626,24,658,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afb35f5cfd70af565c23555f8652cacf3" title=" " alt="" coords="197,13,395,40"/>
-<area shape="poly" title=" " alt="" coords="427,29,396,29,396,24,427,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,13,149,40"/>
-<area shape="poly" title=" " alt="" coords="181,29,149,29,149,24,181,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a986d7467e1d491d12ceeb5861dedbeab_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -994,31 +1129,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00396">396</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  397</span>    {</div>
+<div class="line"><span class="lineno">  398</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  399</span>            {std::string(chatkey::Type), <a class="code hl_function" href="#ad8139941ca11d8369f89b262890dad33">DCTypeToJson</a>(DCType::ChatGroupDelete)},</div>
+<div class="line"><span class="lineno">  400</span>            {std::string(chatkey::TableId), tableId},</div>
+<div class="line"><span class="lineno">  401</span>            {std::string(chatkey::GroupId), groupId}};</div>
+<div class="line"><span class="lineno">  402</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_cgraph.png" border="0" usemap="#ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_cgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_cgraph" id="ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,193,32"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33" title=" " alt="" coords="241,5,385,32"/>
-<area shape="poly" title=" " alt="" coords="193,16,225,16,225,21,193,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_cgraph.svg" width="391" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_icgraph" id="ad5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_icgraph">
-<area shape="rect" title=" " alt="" coords="926,13,1113,40"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afc539f60f939c905374f1f4e937b94fe" title=" " alt="" coords="672,13,878,40"/>
-<area shape="poly" title=" " alt="" coords="910,29,878,29,878,24,910,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a9526a187231f0c74492dfc0c575f3afa" title=" " alt="" coords="443,5,624,48"/>
-<area shape="poly" title=" " alt="" coords="657,29,625,29,625,24,657,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afb35f5cfd70af565c23555f8652cacf3" title=" " alt="" coords="197,13,395,40"/>
-<area shape="poly" title=" " alt="" coords="427,29,396,29,396,24,427,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,13,149,40"/>
-<area shape="poly" title=" " alt="" coords="181,29,149,29,149,24,181,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_afe9573aed063a0e6b1aa59c451c26e9e_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -1061,36 +1186,26 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00381">381</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  384</span>    {</div>
+<div class="line"><span class="lineno">  385</span>        <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a> j = {</div>
+<div class="line"><span class="lineno">  386</span>            {std::string(chatkey::Type), <a class="code hl_function" href="#ad8139941ca11d8369f89b262890dad33">DCTypeToJson</a>(DCType::ChatGroupUpdate)},</div>
+<div class="line"><span class="lineno">  387</span>            {std::string(chatkey::TableId), tableId},</div>
+<div class="line"><span class="lineno">  388</span>            {std::string(chatkey::GroupId), groupId},</div>
+<div class="line"><span class="lineno">  389</span>            {std::string(chatkey::Name), name},</div>
+<div class="line"><span class="lineno">  390</span>            {std::string(chatkey::Parts), Json::array()}};</div>
+<div class="line"><span class="lineno">  391</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; p : participants)</div>
+<div class="line"><span class="lineno">  392</span>            j[std::string(chatkey::<a class="code hl_variable" href="../../d7/d7d/namespacemsg_1_1chatkey.html#a631bf7d704435b3db8cac453a8e39223">Parts</a>)].push_back(p);</div>
+<div class="line"><span class="lineno">  393</span>        <span class="keywordflow">return</span> j;</div>
+<div class="line"><span class="lineno">  394</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_cgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_cgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_cgraph" id="ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,197,32"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33" title=" " alt="" coords="245,5,389,32"/>
-<area shape="poly" title=" " alt="" coords="197,16,229,16,229,21,197,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_cgraph.svg" width="395" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_icgraph" id="ad5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_icgraph">
-<area shape="rect" title=" " alt="" coords="950,47,1141,73"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a545045ad462d96e87d64a52e37b4e6df" title=" " alt="" coords="696,17,898,44"/>
-<area shape="poly" title=" " alt="" coords="933,49,898,45,899,40,934,44"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a727bf7136a525639a887a400f45f28d7" title=" " alt="" coords="692,72,902,99"/>
-<area shape="poly" title=" " alt="" coords="934,74,902,77,902,72,934,69"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a9526a187231f0c74492dfc0c575f3afa" title=" " alt="" coords="453,5,634,48"/>
-<area shape="poly" title=" " alt="" coords="680,31,635,31,635,25,680,26"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afb35f5cfd70af565c23555f8652cacf3" title=" " alt="" coords="197,47,395,73"/>
-<area shape="poly" title=" " alt="" coords="438,44,396,49,395,44,437,38"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,47,149,73"/>
-<area shape="poly" title=" " alt="" coords="181,63,149,63,149,57,181,57"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a2a7f8794c7ba31096eba399192bba538" title=" " alt="" coords="443,72,644,115"/>
-<area shape="poly" title=" " alt="" coords="677,92,645,93,645,87,677,86"/>
-<area shape="poly" title=" " alt="" coords="427,80,395,76,396,71,428,75"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a24e8339bdeb6b6a9847b7134e8e016ad_icgraph.svg" width="100%" height="390"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -1138,35 +1253,24 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00404">404</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  407</span>    {</div>
+<div class="line"><span class="lineno">  408</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  409</span>            {std::string(chatkey::Type), <a class="code hl_function" href="#ad8139941ca11d8369f89b262890dad33">DCTypeToJson</a>(DCType::ChatMessage)},</div>
+<div class="line"><span class="lineno">  410</span>            {std::string(chatkey::TableId), tableId},</div>
+<div class="line"><span class="lineno">  411</span>            {std::string(chatkey::GroupId), groupId},</div>
+<div class="line"><span class="lineno">  412</span>            {std::string(chatkey::Ts), ts},</div>
+<div class="line"><span class="lineno">  413</span>            {std::string(chatkey::Username), username},</div>
+<div class="line"><span class="lineno">  414</span>            {std::string(chatkey::Text), text}};</div>
+<div class="line"><span class="lineno">  415</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_cgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_cgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_cgraph" id="ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,173,32"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33" title=" " alt="" coords="221,5,365,32"/>
-<area shape="poly" title=" " alt="" coords="173,16,205,16,205,21,173,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_cgraph.svg" width="371" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_icgraph" id="ad5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_icgraph">
-<area shape="rect" title=" " alt="" coords="1180,13,1347,40"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5d3271287b7cf86e09500f25f93052dc" title=" " alt="" coords="919,5,1132,48"/>
-<area shape="poly" title=" " alt="" coords="1165,29,1133,29,1133,24,1165,24"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd" title=" " alt="" coords="197,27,371,69"/>
-<area shape="poly" title=" " alt="" coords="903,26,871,25,645,24,419,36,372,40,371,35,419,31,645,19,871,20,903,21"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451" title=" " alt="" coords="674,35,871,77"/>
-<area shape="poly" title=" " alt="" coords="903,43,872,47,871,42,903,38"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,35,149,61"/>
-<area shape="poly" title=" " alt="" coords="181,51,149,51,149,45,181,45"/>
-<area shape="poly" title=" " alt="" coords="659,57,372,52,372,47,659,51"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5b19f0632a911a519401b1b40e70db7c" title=" " alt="" coords="419,85,626,112"/>
-<area shape="poly" title=" " alt="" coords="659,78,605,87,604,82,658,73"/>
-<area shape="poly" title=" " alt="" coords="441,84,371,69,372,64,442,79"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a0969cd8a8185332490b7ecde9021086a_icgraph.svg" width="100%" height="388"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -1219,15 +1323,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00417">417</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  421</span>    {</div>
+<div class="line"><span class="lineno">  422</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  423</span>            {std::string(key::Type), std::string(signaling::Offer)},</div>
+<div class="line"><span class="lineno">  424</span>            {std::string(key::From), from},</div>
+<div class="line"><span class="lineno">  425</span>            {std::string(key::To), to},</div>
+<div class="line"><span class="lineno">  426</span>            {std::string(key::Broadcast), broadcast},</div>
+<div class="line"><span class="lineno">  427</span>            {std::string(key::Sdp), sdp},</div>
+<div class="line"><span class="lineno">  428</span>            {std::string(key::Username), username},</div>
+<div class="line"><span class="lineno">  429</span>            {std::string(key::UniqueId), uniqueId},</div>
+<div class="line"><span class="lineno">  430</span>        };</div>
+<div class="line"><span class="lineno">  431</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a1cc587e60fa390fb1bbb4f36d0dea83b_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a1cc587e60fa390fb1bbb4f36d0dea83b_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a1cc587e60fa390fb1bbb4f36d0dea83b_icgraph" id="ad5/d64/namespacemsg_a1cc587e60fa390fb1bbb4f36d0dea83b_icgraph">
-<area shape="rect" title=" " alt="" coords="254,13,368,40"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a70a4b940a6ceb973e2d8e4ffeeb62fe9" title=" " alt="" coords="5,5,206,48"/>
-<area shape="poly" title=" " alt="" coords="238,29,206,29,206,24,238,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a1cc587e60fa390fb1bbb4f36d0dea83b_icgraph.svg" width="374" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1260,15 +1370,16 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00466">466</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  467</span>    {</div>
+<div class="line"><span class="lineno">  468</span>        <span class="keywordflow">return</span> nlohmann::json{</div>
+<div class="line"><span class="lineno">  469</span>            {std::string(key::Type), std::string(signaling::PeerDisconnect)},</div>
+<div class="line"><span class="lineno">  470</span>            {std::string(key::Broadcast), broadcast ? std::string(<a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a>) : std::string(<a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>::value::False)},</div>
+<div class="line"><span class="lineno">  471</span>            {std::string(key::Target), targetPeerId}};</div>
+<div class="line"><span class="lineno">  472</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d5/d64/namespacemsg_a868c66bfac86c5e97cdeb0f7d472c9f5_icgraph.png" border="0" usemap="#ad5/d64/namespacemsg_a868c66bfac86c5e97cdeb0f7d472c9f5_icgraph" alt=""/></div>
-<map name="ad5/d64/namespacemsg_a868c66bfac86c5e97cdeb0f7d472c9f5_icgraph" id="ad5/d64/namespacemsg_a868c66bfac86c5e97cdeb0f7d472c9f5_icgraph">
-<area shape="rect" title=" " alt="" coords="239,13,418,40"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a45da49cbdbd1e1d26fb0f83c6ed97051" title=" " alt="" coords="5,5,191,48"/>
-<area shape="poly" title=" " alt="" coords="223,29,191,29,191,24,223,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d5/d64/namespacemsg_a868c66bfac86c5e97cdeb0f7d472c9f5_icgraph.svg" width="424" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1297,7 +1408,12 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00481">481</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  482</span>    {</div>
+<div class="line"><span class="lineno">  483</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  484</span>            {std::string(key::Type), std::string(signaling::Ping)},</div>
+<div class="line"><span class="lineno">  485</span>            {std::string(key::From), from}};</div>
+<div class="line"><span class="lineno">  486</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a3bf99be7df35d32e99c3a92fa07d2546" name="a3bf99be7df35d32e99c3a92fa07d2546"></a>
@@ -1328,7 +1444,13 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00458">458</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  459</span>    {</div>
+<div class="line"><span class="lineno">  460</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  461</span>            {std::string(key::Type), std::string(signaling::Presence)},</div>
+<div class="line"><span class="lineno">  462</span>            {std::string(key::Event), <span class="keyword">event</span>},</div>
+<div class="line"><span class="lineno">  463</span>            {std::string(key::ClientId), clientId}};</div>
+<div class="line"><span class="lineno">  464</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a519453ed6e93f538f673a3835eb0e2ca" name="a519453ed6e93f538f673a3835eb0e2ca"></a>
@@ -1369,7 +1491,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00561">561</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  562</span>    {</div>
+<div class="line"><span class="lineno">  563</span>        <span class="keywordflow">return</span> <a class="code hl_typedef" href="#a754f31ce5d84f81c57c88ace6f76b133">Json</a>{</div>
+<div class="line"><span class="lineno">  564</span>            {std::string(key::Type), std::string(signaling::Text)},</div>
+<div class="line"><span class="lineno">  565</span>            {std::string(key::From), from},</div>
+<div class="line"><span class="lineno">  566</span>            {std::string(key::To), to},</div>
+<div class="line"><span class="lineno">  567</span>            {std::string(key::Broadcast), broadcast},</div>
+<div class="line"><span class="lineno">  568</span>            {std::string(key::Text), text}};</div>
+<div class="line"><span class="lineno">  569</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 </div><!-- contents -->

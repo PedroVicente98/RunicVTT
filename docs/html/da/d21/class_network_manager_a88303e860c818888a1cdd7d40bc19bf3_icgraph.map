@@ -1,5 +1,5 @@
 <map id="NetworkManager::sendMarker" name="NetworkManager::sendMarker">
-<area shape="rect" id="Node000001" title=" " alt="" coords="239,13,435,40"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a1548090a456937ffafda64318f21ba40" title=" " alt="" coords="5,5,191,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="223,29,191,29,191,24,223,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="279,5,475,32"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a1548090a456937ffafda64318f21ba40" title=" " alt="" coords="5,5,231,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="263,21,231,21,231,16,263,16"/>
 </map>

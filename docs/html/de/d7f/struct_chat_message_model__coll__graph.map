@@ -1,5 +1,9 @@
 <map id="ChatMessageModel" name="ChatMessageModel">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,171,132,261"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="47,5,90,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="71,74,71,154,66,154,66,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,171,154,240"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,42,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="31,74,39,109,51,146,56,155,52,158,47,148,33,111,26,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="69,5,112,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="93,75,93,153,88,153,88,75"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="195,5,244,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="220,75,211,112,192,148,169,171,165,167,188,145,206,110,214,74"/>
 </map>

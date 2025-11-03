@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,12 +105,7 @@ $(function(){initNavTree('d8/d0b/structmsg_1_1_net_event.html','../../'); initRe
 <div class="dynheader">
 Collaboration diagram for msg::NetEvent:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../dd/d35/structmsg_1_1_net_event__coll__graph.png" border="0" usemap="#amsg_1_1_net_event_coll__map" alt="Collaboration graph"/></div>
-<map name="amsg_1_1_net_event_coll__map" id="amsg_1_1_net_event_coll__map">
-<area shape="rect" title=" " alt="" coords="5,155,104,224"/>
-<area shape="rect" title=" " alt="" coords="33,5,76,75"/>
-<area shape="poly" title=" " alt="" coords="57,75,57,137,52,137,52,75"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../dd/d35/structmsg_1_1_net_event__coll__graph.svg" width="110" height="230"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
@@ -169,7 +164,21 @@ Public Attributes</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="../../db/db6/_message_8h_source.html#l00205">205</a> of file <a class="el" href="../../db/db6/_message_8h_source.html">Message.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  206</span>        {</div>
+<div class="line"><span class="lineno">  207</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00a071903acae501092383cced1fb9e831d">DcOpen</a>,</div>
+<div class="line"><span class="lineno">  208</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c">DcClosed</a>,</div>
+<div class="line"><span class="lineno">  209</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495">PcOpen</a>,</div>
+<div class="line"><span class="lineno">  210</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515">PcClosed</a>,</div>
+<div class="line"><span class="lineno">  211</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00aa4d0583ba196d07483da466a91a3171b">ClientOpen</a>,</div>
+<div class="line"><span class="lineno">  212</span>            <a class="code hl_enumvalue" href="#ad7bacc0d79f1287207577d95d635bc00aeb0d737f78a0e56b04a14f85303912b6">ClientClosed</a></div>
+<div class="line"><span class="lineno">  213</span>        };</div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00a071903acae501092383cced1fb9e831d"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00a071903acae501092383cced1fb9e831d">msg::NetEvent::Type::DcOpen</a></div><div class="ttdeci">@ DcOpen</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495">msg::NetEvent::Type::PcOpen</a></div><div class="ttdeci">@ PcOpen</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c">msg::NetEvent::Type::DcClosed</a></div><div class="ttdeci">@ DcClosed</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00aa4d0583ba196d07483da466a91a3171b"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00aa4d0583ba196d07483da466a91a3171b">msg::NetEvent::Type::ClientOpen</a></div><div class="ttdeci">@ ClientOpen</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00aeb0d737f78a0e56b04a14f85303912b6"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00aeb0d737f78a0e56b04a14f85303912b6">msg::NetEvent::Type::ClientClosed</a></div><div class="ttdeci">@ ClientClosed</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515"><div class="ttname"><a href="#ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515">msg::NetEvent::Type::PcClosed</a></div><div class="ttdeci">@ PcClosed</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

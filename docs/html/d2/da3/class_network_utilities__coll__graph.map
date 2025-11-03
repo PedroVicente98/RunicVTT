@@ -1,3 +1,13 @@
 <map id="NetworkUtilities" name="NetworkUtilities">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,222,1056"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="127,235,413,832"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,103,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,74,77,138,100,210,122,263,118,265,95,212,72,139,58,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="128,5,170,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="153,74,159,137,170,210,171,218,166,219,165,211,153,138,148,74"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="239,5,286,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="265,74,268,218,262,218,260,74"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="310,5,425,75"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="364,75,335,219,330,218,358,74"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="449,5,550,75"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="487,75,419,221,414,218,482,73"/>
 </map>

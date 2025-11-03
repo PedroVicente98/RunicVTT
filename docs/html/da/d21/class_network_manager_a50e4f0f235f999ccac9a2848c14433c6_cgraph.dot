@@ -6,13 +6,13 @@ digraph "NetworkManager::sendMarkerMoveState"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="NetworkManager::sendMarker\lMoveState",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="NetworkManager::sendMarkerMoveState",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NetworkManager::broadcast\lGameFrame",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#aeb0d7937d1d825d09dc8c7b13e35a962",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkManager::broadcastGameFrame",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#aeb0d7937d1d825d09dc8c7b13e35a962",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="NetworkManager::sendGameTo",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a8f97d83ec35ea68c1e37d6837c1c8b4c",tooltip=" "];
   Node1 -> Node4 [id="edge3_Node000001_Node000004",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="NetworkManager::buildMarker\lMoveStateFrame",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#ae2eab0e91a7b37d26c273e4b0319a21c",tooltip=" "];
+  Node4 [id="Node000004",label="NetworkManager::buildMarkerMoveStateFrame",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#ae2eab0e91a7b37d26c273e4b0319a21c",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="NetworkManager::nowMs",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a1ca85e76187f45d46596a1d04d713f0f",tooltip=" "];
   Node4 -> Node6 [id="edge5_Node000004_Node000006",color="steelblue1",style="solid",tooltip=" "];

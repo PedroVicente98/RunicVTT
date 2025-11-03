@@ -1,5 +1,13 @@
 <map id="ChatGroupModel" name="ChatGroupModel">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,218,320"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="90,5,133,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,74,114,138,109,138,109,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="178,155,287,224"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,62,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="48,73,63,102,85,129,122,153,162,169,160,174,120,157,82,133,59,105,43,76"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="86,5,128,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="110,74,115,102,128,129,144,146,165,160,162,165,141,150,123,132,110,104,104,75"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="165,5,276,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="226,74,231,138,226,138,220,75"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="300,5,485,75"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="368,76,314,133,297,147,294,142,311,129,364,73"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="509,5,566,75"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="511,67,499,77,462,108,422,133,362,157,304,175,302,170,360,152,419,128,459,103,496,73,508,63"/>
 </map>

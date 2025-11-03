@@ -1,7 +1,7 @@
 <map id="NetworkManager::buildMarkerMoveStateFrame" name="NetworkManager::buildMarkerMoveStateFrame">
-<area shape="rect" id="Node000001" title=" " alt="" coords="483,5,678,48"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a50e4f0f235f999ccac9a2848c14433c6" title=" " alt="" coords="239,5,435,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="468,29,435,29,435,24,468,24"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a53b60b6286f20a92807205dd2f71c200" title=" " alt="" coords="5,5,191,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,29,191,29,191,24,223,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="649,5,944,32"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a50e4f0f235f999ccac9a2848c14433c6" title=" " alt="" coords="342,5,601,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="633,21,601,21,601,16,633,16"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a53b60b6286f20a92807205dd2f71c200" title=" " alt="" coords="5,5,294,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="326,21,294,21,294,16,326,16"/>
 </map>

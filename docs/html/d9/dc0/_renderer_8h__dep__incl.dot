@@ -36,7 +36,7 @@ digraph "include/renderer/Renderer.h"
   Node10 -> Node12 [id="edge18_Node000010_Node000012",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node12 [id="Node000012",label="src/renderer/Texture.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d26/_texture_8cpp.html",tooltip=" "];
   Node1 -> Node13 [id="edge19_Node000001_Node000013",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node13 [id="Node000013",label="include/renderer/VertexBuffer\lLayout.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d3f/_vertex_buffer_layout_8h.html",tooltip=" "];
+  Node13 [id="Node000013",label="include/renderer/VertexBufferLayout.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d3f/_vertex_buffer_layout_8h.html",tooltip=" "];
   Node13 -> Node2 [id="edge20_Node000013_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node13 -> Node9 [id="edge21_Node000013_Node000009",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node13 -> Node14 [id="edge22_Node000013_Node000014",dir="back",color="steelblue1",style="solid",tooltip=" "];

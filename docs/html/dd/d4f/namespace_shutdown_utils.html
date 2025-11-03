@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -129,15 +129,18 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/d0a/main_8cpp_source.html#l00010">10</a> of file <a class="el" href="../../df/d0a/main_8cpp_source.html">main.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   11</span>    {</div>
+<div class="line"><span class="lineno">   12</span>        std::thread([timeoutMs]()</div>
+<div class="line"><span class="lineno">   13</span>                    {</div>
+<div class="line"><span class="lineno">   14</span>                        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));</div>
+<div class="line"><span class="lineno">   15</span>                        TerminateProcess(GetCurrentProcess(), 0); <span class="comment">// hard kill (OS reclaims everything)</span></div>
+<div class="line"><span class="lineno">   16</span>                    })</div>
+<div class="line"><span class="lineno">   17</span>            .detach();</div>
+<div class="line"><span class="lineno">   18</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../dd/d4f/namespace_shutdown_utils_a164fd3deeb07623fca39c80eb580ab02_icgraph.png" border="0" usemap="#add/d4f/namespace_shutdown_utils_a164fd3deeb07623fca39c80eb580ab02_icgraph" alt=""/></div>
-<map name="add/d4f/namespace_shutdown_utils_a164fd3deeb07623fca39c80eb580ab02_icgraph" id="add/d4f/namespace_shutdown_utils_a164fd3deeb07623fca39c80eb580ab02_icgraph">
-<area shape="rect" title=" " alt="" coords="103,5,315,32"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../dd/d4f/namespace_shutdown_utils_a164fd3deeb07623fca39c80eb580ab02_icgraph.svg" width="320" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

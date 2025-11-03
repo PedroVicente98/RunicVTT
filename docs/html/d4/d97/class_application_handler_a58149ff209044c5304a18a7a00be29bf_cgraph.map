@@ -1,12 +1,12 @@
 <map id="ApplicationHandler::renderActiveGametable" name="ApplicationHandler::renderActiveGametable">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,171,81"/>
-<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#abdc6fcc7be0a7375c54b920f263f42af" title=" " alt="" coords="219,5,351,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,43,203,38,204,43,172,49"/>
-<area shape="rect" id="Node000003" href="$d4/d97/class_application_handler.html#ad75b179ef62024ae231903d789d019a8" title=" " alt="" coords="220,72,350,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="172,71,205,77,204,82,171,77"/>
-<area shape="rect" id="Node000004" href="$d4/d97/class_application_handler.html#a7655937c9f7a9b730af137a5ad1d9953" title=" " alt="" coords="399,43,529,85"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="350,80,383,74,384,80,351,85"/>
-<area shape="rect" id="Node000005" href="$d4/d97/class_application_handler.html#a1a100fed6275d5d36ae5ff35a278ed18" title=" " alt="" coords="577,72,708,115"/>
-<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="351,93,399,95,529,95,562,94,562,99,529,100,399,100,351,99"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="530,72,562,77,561,83,529,77"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,280,57"/>
+<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#abdc6fcc7be0a7375c54b920f263f42af" title=" " alt="" coords="328,5,569,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="280,30,312,27,312,33,280,35"/>
+<area shape="rect" id="Node000003" href="$d4/d97/class_application_handler.html#ad75b179ef62024ae231903d789d019a8" title=" " alt="" coords="333,56,564,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="280,53,317,56,317,61,280,58"/>
+<area shape="rect" id="Node000004" href="$d4/d97/class_application_handler.html#a7655937c9f7a9b730af137a5ad1d9953" title=" " alt="" coords="617,31,846,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="564,56,601,53,602,58,565,62"/>
+<area shape="rect" id="Node000005" href="$d4/d97/class_application_handler.html#a1a100fed6275d5d36ae5ff35a278ed18" title=" " alt="" coords="894,56,1123,83"/>
+<area shape="poly" id="edge5_Node000003_Node000005" title=" " alt="" coords="565,67,879,67,879,72,565,72"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="847,52,879,55,879,60,847,57"/>
 </map>

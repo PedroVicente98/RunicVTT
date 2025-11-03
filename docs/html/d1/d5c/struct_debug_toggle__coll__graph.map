@@ -1,5 +1,11 @@
 <map id="DebugToggle" name="DebugToggle">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,188,283"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="76,5,118,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="100,75,100,121,94,121,94,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="117,139,203,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="48,73,79,113,104,134,101,139,75,117,44,76"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="75,5,109,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="112,73,137,123,133,125,107,76"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="133,5,315,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="210,76,186,124,182,122,205,73"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="339,5,448,75"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="346,77,280,117,220,148,217,143,277,112,343,72"/>
 </map>

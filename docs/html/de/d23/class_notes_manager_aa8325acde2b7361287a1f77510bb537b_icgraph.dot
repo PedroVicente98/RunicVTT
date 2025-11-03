@@ -8,7 +8,7 @@ digraph "NotesManager::toastError"
   rankdir="RL";
   Node1 [id="Node000001",label="NotesManager::toastError",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NotesManager::saveInboxTo\lLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#a03806d2e472d4d7a4aa16159fddfbb94",tooltip=" "];
+  Node2 [id="Node000002",label="NotesManager::saveInboxToLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#a03806d2e472d4d7a4aa16159fddfbb94",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="NotesManager::saveNote",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#a89f1c0c8537a6d0224a81f3989f01064",tooltip=" "];
   Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];

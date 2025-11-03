@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -108,15 +108,7 @@ $(function(){initNavTree('d4/db8/class_directory_window.html','../../'); initRes
 <div class="dynheader">
 Collaboration diagram for DirectoryWindow:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d64/class_directory_window__coll__graph.png" border="0" usemap="#a_directory_window_coll__map" alt="Collaboration graph"/></div>
-<map name="a_directory_window_coll__map" id="a_directory_window_coll__map">
-<area shape="rect" title=" " alt="" coords="5,293,242,1179"/>
-<area shape="rect" title=" " alt="" coords="102,5,145,75"/>
-<area shape="poly" title=" " alt="" coords="123,75,117,139,117,229,118,276,113,276,112,229,112,139,117,74"/>
-<area shape="rect" href="../../d0/d92/struct_directory_window_1_1_image_data.html" title=" " alt="" coords="223,139,406,229"/>
-<area shape="poly" title=" " alt="" coords="147,55,244,127,240,131,143,59"/>
-<area shape="poly" title=" " alt="" coords="302,230,251,378,245,376,297,228"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d7/d64/class_directory_window__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -231,7 +223,15 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00024">24</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   25</span>    {</div>
+<div class="line"><span class="lineno">   26</span>        this-&gt;<a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a> = <a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a>;</div>
+<div class="line"><span class="lineno">   27</span>        this-&gt;<a class="code hl_variable" href="#ad2d5f6260a7726fef1e13446181b76dc">directoryName</a> = <a class="code hl_variable" href="#ad2d5f6260a7726fef1e13446181b76dc">directoryName</a>;</div>
+<div class="line"><span class="lineno">   28</span>        this-&gt;<a class="code hl_variable" href="#a19e0231c0a112991db30af84d7fe29e3">kind_</a> = <a class="code hl_variable" href="#a19e0231c0a112991db30af84d7fe29e3">kind_</a>;</div>
+<div class="line"><span class="lineno">   29</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_a19e0231c0a112991db30af84d7fe29e3"><div class="ttname"><a href="#a19e0231c0a112991db30af84d7fe29e3">DirectoryWindow::kind_</a></div><div class="ttdeci">DirectoryKind kind_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00342">DirectoryWindow.h:342</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_aaf5c6d0a01bcef65bda17b2df1b7f466"><div class="ttname"><a href="#aaf5c6d0a01bcef65bda17b2df1b7f466">DirectoryWindow::directoryPath</a></div><div class="ttdeci">std::string directoryPath</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00254">DirectoryWindow.h:254</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_ad2d5f6260a7726fef1e13446181b76dc"><div class="ttname"><a href="#ad2d5f6260a7726fef1e13446181b76dc">DirectoryWindow::directoryName</a></div><div class="ttdeci">std::string directoryName</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00255">DirectoryWindow.h:255</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a9576f7071eb599625284eafd91bac1be" name="a9576f7071eb599625284eafd91bac1be"></a>
@@ -258,15 +258,14 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00224">224</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  225</span>    {</div>
+<div class="line"><span class="lineno">  226</span>        <a class="code hl_function" href="#a3504d8d985f8283d602c98f7b961099c">stopMonitoring</a>();</div>
+<div class="line"><span class="lineno">  227</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_a3504d8d985f8283d602c98f7b961099c"><div class="ttname"><a href="#a3504d8d985f8283d602c98f7b961099c">DirectoryWindow::stopMonitoring</a></div><div class="ttdeci">void stopMonitoring()</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00215">DirectoryWindow.h:215</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a9576f7071eb599625284eafd91bac1be_cgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a9576f7071eb599625284eafd91bac1be_cgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a9576f7071eb599625284eafd91bac1be_cgraph" id="ad4/db8/class_directory_window_a9576f7071eb599625284eafd91bac1be_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,196,48"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a3504d8d985f8283d602c98f7b961099c" title=" " alt="" coords="244,13,458,40"/>
-<area shape="poly" title=" " alt="" coords="196,24,228,24,228,29,196,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a9576f7071eb599625284eafd91bac1be_cgraph.svg" width="464" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -296,7 +295,89 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00257">257</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  258</span>    {</div>
+<div class="line"><span class="lineno">  259</span>        <span class="comment">// 1) Steal queues quickly (minimize lock time)</span></div>
+<div class="line"><span class="lineno">  260</span>        std::vector&lt;std::string&gt; removals;</div>
+<div class="line"><span class="lineno">  261</span>        std::vector&lt;std::pair&lt;std::string, std::string&gt;&gt; adds;</div>
+<div class="line"><span class="lineno">  262</span>        {</div>
+<div class="line"><span class="lineno">  263</span>            std::lock_guard&lt;std::mutex&gt; qlk(<a class="code hl_variable" href="#a4de63aed0a8603060db2e46153eea9db">pendingMtx</a>);</div>
+<div class="line"><span class="lineno">  264</span>            removals.swap(<a class="code hl_variable" href="#ad0a223b9b22c30c53d128955b07538b4">pendingRemovals</a>);</div>
+<div class="line"><span class="lineno">  265</span>            adds.swap(<a class="code hl_variable" href="#afec07b6cc0702534e7175d15d3350ab6">pendingAddPaths</a>);</div>
+<div class="line"><span class="lineno">  266</span>        }</div>
+<div class="line"><span class="lineno">  267</span> </div>
+<div class="line"><span class="lineno">  268</span>        <span class="comment">// 2) Process removals (GL-safe thread)</span></div>
+<div class="line"><span class="lineno">  269</span>        <span class="keywordflow">if</span> (!removals.empty())</div>
+<div class="line"><span class="lineno">  270</span>        {</div>
+<div class="line"><span class="lineno">  271</span>            std::unique_lock&lt;std::shared_mutex&gt; lk(<a class="code hl_variable" href="#a36529335ff5d7e9df456debdd6f36e2b">imagesMutex</a>);</div>
+<div class="line"><span class="lineno">  272</span>            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; fname : removals)</div>
+<div class="line"><span class="lineno">  273</span>            {</div>
+<div class="line"><span class="lineno">  274</span>                <span class="keyword">auto</span> it = std::find_if(<a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.begin(), <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end(),</div>
+<div class="line"><span class="lineno">  275</span>                                       [&amp;](<span class="keyword">const</span> ImageData&amp; im)</div>
+<div class="line"><span class="lineno">  276</span>                                       { return im.filename == fname; });</div>
+<div class="line"><span class="lineno">  277</span>                <span class="keywordflow">if</span> (it != <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end())</div>
+<div class="line"><span class="lineno">  278</span>                {</div>
+<div class="line"><span class="lineno">  279</span>                    <span class="keywordflow">if</span> (it-&gt;textureID != 0)</div>
+<div class="line"><span class="lineno">  280</span>                        glDeleteTextures(1, &amp;it-&gt;textureID);</div>
+<div class="line"><span class="lineno">  281</span>                    <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.erase(it);</div>
+<div class="line"><span class="lineno">  282</span>                }</div>
+<div class="line"><span class="lineno">  283</span>                <span class="comment">// else: already gone — ignore</span></div>
+<div class="line"><span class="lineno">  284</span>            }</div>
+<div class="line"><span class="lineno">  285</span>        }</div>
+<div class="line"><span class="lineno">  286</span> </div>
+<div class="line"><span class="lineno">  287</span>        <span class="comment">// 3) Process additions (load textures here; GL-safe thread)</span></div>
+<div class="line"><span class="lineno">  288</span>        <span class="keywordflow">if</span> (!adds.empty())</div>
+<div class="line"><span class="lineno">  289</span>        {</div>
+<div class="line"><span class="lineno">  290</span>            std::vector&lt;ImageData&gt; toInsert;</div>
+<div class="line"><span class="lineno">  291</span>            toInsert.reserve(adds.size());</div>
+<div class="line"><span class="lineno">  292</span> </div>
+<div class="line"><span class="lineno">  293</span>            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [fname, fullpath] : adds)</div>
+<div class="line"><span class="lineno">  294</span>            {</div>
+<div class="line"><span class="lineno">  295</span>                <span class="comment">// Optional: wait briefly if file is still being copied</span></div>
+<div class="line"><span class="lineno">  296</span>                <span class="keywordtype">bool</span> ready = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  297</span>                <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 10; ++i)</div>
+<div class="line"><span class="lineno">  298</span>                {</div>
+<div class="line"><span class="lineno">  299</span>                    std::ifstream f(fullpath, std::ios::binary);</div>
+<div class="line"><span class="lineno">  300</span>                    <span class="keywordflow">if</span> (f.good())</div>
+<div class="line"><span class="lineno">  301</span>                    {</div>
+<div class="line"><span class="lineno">  302</span>                        ready = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  303</span>                        <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">  304</span>                    }</div>
+<div class="line"><span class="lineno">  305</span>                    std::this_thread::sleep_for(std::chrono::milliseconds(50));</div>
+<div class="line"><span class="lineno">  306</span>                }</div>
+<div class="line"><span class="lineno">  307</span>                <span class="keywordflow">if</span> (!ready)</div>
+<div class="line"><span class="lineno">  308</span>                    <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  309</span> </div>
+<div class="line"><span class="lineno">  310</span>                <span class="comment">// Use your existing loader (returns ImageData with texture + size)</span></div>
+<div class="line"><span class="lineno">  311</span>                ImageData img = <a class="code hl_function" href="#a79841f306a66b8294dd5214704f3eac7">LoadTextureFromFile</a>(fullpath.c_str());</div>
+<div class="line"><span class="lineno">  312</span>                <span class="keywordflow">if</span> (img.textureID != 0)</div>
+<div class="line"><span class="lineno">  313</span>                {</div>
+<div class="line"><span class="lineno">  314</span>                    img.filename = fname; <span class="comment">// store filename (not full path) for matching</span></div>
+<div class="line"><span class="lineno">  315</span>                    toInsert.emplace_back(std::move(img));</div>
+<div class="line"><span class="lineno">  316</span>                }</div>
+<div class="line"><span class="lineno">  317</span>            }</div>
+<div class="line"><span class="lineno">  318</span> </div>
+<div class="line"><span class="lineno">  319</span>            <span class="keywordflow">if</span> (!toInsert.empty())</div>
+<div class="line"><span class="lineno">  320</span>            {</div>
+<div class="line"><span class="lineno">  321</span>                std::unique_lock&lt;std::shared_mutex&gt; lk(<a class="code hl_variable" href="#a36529335ff5d7e9df456debdd6f36e2b">imagesMutex</a>);</div>
+<div class="line"><span class="lineno">  322</span>                <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; im : toInsert)</div>
+<div class="line"><span class="lineno">  323</span>                {</div>
+<div class="line"><span class="lineno">  324</span>                    <span class="comment">// Avoid duplicates</span></div>
+<div class="line"><span class="lineno">  325</span>                    <span class="keyword">auto</span> it = std::find_if(<a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.begin(), <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end(),</div>
+<div class="line"><span class="lineno">  326</span>                                           [&amp;](<span class="keyword">const</span> ImageData&amp; x)</div>
+<div class="line"><span class="lineno">  327</span>                                           { return x.filename == im.filename; });</div>
+<div class="line"><span class="lineno">  328</span>                    <span class="keywordflow">if</span> (it == <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end())</div>
+<div class="line"><span class="lineno">  329</span>                        <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.emplace_back(std::move(im));</div>
+<div class="line"><span class="lineno">  330</span>                }</div>
+<div class="line"><span class="lineno">  331</span>            }</div>
+<div class="line"><span class="lineno">  332</span>        }</div>
+<div class="line"><span class="lineno">  333</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_a36529335ff5d7e9df456debdd6f36e2b"><div class="ttname"><a href="#a36529335ff5d7e9df456debdd6f36e2b">DirectoryWindow::imagesMutex</a></div><div class="ttdeci">std::shared_mutex imagesMutex</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00341">DirectoryWindow.h:341</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_a4de63aed0a8603060db2e46153eea9db"><div class="ttname"><a href="#a4de63aed0a8603060db2e46153eea9db">DirectoryWindow::pendingMtx</a></div><div class="ttdeci">std::mutex pendingMtx</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00345">DirectoryWindow.h:345</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_a5da225b06547035c56dc2c4b2a0f7a47"><div class="ttname"><a href="#a5da225b06547035c56dc2c4b2a0f7a47">DirectoryWindow::images</a></div><div class="ttdeci">std::vector&lt; ImageData &gt; images</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00337">DirectoryWindow.h:337</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_a79841f306a66b8294dd5214704f3eac7"><div class="ttname"><a href="#a79841f306a66b8294dd5214704f3eac7">DirectoryWindow::LoadTextureFromFile</a></div><div class="ttdeci">ImageData LoadTextureFromFile(const char *path)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00411">DirectoryWindow.h:411</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_ad0a223b9b22c30c53d128955b07538b4"><div class="ttname"><a href="#ad0a223b9b22c30c53d128955b07538b4">DirectoryWindow::pendingRemovals</a></div><div class="ttdeci">std::vector&lt; std::string &gt; pendingRemovals</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00346">DirectoryWindow.h:346</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_afec07b6cc0702534e7175d15d3350ab6"><div class="ttname"><a href="#afec07b6cc0702534e7175d15d3350ab6">DirectoryWindow::pendingAddPaths</a></div><div class="ttdeci">std::vector&lt; std::pair&lt; std::string, std::string &gt; &gt; pendingAddPaths</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00347">DirectoryWindow.h:347</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a181e7c05e5755e365b0d0b82a1de619e" name="a181e7c05e5755e365b0d0b82a1de619e"></a>
@@ -323,7 +404,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00205">205</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  206</span>    {</div>
+<div class="line"><span class="lineno">  207</span>        <a class="code hl_variable" href="#adb3c48f418994ba685e4a3464791f7db">selected_image</a> = {0, glm::vec2(), <span class="stringliteral">&quot;&quot;</span>}; <span class="comment">// Limpa a seleção</span></div>
+<div class="line"><span class="lineno">  208</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_adb3c48f418994ba685e4a3464791f7db"><div class="ttname"><a href="#adb3c48f418994ba685e4a3464791f7db">DirectoryWindow::selected_image</a></div><div class="ttdeci">ImageData selected_image</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00336">DirectoryWindow.h:336</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a921b414d3cb9efa3da8772761344b94b" name="a921b414d3cb9efa3da8772761344b94b"></a>
@@ -354,7 +439,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00350">350</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  351</span>    {</div>
+<div class="line"><span class="lineno">  352</span>        <span class="keywordflow">return</span> std::find_if(<a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.begin(), <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end(), [&amp;filename](<span class="keyword">const</span> ImageData&amp; image)</div>
+<div class="line"><span class="lineno">  353</span>                            { return image.filename == filename; });</div>
+<div class="line"><span class="lineno">  354</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a8a04960603ba19acca17f8912eec9761" name="a8a04960603ba19acca17f8912eec9761"></a>
@@ -381,15 +470,44 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00049">49</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   50</span>    {</div>
+<div class="line"><span class="lineno">   51</span>        <span class="comment">// Wait for the monitoring thread to finish one full loop</span></div>
+<div class="line"><span class="lineno">   52</span>        <span class="comment">//{</span></div>
+<div class="line"><span class="lineno">   53</span>        <span class="comment">//    std::shared_lock&lt;std::shared_mutex&gt; lock(imagesMutex);  // Shared lock: waits if the thread is still writing</span></div>
+<div class="line"><span class="lineno">   54</span>        <span class="comment">//    if (!first_scan_done) {</span></div>
+<div class="line"><span class="lineno">   55</span>        <span class="comment">//        lock.unlock();</span></div>
+<div class="line"><span class="lineno">   56</span>        <span class="comment">//        std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Wait and retry</span></div>
+<div class="line"><span class="lineno">   57</span>        <span class="comment">//        generateTextureIDs();  // Retry generating textures</span></div>
+<div class="line"><span class="lineno">   58</span>        <span class="comment">//        return;</span></div>
+<div class="line"><span class="lineno">   59</span>        <span class="comment">//    }</span></div>
+<div class="line"><span class="lineno">   60</span>        <span class="comment">//}</span></div>
+<div class="line"><span class="lineno">   61</span> </div>
+<div class="line"><span class="lineno">   62</span>        <span class="keywordflow">while</span> (<span class="keyword">true</span>)</div>
+<div class="line"><span class="lineno">   63</span>        {</div>
+<div class="line"><span class="lineno">   64</span>            {</div>
+<div class="line"><span class="lineno">   65</span>                std::shared_lock&lt;std::shared_mutex&gt; lock(<a class="code hl_variable" href="#a36529335ff5d7e9df456debdd6f36e2b">imagesMutex</a>);</div>
+<div class="line"><span class="lineno">   66</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#aa34d7f4e9baeba9aaaa40a6ed9f63296">first_scan_done</a>)</div>
+<div class="line"><span class="lineno">   67</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><span class="lineno">   68</span>            }</div>
+<div class="line"><span class="lineno">   69</span>            std::this_thread::sleep_for(std::chrono::milliseconds(100));</div>
+<div class="line"><span class="lineno">   70</span>        }</div>
+<div class="line"><span class="lineno">   71</span> </div>
+<div class="line"><span class="lineno">   72</span>        <span class="comment">// Now generate textures</span></div>
+<div class="line"><span class="lineno">   73</span>        std::unique_lock&lt;std::shared_mutex&gt; lock(<a class="code hl_variable" href="#a36529335ff5d7e9df456debdd6f36e2b">imagesMutex</a>); <span class="comment">// Unique lock to write (generate textures)</span></div>
+<div class="line"><span class="lineno">   74</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; image : <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>)</div>
+<div class="line"><span class="lineno">   75</span>        {</div>
+<div class="line"><span class="lineno">   76</span>            <span class="keywordflow">if</span> (image.textureID == 0)</div>
+<div class="line"><span class="lineno">   77</span>            {</div>
+<div class="line"><span class="lineno">   78</span>                std::string path_file = <a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a> + <span class="stringliteral">&quot;\\&quot;</span> + image.filename;</div>
+<div class="line"><span class="lineno">   79</span>                image = <a class="code hl_function" href="#a79841f306a66b8294dd5214704f3eac7">LoadTextureFromFile</a>(path_file.c_str());</div>
+<div class="line"><span class="lineno">   80</span>            }</div>
+<div class="line"><span class="lineno">   81</span>        }</div>
+<div class="line"><span class="lineno">   82</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_aa34d7f4e9baeba9aaaa40a6ed9f63296"><div class="ttname"><a href="#aa34d7f4e9baeba9aaaa40a6ed9f63296">DirectoryWindow::first_scan_done</a></div><div class="ttdeci">std::atomic&lt; bool &gt; first_scan_done</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00340">DirectoryWindow.h:340</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a8a04960603ba19acca17f8912eec9761_cgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a8a04960603ba19acca17f8912eec9761_cgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a8a04960603ba19acca17f8912eec9761_cgraph" id="ad4/db8/class_directory_window_a8a04960603ba19acca17f8912eec9761_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,185,48"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a79841f306a66b8294dd5214704f3eac7" title=" " alt="" coords="233,5,433,48"/>
-<area shape="poly" title=" " alt="" coords="185,24,217,24,217,29,185,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a8a04960603ba19acca17f8912eec9761_cgraph.svg" width="439" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -418,7 +536,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00249">249</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  250</span>    {</div>
+<div class="line"><span class="lineno">  251</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a>;</div>
+<div class="line"><span class="lineno">  252</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_abd4e3b28f012a39910b8835bc488caa6"><div class="ttname"><a href="#abd4e3b28f012a39910b8835bc488caa6">DirectoryWindow::global_size_slider</a></div><div class="ttdeci">float global_size_slider</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00343">DirectoryWindow.h:343</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a5bec14123fcc20a4f717de0d31fdacb5" name="a5bec14123fcc20a4f717de0d31fdacb5"></a>
@@ -445,7 +567,25 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00229">229</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  230</span>    {</div>
+<div class="line"><span class="lineno">  231</span>        <span class="keyword">auto</span> it = std::find_if(<a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.begin(), <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end(), [&amp;](<span class="keyword">const</span> ImageData&amp; image)</div>
+<div class="line"><span class="lineno">  232</span>                               {</div>
+<div class="line"><span class="lineno">  233</span>            <span class="comment">// Check if image.filename is a substring at the end of file_name</span></div>
+<div class="line"><span class="lineno">  234</span>            if (file_name.size() &gt;= image.filename.size()) {</div>
+<div class="line"><span class="lineno">  235</span>                return file_name.compare(file_name.size() - image.filename.size(), image.filename.size(), image.filename) == 0;</div>
+<div class="line"><span class="lineno">  236</span>            }</div>
+<div class="line"><span class="lineno">  237</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>; });</div>
+<div class="line"><span class="lineno">  238</span> </div>
+<div class="line"><span class="lineno">  239</span>        <span class="keywordflow">if</span> (it != <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>.end())</div>
+<div class="line"><span class="lineno">  240</span>        {</div>
+<div class="line"><span class="lineno">  241</span>            <span class="keywordflow">return</span> *it;</div>
+<div class="line"><span class="lineno">  242</span>        }</div>
+<div class="line"><span class="lineno">  243</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  244</span>        {</div>
+<div class="line"><span class="lineno">  245</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;Image not found: &quot;</span> + file_name);</div>
+<div class="line"><span class="lineno">  246</span>        }</div>
+<div class="line"><span class="lineno">  247</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aa67484e616a6dacd0d8f9e9836dc9d6b" name="aa67484e616a6dacd0d8f9e9836dc9d6b"></a>
@@ -472,7 +612,10 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00199">199</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  200</span>    {</div>
+<div class="line"><span class="lineno">  201</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#adb3c48f418994ba685e4a3464791f7db">selected_image</a>;</div>
+<div class="line"><span class="lineno">  202</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a79841f306a66b8294dd5214704f3eac7" name="a79841f306a66b8294dd5214704f3eac7"></a>
@@ -499,17 +642,50 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00411">411</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  412</span>    {</div>
+<div class="line"><span class="lineno">  413</span> </div>
+<div class="line"><span class="lineno">  414</span>        <span class="comment">// Record the start time using std::chrono::high_resolution_clock</span></div>
+<div class="line"><span class="lineno">  415</span>        <span class="comment">//std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><span class="lineno">  416</span> </div>
+<div class="line"><span class="lineno">  417</span>        <span class="keywordtype">int</span> width, height, nrChannels;</div>
+<div class="line"><span class="lineno">  418</span>        <span class="keywordtype">unsigned</span> <span class="keywordtype">char</span>* data = stbi_load(path, &amp;width, &amp;height, &amp;nrChannels, 4);</div>
+<div class="line"><span class="lineno">  419</span>        stbi_set_flip_vertically_on_load(0); <span class="comment">// Flip images vertically if needed</span></div>
+<div class="line"><span class="lineno">  420</span>        <span class="keywordflow">if</span> (!data)</div>
+<div class="line"><span class="lineno">  421</span>        {</div>
+<div class="line"><span class="lineno">  422</span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Failed to load texture: &quot;</span> &lt;&lt; path &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  423</span>            <span class="keywordflow">return</span> ImageData(0, glm::vec2(), <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  424</span>        }</div>
+<div class="line"><span class="lineno">  425</span> </div>
+<div class="line"><span class="lineno">  426</span>        GLuint textureID[1];</div>
+<div class="line"><span class="lineno">  427</span>        glGenTextures(1, textureID);</div>
+<div class="line"><span class="lineno">  428</span>        glBindTexture(GL_TEXTURE_2D, textureID[0]);</div>
+<div class="line"><span class="lineno">  429</span> </div>
+<div class="line"><span class="lineno">  430</span>        <span class="comment">// Set the texture data</span></div>
+<div class="line"><span class="lineno">  431</span>        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);</div>
+<div class="line"><span class="lineno">  432</span> </div>
+<div class="line"><span class="lineno">  433</span>        <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));</div>
+<div class="line"><span class="lineno">  434</span>        <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));</div>
+<div class="line"><span class="lineno">  435</span>        <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));</div>
+<div class="line"><span class="lineno">  436</span>        <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));</div>
+<div class="line"><span class="lineno">  437</span> </div>
+<div class="line"><span class="lineno">  438</span>        stbi_image_free(data);</div>
+<div class="line"><span class="lineno">  439</span> </div>
+<div class="line"><span class="lineno">  440</span>        <span class="comment">// Record the end time using std::chrono::high_resolution_clock</span></div>
+<div class="line"><span class="lineno">  441</span>        <span class="comment">//std::chrono::high_resolution_clock::time_point end = std::chrono::high_resolution_clock::now();</span></div>
+<div class="line"><span class="lineno">  442</span> </div>
+<div class="line"><span class="lineno">  443</span>        <span class="comment">// Calculate the duration in milliseconds</span></div>
+<div class="line"><span class="lineno">  444</span>        <span class="comment">//std::chrono::seconds duration = std::chrono::duration_cast&lt;std::chrono::seconds&gt;(end - start);</span></div>
+<div class="line"><span class="lineno">  445</span> </div>
+<div class="line"><span class="lineno">  446</span>        <span class="comment">// Output the duration in milliseconds</span></div>
+<div class="line"><span class="lineno">  447</span>        <span class="comment">//std::cout &lt;&lt; &quot;Operation for file &quot;&lt;&lt; path &lt;&lt;&quot;took &quot; &lt;&lt; duration.count() &lt;&lt; &quot; seconds&quot; &lt;&lt; std::endl;</span></div>
+<div class="line"><span class="lineno">  448</span> </div>
+<div class="line"><span class="lineno">  449</span>        <span class="keywordflow">return</span> ImageData(textureID[0], glm::vec2(width, height), path);</div>
+<div class="line"><span class="lineno">  450</span>    }</div>
+<div class="ttc" id="a_renderer_8h_html_a8cc1e1baeb83f3fa64a4aaa75baf3548"><div class="ttname"><a href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a></div><div class="ttdeci">#define GLCall(x)</div><div class="ttdef"><b>Definition</b> <a href="../../d3/da0/_renderer_8h_source.html#l00012">Renderer.h:12</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a79841f306a66b8294dd5214704f3eac7_icgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a79841f306a66b8294dd5214704f3eac7_icgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a79841f306a66b8294dd5214704f3eac7_icgraph" id="ad4/db8/class_directory_window_a79841f306a66b8294dd5214704f3eac7_icgraph">
-<area shape="rect" title=" " alt="" coords="272,35,472,77"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a8a04960603ba19acca17f8912eec9761" title=" " alt="" coords="25,5,204,48"/>
-<area shape="poly" title=" " alt="" coords="256,45,204,40,205,34,257,40"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a6e6e2f23c75eb427949699d8254c0ccf" title=" " alt="" coords="5,72,224,99"/>
-<area shape="poly" title=" " alt="" coords="257,72,224,76,224,70,256,67"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a79841f306a66b8294dd5214704f3eac7_icgraph.svg" width="478" height="104"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -538,15 +714,64 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00356">356</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  357</span>    {</div>
+<div class="line"><span class="lineno">  358</span>        <span class="keyword">using namespace </span>std::chrono_literals;</div>
+<div class="line"><span class="lineno">  359</span> </div>
+<div class="line"><span class="lineno">  360</span>        <span class="comment">// Keep only a simple &quot;known file list&quot; of filenames (no GL/state here)</span></div>
+<div class="line"><span class="lineno">  361</span>        std::vector&lt;std::string&gt; knownFiles;</div>
+<div class="line"><span class="lineno">  362</span> </div>
+<div class="line"><span class="lineno">  363</span>        <span class="keywordflow">while</span> (<a class="code hl_variable" href="#a39946f26dd1a382360a70ab75cf31089">running</a>.load(std::memory_order_relaxed))</div>
+<div class="line"><span class="lineno">  364</span>        {</div>
+<div class="line"><span class="lineno">  365</span>            std::vector&lt;std::string&gt; currentFiles;</div>
+<div class="line"><span class="lineno">  366</span>            <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  367</span>            {</div>
+<div class="line"><span class="lineno">  368</span>                <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; entry : std::filesystem::directory_iterator(path))</div>
+<div class="line"><span class="lineno">  369</span>                {</div>
+<div class="line"><span class="lineno">  370</span>                    <span class="keywordflow">if</span> (entry.is_regular_file())</div>
+<div class="line"><span class="lineno">  371</span>                    {</div>
+<div class="line"><span class="lineno">  372</span>                        currentFiles.push_back(entry.path().filename().string());</div>
+<div class="line"><span class="lineno">  373</span>                    }</div>
+<div class="line"><span class="lineno">  374</span>                }</div>
+<div class="line"><span class="lineno">  375</span>            }</div>
+<div class="line"><span class="lineno">  376</span>            <span class="keywordflow">catch</span> (<span class="keyword">const</span> std::filesystem::filesystem_error&amp; e)</div>
+<div class="line"><span class="lineno">  377</span>            {</div>
+<div class="line"><span class="lineno">  378</span>                std::cerr &lt;&lt; <span class="stringliteral">&quot;[DirectoryWindow] Filesystem error: &quot;</span> &lt;&lt; e.what() &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  379</span>            }</div>
+<div class="line"><span class="lineno">  380</span> </div>
+<div class="line"><span class="lineno">  381</span>            <span class="comment">// Diff: removed = known - current</span></div>
+<div class="line"><span class="lineno">  382</span>            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; name : knownFiles)</div>
+<div class="line"><span class="lineno">  383</span>            {</div>
+<div class="line"><span class="lineno">  384</span>                <span class="keywordflow">if</span> (std::find(currentFiles.begin(), currentFiles.end(), name) == currentFiles.end())</div>
+<div class="line"><span class="lineno">  385</span>                {</div>
+<div class="line"><span class="lineno">  386</span>                    std::lock_guard&lt;std::mutex&gt; qlk(<a class="code hl_variable" href="#a4de63aed0a8603060db2e46153eea9db">pendingMtx</a>);</div>
+<div class="line"><span class="lineno">  387</span>                    <a class="code hl_variable" href="#ad0a223b9b22c30c53d128955b07538b4">pendingRemovals</a>.emplace_back(name);</div>
+<div class="line"><span class="lineno">  388</span>                }</div>
+<div class="line"><span class="lineno">  389</span>            }</div>
+<div class="line"><span class="lineno">  390</span> </div>
+<div class="line"><span class="lineno">  391</span>            <span class="comment">// Diff: added = current - known</span></div>
+<div class="line"><span class="lineno">  392</span>            <span class="keywordflow">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; name : currentFiles)</div>
+<div class="line"><span class="lineno">  393</span>            {</div>
+<div class="line"><span class="lineno">  394</span>                <span class="keywordflow">if</span> (std::find(knownFiles.begin(), knownFiles.end(), name) == knownFiles.end())</div>
+<div class="line"><span class="lineno">  395</span>                {</div>
+<div class="line"><span class="lineno">  396</span>                    <span class="keyword">const</span> std::string full = (std::filesystem::path(path) / name).<span class="keywordtype">string</span>();</div>
+<div class="line"><span class="lineno">  397</span>                    std::lock_guard&lt;std::mutex&gt; qlk(<a class="code hl_variable" href="#a4de63aed0a8603060db2e46153eea9db">pendingMtx</a>);</div>
+<div class="line"><span class="lineno">  398</span>                    <a class="code hl_variable" href="#afec07b6cc0702534e7175d15d3350ab6">pendingAddPaths</a>.emplace_back(name, full);</div>
+<div class="line"><span class="lineno">  399</span>                }</div>
+<div class="line"><span class="lineno">  400</span>            }</div>
+<div class="line"><span class="lineno">  401</span> </div>
+<div class="line"><span class="lineno">  402</span>            knownFiles = std::move(currentFiles);</div>
+<div class="line"><span class="lineno">  403</span> </div>
+<div class="line"><span class="lineno">  404</span>            <span class="comment">// First pass complete → allow generateTextureIDs() to proceed</span></div>
+<div class="line"><span class="lineno">  405</span>            <a class="code hl_variable" href="#aa34d7f4e9baeba9aaaa40a6ed9f63296">first_scan_done</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  406</span> </div>
+<div class="line"><span class="lineno">  407</span>            std::this_thread::sleep_for(2s);</div>
+<div class="line"><span class="lineno">  408</span>        }</div>
+<div class="line"><span class="lineno">  409</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_a39946f26dd1a382360a70ab75cf31089"><div class="ttname"><a href="#a39946f26dd1a382360a70ab75cf31089">DirectoryWindow::running</a></div><div class="ttdeci">std::atomic&lt; bool &gt; running</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00339">DirectoryWindow.h:339</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_aefae130cbcbf43f010976abd589b155c_icgraph.png" border="0" usemap="#ad4/db8/class_directory_window_aefae130cbcbf43f010976abd589b155c_icgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_aefae130cbcbf43f010976abd589b155c_icgraph" id="ad4/db8/class_directory_window_aefae130cbcbf43f010976abd589b155c_icgraph">
-<area shape="rect" title=" " alt="" coords="269,5,441,48"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a921051aef1d23e12751d4bfebed11bd2" title=" " alt="" coords="5,13,221,40"/>
-<area shape="poly" title=" " alt="" coords="253,29,221,29,221,24,253,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_aefae130cbcbf43f010976abd589b155c_icgraph.svg" width="447" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -575,17 +800,127 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00084">84</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   85</span>    {</div>
+<div class="line"><span class="lineno">   86</span>        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoCollapse;</div>
+<div class="line"><span class="lineno">   87</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a19e0231c0a112991db30af84d7fe29e3">kind_</a> == <a class="code hl_enumvalue" href="../../d1/d91/_directory_window_8h.html#a0cb2990f5d283e8848ed9cd4f4bbc0d5a5af1a3a285c2bdee4192223e31e1f833">DirectoryKind::MAP</a>)</div>
+<div class="line"><span class="lineno">   88</span>        {</div>
+<div class="line"><span class="lineno">   89</span>            window_flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_AlwaysAutoResize;</div>
+<div class="line"><span class="lineno">   90</span>        }</div>
+<div class="line"><span class="lineno">   91</span> </div>
+<div class="line"><span class="lineno">   92</span>        ImGui::SetNextWindowSizeConstraints(ImVec2(ImGui::GetIO().DisplaySize.x * 0.1, ImGui::GetIO().DisplaySize.y * 0.1), ImVec2(ImGui::GetIO().DisplaySize.x - 200, ImGui::GetIO().DisplaySize.y));</div>
+<div class="line"><span class="lineno">   93</span>        ImGui::Begin(<a class="code hl_variable" href="#ad2d5f6260a7726fef1e13446181b76dc">directoryName</a>.c_str(), NULL, window_flags);</div>
+<div class="line"><span class="lineno">   94</span>        ImGui::Text(<span class="stringliteral">&quot;Path: %s&quot;</span>, <a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a>.c_str());</div>
+<div class="line"><span class="lineno">   95</span> </div>
+<div class="line"><span class="lineno">   96</span>        <span class="comment">// --- Fixed header (no scrolling) ---</span></div>
+<div class="line"><span class="lineno">   97</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a19e0231c0a112991db30af84d7fe29e3">kind_</a> == <a class="code hl_enumvalue" href="../../d1/d91/_directory_window_8h.html#a0cb2990f5d283e8848ed9cd4f4bbc0d5a415f48644024b2956d2d3a94a363a2bb">DirectoryKind::MARKER</a>)</div>
+<div class="line"><span class="lineno">   98</span>        {</div>
+<div class="line"><span class="lineno">   99</span>            <span class="keywordtype">float</span> minScale = 0.10f, maxScale = 10.0f;</div>
+<div class="line"><span class="lineno">  100</span>            ImGui::Separator();</div>
+<div class="line"><span class="lineno">  101</span>            ImGui::TextUnformatted(<span class="stringliteral">&quot;Default Marker Size Scale&quot;</span>);</div>
+<div class="line"><span class="lineno">  102</span>            ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  103</span>            ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);</div>
+<div class="line"><span class="lineno">  104</span>            <span class="keywordflow">if</span> (ImGui::SliderFloat(<span class="stringliteral">&quot;##marker_size_slider&quot;</span>, &amp;<a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a>, minScale, maxScale, <span class="stringliteral">&quot;x%.2f&quot;</span>))</div>
+<div class="line"><span class="lineno">  105</span>            {</div>
+<div class="line"><span class="lineno">  106</span>                <span class="comment">// Clamp just in case</span></div>
+<div class="line"><span class="lineno">  107</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a> &lt; minScale)</div>
+<div class="line"><span class="lineno">  108</span>                    <a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a> = minScale;</div>
+<div class="line"><span class="lineno">  109</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a> &gt; maxScale)</div>
+<div class="line"><span class="lineno">  110</span>                    <a class="code hl_variable" href="#abd4e3b28f012a39910b8835bc488caa6">global_size_slider</a> = maxScale;</div>
+<div class="line"><span class="lineno">  111</span>            }</div>
+<div class="line"><span class="lineno">  112</span>        }</div>
+<div class="line"><span class="lineno">  113</span> </div>
+<div class="line"><span class="lineno">  114</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  115</span> </div>
+<div class="line"><span class="lineno">  116</span>        <span class="keywordtype">float</span> minScale = 25.0f, maxScale = 550.0f;</div>
+<div class="line"><span class="lineno">  117</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  118</span>        ImGui::TextUnformatted(<span class="stringliteral">&quot;Directory Thumb Pixel Size&quot;</span>);</div>
+<div class="line"><span class="lineno">  119</span>        ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  120</span>        ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x);</div>
+<div class="line"><span class="lineno">  121</span>        <span class="keywordflow">if</span> (ImGui::SliderFloat(<span class="stringliteral">&quot;##image_size_slider&quot;</span>, &amp;<a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>, minScale, maxScale, <span class="stringliteral">&quot;x%.2f&quot;</span>))</div>
+<div class="line"><span class="lineno">  122</span>        {</div>
+<div class="line"><span class="lineno">  123</span>            <span class="comment">// Clamp just in case</span></div>
+<div class="line"><span class="lineno">  124</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a> &lt; minScale)</div>
+<div class="line"><span class="lineno">  125</span>                <a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a> = minScale;</div>
+<div class="line"><span class="lineno">  126</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a> &gt; maxScale)</div>
+<div class="line"><span class="lineno">  127</span>                <a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a> = maxScale;</div>
+<div class="line"><span class="lineno">  128</span>        }</div>
+<div class="line"><span class="lineno">  129</span> </div>
+<div class="line"><span class="lineno">  130</span>        ImGui::Separator();</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>        ImGui::BeginChild(<span class="stringliteral">&quot;DirectoryScrollRegion&quot;</span>, ImVec2(0, 0), <span class="keyword">true</span>, ImGuiWindowFlags_HorizontalScrollbar);</div>
+<div class="line"><span class="lineno">  133</span>        <span class="keywordtype">float</span> window_width = ImGui::GetWindowWidth();</div>
+<div class="line"><span class="lineno">  134</span>        ImVec2 content_region = ImGui::GetContentRegionAvail();</div>
+<div class="line"><span class="lineno">  135</span>        <span class="keywordtype">int</span> columns = (int)(content_region.x / <a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>);</div>
+<div class="line"><span class="lineno">  136</span>        <span class="keywordflow">if</span> (columns &lt;= 0)</div>
+<div class="line"><span class="lineno">  137</span>            columns = 1;</div>
+<div class="line"><span class="lineno">  138</span>        <span class="keywordtype">int</span> count = 0;</div>
+<div class="line"><span class="lineno">  139</span>        {</div>
+<div class="line"><span class="lineno">  140</span> </div>
+<div class="line"><span class="lineno">  141</span>            std::shared_lock&lt;std::shared_mutex&gt; lock(<a class="code hl_variable" href="#a36529335ff5d7e9df456debdd6f36e2b">imagesMutex</a>);</div>
+<div class="line"><span class="lineno">  142</span>            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; image : <a class="code hl_variable" href="#a5da225b06547035c56dc2c4b2a0f7a47">images</a>)</div>
+<div class="line"><span class="lineno">  143</span>            {</div>
+<div class="line"><span class="lineno">  144</span>                <span class="keywordflow">if</span> (count % columns != 0)</div>
+<div class="line"><span class="lineno">  145</span>                    ImGui::SameLine();</div>
+<div class="line"><span class="lineno">  146</span>                std::string path_file = <a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a> + <span class="stringliteral">&quot;\\&quot;</span> + image.filename.c_str();</div>
+<div class="line"><span class="lineno">  147</span>                <span class="keywordflow">if</span> (image.textureID == 0)</div>
+<div class="line"><span class="lineno">  148</span>                {</div>
+<div class="line"><span class="lineno">  149</span>                    image = <a class="code hl_function" href="#a79841f306a66b8294dd5214704f3eac7">LoadTextureFromFile</a>(path_file.c_str());</div>
+<div class="line"><span class="lineno">  150</span>                }</div>
+<div class="line"><span class="lineno">  151</span> </div>
+<div class="line"><span class="lineno">  152</span>                ImGui::BeginGroup();</div>
+<div class="line"><span class="lineno">  153</span>                ImGui::PushID(count);</div>
+<div class="line"><span class="lineno">  154</span> </div>
+<div class="line"><span class="lineno">  155</span>                <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a19e0231c0a112991db30af84d7fe29e3">kind_</a> == <a class="code hl_enumvalue" href="../../d1/d91/_directory_window_8h.html#a0cb2990f5d283e8848ed9cd4f4bbc0d5a415f48644024b2956d2d3a94a363a2bb">DirectoryKind::MARKER</a>)</div>
+<div class="line"><span class="lineno">  156</span>                {</div>
+<div class="line"><span class="lineno">  157</span>                    <span class="comment">// Add drag-and-drop functionality for marker images</span></div>
+<div class="line"><span class="lineno">  158</span>                    <span class="keywordflow">if</span> (ImGui::ImageButton((<span class="keywordtype">void</span>*)(intptr_t)image.textureID, ImVec2(<a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>, <a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>)))</div>
+<div class="line"><span class="lineno">  159</span>                    {</div>
+<div class="line"><span class="lineno">  160</span>                        <a class="code hl_variable" href="#adb3c48f418994ba685e4a3464791f7db">selected_image</a> = image;</div>
+<div class="line"><span class="lineno">  161</span>                        std::cout &lt;&lt; <span class="stringliteral">&quot;Selected Image: &quot;</span> &lt;&lt; image.<a class="code hl_variable" href="../../d0/d92/struct_directory_window_1_1_image_data.html#a4a6ef487ac0c257467bca420ca2cd750">filename</a> &lt;&lt; <span class="stringliteral">&quot; | &quot;</span> &lt;&lt; image.textureID &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  162</span>                        ImGui::OpenPopup(<span class="stringliteral">&quot;Image Popup&quot;</span>);</div>
+<div class="line"><span class="lineno">  163</span>                    }</div>
+<div class="line"><span class="lineno">  164</span> </div>
+<div class="line"><span class="lineno">  165</span>                    <span class="comment">// Begin the drag source for the markers</span></div>
+<div class="line"><span class="lineno">  166</span>                    <span class="keywordflow">if</span> (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))</div>
+<div class="line"><span class="lineno">  167</span>                    {</div>
+<div class="line"><span class="lineno">  168</span>                        ImGui::SetDragDropPayload(<span class="stringliteral">&quot;MARKER_IMAGE&quot;</span>, &amp;image, <span class="keyword">sizeof</span>(image)); <span class="comment">// Attach the marker image payload</span></div>
+<div class="line"><span class="lineno">  169</span>                        ImGui::Text(<span class="stringliteral">&quot;Drag Marker: %s&quot;</span>, image.filename.c_str());           <span class="comment">// Tooltip while dragging</span></div>
+<div class="line"><span class="lineno">  170</span>                        ImGui::EndDragDropSource();</div>
+<div class="line"><span class="lineno">  171</span>                    }</div>
+<div class="line"><span class="lineno">  172</span>                }</div>
+<div class="line"><span class="lineno">  173</span>                <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  174</span>                {</div>
+<div class="line"><span class="lineno">  175</span>                    <span class="keywordflow">if</span> (ImGui::ImageButton((<span class="keywordtype">void</span>*)(intptr_t)image.textureID, ImVec2(<a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>, <a class="code hl_variable" href="#a3e9cfce8aa9960b992f07463343526dc">imageSize</a>)))</div>
+<div class="line"><span class="lineno">  176</span>                    {</div>
+<div class="line"><span class="lineno">  177</span>                        <a class="code hl_variable" href="#adb3c48f418994ba685e4a3464791f7db">selected_image</a> = image;</div>
+<div class="line"><span class="lineno">  178</span>                        std::cout &lt;&lt; <span class="stringliteral">&quot;Selected Image: &quot;</span> &lt;&lt; image.<a class="code hl_variable" href="../../d0/d92/struct_directory_window_1_1_image_data.html#a4a6ef487ac0c257467bca420ca2cd750">filename</a> &lt;&lt; <span class="stringliteral">&quot; | &quot;</span> &lt;&lt; image.textureID &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  179</span>                        ImGui::OpenPopup(<span class="stringliteral">&quot;Image Popup&quot;</span>);</div>
+<div class="line"><span class="lineno">  180</span>                    }</div>
+<div class="line"><span class="lineno">  181</span> </div>
+<div class="line"><span class="lineno">  182</span>                    <span class="keywordflow">if</span> (ImGui::BeginPopup(<span class="stringliteral">&quot;Image Popup&quot;</span>))</div>
+<div class="line"><span class="lineno">  183</span>                    {</div>
+<div class="line"><span class="lineno">  184</span>                        ImGui::Text(<span class="stringliteral">&quot;File: %s&quot;</span>, image.filename.c_str());</div>
+<div class="line"><span class="lineno">  185</span>                        ImGui::EndPopup();</div>
+<div class="line"><span class="lineno">  186</span>                    }</div>
+<div class="line"><span class="lineno">  187</span>                }</div>
+<div class="line"><span class="lineno">  188</span>                ImGui::TextWrapped(<span class="stringliteral">&quot;%s&quot;</span>, <a class="code hl_function" href="#a2cf68068c1d14ad4435d84074a2239cc">TruncateString</a>(image.filename.c_str(), 16).c_str());</div>
+<div class="line"><span class="lineno">  189</span>                ImGui::PopID();</div>
+<div class="line"><span class="lineno">  190</span>                ImGui::EndGroup();</div>
+<div class="line"><span class="lineno">  191</span>                count++;</div>
+<div class="line"><span class="lineno">  192</span>            }</div>
+<div class="line"><span class="lineno">  193</span>        }</div>
+<div class="line"><span class="lineno">  194</span>        ImGui::EndChild();</div>
+<div class="line"><span class="lineno">  195</span>        ImGui::End();</div>
+<div class="line"><span class="lineno">  196</span>    }</div>
+<div class="ttc" id="a_directory_window_8h_html_a0cb2990f5d283e8848ed9cd4f4bbc0d5a415f48644024b2956d2d3a94a363a2bb"><div class="ttname"><a href="../../d1/d91/_directory_window_8h.html#a0cb2990f5d283e8848ed9cd4f4bbc0d5a415f48644024b2956d2d3a94a363a2bb">DirectoryKind::MARKER</a></div><div class="ttdeci">@ MARKER</div></div>
+<div class="ttc" id="a_directory_window_8h_html_a0cb2990f5d283e8848ed9cd4f4bbc0d5a5af1a3a285c2bdee4192223e31e1f833"><div class="ttname"><a href="../../d1/d91/_directory_window_8h.html#a0cb2990f5d283e8848ed9cd4f4bbc0d5a5af1a3a285c2bdee4192223e31e1f833">DirectoryKind::MAP</a></div><div class="ttdeci">@ MAP</div></div>
+<div class="ttc" id="aclass_directory_window_html_a2cf68068c1d14ad4435d84074a2239cc"><div class="ttname"><a href="#a2cf68068c1d14ad4435d84074a2239cc">DirectoryWindow::TruncateString</a></div><div class="ttdeci">std::string TruncateString(const std::string &amp;str, size_t maxLength)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00039">DirectoryWindow.h:39</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_a3e9cfce8aa9960b992f07463343526dc"><div class="ttname"><a href="#a3e9cfce8aa9960b992f07463343526dc">DirectoryWindow::imageSize</a></div><div class="ttdeci">float imageSize</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00344">DirectoryWindow.h:344</a></div></div>
+<div class="ttc" id="astruct_directory_window_1_1_image_data_html_a4a6ef487ac0c257467bca420ca2cd750"><div class="ttname"><a href="../../d0/d92/struct_directory_window_1_1_image_data.html#a4a6ef487ac0c257467bca420ca2cd750">DirectoryWindow::ImageData::filename</a></div><div class="ttdeci">std::string filename</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00035">DirectoryWindow.h:35</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a6e6e2f23c75eb427949699d8254c0ccf_cgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a6e6e2f23c75eb427949699d8254c0ccf_cgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a6e6e2f23c75eb427949699d8254c0ccf_cgraph" id="ad4/db8/class_directory_window_a6e6e2f23c75eb427949699d8254c0ccf_cgraph">
-<area shape="rect" title=" " alt="" coords="5,47,224,73"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a79841f306a66b8294dd5214704f3eac7" title=" " alt="" coords="272,5,472,48"/>
-<area shape="poly" title=" " alt="" coords="222,43,256,39,256,44,223,49"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a2cf68068c1d14ad4435d84074a2239cc" title=" " alt="" coords="282,72,462,115"/>
-<area shape="poly" title=" " alt="" coords="223,71,267,77,266,82,222,77"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a6e6e2f23c75eb427949699d8254c0ccf_cgraph.svg" width="478" height="120"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -614,15 +949,15 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00210">210</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  211</span>    {</div>
+<div class="line"><span class="lineno">  212</span>        <a class="code hl_variable" href="#a7fb01c21cffb2b5c59e7aad6d24816c0">monitorThread</a> = std::thread(&amp;<a class="code hl_function" href="#aefae130cbcbf43f010976abd589b155c">DirectoryWindow::monitorDirectory</a>, <span class="keyword">this</span>, <a class="code hl_variable" href="#aaf5c6d0a01bcef65bda17b2df1b7f466">directoryPath</a>);</div>
+<div class="line"><span class="lineno">  213</span>    }</div>
+<div class="ttc" id="aclass_directory_window_html_a7fb01c21cffb2b5c59e7aad6d24816c0"><div class="ttname"><a href="#a7fb01c21cffb2b5c59e7aad6d24816c0">DirectoryWindow::monitorThread</a></div><div class="ttdeci">std::thread monitorThread</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00338">DirectoryWindow.h:338</a></div></div>
+<div class="ttc" id="aclass_directory_window_html_aefae130cbcbf43f010976abd589b155c"><div class="ttname"><a href="#aefae130cbcbf43f010976abd589b155c">DirectoryWindow::monitorDirectory</a></div><div class="ttdeci">void monitorDirectory(const std::string &amp;path)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/d91/_directory_window_8h_source.html#l00356">DirectoryWindow.h:356</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a921051aef1d23e12751d4bfebed11bd2_cgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a921051aef1d23e12751d4bfebed11bd2_cgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a921051aef1d23e12751d4bfebed11bd2_cgraph" id="ad4/db8/class_directory_window_a921051aef1d23e12751d4bfebed11bd2_cgraph">
-<area shape="rect" title=" " alt="" coords="5,13,221,40"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#aefae130cbcbf43f010976abd589b155c" title=" " alt="" coords="269,5,441,48"/>
-<area shape="poly" title=" " alt="" coords="221,24,253,24,253,29,221,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a921051aef1d23e12751d4bfebed11bd2_cgraph.svg" width="447" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -651,15 +986,17 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00215">215</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  216</span>    {</div>
+<div class="line"><span class="lineno">  217</span>        <a class="code hl_variable" href="#a39946f26dd1a382360a70ab75cf31089">running</a>.exchange(<span class="keyword">false</span>, std::memory_order_relaxed);</div>
+<div class="line"><span class="lineno">  218</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a7fb01c21cffb2b5c59e7aad6d24816c0">monitorThread</a>.joinable())</div>
+<div class="line"><span class="lineno">  219</span>        {</div>
+<div class="line"><span class="lineno">  220</span>            <a class="code hl_variable" href="#a7fb01c21cffb2b5c59e7aad6d24816c0">monitorThread</a>.join();</div>
+<div class="line"><span class="lineno">  221</span>        }</div>
+<div class="line"><span class="lineno">  222</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a3504d8d985f8283d602c98f7b961099c_icgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a3504d8d985f8283d602c98f7b961099c_icgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a3504d8d985f8283d602c98f7b961099c_icgraph" id="ad4/db8/class_directory_window_a3504d8d985f8283d602c98f7b961099c_icgraph">
-<area shape="rect" title=" " alt="" coords="244,13,458,40"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a9576f7071eb599625284eafd91bac1be" title=" " alt="" coords="5,5,196,48"/>
-<area shape="poly" title=" " alt="" coords="228,29,196,29,196,24,228,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a3504d8d985f8283d602c98f7b961099c_icgraph.svg" width="464" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -692,15 +1029,17 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00039">39</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   40</span>    {</div>
+<div class="line"><span class="lineno">   41</span>        <span class="keywordflow">if</span> (str.length() &gt; maxLength)</div>
+<div class="line"><span class="lineno">   42</span>        {</div>
+<div class="line"><span class="lineno">   43</span>            <span class="keywordflow">return</span> str.substr(0, maxLength) + <span class="stringliteral">&quot;...&quot;</span>;</div>
+<div class="line"><span class="lineno">   44</span>        }</div>
+<div class="line"><span class="lineno">   45</span>        <span class="keywordflow">return</span> str;</div>
+<div class="line"><span class="lineno">   46</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d4/db8/class_directory_window_a2cf68068c1d14ad4435d84074a2239cc_icgraph.png" border="0" usemap="#ad4/db8/class_directory_window_a2cf68068c1d14ad4435d84074a2239cc_icgraph" alt=""/></div>
-<map name="ad4/db8/class_directory_window_a2cf68068c1d14ad4435d84074a2239cc_icgraph" id="ad4/db8/class_directory_window_a2cf68068c1d14ad4435d84074a2239cc_icgraph">
-<area shape="rect" title=" " alt="" coords="272,5,452,48"/>
-<area shape="rect" href="../../d4/db8/class_directory_window.html#a6e6e2f23c75eb427949699d8254c0ccf" title=" " alt="" coords="5,13,224,40"/>
-<area shape="poly" title=" " alt="" coords="256,29,224,29,224,24,256,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d4/db8/class_directory_window_a2cf68068c1d14ad4435d84074a2239cc_icgraph.svg" width="458" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -759,7 +1098,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00340">340</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  340</span>{<span class="keyword">true</span>};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="abd4e3b28f012a39910b8835bc488caa6" name="abd4e3b28f012a39910b8835bc488caa6"></a>
@@ -999,7 +1339,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00339">339</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  339</span>{<span class="keyword">true</span>};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="adb3c48f418994ba685e4a3464791f7db" name="adb3c48f418994ba685e4a3464791f7db"></a>
@@ -1023,7 +1364,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/d91/_directory_window_8h_source.html#l00336">336</a> of file <a class="el" href="../../d1/d91/_directory_window_8h_source.html">DirectoryWindow.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  336</span>{0, glm::vec2(), <span class="stringliteral">&quot;&quot;</span>}; <span class="comment">// Armazena a imagem selecionada</span></div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>

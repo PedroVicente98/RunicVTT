@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -110,10 +110,7 @@ $(function(){initNavTree('d3/d42/class_logger.html','../../'); initResizable(); 
 <div class="dynheader">
 Collaboration diagram for Logger:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../de/d85/class_logger__coll__graph.png" border="0" usemap="#a_logger_coll__map" alt="Collaboration graph"/></div>
-<map name="a_logger_coll__map" id="a_logger_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,215,875"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../de/d85/class_logger__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
@@ -258,7 +255,21 @@ Private Attributes</h2></td></tr>
 </table>
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00018">18</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   19</span>    {</div>
+<div class="line"><span class="lineno">   20</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4ccadd4ec0ac4e58f7c32a01244ae91150b1">Trace</a>,</div>
+<div class="line"><span class="lineno">   21</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Debug</a>,</div>
+<div class="line"><span class="lineno">   22</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Info</a>,</div>
+<div class="line"><span class="lineno">   23</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Warn</a>,</div>
+<div class="line"><span class="lineno">   24</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd">Error</a>,</div>
+<div class="line"><span class="lineno">   25</span>        <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca505a83f220c02df2f85c3810cd9ceb38">Success</a></div>
+<div class="line"><span class="lineno">   26</span>    };</div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Logger::Level::Info</a></div><div class="ttdeci">@ Info</div></div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca505a83f220c02df2f85c3810cd9ceb38"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4cca505a83f220c02df2f85c3810cd9ceb38">Logger::Level::Success</a></div><div class="ttdeci">@ Success</div></div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a></div><div class="ttdeci">@ Warn</div></div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd">Logger::Level::Error</a></div><div class="ttdeci">@ Error</div></div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Logger::Level::Debug</a></div><div class="ttdeci">@ Debug</div></div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4ccadd4ec0ac4e58f7c32a01244ae91150b1"><div class="ttname"><a href="#ac6a29c806d1917b5363ae43c5381c4ccadd4ec0ac4e58f7c32a01244ae91150b1">Logger::Level::Trace</a></div><div class="ttdeci">@ Trace</div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
@@ -312,7 +323,16 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00096">96</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   97</span>    {</div>
+<div class="line"><span class="lineno">   98</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">   99</span>        <span class="keywordtype">int</span> <span class="keywordtype">id</span> = ++<a class="code hl_variable" href="#af36fedfb4431684cdc126f017badbaa6">nextSinkId_</a>;</div>
+<div class="line"><span class="lineno">  100</span>        <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.emplace_back(<span class="keywordtype">id</span>, s);</div>
+<div class="line"><span class="lineno">  101</span>        <span class="keywordflow">return</span> id;</div>
+<div class="line"><span class="lineno">  102</span>    }</div>
+<div class="ttc" id="aclass_logger_html_a149a7f0562ed9ec3ae14e31c2beb9f0d"><div class="ttname"><a href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">Logger::sinks_</a></div><div class="ttdeci">std::vector&lt; std::pair&lt; int, Sink &gt; &gt; sinks_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00310">Logger.h:310</a></div></div>
+<div class="ttc" id="aclass_logger_html_acc3ac4fd1f6e5e58a5e65609824e5d6b"><div class="ttname"><a href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">Logger::m_</a></div><div class="ttdeci">std::mutex m_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00306">Logger.h:306</a></div></div>
+<div class="ttc" id="aclass_logger_html_af36fedfb4431684cdc126f017badbaa6"><div class="ttname"><a href="#af36fedfb4431684cdc126f017badbaa6">Logger::nextSinkId_</a></div><div class="ttdeci">int nextSinkId_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00309">Logger.h:309</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="adbbb6d7e9049625c19c72a8329ce123c" name="adbbb6d7e9049625c19c72a8329ce123c"></a>
@@ -339,15 +359,32 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00268">268</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  269</span>    {</div>
+<div class="line"><span class="lineno">  270</span>        <span class="comment">// very small heuristics (case-insensitive): [error], error:, fail, warn, etc.</span></div>
+<div class="line"><span class="lineno">  271</span>        <span class="keyword">auto</span> has = [&amp;](<span class="keyword">const</span> <span class="keywordtype">char</span>* needle)</div>
+<div class="line"><span class="lineno">  272</span>        {</div>
+<div class="line"><span class="lineno">  273</span>            <span class="keyword">auto</span> it = std::search(</div>
+<div class="line"><span class="lineno">  274</span>                s.begin(), s.end(),</div>
+<div class="line"><span class="lineno">  275</span>                needle, needle + std::strlen(needle),</div>
+<div class="line"><span class="lineno">  276</span>                [](<span class="keywordtype">char</span> a, <span class="keywordtype">char</span> b)</div>
+<div class="line"><span class="lineno">  277</span>                { return std::tolower((unsigned char)a) == std::tolower((unsigned char)b); });</div>
+<div class="line"><span class="lineno">  278</span>            <span class="keywordflow">return</span> it != s.end();</div>
+<div class="line"><span class="lineno">  279</span>        };</div>
+<div class="line"><span class="lineno">  280</span>        <span class="keywordflow">if</span> (has(<span class="stringliteral">&quot;[error]&quot;</span>) || has(<span class="stringliteral">&quot; error&quot;</span>) || has(<span class="stringliteral">&quot;failed&quot;</span>) || has(<span class="stringliteral">&quot;exception&quot;</span>))</div>
+<div class="line"><span class="lineno">  281</span>            <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd">Level::Error</a>;</div>
+<div class="line"><span class="lineno">  282</span>        <span class="keywordflow">if</span> (has(<span class="stringliteral">&quot;[warn]&quot;</span>) || has(<span class="stringliteral">&quot; warning&quot;</span>))</div>
+<div class="line"><span class="lineno">  283</span>            <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Level::Warn</a>;</div>
+<div class="line"><span class="lineno">  284</span>        <span class="comment">// If you wish, detect [debug] → Debug, [trace] → Trace</span></div>
+<div class="line"><span class="lineno">  285</span>        <span class="keywordflow">if</span> (has(<span class="stringliteral">&quot;[debug]&quot;</span>))</div>
+<div class="line"><span class="lineno">  286</span>            <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Level::Debug</a>;</div>
+<div class="line"><span class="lineno">  287</span>        <span class="keywordflow">if</span> (has(<span class="stringliteral">&quot;[trace]&quot;</span>))</div>
+<div class="line"><span class="lineno">  288</span>            <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4ccadd4ec0ac4e58f7c32a01244ae91150b1">Level::Trace</a>;</div>
+<div class="line"><span class="lineno">  289</span>        <span class="keywordflow">return</span> <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Level::Info</a>;</div>
+<div class="line"><span class="lineno">  290</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_adbbb6d7e9049625c19c72a8329ce123c_icgraph.png" border="0" usemap="#ad3/d42/class_logger_adbbb6d7e9049625c19c72a8329ce123c_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_adbbb6d7e9049625c19c72a8329ce123c_icgraph" id="ad3/d42/class_logger_adbbb6d7e9049625c19c72a8329ce123c_icgraph">
-<area shape="rect" title=" " alt="" coords="139,5,278,32"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#a0bc3a507d60c66ff594379aa4196f861" title=" " alt="" coords="5,5,91,32"/>
-<area shape="poly" title=" " alt="" coords="123,21,91,21,91,16,123,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_adbbb6d7e9049625c19c72a8329ce123c_icgraph.svg" width="284" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -376,23 +413,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00073">73</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   74</span>    {</div>
+<div class="line"><span class="lineno">   75</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">   76</span>        std::vector&lt;std::string&gt; names;</div>
+<div class="line"><span class="lineno">   77</span>        names.reserve(<a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>.size());</div>
+<div class="line"><span class="lineno">   78</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; kv : <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>)</div>
+<div class="line"><span class="lineno">   79</span>            names.push_back(kv.first);</div>
+<div class="line"><span class="lineno">   80</span>        <span class="keywordflow">return</span> names;</div>
+<div class="line"><span class="lineno">   81</span>    }</div>
+<div class="ttc" id="aclass_logger_html_aacfccded4172d4e18daa25452446aab4"><div class="ttname"><a href="#aacfccded4172d4e18daa25452446aab4">Logger::channels_</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::deque&lt; LogEntry &gt; &gt; channels_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00308">Logger.h:308</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_ab3787eeb00f65f63877f1c7a5e681d66_icgraph.png" border="0" usemap="#ad3/d42/class_logger_ab3787eeb00f65f63877f1c7a5e681d66_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_ab3787eeb00f65f63877f1c7a5e681d66_icgraph" id="ad3/d42/class_logger_ab3787eeb00f65f63877f1c7a5e681d66_icgraph">
-<area shape="rect" title=" " alt="" coords="972,13,1092,40"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a54beaa848e4e2e121cad09e36ac26558" title=" " alt="" coords="734,5,924,48"/>
-<area shape="poly" title=" " alt="" coords="956,29,925,29,925,24,956,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="512,5,686,48"/>
-<area shape="poly" title=" " alt="" coords="718,29,686,29,686,24,718,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="307,13,464,40"/>
-<area shape="poly" title=" " alt="" coords="497,29,465,29,465,24,497,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" title=" " alt="" coords="292,29,260,29,260,24,292,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_ab3787eeb00f65f63877f1c7a5e681d66_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -421,21 +454,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00083">83</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   84</span>    {</div>
+<div class="line"><span class="lineno">   85</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">   86</span>        <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>[channel].clear();</div>
+<div class="line"><span class="lineno">   87</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_af98b620264a3be3cf1df7b7265a7ac88_icgraph.png" border="0" usemap="#ad3/d42/class_logger_af98b620264a3be3cf1df7b7265a7ac88_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_af98b620264a3be3cf1df7b7265a7ac88_icgraph" id="ad3/d42/class_logger_af98b620264a3be3cf1df7b7265a7ac88_icgraph">
-<area shape="rect" title=" " alt="" coords="734,13,878,40"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="512,5,686,48"/>
-<area shape="poly" title=" " alt="" coords="718,29,686,29,686,24,718,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="307,13,464,40"/>
-<area shape="poly" title=" " alt="" coords="497,29,465,29,465,24,497,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" title=" " alt="" coords="292,29,260,29,260,24,292,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_af98b620264a3be3cf1df7b7265a7ac88_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -464,7 +490,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00111">111</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  112</span>    {</div>
+<div class="line"><span class="lineno">  113</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">  114</span>        <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.clear();</div>
+<div class="line"><span class="lineno">  115</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a5e5b35187416e687bc57384c386360c9" name="a5e5b35187416e687bc57384c386360c9"></a>
@@ -495,15 +525,22 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00292">292</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  293</span>    {</div>
+<div class="line"><span class="lineno">  294</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">  295</span>        <span class="keyword">auto</span>&amp; q = <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>[channel];</div>
+<div class="line"><span class="lineno">  296</span>        q.emplace_back(std::move(e));</div>
+<div class="line"><span class="lineno">  297</span>        <span class="keywordflow">while</span> (q.size() &gt; <a class="code hl_variable" href="#aad9420d4c33539f6f276af6588b21fe0">capacity_</a>)</div>
+<div class="line"><span class="lineno">  298</span>            q.pop_front();</div>
+<div class="line"><span class="lineno">  299</span>        <span class="comment">// fan-out sinks</span></div>
+<div class="line"><span class="lineno">  300</span>        <span class="keyword">auto</span>&amp; back = q.back();</div>
+<div class="line"><span class="lineno">  301</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, s] : <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>)</div>
+<div class="line"><span class="lineno">  302</span>            s(channel, back);</div>
+<div class="line"><span class="lineno">  303</span>    }</div>
+<div class="ttc" id="aclass_logger_html_aad9420d4c33539f6f276af6588b21fe0"><div class="ttname"><a href="#aad9420d4c33539f6f276af6588b21fe0">Logger::capacity_</a></div><div class="ttdeci">size_t capacity_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00307">Logger.h:307</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_a5e5b35187416e687bc57384c386360c9_icgraph.png" border="0" usemap="#ad3/d42/class_logger_a5e5b35187416e687bc57384c386360c9_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_a5e5b35187416e687bc57384c386360c9_icgraph" id="ad3/d42/class_logger_a5e5b35187416e687bc57384c386360c9_icgraph">
-<area shape="rect" title=" " alt="" coords="139,5,257,32"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#a0bc3a507d60c66ff594379aa4196f861" title=" " alt="" coords="5,5,91,32"/>
-<area shape="poly" title=" " alt="" coords="123,21,91,21,91,16,123,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_a5e5b35187416e687bc57384c386360c9_icgraph.svg" width="263" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -532,19 +569,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00252">252</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  253</span>    {</div>
+<div class="line"><span class="lineno">  254</span>        <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a93b80c59fd796816ad1f33ca3eead846">seeded_</a>)</div>
+<div class="line"><span class="lineno">  255</span>        {</div>
+<div class="line"><span class="lineno">  256</span>            <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>[<span class="stringliteral">&quot;main&quot;</span>];</div>
+<div class="line"><span class="lineno">  257</span>            <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>[<span class="stringliteral">&quot;localtunnel&quot;</span>];</div>
+<div class="line"><span class="lineno">  258</span>            <a class="code hl_variable" href="#a93b80c59fd796816ad1f33ca3eead846">seeded_</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  259</span>        }</div>
+<div class="line"><span class="lineno">  260</span>    }</div>
+<div class="ttc" id="aclass_logger_html_a93b80c59fd796816ad1f33ca3eead846"><div class="ttname"><a href="#a93b80c59fd796816ad1f33ca3eead846">Logger::seeded_</a></div><div class="ttdeci">bool seeded_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00311">Logger.h:311</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_a4e5e5f780d0d088fb2c8152755bc2dfb_icgraph.png" border="0" usemap="#ad3/d42/class_logger_a4e5e5f780d0d088fb2c8152755bc2dfb_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_a4e5e5f780d0d088fb2c8152755bc2dfb_icgraph" id="ad3/d42/class_logger_a4e5e5f780d0d088fb2c8152755bc2dfb_icgraph">
-<area shape="rect" title=" " alt="" coords="556,13,701,40"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ac0754e12de89078ec1fb60a7f8493f08" title=" " alt="" coords="340,13,508,40"/>
-<area shape="poly" title=" " alt="" coords="541,29,509,29,509,24,541,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a2ba9a847495e31f2d1cf3f9e629e6990" title=" " alt="" coords="103,5,292,48"/>
-<area shape="poly" title=" " alt="" coords="324,29,292,29,292,24,324,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_a4e5e5f780d0d088fb2c8152755bc2dfb_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -573,21 +610,25 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00135">135</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  136</span>    {</div>
+<div class="line"><span class="lineno">  137</span>        <span class="keyword">using namespace </span>std::chrono;</div>
+<div class="line"><span class="lineno">  138</span>        <span class="keyword">auto</span> tp = time_point&lt;system_clock, milliseconds&gt;(milliseconds(ms));</div>
+<div class="line"><span class="lineno">  139</span>        <span class="keyword">auto</span> t = system_clock::to_time_t(tp);</div>
+<div class="line"><span class="lineno">  140</span>        <span class="keyword">auto</span> ms_part = (int)(ms % 1000);</div>
+<div class="line"><span class="lineno">  141</span>        <span class="keyword">struct </span>tm bt;</div>
+<div class="line"><span class="lineno">  142</span><span class="preprocessor">#if defined(_WIN32)</span></div>
+<div class="line"><span class="lineno">  143</span>        localtime_s(&amp;bt, &amp;t);</div>
+<div class="line"><span class="lineno">  144</span><span class="preprocessor">#else</span></div>
+<div class="line"><span class="lineno">  145</span>        localtime_r(&amp;t, &amp;bt);</div>
+<div class="line"><span class="lineno">  146</span><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="lineno">  147</span>        <span class="keywordtype">char</span> buf[32];</div>
+<div class="line"><span class="lineno">  148</span>        std::snprintf(buf, <span class="keyword">sizeof</span>(buf), <span class="stringliteral">&quot;%02d:%02d:%02d.%03d&quot;</span>, bt.tm_hour, bt.tm_min, bt.tm_sec, ms_part);</div>
+<div class="line"><span class="lineno">  149</span>        <span class="keywordflow">return</span> std::string(buf);</div>
+<div class="line"><span class="lineno">  150</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_a9fd06df40e80df63fc91cfc0ccd06788_icgraph.png" border="0" usemap="#ad3/d42/class_logger_a9fd06df40e80df63fc91cfc0ccd06788_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_a9fd06df40e80df63fc91cfc0ccd06788_icgraph" id="ad3/d42/class_logger_a9fd06df40e80df63fc91cfc0ccd06788_icgraph">
-<area shape="rect" title=" " alt="" coords="743,13,862,40"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a8f35a8359718f74e24ccfa652a432853" title=" " alt="" coords="512,5,695,48"/>
-<area shape="poly" title=" " alt="" coords="727,29,695,29,695,24,727,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="307,13,464,40"/>
-<area shape="poly" title=" " alt="" coords="497,29,465,29,465,24,497,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" title=" " alt="" coords="292,29,260,29,260,24,292,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_a9fd06df40e80df63fc91cfc0ccd06788_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -616,21 +657,17 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00064">64</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   65</span>    {</div>
+<div class="line"><span class="lineno">   66</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">   67</span>        <span class="keyword">auto</span> it = <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>.find(channel);</div>
+<div class="line"><span class="lineno">   68</span>        <span class="keywordflow">if</span> (it == <a class="code hl_variable" href="#aacfccded4172d4e18daa25452446aab4">channels_</a>.end())</div>
+<div class="line"><span class="lineno">   69</span>            <span class="keywordflow">return</span> {};</div>
+<div class="line"><span class="lineno">   70</span>        <span class="keywordflow">return</span> {it-&gt;second.begin(), it-&gt;second.end()};</div>
+<div class="line"><span class="lineno">   71</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_a20bc2511969750adca340e0a1fe7ce93_icgraph.png" border="0" usemap="#ad3/d42/class_logger_a20bc2511969750adca340e0a1fe7ce93_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_a20bc2511969750adca340e0a1fe7ce93_icgraph" id="ad3/d42/class_logger_a20bc2511969750adca340e0a1fe7ce93_icgraph">
-<area shape="rect" title=" " alt="" coords="743,13,877,40"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a8f35a8359718f74e24ccfa652a432853" title=" " alt="" coords="512,5,695,48"/>
-<area shape="poly" title=" " alt="" coords="727,29,695,29,695,24,727,24"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="307,13,464,40"/>
-<area shape="poly" title=" " alt="" coords="497,29,465,29,465,24,497,24"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" title=" " alt="" coords="292,29,260,29,260,24,292,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_a20bc2511969750adca340e0a1fe7ce93_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -659,27 +696,26 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00118">118</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  119</span>    {</div>
+<div class="line"><span class="lineno">  120</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">  121</span>        <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a5c39f01ef0292da019287955b849ac2c">coutRedirect_</a>)</div>
+<div class="line"><span class="lineno">  122</span>            <a class="code hl_variable" href="#a5c39f01ef0292da019287955b849ac2c">coutRedirect_</a> = std::make_unique&lt;OstreamRedirect&gt;(std::cout, <span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Level::Debug</a>);</div>
+<div class="line"><span class="lineno">  123</span>        <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a099d6f760e3d28ce7b4d3aae0005d956">cerrRedirect_</a>)</div>
+<div class="line"><span class="lineno">  124</span>            <a class="code hl_variable" href="#a099d6f760e3d28ce7b4d3aae0005d956">cerrRedirect_</a> = std::make_unique&lt;OstreamRedirect&gt;(std::cerr, <span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca902b0d55fddef6f8d651fe1035b7d4bd">Level::Error</a>);</div>
+<div class="line"><span class="lineno">  125</span>        <a class="code hl_function" href="#a4e5e5f780d0d088fb2c8152755bc2dfb">ensureSeed_</a>();</div>
+<div class="line"><span class="lineno">  126</span>    }</div>
+<div class="ttc" id="aclass_logger_html_a099d6f760e3d28ce7b4d3aae0005d956"><div class="ttname"><a href="#a099d6f760e3d28ce7b4d3aae0005d956">Logger::cerrRedirect_</a></div><div class="ttdeci">std::unique_ptr&lt; OstreamRedirect &gt; cerrRedirect_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00313">Logger.h:313</a></div></div>
+<div class="ttc" id="aclass_logger_html_a4e5e5f780d0d088fb2c8152755bc2dfb"><div class="ttname"><a href="#a4e5e5f780d0d088fb2c8152755bc2dfb">Logger::ensureSeed_</a></div><div class="ttdeci">void ensureSeed_()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00252">Logger.h:252</a></div></div>
+<div class="ttc" id="aclass_logger_html_a5c39f01ef0292da019287955b849ac2c"><div class="ttname"><a href="#a5c39f01ef0292da019287955b849ac2c">Logger::coutRedirect_</a></div><div class="ttdeci">std::unique_ptr&lt; OstreamRedirect &gt; coutRedirect_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00312">Logger.h:312</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_cgraph.png" border="0" usemap="#ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_cgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_cgraph" id="ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,174,32"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#a4e5e5f780d0d088fb2c8152755bc2dfb" title=" " alt="" coords="222,5,366,32"/>
-<area shape="poly" title=" " alt="" coords="174,16,206,16,206,21,174,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_cgraph.svg" width="372" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_icgraph.png" border="0" usemap="#ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_icgraph" id="ad3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_icgraph">
-<area shape="rect" title=" " alt="" coords="340,13,508,40"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a2ba9a847495e31f2d1cf3f9e629e6990" title=" " alt="" coords="103,5,292,48"/>
-<area shape="poly" title=" " alt="" coords="324,29,292,29,292,24,324,24"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_ac0754e12de89078ec1fb60a7f8493f08_icgraph.svg" width="514" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -708,179 +744,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00039">39</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   40</span>    {</div>
+<div class="line"><span class="lineno">   41</span>        <span class="keyword">static</span> <a class="code hl_class" href="../../d3/d42/class_logger.html">Logger</a> L;</div>
+<div class="line"><span class="lineno">   42</span>        <span class="keywordflow">return</span> L;</div>
+<div class="line"><span class="lineno">   43</span>    }</div>
+<div class="ttc" id="aclass_logger_html"><div class="ttname"><a href="../../d3/d42/class_logger.html">Logger</a></div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00015">Logger.h:16</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_aebb248e608f8e2724de20b482cb2a15f_icgraph.png" border="0" usemap="#ad3/d42/class_logger_aebb248e608f8e2724de20b482cb2a15f_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_aebb248e608f8e2724de20b482cb2a15f_icgraph" id="ad3/d42/class_logger_aebb248e608f8e2724de20b482cb2a15f_icgraph">
-<area shape="rect" title=" " alt="" coords="1289,1128,1406,1155"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afbcd9a98952f12f4e7517491088e417f" title=" " alt="" coords="1027,5,1204,32"/>
-<area shape="poly" title=" " alt="" coords="1343,1113,1334,889,1315,552,1301,380,1284,229,1263,114,1251,76,1239,52,1223,39,1203,29,1205,24,1226,34,1243,49,1256,73,1268,113,1289,228,1307,380,1321,551,1340,889,1348,1113"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ac5104e38077637eeeab41e078fa51a5b" title=" " alt="" coords="486,107,669,149"/>
-<area shape="poly" title=" " alt="" coords="1343,1113,1334,908,1315,604,1301,451,1284,317,1263,216,1251,183,1239,163,1222,151,1199,140,1140,123,1067,114,986,109,816,111,669,121,669,116,816,106,986,104,1068,108,1141,118,1201,135,1225,146,1243,160,1256,180,1268,214,1289,316,1307,451,1321,604,1340,908,1348,1112"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a9211bd133aed2e5ec776b4d4308b30c4" title=" " alt="" coords="213,85,410,112"/>
-<area shape="poly" title=" " alt="" coords="1343,1112,1335,899,1316,581,1302,421,1285,280,1264,174,1252,138,1239,118,1214,99,1180,84,1139,71,1092,62,983,52,862,50,736,55,613,64,409,87,409,82,613,59,736,50,862,45,984,46,1093,57,1140,66,1182,79,1216,94,1243,114,1257,136,1269,172,1290,279,1308,420,1322,581,1340,899,1348,1112"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a2ba9a847495e31f2d1cf3f9e629e6990" title=" " alt="" coords="217,376,406,419"/>
-<area shape="poly" title=" " alt="" coords="1344,1113,1342,968,1330,761,1317,656,1298,560,1273,483,1257,454,1239,433,1213,414,1178,399,1137,387,1089,377,980,365,858,362,732,364,609,371,407,389,406,383,609,365,732,359,858,356,980,360,1090,372,1138,382,1180,394,1216,410,1243,429,1261,451,1277,481,1303,559,1322,655,1335,761,1348,968,1349,1112"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="52,384,102,411"/>
-<area shape="poly" title=" " alt="" coords="1344,1113,1344,959,1340,852,1332,737,1320,623,1301,520,1274,436,1258,404,1239,381,1208,361,1163,349,1108,341,1048,338,929,339,837,341,576,341,386,343,303,351,197,367,146,378,103,392,101,387,145,373,196,361,302,345,385,338,576,336,837,336,929,333,1048,333,1109,336,1164,343,1210,357,1243,377,1262,401,1279,434,1306,519,1325,623,1338,737,1345,852,1349,959,1350,1113"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a54beaa848e4e2e121cad09e36ac26558" title=" " alt="" coords="1020,477,1210,520"/>
-<area shape="poly" title=" " alt="" coords="1342,1112,1335,989,1317,818,1303,730,1286,651,1265,585,1252,560,1239,540,1226,528,1210,519,1212,514,1229,524,1243,537,1257,557,1270,583,1291,649,1309,729,1322,817,1340,989,1348,1112"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="749,493,922,536"/>
-<area shape="poly" title=" " alt="" coords="1342,1113,1334,999,1316,842,1303,762,1286,690,1264,631,1252,609,1239,593,1224,585,1197,576,1115,558,922,528,923,523,1116,553,1198,571,1227,580,1243,589,1257,606,1269,629,1291,689,1308,761,1322,841,1340,998,1348,1112"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a2c76b411c7784b44b02f76f19773c252" title=" " alt="" coords="780,629,891,656"/>
-<area shape="poly" title=" " alt="" coords="1342,1113,1334,1005,1317,860,1303,787,1286,721,1265,669,1252,649,1239,635,1196,609,1147,594,1096,588,1044,590,993,597,946,608,872,631,870,626,945,602,992,592,1043,584,1096,583,1148,589,1198,604,1243,631,1257,646,1269,666,1291,719,1308,785,1322,859,1340,1005,1348,1112"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a91ae6eaae32ae463c033547f74080e36" title=" " alt="" coords="479,1091,676,1133"/>
-<area shape="poly" title=" " alt="" coords="1273,1141,677,1118,677,1113,1273,1136"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a53df93ad0cb0498c82f866a921e7b285" title=" " alt="" coords="479,864,676,907"/>
-<area shape="poly" title=" " alt="" coords="1343,1113,1338,1051,1323,973,1309,931,1291,891,1268,854,1239,822,1209,800,1179,790,1151,787,1121,788,1059,790,1025,784,988,769,973,757,964,743,955,731,940,721,883,701,835,693,787,700,730,721,706,734,684,751,644,790,614,831,593,865,588,862,609,828,640,787,680,747,703,730,728,716,786,695,835,688,884,695,943,716,959,727,968,740,977,753,991,764,1027,779,1060,785,1121,782,1151,781,1181,785,1211,796,1243,818,1273,851,1296,889,1314,929,1328,971,1343,1051,1349,1112"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adea6a8bf4c034a65775aa7a8f9d2e8a2" title=" " alt="" coords="479,957,676,1000"/>
-<area shape="poly" title=" " alt="" coords="1315,1121,1280,1099,1240,1080,1193,1066,1132,1053,980,1028,677,991,677,986,981,1023,1133,1048,1195,1061,1242,1075,1283,1094,1318,1116"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a40a38591b24f2d04217a8df97c2fbe72" title=" " alt="" coords="479,1024,676,1067"/>
-<area shape="poly" title=" " alt="" coords="1285,1126,1240,1116,1087,1092,933,1074,676,1053,677,1048,933,1069,1088,1087,1242,1111,1286,1121"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a1fbba41c0e7e761f7b03905b673b564e" title=" " alt="" coords="1023,1149,1208,1192"/>
-<area shape="poly" title=" " alt="" coords="1274,1153,1208,1162,1208,1156,1273,1148"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a70aa13890f08f63bd8497e8bc366ccfa" title=" " alt="" coords="1024,1216,1207,1259"/>
-<area shape="poly" title=" " alt="" coords="1316,1166,1281,1187,1242,1206,1208,1219,1206,1214,1240,1202,1279,1182,1313,1161"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a0f041b3910739653ed212ae04eda7729" title=" " alt="" coords="1020,1283,1211,1325"/>
-<area shape="poly" title=" " alt="" coords="1334,1170,1297,1222,1272,1250,1242,1273,1212,1288,1210,1283,1240,1268,1268,1246,1293,1219,1329,1166"/>
-<area shape="rect" href="../../d2/dbf/class_board_manager.html#a5385f2c3be3dbce8a6a1b9e12b813367" title=" " alt="" coords="1018,1349,1213,1376"/>
-<area shape="poly" title=" " alt="" coords="1342,1170,1329,1209,1309,1255,1281,1301,1243,1339,1215,1354,1212,1350,1239,1335,1277,1298,1305,1252,1324,1207,1337,1169"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="1033,1467,1198,1509"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1342,1230,1325,1307,1312,1348,1294,1387,1271,1424,1243,1457,1222,1471,1199,1481,1197,1476,1220,1466,1239,1453,1267,1421,1289,1385,1307,1346,1320,1305,1336,1229,1343,1170"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a04bb6c5d112ef6b6bc016d8742117478" title=" " alt="" coords="1026,1736,1204,1779"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1340,1290,1322,1456,1309,1541,1291,1618,1270,1682,1257,1707,1243,1726,1226,1740,1206,1750,1203,1745,1223,1735,1239,1722,1252,1704,1265,1680,1286,1617,1303,1540,1317,1455,1335,1289,1342,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a697edf7a52d99ffef164830d24130116" title=" " alt="" coords="734,731,937,773"/>
-<area shape="poly" title=" " alt="" coords="1341,1113,1333,1060,1316,994,1302,960,1285,927,1265,896,1239,870,1208,848,1180,836,1151,830,1123,829,1062,829,1027,824,989,813,964,801,941,788,910,776,912,771,943,783,967,796,991,808,1028,819,1062,823,1123,823,1152,825,1181,830,1211,843,1243,866,1269,893,1290,924,1307,958,1321,992,1338,1059,1347,1112"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4f87c47c2317b51690a0947bc8ad88b7" title=" " alt="" coords="738,931,933,973"/>
-<area shape="poly" title=" " alt="" coords="1333,1115,1319,1085,1298,1052,1272,1020,1240,994,1203,976,1165,962,1084,946,1004,941,933,943,933,937,1005,935,1085,941,1166,957,1205,971,1242,990,1276,1016,1303,1049,1323,1083,1338,1113"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a22bd9aaf7a1f27163089c06202ff4942" title=" " alt="" coords="1023,1803,1208,1845"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1343,1302,1326,1488,1313,1584,1295,1671,1272,1743,1258,1771,1243,1792,1227,1806,1209,1815,1207,1810,1224,1801,1239,1789,1254,1768,1267,1741,1290,1670,1308,1583,1321,1487,1337,1301,1343,1170"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a957143d66873fe4b3b5c94ee9ae0b326" title=" " alt="" coords="1024,1869,1207,1896"/>
-<area shape="poly" title=" " alt="" coords="1349,1170,1346,1315,1332,1522,1319,1628,1300,1725,1276,1805,1260,1836,1243,1859,1227,1872,1208,1880,1206,1876,1224,1867,1239,1855,1256,1833,1271,1803,1295,1724,1314,1627,1327,1521,1340,1315,1344,1170"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#ae60162d45976facc774ecba54cf3d13f" title=" " alt="" coords="1010,1635,1220,1661"/>
-<area shape="poly" title=" " alt="" coords="1347,1170,1336,1271,1317,1408,1303,1476,1286,1539,1266,1590,1243,1625,1222,1639,1219,1635,1239,1621,1262,1587,1281,1537,1298,1475,1311,1407,1331,1271,1341,1170"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a5bb9f9327ede8452c1fcd437608e23a8" title=" " alt="" coords="1024,1685,1207,1712"/>
-<area shape="poly" title=" " alt="" coords="1347,1171,1339,1281,1320,1433,1306,1509,1289,1579,1268,1636,1243,1675,1227,1688,1208,1696,1206,1691,1224,1683,1239,1672,1263,1634,1284,1578,1301,1508,1315,1432,1333,1281,1342,1170"/>
-<area shape="rect" href="../../df/d93/class_game_table_manager.html#a8967546a2319d4f7a8e51c58bee4e469" title=" " alt="" coords="1020,1920,1211,1963"/>
-<area shape="poly" title=" " alt="" coords="1349,1171,1347,1324,1334,1545,1321,1659,1302,1764,1276,1850,1261,1884,1243,1910,1229,1922,1213,1931,1210,1927,1226,1918,1239,1906,1256,1881,1271,1848,1297,1763,1315,1658,1328,1544,1341,1323,1344,1171"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a12a185f305c7886960e02f78c61ccd18" title=" " alt="" coords="1021,1987,1210,2029"/>
-<area shape="poly" title=" " alt="" coords="1349,1170,1349,1334,1345,1451,1338,1576,1325,1701,1306,1816,1279,1911,1262,1948,1243,1976,1228,1989,1211,1999,1209,1994,1225,1985,1239,1973,1258,1945,1274,1909,1301,1815,1320,1700,1332,1576,1340,1450,1343,1334,1344,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad1fd3e16e9ee2c7b16cdb116def849d8" title=" " alt="" coords="990,2053,1241,2096"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1336,1359,1315,1636,1300,1775,1283,1898,1265,1991,1254,2023,1243,2043,1230,2055,1226,2051,1239,2040,1249,2021,1259,1990,1278,1897,1295,1774,1309,1635,1331,1359,1342,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a14b0cfed443205584e8c2e76ecb0ad94" title=" " alt="" coords="1016,2120,1214,2147"/>
-<area shape="poly" title=" " alt="" coords="1348,1171,1338,1372,1318,1670,1303,1821,1286,1954,1266,2054,1255,2089,1243,2110,1216,2128,1213,2124,1239,2106,1250,2086,1261,2053,1281,1953,1298,1820,1312,1670,1333,1372,1343,1170"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a8f35a8359718f74e24ccfa652a432853" title=" " alt="" coords="744,427,927,469"/>
-<area shape="poly" title=" " alt="" coords="1344,1112,1341,974,1328,778,1315,678,1296,588,1271,515,1256,487,1239,467,1218,455,1187,446,1106,437,1014,437,927,442,927,436,1014,432,1107,432,1188,441,1220,450,1243,463,1261,484,1276,512,1301,586,1320,677,1333,777,1346,974,1349,1112"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a3b6ac761c2940db9d3214729e5e166a3" title=" " alt="" coords="1025,645,1206,688"/>
-<area shape="poly" title=" " alt="" coords="1341,1113,1329,1020,1308,896,1278,778,1259,733,1239,702,1224,690,1205,681,1208,676,1226,685,1243,698,1264,730,1283,776,1313,895,1334,1019,1346,1112"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a6644e970960fb75794434d8bb73e5b27" title=" " alt="" coords="1025,712,1206,755"/>
-<area shape="poly" title=" " alt="" coords="1344,1112,1340,1044,1326,954,1313,906,1294,859,1270,814,1239,775,1223,762,1205,753,1208,748,1226,758,1243,771,1275,811,1299,856,1318,904,1331,953,1346,1044,1349,1112"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00" title=" " alt="" coords="1025,2171,1206,2213"/>
-<area shape="poly" title=" " alt="" coords="1348,1171,1338,1381,1318,1695,1304,1854,1287,1994,1267,2101,1255,2138,1243,2160,1227,2175,1208,2184,1205,2180,1224,2170,1239,2157,1251,2136,1262,2100,1282,1993,1299,1853,1313,1695,1333,1381,1343,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a9faf2055aa0370adbffaa46b7f7181c1" title=" " alt="" coords="740,169,931,196"/>
-<area shape="poly" title=" " alt="" coords="1343,1113,1334,915,1314,622,1300,474,1283,345,1263,248,1251,216,1239,198,1218,185,1189,177,1109,168,1018,169,931,175,931,170,1018,164,1109,163,1190,171,1221,181,1243,194,1256,214,1268,247,1288,344,1306,474,1320,621,1339,914,1348,1112"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ab54b0f1b56efebcaeaf9a34a0af6194c" title=" " alt="" coords="1019,208,1212,251"/>
-<area shape="poly" title=" " alt="" coords="1344,1113,1344,942,1340,821,1333,690,1320,559,1301,438,1275,339,1258,300,1239,271,1226,259,1210,249,1213,245,1229,254,1243,268,1263,298,1280,337,1307,437,1326,558,1338,690,1346,821,1349,942,1350,1113"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a88303e860c818888a1cdd7d40bc19bf3" title=" " alt="" coords="737,257,934,284"/>
-<area shape="poly" title=" " alt="" coords="1342,1112,1330,938,1309,686,1294,559,1278,449,1259,365,1249,338,1239,322,1219,308,1190,297,1111,282,1021,274,934,272,934,267,1021,269,1112,277,1191,292,1221,304,1243,318,1254,336,1264,364,1283,448,1300,559,1314,685,1336,937,1347,1112"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a27b571593133576a069d69756f889d6b" title=" " alt="" coords="1014,2288,1217,2331"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1340,1401,1321,1750,1307,1927,1289,2084,1268,2204,1256,2245,1243,2271,1219,2291,1216,2287,1239,2268,1251,2243,1263,2203,1284,2084,1301,1927,1315,1750,1334,1400,1343,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e" title=" " alt="" coords="755,2296,916,2323"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1340,1393,1321,1729,1307,1900,1290,2050,1269,2164,1257,2203,1243,2227,1214,2253,1186,2268,1158,2275,1129,2276,1065,2273,1030,2273,990,2279,900,2298,899,2293,989,2273,1029,2268,1065,2267,1129,2271,1157,2270,1184,2263,1211,2249,1239,2224,1252,2201,1264,2163,1285,2049,1302,1899,1316,1729,1335,1393,1343,1170"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567" title=" " alt="" coords="1026,2355,1205,2397"/>
-<area shape="poly" title=" " alt="" coords="1348,1170,1341,1414,1324,1787,1310,1977,1292,2145,1270,2273,1257,2317,1243,2344,1226,2359,1207,2369,1204,2364,1223,2355,1239,2341,1252,2315,1265,2272,1287,2144,1305,1977,1318,1787,1336,1414,1343,1170"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a9dd164184038b0f6a7d1b3926d228d30" title=" " alt="" coords="1033,1400,1198,1443"/>
-<area shape="poly" title=" " alt="" coords="1345,1171,1335,1218,1316,1278,1286,1338,1266,1366,1243,1390,1222,1404,1199,1413,1197,1408,1220,1399,1239,1386,1262,1362,1282,1335,1311,1276,1330,1217,1340,1170"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a4768e514c08fc094a8e80ba8def371ea" title=" " alt="" coords="1012,1533,1218,1560"/>
-<area shape="poly" title=" " alt="" coords="1345,1170,1331,1252,1309,1358,1280,1458,1262,1497,1243,1523,1221,1538,1218,1534,1239,1519,1258,1494,1275,1456,1304,1357,1326,1251,1340,1170"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a9f0ef1ee48947cd640d772814c7e5140" title=" " alt="" coords="1026,1584,1205,1611"/>
-<area shape="poly" title=" " alt="" coords="1346,1171,1334,1262,1313,1383,1299,1444,1283,1499,1264,1543,1243,1574,1226,1586,1206,1595,1204,1590,1223,1582,1239,1570,1260,1541,1278,1497,1294,1442,1308,1382,1329,1261,1341,1170"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#abdacab45fd438391b9fa75a6c6d3a421" title=" " alt="" coords="1021,880,1210,923"/>
-<area shape="poly" title=" " alt="" coords="1336,1114,1323,1075,1303,1029,1276,983,1239,943,1208,925,1211,920,1243,939,1280,980,1308,1027,1328,1073,1341,1112"/>
-<area shape="poly" title=" " alt="" coords="471,119,410,112,411,107,471,114"/>
-<area shape="poly" title=" " alt="" coords="201,400,102,400,102,395,201,395"/>
-<area shape="poly" title=" " alt="" coords="1005,508,923,512,922,507,1005,502"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="499,443,656,469"/>
-<area shape="poly" title=" " alt="" coords="733,494,639,473,640,467,734,489"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="233,443,390,469"/>
-<area shape="poly" title=" " alt="" coords="483,459,390,459,390,453,483,453"/>
-<area shape="poly" title=" " alt="" coords="229,441,196,433,102,407,103,402,197,428,230,436"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="197,1029,426,1056"/>
-<area shape="poly" title=" " alt="" coords="478,1089,365,1059,366,1054,479,1084"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="221,961,402,1004"/>
-<area shape="poly" title=" " alt="" coords="479,1085,472,1081,456,1065,448,1049,439,1034,424,1019,401,1007,404,1002,428,1015,444,1031,452,1047,461,1062,476,1077,482,1081"/>
-<area shape="poly" title=" " alt="" coords="518,917,476,947,461,966,454,983,445,1001,428,1018,403,1031,400,1026,424,1014,441,998,449,981,457,963,472,943,515,912"/>
-<area shape="poly" title=" " alt="" coords="504,915,373,963,371,958,502,910"/>
-<area shape="poly" title=" " alt="" coords="475,1007,427,1019,373,1031,372,1026,425,1013,473,1002"/>
-<area shape="poly" title=" " alt="" coords="464,983,403,984,402,979,464,978"/>
-<area shape="poly" title=" " alt="" coords="463,1047,426,1046,426,1041,463,1042"/>
-<area shape="poly" title=" " alt="" coords="469,1023,402,1007,403,1001,470,1017"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a2cfe4223139cf58587a9f066b956cb23" title=" " alt="" coords="743,1283,928,1325"/>
-<area shape="poly" title=" " alt="" coords="1004,1307,928,1307,928,1301,1004,1301"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a92248ba0deff6e257595b422c5a4443d" title=" " alt="" coords="753,1400,918,1443"/>
-<area shape="poly" title=" " alt="" coords="1017,1467,918,1444,919,1438,1018,1462"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a274c06eec4ad000418b4b5ddf623b93e" title=" " alt="" coords="753,1467,918,1509"/>
-<area shape="poly" title=" " alt="" coords="1017,1491,918,1491,918,1485,1017,1485"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba" title=" " alt="" coords="748,1677,923,1720"/>
-<area shape="poly" title=" " alt="" coords="1010,1738,923,1720,924,1714,1011,1733"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="508,1627,647,1669"/>
-<area shape="poly" title=" " alt="" coords="732,1681,647,1664,648,1659,733,1676"/>
-<area shape="poly" title=" " alt="" coords="743,782,731,788,663,827,608,866,605,861,660,822,728,783,741,777"/>
-<area shape="poly" title=" " alt="" coords="735,929,662,910,664,905,736,924"/>
-<area shape="poly" title=" " alt="" coords="1008,1800,989,1793,921,1758,866,1723,869,1718,924,1754,991,1788,1009,1795"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a4d024810a54c16a402720bdad988631a" title=" " alt="" coords="754,1887,917,1913"/>
-<area shape="poly" title=" " alt="" coords="1008,1892,917,1898,917,1892,1008,1887"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a2fd8b6b1e27c91bf9107390aa30dd554" title=" " alt="" coords="746,1836,925,1863"/>
-<area shape="poly" title=" " alt="" coords="1008,1873,925,1863,926,1857,1009,1867"/>
-<area shape="poly" title=" " alt="" coords="1023,1667,924,1685,923,1680,1022,1662"/>
-<area shape="poly" title=" " alt="" coords="1008,1701,924,1701,924,1696,1008,1696"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd" title=" " alt="" coords="224,1996,398,2039"/>
-<area shape="poly" title=" " alt="" coords="1005,1999,942,1995,810,1990,708,1991,474,2005,399,2011,399,2006,474,2000,708,1986,810,1985,942,1989,1006,1994"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451" title=" " alt="" coords="737,2004,934,2047"/>
-<area shape="poly" title=" " alt="" coords="1005,2017,934,2022,934,2017,1005,2012"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,2004,149,2031"/>
-<area shape="poly" title=" " alt="" coords="209,2020,149,2020,149,2015,209,2015"/>
-<area shape="poly" title=" " alt="" coords="721,2026,399,2021,399,2016,722,2021"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5b19f0632a911a519401b1b40e70db7c" title=" " alt="" coords="474,2055,681,2081"/>
-<area shape="poly" title=" " alt="" coords="722,2047,663,2057,662,2051,721,2041"/>
-<area shape="poly" title=" " alt="" coords="488,2054,398,2036,399,2031,489,2049"/>
-<area shape="poly" title=" " alt="" coords="729,454,657,456,657,451,729,449"/>
-<area shape="poly" title=" " alt="" coords="1009,660,891,650,892,645,1009,655"/>
-<area shape="poly" title=" " alt="" coords="1009,710,989,702,964,690,941,677,888,659,890,654,943,672,967,685,991,698,1011,705"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#ac3db9617d91d271ba18bde81f24b5c97" title=" " alt="" coords="762,2120,909,2147"/>
-<area shape="poly" title=" " alt="" coords="1009,2172,902,2150,903,2145,1010,2167"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a8e0d2dcd98ddaf7e2546508c44dd804e" title=" " alt="" coords="740,2171,931,2213"/>
-<area shape="poly" title=" " alt="" coords="1009,2195,932,2195,932,2189,1009,2189"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#ad1eb7f34bf1ee45ab24d16020ffcb889" title=" " alt="" coords="763,2237,908,2264"/>
-<area shape="poly" title=" " alt="" coords="1010,2217,903,2239,902,2234,1009,2212"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a257d9fcbdd01ef29c2c4b093a79b023a" title=" " alt="" coords="487,2229,668,2272"/>
-<area shape="poly" title=" " alt="" coords="747,2253,669,2253,669,2248,747,2248"/>
-<area shape="poly" title=" " alt="" coords="754,168,669,150,670,145,755,163"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a8104f62e2e6c3197832dbfe7753853de" title=" " alt="" coords="485,173,670,216"/>
-<area shape="poly" title=" " alt="" coords="725,190,671,193,671,188,725,185"/>
-<area shape="poly" title=" " alt="" coords="1003,213,919,199,920,194,1004,208"/>
-<area shape="poly" title=" " alt="" coords="1004,248,931,259,930,254,1003,243"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a1548090a456937ffafda64318f21ba40" title=" " alt="" coords="485,249,670,292"/>
-<area shape="poly" title=" " alt="" coords="722,273,671,273,671,268,722,268"/>
-<area shape="poly" title=" " alt="" coords="998,2312,916,2312,916,2307,998,2307"/>
-<area shape="poly" title=" " alt="" coords="1010,2354,894,2326,895,2321,1011,2348"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="739,2363,932,2389"/>
-<area shape="poly" title=" " alt="" coords="1010,2379,932,2379,932,2373,1010,2373"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="482,2363,674,2389"/>
-<area shape="poly" title=" " alt="" coords="724,2379,674,2379,674,2373,724,2373"/>
-<area shape="poly" title=" " alt="" coords="1017,1424,918,1424,918,1419,1017,1419"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd" title=" " alt="" coords="734,1576,937,1619"/>
-<area shape="poly" title=" " alt="" coords="1023,1566,938,1582,937,1576,1022,1561"/>
-<area shape="poly" title=" " alt="" coords="719,1623,648,1637,647,1632,718,1618"/>
-<area shape="poly" title=" " alt="" coords="1010,1600,938,1600,938,1595,1010,1595"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4cb4b93a437c7da00771f5cc9488384e" title=" " alt="" coords="729,797,942,840"/>
-<area shape="poly" title=" " alt="" coords="1025,878,909,843,911,838,1027,873"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4b09485e1d33303ed11454b605fd740c" title=" " alt="" coords="729,864,942,907"/>
-<area shape="poly" title=" " alt="" coords="1005,898,942,894,942,889,1006,892"/>
-<area shape="poly" title=" " alt="" coords="736,847,664,866,662,861,735,842"/>
-<area shape="poly" title=" " alt="" coords="714,888,677,888,677,883,714,883"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_aebb248e608f8e2724de20b482cb2a15f_icgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -913,183 +785,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00048">48</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   49</span>    {</div>
+<div class="line"><span class="lineno">   50</span>        <a class="code hl_function" href="#ab77a9a6a08954192b47c39f359b5d370">log</a>(channel, <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Level::Info</a>, line);</div>
+<div class="line"><span class="lineno">   51</span>    }</div>
+<div class="ttc" id="aclass_logger_html_ab77a9a6a08954192b47c39f359b5d370"><div class="ttname"><a href="#ab77a9a6a08954192b47c39f359b5d370">Logger::log</a></div><div class="ttdeci">void log(const std::string &amp;channel, const std::string &amp;line)</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00048">Logger.h:48</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_cgraph.png" border="0" usemap="#ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_cgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_cgraph" id="ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_cgraph">
-<area shape="rect" title=" " alt="" coords="5,29,91,56"/>
-<area shape="poly" title=" " alt="" coords="32,29,31,12,38,5,48,3,59,5,65,12,61,15,56,10,48,8,40,10,36,14,37,29"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_cgraph.svg" width="96" height="62"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_icgraph.png" border="0" usemap="#ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_icgraph" id="ad3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_icgraph">
-<area shape="rect" title=" " alt="" coords="1289,1089,1374,1116"/>
-<area shape="poly" title=" " alt="" coords="1369,1076,1356,1070,1332,1068,1309,1070,1297,1075,1294,1080,1299,1087,1295,1090,1289,1081,1293,1071,1308,1065,1332,1063,1357,1065,1371,1072"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#afbcd9a98952f12f4e7517491088e417f" title=" " alt="" coords="1027,5,1204,32"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1322,858,1307,533,1296,368,1280,222,1262,112,1251,75,1239,52,1223,38,1203,29,1205,24,1226,34,1243,49,1256,73,1267,111,1286,222,1301,367,1312,532,1327,858,1333,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ac5104e38077637eeeab41e078fa51a5b" title=" " alt="" coords="486,107,669,149"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1321,877,1307,586,1295,439,1280,310,1262,214,1251,182,1239,163,1222,150,1199,140,1140,123,1068,113,986,109,816,111,670,121,669,116,816,106,986,103,1068,108,1141,118,1201,135,1225,146,1243,160,1256,179,1267,212,1286,310,1301,439,1312,585,1327,877,1332,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a9211bd133aed2e5ec776b4d4308b30c4" title=" " alt="" coords="213,85,410,112"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1322,868,1308,562,1297,408,1281,272,1262,170,1251,136,1239,116,1214,98,1180,82,1139,70,1092,61,983,50,861,49,735,54,612,64,408,87,407,82,611,58,734,49,861,43,983,45,1093,55,1140,65,1182,77,1216,93,1243,113,1256,134,1267,169,1287,271,1302,407,1313,562,1327,868,1333,1074"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a2ba9a847495e31f2d1cf3f9e629e6990" title=" " alt="" coords="483,376,672,419"/>
-<area shape="poly" title=" " alt="" coords="1326,1074,1316,924,1298,714,1286,610,1272,519,1256,452,1248,429,1239,417,1222,404,1199,394,1140,379,1068,371,987,369,819,375,673,388,673,383,819,369,987,363,1069,366,1141,374,1201,389,1224,400,1243,413,1252,427,1261,450,1277,518,1291,610,1304,714,1322,924,1331,1073"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="287,384,336,411"/>
-<area shape="poly" title=" " alt="" coords="1326,1074,1317,917,1300,693,1288,582,1273,485,1257,412,1248,388,1239,374,1222,365,1193,357,1107,348,993,344,866,345,621,356,474,367,399,379,337,394,336,388,398,374,474,361,621,350,866,340,993,339,1107,342,1194,352,1224,360,1243,370,1253,385,1262,410,1279,484,1293,581,1305,692,1323,916,1332,1074"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a2c76b411c7784b44b02f76f19773c252" title=" " alt="" coords="780,552,891,579"/>
-<area shape="poly" title=" " alt="" coords="1328,1074,1326,955,1314,790,1303,707,1288,633,1266,572,1254,550,1239,534,1218,519,1195,507,1145,493,1092,490,1038,496,986,508,938,523,865,554,863,549,937,518,985,503,1037,491,1092,485,1146,488,1197,502,1221,514,1243,530,1258,547,1271,570,1293,631,1308,706,1320,790,1331,954,1333,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a91ae6eaae32ae463c033547f74080e36" title=" " alt="" coords="479,784,676,827"/>
-<area shape="poly" title=" " alt="" coords="1325,1074,1315,995,1298,893,1273,798,1257,763,1239,739,1221,727,1198,716,1139,701,1070,692,994,690,917,692,844,698,780,706,730,717,695,730,661,748,607,786,604,781,659,743,693,725,729,712,779,701,843,692,916,686,994,684,1070,687,1140,696,1199,711,1223,722,1243,735,1262,760,1278,797,1303,892,1321,994,1330,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a53df93ad0cb0498c82f866a921e7b285" title=" " alt="" coords="479,851,676,893"/>
-<area shape="poly" title=" " alt="" coords="1324,1074,1313,1004,1294,915,1269,832,1255,801,1239,781,1208,767,1149,755,987,736,824,729,764,733,731,741,719,751,712,762,706,787,701,814,695,828,683,841,666,852,663,848,680,837,690,825,696,812,701,786,707,760,715,747,728,736,763,727,824,724,987,731,1150,750,1209,762,1243,777,1259,798,1274,830,1299,913,1318,1003,1329,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adea6a8bf4c034a65775aa7a8f9d2e8a2" title=" " alt="" coords="479,917,676,960"/>
-<area shape="poly" title=" " alt="" coords="1312,1078,1282,1041,1262,1024,1240,1010,1202,996,1168,987,1104,982,1045,988,989,1001,932,1015,872,1025,805,1024,768,1018,728,1008,713,1001,703,992,680,974,654,963,656,958,683,970,706,988,716,996,730,1003,769,1013,805,1019,871,1019,931,1010,988,996,1044,983,1104,976,1168,982,1204,991,1242,1006,1265,1019,1286,1037,1317,1075"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a40a38591b24f2d04217a8df97c2fbe72" title=" " alt="" coords="479,984,676,1027"/>
-<area shape="poly" title=" " alt="" coords="1306,1081,1276,1057,1240,1038,1172,1022,1117,1020,1061,1027,990,1039,966,1045,942,1052,836,1062,789,1059,729,1052,682,1043,638,1030,640,1025,684,1037,730,1047,789,1054,835,1056,941,1047,965,1040,989,1033,1060,1022,1117,1014,1173,1016,1242,1034,1279,1052,1309,1077"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a1fbba41c0e7e761f7b03905b673b564e" title=" " alt="" coords="1023,1048,1208,1091"/>
-<area shape="poly" title=" " alt="" coords="1273,1096,1207,1086,1208,1081,1274,1091"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a70aa13890f08f63bd8497e8bc366ccfa" title=" " alt="" coords="1024,1115,1207,1157"/>
-<area shape="poly" title=" " alt="" coords="1274,1114,1208,1124,1207,1119,1273,1109"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a0f041b3910739653ed212ae04eda7729" title=" " alt="" coords="1020,1181,1211,1224"/>
-<area shape="poly" title=" " alt="" coords="1306,1128,1277,1151,1242,1172,1212,1184,1210,1179,1240,1167,1274,1147,1303,1124"/>
-<area shape="rect" href="../../d2/dbf/class_board_manager.html#a5385f2c3be3dbce8a6a1b9e12b813367" title=" " alt="" coords="1018,1248,1213,1275"/>
-<area shape="poly" title=" " alt="" coords="1322,1132,1292,1187,1270,1215,1242,1238,1215,1252,1212,1247,1240,1234,1266,1211,1287,1184,1317,1129"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="1033,1365,1198,1408"/>
-<area shape="poly" title=" " alt="" coords="1331,1132,1325,1180,1310,1240,1284,1302,1265,1330,1243,1355,1222,1370,1199,1379,1197,1374,1220,1365,1239,1351,1261,1327,1279,1300,1305,1239,1319,1179,1326,1131"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a04bb6c5d112ef6b6bc016d8742117478" title=" " alt="" coords="1026,1432,1204,1475"/>
-<area shape="poly" title=" " alt="" coords="1334,1132,1331,1192,1319,1270,1308,1311,1292,1351,1270,1389,1243,1422,1226,1435,1206,1444,1204,1440,1223,1431,1239,1418,1266,1386,1287,1349,1302,1309,1314,1269,1326,1191,1328,1131"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a697edf7a52d99ffef164830d24130116" title=" " alt="" coords="734,751,937,793"/>
-<area shape="poly" title=" " alt="" coords="1328,1074,1324,1019,1312,950,1300,915,1285,881,1265,850,1239,823,1218,811,1189,801,1111,786,1022,778,937,775,937,770,1023,773,1112,781,1190,796,1220,806,1243,819,1269,846,1290,878,1305,913,1317,949,1330,1018,1333,1073"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4f87c47c2317b51690a0947bc8ad88b7" title=" " alt="" coords="738,817,933,860"/>
-<area shape="poly" title=" " alt="" coords="1326,1075,1320,1028,1306,971,1280,915,1262,891,1239,870,1205,849,1167,833,1128,823,1087,817,1006,814,933,821,933,816,1006,809,1087,811,1129,818,1169,828,1207,844,1243,866,1266,887,1285,913,1311,970,1325,1027,1332,1074"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a22bd9aaf7a1f27163089c06202ff4942" title=" " alt="" coords="1023,1499,1208,1541"/>
-<area shape="poly" title=" " alt="" coords="1330,1132,1320,1214,1302,1320,1277,1422,1261,1461,1243,1488,1227,1501,1209,1510,1207,1506,1224,1497,1239,1485,1256,1459,1272,1420,1297,1319,1315,1213,1325,1131"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a957143d66873fe4b3b5c94ee9ae0b326" title=" " alt="" coords="1024,1768,1207,1795"/>
-<area shape="poly" title=" " alt="" coords="1333,1131,1332,1264,1321,1452,1310,1548,1294,1636,1272,1708,1259,1736,1243,1758,1227,1771,1208,1779,1206,1774,1224,1766,1239,1754,1254,1734,1267,1706,1289,1635,1305,1547,1316,1452,1326,1264,1328,1131"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#ae60162d45976facc774ecba54cf3d13f" title=" " alt="" coords="1010,1565,1220,1592"/>
-<area shape="poly" title=" " alt="" coords="1331,1131,1324,1227,1308,1354,1296,1417,1282,1475,1264,1523,1243,1555,1222,1570,1219,1566,1239,1551,1259,1520,1277,1474,1291,1416,1303,1353,1318,1226,1326,1131"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a5bb9f9327ede8452c1fcd437608e23a8" title=" " alt="" coords="1024,1616,1207,1643"/>
-<area shape="poly" title=" " alt="" coords="1332,1131,1326,1236,1311,1378,1300,1450,1285,1516,1266,1569,1243,1606,1227,1618,1209,1627,1206,1622,1224,1614,1239,1602,1261,1567,1280,1514,1295,1449,1306,1378,1321,1236,1327,1131"/>
-<area shape="rect" href="../../df/d93/class_game_table_manager.html#a8967546a2319d4f7a8e51c58bee4e469" title=" " alt="" coords="1020,1819,1211,1861"/>
-<area shape="poly" title=" " alt="" coords="1333,1132,1333,1273,1323,1476,1312,1580,1296,1675,1273,1754,1259,1785,1243,1808,1229,1821,1213,1830,1210,1825,1226,1817,1239,1805,1254,1782,1268,1752,1290,1674,1307,1579,1317,1475,1327,1273,1328,1132"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a12a185f305c7886960e02f78c61ccd18" title=" " alt="" coords="1021,1885,1210,1928"/>
-<area shape="poly" title=" " alt="" coords="1332,1132,1322,1296,1304,1531,1277,1752,1261,1831,1253,1858,1243,1875,1228,1888,1211,1897,1209,1893,1225,1884,1239,1872,1248,1856,1256,1830,1272,1752,1298,1531,1317,1295,1326,1131"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad1fd3e16e9ee2c7b16cdb116def849d8" title=" " alt="" coords="990,1952,1241,1995"/>
-<area shape="poly" title=" " alt="" coords="1332,1132,1323,1309,1306,1565,1294,1694,1279,1807,1263,1894,1253,1923,1243,1942,1230,1954,1226,1950,1239,1938,1248,1921,1257,1892,1274,1807,1288,1693,1300,1565,1318,1308,1326,1132"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a14b0cfed443205584e8c2e76ecb0ad94" title=" " alt="" coords="1016,2019,1214,2045"/>
-<area shape="poly" title=" " alt="" coords="1332,1131,1325,1321,1309,1599,1297,1739,1282,1863,1264,1957,1254,1989,1243,2008,1216,2027,1213,2023,1239,2005,1249,1986,1259,1955,1277,1862,1292,1739,1303,1599,1320,1320,1327,1131"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="1029,427,1202,469"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1324,949,1311,774,1300,685,1284,603,1264,536,1252,510,1239,490,1222,475,1201,464,1204,459,1225,470,1243,486,1257,507,1269,534,1289,602,1305,684,1316,774,1329,949,1333,1074"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a3b6ac761c2940db9d3214729e5e166a3" title=" " alt="" coords="1025,544,1206,587"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1320,970,1305,827,1294,755,1279,690,1261,637,1239,600,1224,588,1205,579,1208,574,1227,583,1243,597,1266,634,1284,689,1299,754,1310,827,1325,969,1332,1074"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a6644e970960fb75794434d8bb73e5b27" title=" " alt="" coords="1025,611,1206,653"/>
-<area shape="poly" title=" " alt="" coords="1325,1074,1316,984,1299,864,1274,749,1258,704,1239,674,1224,660,1205,650,1208,646,1227,656,1243,670,1262,702,1279,747,1305,863,1322,983,1331,1074"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00" title=" " alt="" coords="1025,2069,1206,2112"/>
-<area shape="poly" title=" " alt="" coords="1332,1132,1325,1330,1309,1624,1297,1773,1283,1904,1265,2004,1255,2038,1243,2059,1227,2073,1208,2083,1205,2078,1224,2069,1239,2056,1250,2036,1260,2002,1277,1903,1292,1772,1304,1624,1320,1330,1327,1131"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a9faf2055aa0370adbffaa46b7f7181c1" title=" " alt="" coords="740,169,931,196"/>
-<area shape="poly" title=" " alt="" coords="1327,1074,1321,883,1306,603,1294,462,1279,339,1261,246,1250,216,1239,198,1219,185,1189,176,1109,168,1018,169,931,175,931,169,1018,163,1109,163,1190,171,1221,181,1243,194,1255,213,1266,245,1285,338,1300,461,1311,602,1326,883,1332,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ab54b0f1b56efebcaeaf9a34a0af6194c" title=" " alt="" coords="1019,208,1212,251"/>
-<area shape="poly" title=" " alt="" coords="1326,1074,1317,898,1299,643,1287,515,1273,403,1257,317,1248,288,1239,271,1226,259,1210,249,1213,244,1229,254,1243,268,1253,286,1262,316,1278,402,1293,515,1305,643,1323,898,1332,1074"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a88303e860c818888a1cdd7d40bc19bf3" title=" " alt="" coords="737,257,934,284"/>
-<area shape="poly" title=" " alt="" coords="1326,1074,1318,907,1300,667,1288,547,1274,442,1258,363,1248,337,1239,322,1219,308,1190,297,1111,282,1020,274,934,272,934,267,1021,269,1112,276,1191,292,1221,303,1243,318,1253,335,1263,362,1279,441,1294,547,1306,666,1323,906,1332,1074"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#a27b571593133576a069d69756f889d6b" title=" " alt="" coords="1014,2187,1217,2229"/>
-<area shape="poly" title=" " alt="" coords="1332,1132,1327,1350,1312,1679,1300,1846,1285,1994,1266,2107,1255,2145,1243,2170,1219,2190,1216,2186,1239,2166,1250,2143,1261,2106,1280,1993,1295,1846,1306,1679,1321,1350,1327,1132"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e" title=" " alt="" coords="755,2195,916,2221"/>
-<area shape="poly" title=" " alt="" coords="1332,1132,1327,1344,1312,1659,1301,1819,1286,1960,1267,2067,1256,2103,1243,2126,1215,2152,1186,2167,1158,2174,1129,2175,1065,2171,1030,2172,990,2177,900,2197,899,2191,989,2172,1029,2167,1065,2166,1129,2170,1157,2169,1184,2162,1211,2147,1239,2122,1251,2101,1262,2065,1280,1959,1295,1819,1307,1659,1322,1343,1327,1132"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567" title=" " alt="" coords="1026,2253,1205,2296"/>
-<area shape="poly" title=" " alt="" coords="1333,1132,1328,1364,1315,1717,1303,1896,1288,2055,1268,2176,1256,2217,1243,2243,1226,2258,1207,2268,1204,2263,1223,2253,1239,2240,1252,2215,1263,2175,1283,2054,1298,1896,1309,1717,1323,1364,1327,1131"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a9dd164184038b0f6a7d1b3926d228d30" title=" " alt="" coords="1033,1299,1198,1341"/>
-<area shape="poly" title=" " alt="" coords="1327,1132,1316,1168,1300,1210,1275,1253,1243,1289,1222,1302,1199,1311,1197,1306,1220,1297,1239,1285,1271,1249,1295,1208,1311,1166,1322,1131"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a4768e514c08fc094a8e80ba8def371ea" title=" " alt="" coords="1012,1667,1218,1693"/>
-<area shape="poly" title=" " alt="" coords="1333,1131,1328,1246,1315,1403,1303,1483,1288,1556,1268,1616,1256,1639,1243,1657,1220,1673,1217,1668,1239,1653,1252,1636,1263,1613,1283,1554,1298,1482,1309,1403,1323,1245,1327,1131"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#a9f0ef1ee48947cd640d772814c7e5140" title=" " alt="" coords="1026,1717,1205,1744"/>
-<area shape="poly" title=" " alt="" coords="1333,1132,1330,1255,1318,1428,1307,1516,1291,1596,1270,1662,1257,1688,1243,1707,1226,1720,1206,1729,1204,1724,1223,1716,1239,1703,1253,1685,1265,1660,1286,1595,1301,1515,1313,1427,1324,1255,1328,1131"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#abdacab45fd438391b9fa75a6c6d3a421" title=" " alt="" coords="1021,880,1210,923"/>
-<area shape="poly" title=" " alt="" coords="1319,1075,1291,1009,1268,974,1239,943,1208,925,1211,920,1243,939,1272,970,1295,1006,1324,1073"/>
-<area shape="poly" title=" " alt="" coords="471,119,410,112,411,107,471,114"/>
-<area shape="poly" title=" " alt="" coords="468,400,336,400,336,395,468,395"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8" title=" " alt="" coords="197,863,426,889"/>
-<area shape="poly" title=" " alt="" coords="480,834,365,865,364,859,479,829"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276" title=" " alt="" coords="221,915,402,957"/>
-<area shape="poly" title=" " alt="" coords="482,837,476,841,461,856,452,871,444,888,428,903,404,917,401,912,424,899,439,884,448,869,456,853,472,837,479,832"/>
-<area shape="poly" title=" " alt="" coords="463,876,426,877,426,872,463,871"/>
-<area shape="poly" title=" " alt="" coords="472,900,403,917,402,912,471,895"/>
-<area shape="poly" title=" " alt="" coords="470,916,425,905,371,893,373,887,427,900,471,911"/>
-<area shape="poly" title=" " alt="" coords="464,940,402,940,402,934,464,935"/>
-<area shape="poly" title=" " alt="" coords="478,978,472,974,456,956,448,938,440,921,424,905,400,892,402,887,428,901,445,918,453,936,460,953,476,970,481,974"/>
-<area shape="poly" title=" " alt="" coords="477,982,395,960,397,955,479,977"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a2cfe4223139cf58587a9f066b956cb23" title=" " alt="" coords="743,1181,928,1224"/>
-<area shape="poly" title=" " alt="" coords="1004,1205,928,1205,928,1200,1004,1200"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a92248ba0deff6e257595b422c5a4443d" title=" " alt="" coords="753,1299,918,1341"/>
-<area shape="poly" title=" " alt="" coords="1017,1366,918,1342,919,1337,1018,1361"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html#a274c06eec4ad000418b4b5ddf623b93e" title=" " alt="" coords="753,1365,918,1408"/>
-<area shape="poly" title=" " alt="" coords="1017,1389,918,1389,918,1384,1017,1384"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba" title=" " alt="" coords="748,1557,923,1600"/>
-<area shape="poly" title=" " alt="" coords="1012,1481,991,1489,924,1524,869,1559,866,1555,921,1519,989,1484,1011,1476"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="508,1608,647,1651"/>
-<area shape="poly" title=" " alt="" coords="733,1601,648,1618,647,1613,732,1596"/>
-<area shape="poly" title=" " alt="" coords="743,802,731,808,707,824,683,841,656,853,654,848,680,836,704,820,728,803,741,797"/>
-<area shape="poly" title=" " alt="" coords="723,856,677,862,677,857,722,851"/>
-<area shape="poly" title=" " alt="" coords="1009,1545,924,1563,923,1558,1008,1540"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a4d024810a54c16a402720bdad988631a" title=" " alt="" coords="754,1744,917,1771"/>
-<area shape="poly" title=" " alt="" coords="1008,1775,917,1767,917,1762,1008,1770"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#a2fd8b6b1e27c91bf9107390aa30dd554" title=" " alt="" coords="746,1795,925,1821"/>
-<area shape="poly" title=" " alt="" coords="1009,1794,926,1802,925,1797,1008,1789"/>
-<area shape="poly" title=" " alt="" coords="994,1581,923,1581,923,1576,994,1576"/>
-<area shape="poly" title=" " alt="" coords="1022,1615,923,1597,924,1592,1023,1610"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd" title=" " alt="" coords="224,1907,398,1949"/>
-<area shape="poly" title=" " alt="" coords="1005,1906,942,1905,708,1905,474,1916,399,1922,399,1917,474,1911,708,1899,942,1900,1005,1901"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451" title=" " alt="" coords="737,1915,934,1957"/>
-<area shape="poly" title=" " alt="" coords="1006,1921,934,1928,934,1923,1005,1916"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5" title=" " alt="" coords="5,1915,149,1941"/>
-<area shape="poly" title=" " alt="" coords="209,1931,149,1931,149,1925,209,1925"/>
-<area shape="poly" title=" " alt="" coords="721,1937,399,1932,399,1927,722,1932"/>
-<area shape="rect" href="../../d8/d37/class_chat_manager.html#a5b19f0632a911a519401b1b40e70db7c" title=" " alt="" coords="474,1965,681,1992"/>
-<area shape="poly" title=" " alt="" coords="722,1957,663,1967,662,1962,721,1952"/>
-<area shape="poly" title=" " alt="" coords="488,1964,398,1947,399,1942,489,1959"/>
-<area shape="rect" href="../../d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="757,439,914,465"/>
-<area shape="poly" title=" " alt="" coords="1013,452,915,454,915,448,1013,447"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="500,443,656,469"/>
-<area shape="poly" title=" " alt="" coords="741,456,657,457,656,452,741,451"/>
-<area shape="poly" title=" " alt="" coords="498,441,336,405,337,400,499,436"/>
-<area shape="poly" title=" " alt="" coords="1009,568,892,568,892,563,1009,563"/>
-<area shape="poly" title=" " alt="" coords="1009,609,891,581,892,576,1010,604"/>
-<area shape="rect" href="../../d4/d9e/class_signaling_client.html#ac3db9617d91d271ba18bde81f24b5c97" title=" " alt="" coords="762,2019,909,2045"/>
-<area shape="poly" title=" " alt="" coords="1009,2071,902,2049,903,2043,1010,2066"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a8e0d2dcd98ddaf7e2546508c44dd804e" title=" " alt="" coords="740,2069,931,2112"/>
-<area shape="poly" title=" " alt="" coords="1009,2093,932,2093,932,2088,1009,2088"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#ad1eb7f34bf1ee45ab24d16020ffcb889" title=" " alt="" coords="763,2136,908,2163"/>
-<area shape="poly" title=" " alt="" coords="1010,2115,903,2138,902,2133,1009,2110"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a257d9fcbdd01ef29c2c4b093a79b023a" title=" " alt="" coords="487,2128,668,2171"/>
-<area shape="poly" title=" " alt="" coords="747,2152,669,2152,669,2147,747,2147"/>
-<area shape="poly" title=" " alt="" coords="754,168,669,150,670,145,755,163"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a8104f62e2e6c3197832dbfe7753853de" title=" " alt="" coords="485,173,670,216"/>
-<area shape="poly" title=" " alt="" coords="725,190,671,193,671,188,725,185"/>
-<area shape="poly" title=" " alt="" coords="1003,213,919,199,920,194,1004,208"/>
-<area shape="poly" title=" " alt="" coords="1004,248,931,259,930,254,1003,243"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a1548090a456937ffafda64318f21ba40" title=" " alt="" coords="485,249,670,292"/>
-<area shape="poly" title=" " alt="" coords="722,273,671,273,671,268,722,268"/>
-<area shape="poly" title=" " alt="" coords="998,2211,916,2211,916,2205,998,2205"/>
-<area shape="poly" title=" " alt="" coords="1010,2252,894,2224,895,2219,1011,2247"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="739,2261,932,2288"/>
-<area shape="poly" title=" " alt="" coords="1010,2277,932,2277,932,2272,1010,2272"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="482,2261,674,2288"/>
-<area shape="poly" title=" " alt="" coords="724,2277,674,2277,674,2272,724,2272"/>
-<area shape="poly" title=" " alt="" coords="1017,1323,918,1323,918,1317,1017,1317"/>
-<area shape="rect" href="../../d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd" title=" " alt="" coords="734,1659,937,1701"/>
-<area shape="poly" title=" " alt="" coords="997,1683,937,1683,937,1677,997,1677"/>
-<area shape="poly" title=" " alt="" coords="718,1660,647,1646,648,1640,719,1654"/>
-<area shape="poly" title=" " alt="" coords="1022,1717,937,1701,938,1696,1023,1711"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4cb4b93a437c7da00771f5cc9488384e" title=" " alt="" coords="729,884,942,927"/>
-<area shape="poly" title=" " alt="" coords="1006,906,942,906,942,901,1006,900"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a4b09485e1d33303ed11454b605fd740c" title=" " alt="" coords="729,951,942,993"/>
-<area shape="poly" title=" " alt="" coords="1014,930,924,953,922,947,1012,924"/>
-<area shape="poly" title=" " alt="" coords="713,892,676,887,677,882,714,887"/>
-<area shape="poly" title=" " alt="" coords="741,947,728,941,704,924,680,908,654,896,656,891,683,903,707,920,731,936,743,942"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_ab77a9a6a08954192b47c39f359b5d370_icgraph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -1127,19 +835,20 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00054">54</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   55</span>    {</div>
+<div class="line"><span class="lineno">   56</span>        LogEntry e{line, lvl, <a class="code hl_function" href="#aef47611fd5e84cf8dac6dd8ebc750576">nowMs_</a>(), {}};</div>
+<div class="line"><span class="lineno">   57</span>        <span class="comment">// auto-detect if level was Info but looks like warn/error</span></div>
+<div class="line"><span class="lineno">   58</span>        <span class="keywordflow">if</span> (lvl == <a class="code hl_enumvalue" href="#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Level::Info</a>)</div>
+<div class="line"><span class="lineno">   59</span>            e.level = <a class="code hl_function" href="#adbbb6d7e9049625c19c72a8329ce123c">autoDetect_</a>(line);</div>
+<div class="line"><span class="lineno">   60</span>        <a class="code hl_function" href="#a5e5b35187416e687bc57384c386360c9">commit_</a>(channel, std::move(e));</div>
+<div class="line"><span class="lineno">   61</span>    }</div>
+<div class="ttc" id="aclass_logger_html_a5e5b35187416e687bc57384c386360c9"><div class="ttname"><a href="#a5e5b35187416e687bc57384c386360c9">Logger::commit_</a></div><div class="ttdeci">void commit_(const std::string &amp;channel, LogEntry e)</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00292">Logger.h:292</a></div></div>
+<div class="ttc" id="aclass_logger_html_adbbb6d7e9049625c19c72a8329ce123c"><div class="ttname"><a href="#adbbb6d7e9049625c19c72a8329ce123c">Logger::autoDetect_</a></div><div class="ttdeci">static Level autoDetect_(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00268">Logger.h:268</a></div></div>
+<div class="ttc" id="aclass_logger_html_aef47611fd5e84cf8dac6dd8ebc750576"><div class="ttname"><a href="#aef47611fd5e84cf8dac6dd8ebc750576">Logger::nowMs_</a></div><div class="ttdeci">static uint64_t nowMs_()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00262">Logger.h:262</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_a0bc3a507d60c66ff594379aa4196f861_cgraph.png" border="0" usemap="#ad3/d42/class_logger_a0bc3a507d60c66ff594379aa4196f861_cgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_a0bc3a507d60c66ff594379aa4196f861_cgraph" id="ad3/d42/class_logger_a0bc3a507d60c66ff594379aa4196f861_cgraph">
-<area shape="rect" title=" " alt="" coords="5,56,91,83"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#adbbb6d7e9049625c19c72a8329ce123c" title=" " alt="" coords="139,5,278,32"/>
-<area shape="poly" title=" " alt="" coords="90,53,149,35,150,40,92,58"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#a5e5b35187416e687bc57384c386360c9" title=" " alt="" coords="149,56,268,83"/>
-<area shape="poly" title=" " alt="" coords="91,67,134,67,134,72,91,72"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aef47611fd5e84cf8dac6dd8ebc750576" title=" " alt="" coords="150,107,267,133"/>
-<area shape="poly" title=" " alt="" coords="92,80,150,99,149,104,90,85"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_a0bc3a507d60c66ff594379aa4196f861_cgraph.svg" width="284" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1168,15 +877,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00262">262</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  263</span>    {</div>
+<div class="line"><span class="lineno">  264</span>        <span class="keyword">using namespace </span>std::chrono;</div>
+<div class="line"><span class="lineno">  265</span>        <span class="keywordflow">return</span> duration_cast&lt;milliseconds&gt;(system_clock::now().time_since_epoch()).count();</div>
+<div class="line"><span class="lineno">  266</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_aef47611fd5e84cf8dac6dd8ebc750576_icgraph.png" border="0" usemap="#ad3/d42/class_logger_aef47611fd5e84cf8dac6dd8ebc750576_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_aef47611fd5e84cf8dac6dd8ebc750576_icgraph" id="ad3/d42/class_logger_aef47611fd5e84cf8dac6dd8ebc750576_icgraph">
-<area shape="rect" title=" " alt="" coords="139,5,256,32"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#a0bc3a507d60c66ff594379aa4196f861" title=" " alt="" coords="5,5,91,32"/>
-<area shape="poly" title=" " alt="" coords="123,21,91,21,91,16,123,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/d42/class_logger_aef47611fd5e84cf8dac6dd8ebc750576_icgraph.svg" width="262" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1205,7 +913,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00103">103</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  104</span>    {</div>
+<div class="line"><span class="lineno">  105</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">  106</span>        <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.erase(std::remove_if(<a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.begin(), <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.end(),</div>
+<div class="line"><span class="lineno">  107</span>                                    [<span class="keywordtype">id</span>](<span class="keyword">auto</span>&amp; p)</div>
+<div class="line"><span class="lineno">  108</span>                                    { return p.first == id; }),</div>
+<div class="line"><span class="lineno">  109</span>                     <a class="code hl_variable" href="#a149a7f0562ed9ec3ae14e31c2beb9f0d">sinks_</a>.end());</div>
+<div class="line"><span class="lineno">  110</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aa5f277e7a2c780a518e7d5232556c4c2" name="aa5f277e7a2c780a518e7d5232556c4c2"></a>
@@ -1232,17 +947,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00089">89</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d3/d42/class_logger_aa5f277e7a2c780a518e7d5232556c4c2_icgraph.png" border="0" usemap="#ad3/d42/class_logger_aa5f277e7a2c780a518e7d5232556c4c2_icgraph" alt=""/></div>
-<map name="ad3/d42/class_logger_aa5f277e7a2c780a518e7d5232556c4c2_icgraph" id="ad3/d42/class_logger_aa5f277e7a2c780a518e7d5232556c4c2_icgraph">
-<area shape="rect" title=" " alt="" coords="103,5,289,32"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>
-</div>
-
+<div class="fragment"><div class="line"><span class="lineno">   90</span>    {</div>
+<div class="line"><span class="lineno">   91</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">   92</span>        <a class="code hl_variable" href="#aad9420d4c33539f6f276af6588b21fe0">capacity_</a> = cap;</div>
+<div class="line"><span class="lineno">   93</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a9a5430b63e73ed117ca620542a9a733c" name="a9a5430b63e73ed117ca620542a9a733c"></a>
@@ -1269,7 +978,12 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00127">127</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  128</span>    {</div>
+<div class="line"><span class="lineno">  129</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#acc3ac4fd1f6e5e58a5e65609824e5d6b">m_</a>);</div>
+<div class="line"><span class="lineno">  130</span>        <a class="code hl_variable" href="#a099d6f760e3d28ce7b4d3aae0005d956">cerrRedirect_</a>.reset();</div>
+<div class="line"><span class="lineno">  131</span>        <a class="code hl_variable" href="#a5c39f01ef0292da019287955b849ac2c">coutRedirect_</a>.reset();</div>
+<div class="line"><span class="lineno">  132</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

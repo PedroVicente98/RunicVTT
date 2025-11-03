@@ -1,9 +1,9 @@
 <map id="BoardManager::handleFogCreation" name="BoardManager::handleFogCreation">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,228,61"/>
-<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#acdce04083030c8be718c47f246f1cf0f" title=" " alt="" coords="276,5,484,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,33,260,29,261,35,228,38"/>
-<area shape="rect" id="Node000004" href="$d2/dbf/class_board_manager.html#a7d2d476b95461eead67e8d151f0d376a" title=" " alt="" coords="281,56,479,99"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="228,58,266,62,265,67,228,63"/>
-<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#a2f084d03176076e9260e06df52e474fe" title=" " alt="" coords="532,5,747,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="485,16,517,16,517,21,485,21"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,228,57"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#acdce04083030c8be718c47f246f1cf0f" title=" " alt="" coords="294,5,502,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,31,278,27,279,32,228,37"/>
+<area shape="rect" id="Node000004" href="$d2/dbf/class_board_manager.html#a7d2d476b95461eead67e8d151f0d376a" title=" " alt="" coords="276,56,521,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="228,51,260,54,260,60,228,57"/>
+<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#a2f084d03176076e9260e06df52e474fe" title=" " alt="" coords="569,5,784,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="503,16,553,16,553,21,503,21"/>
 </map>

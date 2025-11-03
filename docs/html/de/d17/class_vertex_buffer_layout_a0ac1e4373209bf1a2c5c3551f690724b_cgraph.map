@@ -1,7 +1,5 @@
 <map id="VertexBufferLayout::Push" name="VertexBufferLayout::Push">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,137,81"/>
-<area shape="rect" id="Node000002" href="$de/df5/struct_vertex_buffer_element.html#a8465417a435f8bcd68a71bc414f1d0ee" title=" " alt="" coords="185,5,325,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="137,45,169,40,170,45,138,51"/>
-<area shape="rect" id="Node000003" href="$de/d17/class_vertex_buffer_layout.html#a7e1ef819bf5dc21d20bb38d9c6914aa5" title=" " alt="" coords="189,72,320,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="138,69,175,76,174,81,137,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,175,32"/>
+<area shape="rect" id="Node000002" href="$de/df5/struct_vertex_buffer_element.html#a8465417a435f8bcd68a71bc414f1d0ee" title=" " alt="" coords="223,5,460,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,16,207,16,207,21,175,21"/>
 </map>

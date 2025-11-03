@@ -6,7 +6,7 @@ digraph "GameTableManager::saveBoardPopUp"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="GameTableManager::saveBoard\lPopUp",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="GameTableManager::saveBoardPopUp",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="GameTableManager::UI\l_TransientLine",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549",tooltip=" "];
+  Node2 [id="Node000002",label="GameTableManager::UI_TransientLine",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549",tooltip=" "];
 }

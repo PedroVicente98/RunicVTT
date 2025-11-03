@@ -1,10 +1,10 @@
 <map id="GameTableManager::UI_ConfirmModal" name="GameTableManager::UI_ConfirmModal">
-<area shape="rect" id="Node000001" title=" " alt="" coords="474,39,633,81"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a9e77e8dc8b230daf3133b430fc2149b7" title=" " alt="" coords="245,5,426,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="458,48,426,43,427,38,459,43"/>
-<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#adeaf6e8bd31c587d2b65f5288afdc907" title=" " alt="" coords="245,72,426,115"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="459,77,427,82,426,77,458,72"/>
-<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,39,197,81"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="230,44,197,49,197,44,229,39"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="229,81,197,76,197,71,230,76"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="678,31,925,57"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a9e77e8dc8b230daf3133b430fc2149b7" title=" " alt="" coords="332,5,622,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="662,36,622,33,622,27,663,31"/>
+<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#adeaf6e8bd31c587d2b65f5288afdc907" title=" " alt="" coords="324,56,630,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="663,57,631,60,630,55,662,52"/>
+<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,31,276,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,33,276,36,276,31,316,28"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="308,59,276,57,276,52,308,54"/>
 </map>

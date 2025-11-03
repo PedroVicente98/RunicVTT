@@ -1,8 +1,8 @@
 <map id="DebugConsole::setLocalTunnelHandlers" name="DebugConsole::setLocalTunnelHandlers">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,209,77"/>
-<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="257,5,374,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,35,241,29,242,34,209,40"/>
-<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="273,80,358,107"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,72,258,80,257,86,208,77"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="280,81,274,71,278,62,292,55,315,53,340,56,353,62,351,67,339,61,315,59,294,61,282,65,279,71,284,78"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,261,69"/>
+<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="309,5,426,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="220,39,293,28,294,33,221,45"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="325,80,410,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="221,67,310,82,309,87,220,73"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="328,81,321,71,326,61,342,55,367,53,396,56,410,63,408,68,394,61,367,59,343,61,329,65,326,71,332,78"/>
 </map>

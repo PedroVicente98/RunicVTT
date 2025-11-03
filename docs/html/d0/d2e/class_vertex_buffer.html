@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,7 @@ $(function(){initNavTree('d0/d2e/class_vertex_buffer.html','../../'); initResiza
 <div class="dynheader">
 Collaboration diagram for VertexBuffer:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d9/dc4/class_vertex_buffer__coll__graph.png" border="0" usemap="#a_vertex_buffer_coll__map" alt="Collaboration graph"/></div>
-<map name="a_vertex_buffer_coll__map" id="a_vertex_buffer_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,188,171"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d9/dc4/class_vertex_buffer__coll__graph.svg" width="194" height="176"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -151,7 +148,14 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html#l00004">4</a> of file <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html">VertexBuffer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">    5</span>{</div>
+<div class="line"><span class="lineno">    6</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glGenBuffers(1, &amp;<a class="code hl_variable" href="#a1bd5ca5551f0b5797fe7e008abbcca03">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">    7</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindBuffer(GL_ARRAY_BUFFER, <a class="code hl_variable" href="#a1bd5ca5551f0b5797fe7e008abbcca03">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">    8</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));</div>
+<div class="line"><span class="lineno">    9</span>}</div>
+<div class="ttc" id="a_renderer_8h_html_a8cc1e1baeb83f3fa64a4aaa75baf3548"><div class="ttname"><a href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a></div><div class="ttdeci">#define GLCall(x)</div><div class="ttdef"><b>Definition</b> <a href="../../d3/da0/_renderer_8h_source.html#l00012">Renderer.h:12</a></div></div>
+<div class="ttc" id="aclass_vertex_buffer_html_a1bd5ca5551f0b5797fe7e008abbcca03"><div class="ttname"><a href="#a1bd5ca5551f0b5797fe7e008abbcca03">VertexBuffer::m_RendererID</a></div><div class="ttdeci">unsigned int m_RendererID</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d84/_vertex_buffer_8h_source.html#l00013">VertexBuffer.h:13</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a5216726fdd43b2ae8e1439e347717fdd" name="a5216726fdd43b2ae8e1439e347717fdd"></a>
@@ -170,7 +174,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html#l00011">11</a> of file <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html">VertexBuffer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   12</span>{</div>
+<div class="line"><span class="lineno">   13</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glDeleteBuffers(1, &amp;<a class="code hl_variable" href="#a1bd5ca5551f0b5797fe7e008abbcca03">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   14</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -190,21 +197,10 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html#l00016">16</a> of file <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html">VertexBuffer.cpp</a>.</p>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d0/d2e/class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9_icgraph.png" border="0" usemap="#ad0/d2e/class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9_icgraph" alt=""/></div>
-<map name="ad0/d2e/class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9_icgraph" id="ad0/d2e/class_vertex_buffer_a13019e8580ca3e369fad4166500ad2b9_icgraph">
-<area shape="rect" title=" " alt="" coords="509,5,636,32"/>
-<area shape="rect" href="../../d9/d51/class_vertex_array.html#a994a9dc780ecc0c725b0814a9e7ab532" title=" " alt="" coords="307,5,461,32"/>
-<area shape="poly" title=" " alt="" coords="494,21,462,21,462,16,494,16"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,5,259,32"/>
-<area shape="poly" title=" " alt="" coords="291,21,259,21,259,16,291,16"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>
-</div>
-
+<div class="fragment"><div class="line"><span class="lineno">   17</span>{</div>
+<div class="line"><span class="lineno">   18</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindBuffer(GL_ARRAY_BUFFER, <a class="code hl_variable" href="#a1bd5ca5551f0b5797fe7e008abbcca03">m_RendererID</a>));</div>
+<div class="line"><span class="lineno">   19</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="abfdb36238d60f2cd7bf63093f914b61f" name="abfdb36238d60f2cd7bf63093f914b61f"></a>
@@ -223,19 +219,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html#l00021">21</a> of file <a class="el" href="../../df/df6/_vertex_buffer_8cpp_source.html">VertexBuffer.cpp</a>.</p>
-<div class="dynheader">
-Here is the caller graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><img src="../../d0/d2e/class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f_icgraph.png" border="0" usemap="#ad0/d2e/class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f_icgraph" alt=""/></div>
-<map name="ad0/d2e/class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f_icgraph" id="ad0/d2e/class_vertex_buffer_abfdb36238d60f2cd7bf63093f914b61f_icgraph">
-<area shape="rect" title=" " alt="" coords="307,5,448,32"/>
-<area shape="rect" href="../../d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,5,259,32"/>
-<area shape="poly" title=" " alt="" coords="292,21,259,21,259,16,292,16"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,5,55,32"/>
-<area shape="poly" title=" " alt="" coords="87,21,55,21,55,16,87,16"/>
-</map>
-</div>
-
+<div class="fragment"><div class="line"><span class="lineno">   22</span>{</div>
+<div class="line"><span class="lineno">   23</span>    <a class="code hl_define" href="../../d3/da0/_renderer_8h.html#a8cc1e1baeb83f3fa64a4aaa75baf3548">GLCall</a>(glBindBuffer(GL_ARRAY_BUFFER, 0));</div>
+<div class="line"><span class="lineno">   24</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

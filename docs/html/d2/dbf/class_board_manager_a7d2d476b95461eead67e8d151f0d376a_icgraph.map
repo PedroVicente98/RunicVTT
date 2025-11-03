@@ -1,5 +1,5 @@
 <map id="BoardManager::getMouseStartPosition" name="BoardManager::getMouseStartPosition">
-<area shape="rect" id="Node000001" title=" " alt="" coords="276,5,474,48"/>
-<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ae79a62af94b472eabd633c118807fba8" title=" " alt="" coords="5,13,228,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="260,29,228,29,228,24,260,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="276,5,521,32"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ae79a62af94b472eabd633c118807fba8" title=" " alt="" coords="5,5,228,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="260,21,228,21,228,16,260,16"/>
 </map>

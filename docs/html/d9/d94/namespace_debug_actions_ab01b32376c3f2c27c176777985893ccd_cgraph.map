@@ -1,18 +1,18 @@
 <map id="DebugActions::RegisterToasterToggles" name="DebugActions::RegisterToasterToggles">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,209,91"/>
-<area shape="rect" id="Node000002" href="$d5/d7c/class_debug_console.html#a7bca63678bdb0ec7273afe2d308e1160" title=" " alt="" coords="273,5,447,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="208,46,274,33,275,38,210,52"/>
-<area shape="rect" id="Node000003" href="$d9/d94/namespace_debug_actions.html#a4768e514c08fc094a8e80ba8def371ea" title=" " alt="" coords="257,56,463,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="209,67,241,67,241,72,209,72"/>
-<area shape="rect" id="Node000006" href="$d9/d94/namespace_debug_actions.html#a9f0ef1ee48947cd640d772814c7e5140" title=" " alt="" coords="270,107,450,133"/>
-<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="210,87,275,100,274,106,208,92"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="553,107,670,133"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="430,81,538,103,537,108,429,86"/>
-<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="569,56,654,83"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="464,67,553,67,553,72,464,72"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="570,57,562,47,567,37,584,31,612,29,642,32,658,39,656,44,641,37,612,35,585,37,571,42,567,47,574,54"/>
-<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="450,117,537,117,537,123,450,123"/>
-<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="429,103,553,78,554,84,430,109"/>
-<area shape="rect" id="Node000007" href="$d9/d94/namespace_debug_actions.html#a627884124505b8c816228d512673be7e" title=" " alt="" coords="511,157,712,184"/>
-<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="430,131,528,151,527,156,429,137"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,254,83"/>
+<area shape="rect" id="Node000002" href="$d5/d7c/class_debug_console.html#a7bca63678bdb0ec7273afe2d308e1160" title=" " alt="" coords="318,5,492,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="206,53,313,33,314,38,207,58"/>
+<area shape="rect" id="Node000003" href="$d9/d94/namespace_debug_actions.html#a4768e514c08fc094a8e80ba8def371ea" title=" " alt="" coords="302,56,508,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="254,67,286,67,286,72,254,72"/>
+<area shape="rect" id="Node000006" href="$d9/d94/namespace_debug_actions.html#a9f0ef1ee48947cd640d772814c7e5140" title=" " alt="" coords="315,107,494,133"/>
+<area shape="poly" id="edge6_Node000001_Node000006" title=" " alt="" coords="207,81,314,101,313,106,206,86"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="598,107,715,133"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="475,81,583,103,582,108,474,86"/>
+<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="614,56,699,83"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="509,67,598,67,598,72,509,72"/>
+<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="615,57,607,47,612,37,629,31,657,29,687,32,703,39,701,44,686,37,657,35,630,37,616,42,612,47,619,54"/>
+<area shape="poly" id="edge7_Node000006_Node000004" title=" " alt="" coords="495,117,582,117,582,123,495,123"/>
+<area shape="poly" id="edge8_Node000006_Node000005" title=" " alt="" coords="474,103,598,78,599,84,475,109"/>
+<area shape="rect" id="Node000007" href="$d9/d94/namespace_debug_actions.html#a627884124505b8c816228d512673be7e" title=" " alt="" coords="556,157,757,184"/>
+<area shape="poly" id="edge9_Node000006_Node000007" title=" " alt="" coords="475,131,573,151,572,156,474,137"/>
 </map>

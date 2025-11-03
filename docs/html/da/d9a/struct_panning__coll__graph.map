@@ -1,3 +1,5 @@
 <map id="Panning" name="Panning">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,114,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,63,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="17,5,52,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="37,75,37,122,32,122,32,75"/>
 </map>

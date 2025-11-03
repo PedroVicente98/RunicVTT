@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -103,16 +103,7 @@ $(function(){initNavTree('dd/d43/class_logger_1_1_ostream_redirect.html','../../
 <div class="dynheader">
 Collaboration diagram for Logger::OstreamRedirect:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../db/d46/class_logger_1_1_ostream_redirect__coll__graph.png" border="0" usemap="#a_logger_1_1_ostream_redirect_coll__map" alt="Collaboration graph"/></div>
-<map name="a_logger_1_1_ostream_redirect_coll__map" id="a_logger_1_1_ostream_redirect_coll__map">
-<area shape="rect" title=" " alt="" coords="5,485,209,827"/>
-<area shape="rect" href="../../db/d80/class_logger_1_1_line_to_logger_buf.html" title=" " alt="" coords="6,155,209,421"/>
-<area shape="poly" title=" " alt="" coords="110,421,110,468,105,468,105,421"/>
-<area shape="rect" title=" " alt="" coords="13,5,108,75"/>
-<area shape="poly" title=" " alt="" coords="72,89,85,154,80,155,67,90"/>
-<area shape="rect" title=" " alt="" coords="133,5,175,75"/>
-<area shape="poly" title=" " alt="" coords="150,75,138,138,133,137,145,74"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../db/d46/class_logger_1_1_ostream_redirect__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -176,7 +167,15 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00221">221</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  221</span>                                                                                                          :</div>
+<div class="line"><span class="lineno">  222</span>            <a class="code hl_variable" href="#aa20f90d911a82fdf05ecd9c46e97e775">os_</a>(os), <a class="code hl_variable" href="#a1fe9670013186287402fa21477fb7f6a">original_</a>(os.rdbuf()), <a class="code hl_variable" href="#a615232bf3e799d5f3524528c25ec8862">buf_</a>(channel, forced)</div>
+<div class="line"><span class="lineno">  223</span>        {</div>
+<div class="line"><span class="lineno">  224</span>            <a class="code hl_variable" href="#aa20f90d911a82fdf05ecd9c46e97e775">os_</a>.rdbuf(&amp;<a class="code hl_variable" href="#a615232bf3e799d5f3524528c25ec8862">buf_</a>);</div>
+<div class="line"><span class="lineno">  225</span>        }</div>
+<div class="ttc" id="aclass_logger_1_1_ostream_redirect_html_a1fe9670013186287402fa21477fb7f6a"><div class="ttname"><a href="#a1fe9670013186287402fa21477fb7f6a">Logger::OstreamRedirect::original_</a></div><div class="ttdeci">std::streambuf * original_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00247">Logger.h:247</a></div></div>
+<div class="ttc" id="aclass_logger_1_1_ostream_redirect_html_a615232bf3e799d5f3524528c25ec8862"><div class="ttname"><a href="#a615232bf3e799d5f3524528c25ec8862">Logger::OstreamRedirect::buf_</a></div><div class="ttdeci">LineToLoggerBuf buf_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00248">Logger.h:248</a></div></div>
+<div class="ttc" id="aclass_logger_1_1_ostream_redirect_html_aa20f90d911a82fdf05ecd9c46e97e775"><div class="ttname"><a href="#aa20f90d911a82fdf05ecd9c46e97e775">Logger::OstreamRedirect::os_</a></div><div class="ttdeci">std::ostream &amp; os_</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00246">Logger.h:246</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aedc7e647524d04504a46850ef89bdd18" name="aedc7e647524d04504a46850ef89bdd18"></a>
@@ -203,7 +202,19 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d6/dec/_logger_8h_source.html#l00226">226</a> of file <a class="el" href="../../d6/dec/_logger_8h_source.html">Logger.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  227</span>        {</div>
+<div class="line"><span class="lineno">  228</span>            <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a1fe9670013186287402fa21477fb7f6a">original_</a>)</div>
+<div class="line"><span class="lineno">  229</span>            {</div>
+<div class="line"><span class="lineno">  230</span>                <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  231</span>                {</div>
+<div class="line"><span class="lineno">  232</span>                    <a class="code hl_variable" href="#aa20f90d911a82fdf05ecd9c46e97e775">os_</a>.rdbuf(<a class="code hl_variable" href="#a1fe9670013186287402fa21477fb7f6a">original_</a>);</div>
+<div class="line"><span class="lineno">  233</span>                }</div>
+<div class="line"><span class="lineno">  234</span>                <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  235</span>                {</div>
+<div class="line"><span class="lineno">  236</span>                }</div>
+<div class="line"><span class="lineno">  237</span>            }</div>
+<div class="line"><span class="lineno">  238</span>        }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a67779020b006d667ed73d5d53a3e1e4c" name="a67779020b006d667ed73d5d53a3e1e4c"></a>

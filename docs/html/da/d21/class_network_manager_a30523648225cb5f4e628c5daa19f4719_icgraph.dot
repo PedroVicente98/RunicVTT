@@ -8,5 +8,5 @@ digraph "NetworkManager::sendMarkerMove"
   rankdir="RL";
   Node1 [id="Node000001",label="NetworkManager::sendMarkerMove",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NetworkManager::broadcast\lMarkerMove",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a2c3da3e8d0493153ac8dea2dcda3bfbd",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkManager::broadcastMarkerMove",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a2c3da3e8d0493153ac8dea2dcda3bfbd",tooltip=" "];
 }

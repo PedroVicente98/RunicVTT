@@ -1,8 +1,8 @@
 <map id="DebugActions::FpsOverlayChanged" name="DebugActions::FpsOverlayChanged">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,184,77"/>
-<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="232,5,349,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="183,36,216,30,217,35,184,42"/>
-<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="248,80,333,107"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="184,70,233,80,232,85,183,76"/>
-<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="257,81,251,71,255,62,269,55,290,53,314,56,326,62,324,67,312,61,290,59,270,61,259,65,256,71,261,78"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,236,69"/>
+<area shape="rect" id="Node000002" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="284,5,401,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,39,268,28,269,34,204,45"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="300,80,385,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="204,67,285,81,284,86,203,73"/>
+<area shape="poly" id="edge3_Node000003_Node000003" title=" " alt="" coords="305,81,298,71,303,61,318,55,342,53,369,56,383,62,380,67,367,61,342,59,319,61,306,65,303,71,309,78"/>
 </map>

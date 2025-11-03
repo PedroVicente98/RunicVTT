@@ -1,12 +1,12 @@
 <map id="BoardManager::renderCameraWindow" name="BoardManager::renderCameraWindow">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,201,91"/>
-<area shape="rect" id="Node000002" href="$da/dbb/class_camera.html#a811613828473f845ff5ab6b38a3492a9" title=" " alt="" coords="280,5,406,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,46,264,33,265,38,202,51"/>
-<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#aa8cc85933ca8f36804277702fa568079" title=" " alt="" coords="249,56,437,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="201,67,233,67,233,72,201,72"/>
-<area shape="rect" id="Node000005" href="$da/dbb/class_camera.html#a2c2387705de7f2189756fe55b4e4ca2c" title=" " alt="" coords="492,107,618,133"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="202,85,249,92,369,105,477,113,476,118,368,110,248,97,201,90"/>
-<area shape="rect" id="Node000004" href="$da/dbb/class_camera.html#a68011392c392f16827b18793f5d8272a" title=" " alt="" coords="485,56,625,83"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="437,67,470,67,470,72,437,72"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="403,81,482,100,481,105,401,86"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,248,83"/>
+<area shape="rect" id="Node000002" href="$da/dbb/class_camera.html#a811613828473f845ff5ab6b38a3492a9" title=" " alt="" coords="327,5,453,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="199,53,311,31,312,36,200,58"/>
+<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#aa8cc85933ca8f36804277702fa568079" title=" " alt="" coords="296,56,484,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="248,67,280,67,280,72,248,72"/>
+<area shape="rect" id="Node000005" href="$da/dbb/class_camera.html#a2c2387705de7f2189756fe55b4e4ca2c" title=" " alt="" coords="539,107,665,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="213,81,296,92,524,112,523,118,295,97,213,86"/>
+<area shape="rect" id="Node000004" href="$da/dbb/class_camera.html#a68011392c392f16827b18793f5d8272a" title=" " alt="" coords="532,56,672,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="484,67,517,67,517,72,484,72"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="450,81,529,100,528,105,448,86"/>
 </map>

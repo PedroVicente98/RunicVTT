@@ -1,5 +1,5 @@
 <map id="BoardManager::handleMarkerDragging" name="BoardManager::handleMarkerDragging">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,197,48"/>
-<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ae0f3b59723144f72cce8eb9657e917fe" title=" " alt="" coords="245,5,426,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,24,229,24,229,29,197,29"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,249,32"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#ae0f3b59723144f72cce8eb9657e917fe" title=" " alt="" coords="297,5,550,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="249,16,281,16,281,21,249,21"/>
 </map>

@@ -6,7 +6,7 @@ digraph "ApplicationHandler::ApplicationHandler"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="ApplicationHandler\l::ApplicationHandler",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="ApplicationHandler::ApplicationHandler",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="PathManager::getGameTablesPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a6be0a95403caf375f4d7b642f0f90061",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
@@ -15,11 +15,11 @@ digraph "ApplicationHandler::ApplicationHandler"
   Node4 [id="Node000004",label="PathManager::getNotesPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#af679863b43cab353b30094f54650bc99",tooltip=" "];
   Node4 -> Node3 [id="edge4_Node000004_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node1 -> Node5 [id="edge5_Node000001_Node000005",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="DebugActions::RegisterAll\lDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
+  Node5 [id="Node000005",label="DebugActions::RegisterAllDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
   Node5 -> Node6 [id="edge6_Node000005_Node000006",color="steelblue1",style="solid",tooltip=" "];
   Node6 [id="Node000006",label="DebugConsole::addToggle",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d7c/class_debug_console.html#a7bca63678bdb0ec7273afe2d308e1160",tooltip=" "];
   Node5 -> Node7 [id="edge7_Node000005_Node000007",color="steelblue1",style="solid",tooltip=" "];
-  Node7 [id="Node000007",label="DebugActions::FpsOverlay\lChanged",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a04bb6c5d112ef6b6bc016d8742117478",tooltip=" "];
+  Node7 [id="Node000007",label="DebugActions::FpsOverlayChanged",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a04bb6c5d112ef6b6bc016d8742117478",tooltip=" "];
   Node7 -> Node8 [id="edge8_Node000007_Node000008",color="steelblue1",style="solid",tooltip=" "];
   Node8 [id="Node000008",label="Logger::instance",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f",tooltip=" "];
   Node7 -> Node9 [id="edge9_Node000007_Node000009",color="steelblue1",style="solid",tooltip=" "];
@@ -28,7 +28,7 @@ digraph "ApplicationHandler::ApplicationHandler"
   Node5 -> Node10 [id="edge11_Node000005_Node000010",color="steelblue1",style="solid",tooltip=" "];
   Node10 [id="Node000010",label="DebugActions::FpsOverlayTick",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa7b4f671ff9a0a6512a6ab00de581acb",tooltip=" "];
   Node5 -> Node11 [id="edge12_Node000005_Node000011",color="steelblue1",style="solid",tooltip=" "];
-  Node11 [id="Node000011",label="DebugActions::MouseCircle\lChanged",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a22bd9aaf7a1f27163089c06202ff4942",tooltip=" "];
+  Node11 [id="Node000011",label="DebugActions::MouseCircleChanged",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a22bd9aaf7a1f27163089c06202ff4942",tooltip=" "];
   Node11 -> Node8 [id="edge13_Node000011_Node000008",color="steelblue1",style="solid",tooltip=" "];
   Node11 -> Node9 [id="edge14_Node000011_Node000009",color="steelblue1",style="solid",tooltip=" "];
   Node5 -> Node12 [id="edge15_Node000005_Node000012",color="steelblue1",style="solid",tooltip=" "];
@@ -44,7 +44,7 @@ digraph "ApplicationHandler::ApplicationHandler"
   Node14 -> Node15 [id="edge22_Node000014_Node000015",color="steelblue1",style="solid",tooltip=" "];
   Node15 [id="Node000015",label="DebugActions::timeElapsedMs",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a627884124505b8c816228d512673be7e",tooltip=" "];
   Node1 -> Node16 [id="edge23_Node000001_Node000016",color="steelblue1",style="solid",tooltip=" "];
-  Node16 [id="Node000016",label="DebugActions::RegisterToaster\lToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd",tooltip=" "];
+  Node16 [id="Node000016",label="DebugActions::RegisterToasterToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd",tooltip=" "];
   Node16 -> Node6 [id="edge24_Node000016_Node000006",color="steelblue1",style="solid",tooltip=" "];
   Node16 -> Node17 [id="edge25_Node000016_Node000017",color="steelblue1",style="solid",tooltip=" "];
   Node17 [id="Node000017",label="DebugActions::ToasterChanged",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a4768e514c08fc094a8e80ba8def371ea",tooltip=" "];

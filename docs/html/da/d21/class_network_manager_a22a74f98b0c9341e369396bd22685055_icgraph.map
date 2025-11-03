@@ -1,7 +1,7 @@
 <map id="NetworkManager::buildFogUpdateFrame" name="NetworkManager::buildFogUpdateFrame">
-<area shape="rect" id="Node000001" title=" " alt="" coords="507,5,684,48"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a3684a5a4e823449e8006c323faf54f8a" title=" " alt="" coords="239,13,459,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="491,29,459,29,459,24,491,24"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a952cf99cf04e63f0a0674f06ab8ec4bb" title=" " alt="" coords="5,5,191,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="223,29,191,29,191,24,223,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="571,5,827,32"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a3684a5a4e823449e8006c323faf54f8a" title=" " alt="" coords="303,5,523,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="555,21,523,21,523,16,555,16"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a952cf99cf04e63f0a0674f06ab8ec4bb" title=" " alt="" coords="5,5,255,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="287,21,255,21,255,16,287,16"/>
 </map>

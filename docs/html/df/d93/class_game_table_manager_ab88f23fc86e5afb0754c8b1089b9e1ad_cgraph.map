@@ -1,5 +1,5 @@
 <map id="GameTableManager::saveBoardPopUp" name="GameTableManager::saveBoardPopUp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,213,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549" title=" " alt="" coords="261,5,420,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="213,24,245,24,245,29,213,29"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,253,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#ada67db01e0a7a38c98fdcba0d572f549" title=" " alt="" coords="301,5,545,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="253,16,285,16,285,21,253,21"/>
 </map>

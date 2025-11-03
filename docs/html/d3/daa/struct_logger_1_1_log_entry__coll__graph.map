@@ -1,5 +1,9 @@
 <map id="Logger::LogEntry" name="Logger::LogEntry">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,115,245"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="39,5,82,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="63,74,63,138,58,138,58,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="38,155,148,224"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="36,74,54,130,60,140,55,142,50,132,31,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,5,114,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="96,75,96,137,91,137,91,75"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="138,5,195,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="161,76,140,132,134,142,129,139,135,130,156,74"/>
 </map>

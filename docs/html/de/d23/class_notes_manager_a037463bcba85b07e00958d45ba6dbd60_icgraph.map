@@ -1,11 +1,11 @@
 <map id="NotesManager::parseMarkdownFile" name="NotesManager::parseMarkdownFile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="490,56,717,83"/>
-<area shape="rect" id="Node000002" href="$de/d23/class_notes_manager.html#ab3b787865dc553f59e3e5d8c6cd44402" title=" " alt="" coords="264,48,442,91"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="474,72,443,72,443,67,474,67"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="534,56,761,83"/>
+<area shape="rect" id="Node000002" href="$de/d23/class_notes_manager.html#ab3b787865dc553f59e3e5d8c6cd44402" title=" " alt="" coords="264,56,486,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="519,72,486,72,486,67,519,67"/>
 <area shape="rect" id="Node000003" href="$de/d23/class_notes_manager.html#ad27f8593eb58d8f778818bf4921574f3" title=" " alt="" coords="5,5,216,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="248,50,177,35,178,30,249,45"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="286,55,183,35,184,30,287,50"/>
 <area shape="rect" id="Node000004" href="$de/d23/class_notes_manager.html#aa1f004250dedc1e84ec8926c0283a450" title=" " alt="" coords="8,56,213,83"/>
 <area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="248,72,214,72,214,67,248,67"/>
 <area shape="rect" id="Node000005" href="$de/d23/class_notes_manager.html#af4a6dd97ecee332425ca422fb84bfc1f" title=" " alt="" coords="11,107,210,133"/>
-<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="249,94,178,109,177,103,248,88"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="287,89,184,109,183,103,286,84"/>
 </map>

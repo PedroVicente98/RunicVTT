@@ -1,9 +1,9 @@
 <map id="NetworkManager::tieBreakWins" name="NetworkManager::tieBreakWins">
-<area shape="rect" id="Node000001" title=" " alt="" coords="253,80,459,107"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a7762e709e932f865336a3e9e8b8629da" title=" " alt="" coords="5,5,205,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="287,78,187,51,189,46,289,73"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a023560dbfc1318f5bdddad3cc9e226ea" title=" " alt="" coords="5,72,205,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="237,96,205,96,205,91,237,91"/>
-<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a279da5736fe76c05b682f3ad5c863550" title=" " alt="" coords="5,139,205,181"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="289,114,189,141,187,135,287,109"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="325,64,531,91"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a7762e709e932f865336a3e9e8b8629da" title=" " alt="" coords="5,5,277,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="350,63,276,47,218,35,219,30,277,41,351,57"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a023560dbfc1318f5bdddad3cc9e226ea" title=" " alt="" coords="5,56,277,99"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="309,80,277,80,277,75,309,75"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a279da5736fe76c05b682f3ad5c863550" title=" " alt="" coords="5,123,277,165"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="353,97,237,125,235,119,352,92"/>
 </map>

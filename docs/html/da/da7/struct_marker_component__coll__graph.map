@@ -1,5 +1,7 @@
 <map id="MarkerComponent" name="MarkerComponent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,178,245"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="70,5,113,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,74,94,138,89,138,89,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="50,155,168,224"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="23,75,23,102,31,130,41,143,36,146,26,132,18,103,18,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="175,5,209,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="187,75,178,104,165,132,158,143,153,140,160,129,173,102,182,74"/>
 </map>

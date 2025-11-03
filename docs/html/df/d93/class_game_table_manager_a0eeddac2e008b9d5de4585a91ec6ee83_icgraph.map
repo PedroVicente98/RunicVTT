@@ -1,7 +1,7 @@
 <map id="GameTableManager::UI_CopyButtonWithToast" name="GameTableManager::UI_CopyButtonWithToast">
-<area shape="rect" id="Node000001" title=" " alt="" coords="474,5,633,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a9e77e8dc8b230daf3133b430fc2149b7" title=" " alt="" coords="245,5,426,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="459,29,426,29,426,24,459,24"/>
-<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,5,197,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="229,29,197,29,197,24,229,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="662,5,956,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a9e77e8dc8b230daf3133b430fc2149b7" title=" " alt="" coords="324,5,614,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="647,21,614,21,614,16,647,16"/>
+<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#a68e5013b543d1d96c0dfff2f44c0d82e" title=" " alt="" coords="5,5,276,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="308,21,276,21,276,16,308,16"/>
 </map>

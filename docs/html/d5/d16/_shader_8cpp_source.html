@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -109,7 +109,7 @@ $(function(){initNavTree('d5/d16/_shader_8cpp_source.html','../../'); initResiza
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span>    m_FilePath(filepath), m_RendererID(0)</div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>{</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>    <a class="code hl_struct" href="../../d4/dac/struct_shader_program_source.html">ShaderProgramSource</a> source = <a class="code hl_function" href="../../d1/d51/class_shader.html#af4a0151fa9ade8c81ac7ec6bc1aef0c5">ParseShader</a>(filepath);</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <a class="code hl_variable" href="../../d1/d51/class_shader.html#a1a5c07b2c962e5c31810cd7a5d93026d">m_RendererID</a> = <a class="code hl_function" href="../../d1/d51/class_shader.html#adaa87b0351653de3b2e3d64c4edb9ada">CreateShader</a>(source.<a class="code hl_variable" href="../../d4/dac/struct_shader_program_source.html#a3024eb3311331ec8ab58d4b5ee12d232">VertexSource</a>, source.<a class="code hl_variable" href="../../d4/dac/struct_shader_program_source.html#a332e9f1bba047b29bd872301ce5289ab">FragmentSource</a>);</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <a class="code hl_variable" href="../../d1/d51/class_shader.html#a1a5c07b2c962e5c31810cd7a5d93026d">m_RendererID</a> = <a class="code hl_function" href="../../d1/d51/class_shader.html#adaa87b0351653de3b2e3d64c4edb9ada">CreateShader</a>(source.VertexSource, source.FragmentSource);</div>
 <div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>}</div>
 </div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
@@ -299,8 +299,6 @@ $(function(){initNavTree('d5/d16/_shader_8cpp_source.html','../../'); initResiza
 <div class="ttc" id="aclass_shader_html_af52dfd9564e8a995f5fcca29e5a65669"><div class="ttname"><a href="../../d1/d51/class_shader.html#af52dfd9564e8a995f5fcca29e5a65669">Shader::SetUniform4f</a></div><div class="ttdeci">void SetUniform4f(const std::string &amp;name, float v0, float v1, float f2, float f3)</div><div class="ttdef"><b>Definition</b> <a href="#l00119">Shader.cpp:119</a></div></div>
 <div class="ttc" id="aclass_shader_html_aff01df87e8a102f270b5b135a295e59d"><div class="ttname"><a href="../../d1/d51/class_shader.html#aff01df87e8a102f270b5b135a295e59d">Shader::~Shader</a></div><div class="ttdeci">~Shader()</div><div class="ttdef"><b>Definition</b> <a href="#l00011">Shader.cpp:11</a></div></div>
 <div class="ttc" id="astruct_shader_program_source_html"><div class="ttname"><a href="../../d4/dac/struct_shader_program_source.html">ShaderProgramSource</a></div><div class="ttdef"><b>Definition</b> <a href="../../d8/d34/_shader_8h_source.html#l00009">Shader.h:10</a></div></div>
-<div class="ttc" id="astruct_shader_program_source_html_a3024eb3311331ec8ab58d4b5ee12d232"><div class="ttname"><a href="../../d4/dac/struct_shader_program_source.html#a3024eb3311331ec8ab58d4b5ee12d232">ShaderProgramSource::VertexSource</a></div><div class="ttdeci">std::string VertexSource</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d34/_shader_8h_source.html#l00011">Shader.h:11</a></div></div>
-<div class="ttc" id="astruct_shader_program_source_html_a332e9f1bba047b29bd872301ce5289ab"><div class="ttname"><a href="../../d4/dac/struct_shader_program_source.html#a332e9f1bba047b29bd872301ce5289ab">ShaderProgramSource::FragmentSource</a></div><div class="ttdeci">std::string FragmentSource</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d34/_shader_8h_source.html#l00012">Shader.h:12</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

@@ -1,5 +1,9 @@
 <map id="DirectoryWindow::ImageData" name="DirectoryWindow::ImageData">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,188,229"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="75,5,118,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,74,99,122,94,122,94,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="36,139,218,208"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,54,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="40,74,47,94,58,113,68,125,64,129,53,116,42,96,35,76"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="108,5,146,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,75,130,122,124,122,124,75"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="172,5,215,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="184,76,167,116,161,125,157,123,162,113,180,73"/>
 </map>

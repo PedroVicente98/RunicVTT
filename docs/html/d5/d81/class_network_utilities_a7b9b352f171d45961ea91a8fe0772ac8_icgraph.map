@@ -1,7 +1,7 @@
 <map id="NetworkUtilities::normalizeWsUrl" name="NetworkUtilities::normalizeWsUrl">
-<area shape="rect" id="Node000001" title=" " alt="" coords="233,23,411,65"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="233,31,448,57"/>
 <area shape="rect" id="Node000002" href="$d4/d9e/class_signaling_client.html#a4d024810a54c16a402720bdad988631a" title=" " alt="" coords="14,5,176,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,35,176,30,177,25,218,30"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="217,34,176,30,177,24,218,29"/>
 <area shape="rect" id="Node000003" href="$d4/d9e/class_signaling_client.html#a2fd8b6b1e27c91bf9107390aa30dd554" title=" " alt="" coords="5,56,185,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="218,58,185,62,185,57,217,53"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="217,59,185,63,185,57,217,54"/>
 </map>

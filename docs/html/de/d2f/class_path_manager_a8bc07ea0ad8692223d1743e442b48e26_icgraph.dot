@@ -8,11 +8,11 @@ digraph "PathManager::getExternalPath"
   rankdir="RL";
   Node1 [id="Node000001",label="PathManager::getExternalPath",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="PathManager::getLocalTunnel\lClientPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a96a013e3353b4e4c80ad9232e18f8472",tooltip=" "];
+  Node2 [id="Node000002",label="PathManager::getLocalTunnelClientPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a96a013e3353b4e4c80ad9232e18f8472",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="PathManager::getLocalTunnel\lControllerPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a84566186a965025393fe31a9cfb50299",tooltip=" "];
+  Node3 [id="Node000003",label="PathManager::getLocalTunnelControllerPath",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d2f/class_path_manager.html#a84566186a965025393fe31a9cfb50299",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="NetworkUtilities::startLocal\lTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567",tooltip=" "];
+  Node4 [id="Node000004",label="NetworkUtilities::startLocalTunnel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d81/class_network_utilities.html#ac0655968aa7b9e06f7566343e0d2e567",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="NetworkManager::setup",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e",tooltip=" "];
   Node4 -> Node6 [id="edge5_Node000004_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];

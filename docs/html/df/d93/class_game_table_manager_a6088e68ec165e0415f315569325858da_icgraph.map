@@ -1,5 +1,5 @@
 <map id="GameTableManager::handleCursorInputs" name="GameTableManager::handleCursorInputs">
-<area shape="rect" id="Node000001" title=" " alt="" coords="237,5,420,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a5b94841c24e8b5259c9e114d956f01fa" title=" " alt="" coords="5,5,189,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,29,189,29,189,24,221,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="273,5,531,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a5b94841c24e8b5259c9e114d956f01fa" title=" " alt="" coords="5,5,225,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="257,21,225,21,225,16,257,16"/>
 </map>

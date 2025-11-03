@@ -1,9 +1,11 @@
 <map id="NotesManager::scanFolderForMd_" name="NotesManager::scanFolderForMd_">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,184,65"/>
-<area shape="rect" id="Node000002" href="$de/d23/class_notes_manager.html#a037463bcba85b07e00958d45ba6dbd60" title=" " alt="" coords="232,31,459,57"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="184,41,216,41,216,47,184,47"/>
-<area shape="rect" id="Node000003" href="$de/d23/class_notes_manager.html#ad0d8672d88e2eef61fb90dfce9bc18d9" title=" " alt="" coords="507,5,714,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="459,30,491,27,492,33,460,36"/>
-<area shape="rect" id="Node000004" href="$de/d23/class_notes_manager.html#aafac8c0a547a63f95440d0ab7bdbe4ef" title=" " alt="" coords="512,56,710,83"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="460,52,496,56,496,61,459,58"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,228,57"/>
+<area shape="rect" id="Node000002" href="$de/de9/_notes_manager_8cpp.html#a96ca1040c499819ef9fc0891872c1dc8" title=" " alt="" coords="334,5,445,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,31,318,23,318,28,228,36"/>
+<area shape="rect" id="Node000003" href="$de/d23/class_notes_manager.html#a037463bcba85b07e00958d45ba6dbd60" title=" " alt="" coords="276,56,503,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="228,52,260,55,260,60,228,57"/>
+<area shape="rect" id="Node000004" href="$de/d23/class_notes_manager.html#ad0d8672d88e2eef61fb90dfce9bc18d9" title=" " alt="" coords="551,31,758,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="503,56,535,53,536,58,504,61"/>
+<area shape="rect" id="Node000005" href="$de/d23/class_notes_manager.html#aafac8c0a547a63f95440d0ab7bdbe4ef" title=" " alt="" coords="556,81,754,108"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="504,78,540,81,540,86,503,83"/>
 </map>

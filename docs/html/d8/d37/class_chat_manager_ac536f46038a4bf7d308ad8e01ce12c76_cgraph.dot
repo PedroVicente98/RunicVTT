@@ -14,5 +14,5 @@ digraph "ChatManager::emitGroupCreate"
   Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
   Node4 [id="Node000004",label="msg::DCTypeToJson",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d64/namespacemsg.html#ad8139941ca11d8369f89b262890dad33",tooltip=" "];
   Node1 -> Node5 [id="edge4_Node000001_Node000005",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="ChatManager::resolvePeer\lIdsForParticipants",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a355992faeefc4f8695bfe76f2c7f295e",tooltip=" "];
+  Node5 [id="Node000005",label="ChatManager::resolvePeerIdsForParticipants",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a355992faeefc4f8695bfe76f2c7f295e",tooltip=" "];
 }

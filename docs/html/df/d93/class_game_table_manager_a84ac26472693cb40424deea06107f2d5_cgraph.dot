@@ -8,5 +8,5 @@ digraph "GameTableManager::render"
   rankdir="LR";
   Node1 [id="Node000001",label="GameTableManager::render",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="GameTableManager::isGame\lTableActive",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#aacb5a6a1884935956c8ee064e5939300",tooltip=" "];
+  Node2 [id="Node000002",label="GameTableManager::isGameTableActive",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#aacb5a6a1884935956c8ee064e5939300",tooltip=" "];
 }

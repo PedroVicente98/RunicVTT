@@ -6,9 +6,9 @@ digraph "DebugActions::MouseCircleChanged"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="DebugActions::MouseCircle\lChanged",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="DebugActions::MouseCircleChanged",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="DebugActions::RegisterAll\lDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
+  Node2 [id="Node000002",label="DebugActions::RegisterAllDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="ApplicationHandler\l::ApplicationHandler",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703",tooltip=" "];
+  Node3 [id="Node000003",label="ApplicationHandler::ApplicationHandler",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703",tooltip=" "];
 }

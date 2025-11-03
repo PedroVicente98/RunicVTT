@@ -1,0 +1,13 @@
+<map id="snapToSquareCenter" name="snapToSquareCenter">
+<area shape="rect" id="Node000001" title=" " alt="" coords="835,56,979,83"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#a4172206441f2f3e86ed4dfe188aa4c3a" title=" " alt="" coords="550,5,751,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="827,55,787,47,728,35,729,30,788,41,828,50"/>
+<area shape="rect" id="Node000003" href="$d2/dbf/class_board_manager.html#ac5a6f3a919fb3fdb4fef2511117069aa" title=" " alt="" coords="513,56,787,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="820,72,788,72,788,67,820,67"/>
+<area shape="rect" id="Node000006" href="$de/d99/_board_manager_8cpp.html#a587fc0c3f892440971a073a02f227278" title=" " alt="" coords="587,107,713,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="828,89,788,97,714,111,713,106,787,92,827,84"/>
+<area shape="rect" id="Node000004" href="$d2/dbf/class_board_manager.html#aa3991452f739c572a483f72672382fa9" title=" " alt="" coords="245,56,465,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="497,72,465,72,465,67,497,67"/>
+<area shape="rect" id="Node000005" href="$d2/dbf/class_board_manager.html#a2aad7a42521772a965571ce188decae8" title=" " alt="" coords="5,56,197,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="229,72,197,72,197,67,229,67"/>
+</map>

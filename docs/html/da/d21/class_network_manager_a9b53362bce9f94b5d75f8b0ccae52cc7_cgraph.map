@@ -1,9 +1,9 @@
 <map id="NetworkManager::debugIdentitySnapshot" name="NetworkManager::debugIdentitySnapshot">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,64,212,107"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a2127afec206b45126dff36ca21ffde3d" title=" " alt="" coords="260,5,469,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="204,61,253,49,254,55,205,66"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a1278e316ee962616fcae67294d53fac0" title=" " alt="" coords="275,72,454,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="212,83,260,83,260,88,212,88"/>
-<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a18a48f401ea5dea0ceb2bcecf0be521a" title=" " alt="" coords="263,123,466,149"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="213,103,279,117,278,122,212,108"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,267,83"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a2127afec206b45126dff36ca21ffde3d" title=" " alt="" coords="315,5,569,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="221,53,342,32,343,38,221,58"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a1278e316ee962616fcae67294d53fac0" title=" " alt="" coords="353,56,531,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="267,67,337,67,337,72,267,72"/>
+<area shape="rect" id="Node000004" href="$da/d21/class_network_manager.html#a18a48f401ea5dea0ceb2bcecf0be521a" title=" " alt="" coords="341,107,543,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="221,81,343,101,342,106,221,86"/>
 </map>

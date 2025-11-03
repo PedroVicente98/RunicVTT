@@ -8,5 +8,5 @@ digraph "DirectoryWindow::stopMonitoring"
   rankdir="RL";
   Node1 [id="Node000001",label="DirectoryWindow::stopMonitoring",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="DirectoryWindow::~Directory\lWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/db8/class_directory_window.html#a9576f7071eb599625284eafd91bac1be",tooltip=" "];
+  Node2 [id="Node000002",label="DirectoryWindow::~DirectoryWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/db8/class_directory_window.html#a9576f7071eb599625284eafd91bac1be",tooltip=" "];
 }

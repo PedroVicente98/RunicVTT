@@ -1,0 +1,20 @@
+digraph "snapToSquareCenter"
+{
+ // INTERACTIVE_SVG=YES
+ // LATEX_PDF_SIZE
+  bgcolor="transparent";
+  edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
+  node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
+  rankdir="RL";
+  Node1 [id="Node000001",label="snapToSquareCenter",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node2 [id="Node000002",label="BoardManager::endMouseDrag",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a4172206441f2f3e86ed4dfe188aa4c3a",tooltip=" "];
+  Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node3 [id="Node000003",label="BoardManager::resnapAllMarkersToNearest",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#ac5a6f3a919fb3fdb4fef2511117069aa",tooltip=" "];
+  Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node4 [id="Node000004",label="BoardManager::renderGridWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#aa3991452f739c572a483f72672382fa9",tooltip=" "];
+  Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node5 [id="Node000005",label="BoardManager::renderToolbar",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a2aad7a42521772a965571ce188decae8",tooltip=" "];
+  Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
+  Node6 [id="Node000006",label="snapToGridCenter",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d99/_board_manager_8cpp.html#a587fc0c3f892440971a073a02f227278",tooltip=" "];
+}

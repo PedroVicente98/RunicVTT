@@ -1,12 +1,9 @@
 <map id="NetworkManager::handleImageChunk" name="NetworkManager::handleImageChunk">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,73,208,116"/>
-<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="268,5,428,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="168,70,255,41,279,34,281,39,256,47,170,75"/>
-<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="256,56,440,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="208,81,240,78,241,83,208,87"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="289,107,406,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="208,103,274,110,274,115,208,108"/>
-<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="305,181,390,208"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="161,114,300,172,298,177,159,119"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="307,183,300,173,305,163,321,157,348,155,377,157,392,164,390,169,376,162,348,160,322,162,309,167,305,172,312,179"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,246,83"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="306,5,466,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="197,53,298,33,299,38,198,58"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="294,56,478,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,67,278,67,278,72,246,72"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="327,107,444,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,81,312,103,311,108,197,86"/>
 </map>

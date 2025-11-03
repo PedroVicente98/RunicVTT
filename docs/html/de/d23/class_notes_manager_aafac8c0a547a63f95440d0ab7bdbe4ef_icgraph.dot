@@ -12,7 +12,7 @@ digraph "NotesManager::generateUUID"
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="NotesManager::parseMarkdownFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#a037463bcba85b07e00958d45ba6dbd60",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="NotesManager::scanFolder\lForMd_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#ab3b787865dc553f59e3e5d8c6cd44402",tooltip=" "];
+  Node4 [id="Node000004",label="NotesManager::scanFolderForMd_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#ab3b787865dc553f59e3e5d8c6cd44402",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="NotesManager::loadAllFromDisk",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#ad27f8593eb58d8f778818bf4921574f3",tooltip=" "];
   Node4 -> Node6 [id="edge5_Node000004_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
@@ -20,5 +20,5 @@ digraph "NotesManager::generateUUID"
   Node4 -> Node7 [id="edge6_Node000004_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node7 [id="Node000007",label="NotesManager::loadFromTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#af4a6dd97ecee332425ca422fb84bfc1f",tooltip=" "];
   Node1 -> Node8 [id="edge7_Node000001_Node000008",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node8 [id="Node000008",label="NotesManager::upsertShared\lIncoming",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#ab0a278cd688dcd64ae25cb91d1a2fe34",tooltip=" "];
+  Node8 [id="Node000008",label="NotesManager::upsertSharedIncoming",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$de/d23/class_notes_manager.html#ab0a278cd688dcd64ae25cb91d1a2fe34",tooltip=" "];
 }

@@ -12,9 +12,9 @@ digraph "MessageQueue::try_pop"
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="NetworkManager::drainInboundRaw",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#ad3605b8b33fa44492458d0aaffb4dec8",tooltip=" "];
   Node1 -> Node4 [id="edge3_Node000001_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="NetworkManager::startRaw\lDrainWorker",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276",tooltip=" "];
+  Node4 [id="Node000004",label="NetworkManager::startRawDrainWorker",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a3289708df965193b6ec0287eb069b276",tooltip=" "];
   Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="NetworkManager::tryPopRaw\lMessage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a3f670cc0d1dd5c59de24e3ae421cf12b",tooltip=" "];
+  Node5 [id="Node000005",label="NetworkManager::tryPopRawMessage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a3f670cc0d1dd5c59de24e3ae421cf12b",tooltip=" "];
   Node1 -> Node6 [id="edge5_Node000001_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="NetworkManager::tryPopReady\lMessage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a27c7cfac9b696de6e1a04d9d3e1d226e",tooltip=" "];
+  Node6 [id="Node000006",label="NetworkManager::tryPopReadyMessage",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a27c7cfac9b696de6e1a04d9d3e1d226e",tooltip=" "];
 }

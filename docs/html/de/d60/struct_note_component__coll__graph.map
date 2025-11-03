@@ -1,5 +1,7 @@
 <map id="NoteComponent" name="NoteComponent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,235,136,389"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="50,5,92,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="74,74,74,218,68,218,68,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="38,235,144,304"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,48,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="22,74,17,139,20,175,31,210,37,220,32,223,26,212,15,176,12,139,17,74"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="137,5,172,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,74,147,139,128,212,124,221,119,219,123,210,142,138,150,74"/>
 </map>

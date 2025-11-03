@@ -8,11 +8,11 @@ digraph "MarkdownRenderer::isHex_"
   rankdir="RL";
   Node1 [id="Node000001",label="MarkdownRenderer::isHex_",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="MarkdownRenderer::looksLike\lShortId_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#ad9b867b0035cea2f5757cc4c009c78fa",tooltip=" "];
+  Node2 [id="Node000002",label="MarkdownRenderer::looksLikeShortId_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#ad9b867b0035cea2f5757cc4c009c78fa",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="MarkdownRenderer::looksLike\lUuid_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20",tooltip=" "];
+  Node3 [id="Node000003",label="MarkdownRenderer::looksLikeUuid_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="MarkdownRenderer::resolve\lNote_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#a51a347a6a77e068ca99755262fd88e29",tooltip=" "];
+  Node4 [id="Node000004",label="MarkdownRenderer::resolveNote_",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#a51a347a6a77e068ca99755262fd88e29",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="MarkdownRenderer::open_url",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d5/d4a/class_markdown_renderer.html#a4bd39f5d7124376cde81f15bed826f41",tooltip=" "];
 }

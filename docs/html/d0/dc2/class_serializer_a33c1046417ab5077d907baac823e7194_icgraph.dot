@@ -6,15 +6,15 @@ digraph "Serializer::serializeBoardEntity"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="Serializer::serializeBoard\lEntity",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="Serializer::serializeBoardEntity",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="BoardManager::saveActive\lBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a15c3689fe12cdc5f3d0589f9d92a678e",tooltip=" "];
+  Node2 [id="Node000002",label="BoardManager::saveActiveBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a15c3689fe12cdc5f3d0589f9d92a678e",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="Serializer::serializeGame\lTableEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a88ec96a4390db20ecce812518dd2622c",tooltip=" "];
+  Node3 [id="Node000003",label="Serializer::serializeGameTableEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a88ec96a4390db20ecce812518dd2622c",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="GameTableManager::create\lGameTableFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a172cce8920ef8672b5508fdbca0108fa",tooltip=" "];
+  Node4 [id="Node000004",label="GameTableManager::createGameTableFile",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a172cce8920ef8672b5508fdbca0108fa",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="GameTableManager::hostGame\lTablePopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a42414a5596a4e90a3f321f90e166f9a0",tooltip=" "];
+  Node5 [id="Node000005",label="GameTableManager::hostGameTablePopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a42414a5596a4e90a3f321f90e166f9a0",tooltip=" "];
   Node4 -> Node6 [id="edge5_Node000004_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="GameTableManager::saveGame\lTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a9e6225573f97256dd5dfef871a1e32d6",tooltip=" "];
+  Node6 [id="Node000006",label="GameTableManager::saveGameTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a9e6225573f97256dd5dfef871a1e32d6",tooltip=" "];
 }

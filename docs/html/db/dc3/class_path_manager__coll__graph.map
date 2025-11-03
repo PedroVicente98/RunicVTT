@@ -1,3 +1,5 @@
 <map id="PathManager" name="PathManager">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,235,512"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,270,512"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="120,5,156,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="140,74,140,138,135,138,135,74"/>
 </map>

@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -113,7 +113,7 @@ $(function(){initNavTree('df/d96/_markdown_renderer_8h_source.html','../../'); i
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="comment">// - overrides imgui_md::open_url()</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">// - supports: http(s), roll:, note:/ and note://open/ refs</span></div>
 <div class="foldopen" id="foldopen00012" data-start="{" data-end="};">
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="../../d5/d4a/class_markdown_renderer.html">   12</a></span><span class="keyword">class </span><a class="code hl_class" href="../../d5/d4a/class_markdown_renderer.html">MarkdownRenderer</a> : <span class="keyword">public</span> imgui_md</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="../../d5/d4a/class_markdown_renderer.html">   12</a></span><span class="keyword">class </span><a class="code hl_class" href="../../d5/d4a/class_markdown_renderer.html">MarkdownRenderer</a> : <span class="keyword">public</span> <a class="code hl_class" href="../../d7/ddd/classimgui__md.html">imgui_md</a></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>{</div>
 <div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">public</span>:</div>
 <div class="foldopen" id="foldopen00015" data-start="{" data-end="};">
@@ -384,6 +384,7 @@ $(function(){initNavTree('df/d96/_markdown_renderer_8h_source.html','../../'); i
 <div class="ttc" id="aclass_markdown_renderer_html_adef9ca2d9af213741e38539412c35108"><div class="ttname"><a href="../../d5/d4a/class_markdown_renderer.html#adef9ca2d9af213741e38539412c35108">MarkdownRenderer::soft_break</a></div><div class="ttdeci">void soft_break() override</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00041">MarkdownRenderer.cpp:41</a></div></div>
 <div class="ttc" id="aclass_markdown_renderer_html_ae095c02db567dbe7a6050d69efe60a0d"><div class="ttname"><a href="../../d5/d4a/class_markdown_renderer.html#ae095c02db567dbe7a6050d69efe60a0d">MarkdownRenderer::parseHref_</a></div><div class="ttdeci">Parsed parseHref_(const std::string &amp;href) const</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00051">MarkdownRenderer.cpp:51</a></div></div>
 <div class="ttc" id="aclass_markdown_renderer_html_ae3b68ecd0ff19af580bda2cc0e21ff20"><div class="ttname"><a href="../../d5/d4a/class_markdown_renderer.html#ae3b68ecd0ff19af580bda2cc0e21ff20">MarkdownRenderer::looksLikeUuid_</a></div><div class="ttdeci">static bool looksLikeUuid_(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/d67/_markdown_renderer_8cpp_source.html#l00116">MarkdownRenderer.cpp:116</a></div></div>
+<div class="ttc" id="aclassimgui__md_html"><div class="ttname"><a href="../../d7/ddd/classimgui__md.html">imgui_md</a></div></div>
 <div class="ttc" id="astruct_markdown_renderer_1_1_parsed_html"><div class="ttname"><a href="../../db/dd2/struct_markdown_renderer_1_1_parsed.html">MarkdownRenderer::Parsed</a></div><div class="ttdef"><b>Definition</b> <a href="#l00040">MarkdownRenderer.h:41</a></div></div>
 <div class="ttc" id="astruct_markdown_renderer_1_1_parsed_html_aa7a77ac0fdefd031c00031d268fb7096"><div class="ttname"><a href="../../db/dd2/struct_markdown_renderer_1_1_parsed.html#aa7a77ac0fdefd031c00031d268fb7096">MarkdownRenderer::Parsed::payload</a></div><div class="ttdeci">std::string payload</div><div class="ttdef"><b>Definition</b> <a href="#l00043">MarkdownRenderer.h:43</a></div></div>
 <div class="ttc" id="astruct_markdown_renderer_1_1_parsed_html_ad1c58f8c25be3115bcdd3cfe73e87692"><div class="ttname"><a href="../../db/dd2/struct_markdown_renderer_1_1_parsed.html#ad1c58f8c25be3115bcdd3cfe73e87692">MarkdownRenderer::Parsed::kind</a></div><div class="ttdeci">Action kind</div><div class="ttdef"><b>Definition</b> <a href="#l00042">MarkdownRenderer.h:42</a></div></div>

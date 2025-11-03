@@ -1,5 +1,5 @@
 <map id="SignalingServer::broadcast" name="SignalingServer::broadcast">
-<area shape="rect" id="Node000001" title=" " alt="" coords="231,13,408,40"/>
-<area shape="rect" id="Node000002" href="$d7/d85/class_signaling_server.html#ab53bb53bb4837a9fcffefb8200a6ee7b" title=" " alt="" coords="5,5,183,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,29,183,29,183,24,215,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="289,5,466,32"/>
+<area shape="rect" id="Node000002" href="$d7/d85/class_signaling_server.html#ab53bb53bb4837a9fcffefb8200a6ee7b" title=" " alt="" coords="5,5,241,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="273,21,241,21,241,16,273,16"/>
 </map>

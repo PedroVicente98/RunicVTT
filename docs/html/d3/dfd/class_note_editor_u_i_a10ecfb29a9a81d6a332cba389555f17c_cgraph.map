@@ -1,9 +1,9 @@
 <map id="NoteEditorUI::actCreateNote_" name="NoteEditorUI::actCreateNote_">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,35,203,61"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,203,57"/>
 <area shape="rect" id="Node000002" href="$d3/dfd/class_note_editor_u_i.html#ae6cdb065e2d7f4eb4633cf81c21d8cad" title=" " alt="" coords="251,5,455,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,34,235,30,236,35,204,39"/>
-<area shape="rect" id="Node000004" href="$db/d4e/namespace_ui_typing_guard.html#a63a23afb57376e34f2fac5999eb9f1d9" title=" " alt="" coords="266,56,440,99"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="204,57,251,63,251,68,203,62"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,31,235,28,235,33,204,37"/>
+<area shape="rect" id="Node000004" href="$db/d4e/namespace_ui_typing_guard.html#a63a23afb57376e34f2fac5999eb9f1d9" title=" " alt="" coords="252,56,454,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="204,51,236,55,235,60,203,57"/>
 <area shape="rect" id="Node000003" href="$d3/dfd/class_note_editor_u_i.html#a818ddcd070082f3d89964a77ec669601" title=" " alt="" coords="503,5,710,32"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="456,16,488,16,488,21,456,21"/>
 </map>

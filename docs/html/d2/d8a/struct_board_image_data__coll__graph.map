@@ -1,5 +1,9 @@
 <map id="BoardImageData" name="BoardImageData">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,182,283"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="72,5,115,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="96,75,96,121,91,121,91,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="36,139,218,245"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,54,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="41,73,58,113,65,124,61,127,53,116,36,75"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="108,5,146,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="130,74,130,122,124,122,124,74"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="172,5,215,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="184,75,167,116,163,124,158,122,162,114,179,73"/>
 </map>

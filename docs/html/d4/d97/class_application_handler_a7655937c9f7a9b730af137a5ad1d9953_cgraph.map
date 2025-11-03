@@ -1,5 +1,5 @@
 <map id="ApplicationHandler::CreateMapFBO" name="ApplicationHandler::CreateMapFBO">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,136,48"/>
-<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#a1a100fed6275d5d36ae5ff35a278ed18" title=" " alt="" coords="184,5,314,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,24,168,24,168,29,136,29"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,235,32"/>
+<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#a1a100fed6275d5d36ae5ff35a278ed18" title=" " alt="" coords="283,5,511,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="235,16,267,16,267,21,235,21"/>
 </map>

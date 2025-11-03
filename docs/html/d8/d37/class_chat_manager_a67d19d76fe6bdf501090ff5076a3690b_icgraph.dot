@@ -6,11 +6,11 @@ digraph "ChatManager::getUsernameColor"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="ChatManager::getUsername\lColor",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="ChatManager::getUsernameColor",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="ChatManager::renderColored\lUsername",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a668fcd8523ba10e99f74dc04cb8ee16d",tooltip=" "];
+  Node2 [id="Node000002",label="ChatManager::renderColoredUsername",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a668fcd8523ba10e99f74dc04cb8ee16d",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="ChatManager::renderRight\lPanel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd",tooltip=" "];
+  Node3 [id="Node000003",label="ChatManager::renderRightPanel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node4 [id="Node000004",label="ChatManager::render",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5",tooltip=" "];
 }

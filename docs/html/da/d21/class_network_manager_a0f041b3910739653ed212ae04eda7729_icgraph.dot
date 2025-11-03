@@ -6,7 +6,7 @@ digraph "NetworkManager::disconnectAllPeers"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="NetworkManager::disconnect\lAllPeers",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="NetworkManager::disconnectAllPeers",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="NetworkManager::~Network\lManager",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a2cfe4223139cf58587a9f066b956cb23",tooltip=" "];
+  Node2 [id="Node000002",label="NetworkManager::~NetworkManager",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a2cfe4223139cf58587a9f066b956cb23",tooltip=" "];
 }

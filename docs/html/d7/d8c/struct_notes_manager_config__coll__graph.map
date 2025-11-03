@@ -1,3 +1,5 @@
 <map id="NotesManagerConfig" name="NotesManagerConfig">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,148,128"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,139,224"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="54,5,90,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,75,75,137,70,137,70,75"/>
 </map>

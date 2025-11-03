@@ -8,5 +8,5 @@ digraph "ChatManager::saveCurrent"
   rankdir="RL";
   Node1 [id="Node000001",label="ChatManager::saveCurrent",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="ChatManager::setActiveGame\lTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a6bf284d1ba8a95c8963efa930ac2c571",tooltip=" "];
+  Node2 [id="Node000002",label="ChatManager::setActiveGameTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a6bf284d1ba8a95c8963efa930ac2c571",tooltip=" "];
 }

@@ -1,7 +1,9 @@
 <map id="Logger::LineToLoggerBuf" name="Logger::LineToLoggerBuf">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,208,421"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="13,5,108,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="72,89,84,154,79,155,67,90"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="132,5,175,75"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="150,75,138,138,133,137,145,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="42,155,250,373"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,100,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="75,87,103,154,98,156,70,90"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="125,5,167,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="149,74,149,138,143,138,143,74"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="192,5,303,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="235,76,210,132,206,140,201,138,205,130,230,73"/>
 </map>

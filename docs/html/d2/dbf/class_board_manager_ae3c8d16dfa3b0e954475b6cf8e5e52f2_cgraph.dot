@@ -6,9 +6,9 @@ digraph "BoardManager::loadActiveBoard"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="BoardManager::loadActive\lBoard",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="BoardManager::loadActiveBoard",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="Serializer::deserializeBoard\lEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aff25e5361ee486db1fb453b6ec1f8acf",tooltip=" "];
+  Node2 [id="Node000002",label="Serializer::deserializeBoardEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aff25e5361ee486db1fb453b6ec1f8acf",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="Serializer::deserializeBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#ac444af6d2a2ff0959826c9d5d922ef74",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",color="steelblue1",style="solid",tooltip=" "];
@@ -16,7 +16,7 @@ digraph "BoardManager::loadActiveBoard"
   Node4 -> Node5 [id="edge4_Node000004_Node000005",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="Serializer::deserializeInt",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781",tooltip=" "];
   Node2 -> Node6 [id="edge5_Node000002_Node000006",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="Serializer::deserializeFog\lEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aa69e53999b1df0a2588948fd249fe436",tooltip=" "];
+  Node6 [id="Node000006",label="Serializer::deserializeFogEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aa69e53999b1df0a2588948fd249fe436",tooltip=" "];
   Node6 -> Node7 [id="edge6_Node000006_Node000007",color="steelblue1",style="solid",tooltip=" "];
   Node7 [id="Node000007",label="Serializer::deserializePosition",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a5eb5ab1b9f7566eaf2486df0e536d82b",tooltip=" "];
   Node7 -> Node8 [id="edge7_Node000007_Node000008",color="steelblue1",style="solid",tooltip=" "];
@@ -39,9 +39,9 @@ digraph "BoardManager::loadActiveBoard"
   Node14 -> Node8 [id="edge17_Node000014_Node000008",color="steelblue1",style="solid",tooltip=" "];
   Node2 -> Node5 [id="edge18_Node000002_Node000005",color="steelblue1",style="solid",tooltip=" "];
   Node2 -> Node15 [id="edge19_Node000002_Node000015",color="steelblue1",style="solid",tooltip=" "];
-  Node15 [id="Node000015",label="Serializer::deserializeMarker\lEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a575d56ef9fe8683ae7be3e60c3952335",tooltip=" "];
+  Node15 [id="Node000015",label="Serializer::deserializeMarkerEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a575d56ef9fe8683ae7be3e60c3952335",tooltip=" "];
   Node15 -> Node16 [id="edge20_Node000015_Node000016",color="steelblue1",style="solid",tooltip=" "];
-  Node16 [id="Node000016",label="Serializer::deserializeMarker\lComponent",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aa6d578945a2d77d417131080d166e497",tooltip=" "];
+  Node16 [id="Node000016",label="Serializer::deserializeMarkerComponent",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aa6d578945a2d77d417131080d166e497",tooltip=" "];
   Node16 -> Node12 [id="edge21_Node000016_Node000012",color="steelblue1",style="solid",tooltip=" "];
   Node16 -> Node4 [id="edge22_Node000016_Node000004",color="steelblue1",style="solid",tooltip=" "];
   Node15 -> Node17 [id="edge23_Node000015_Node000017",color="steelblue1",style="solid",tooltip=" "];
@@ -50,7 +50,7 @@ digraph "BoardManager::loadActiveBoard"
   Node15 -> Node7 [id="edge25_Node000015_Node000007",color="steelblue1",style="solid",tooltip=" "];
   Node15 -> Node9 [id="edge26_Node000015_Node000009",color="steelblue1",style="solid",tooltip=" "];
   Node15 -> Node18 [id="edge27_Node000015_Node000018",color="steelblue1",style="solid",tooltip=" "];
-  Node18 [id="Node000018",label="Serializer::deserializeTexture\lComponent",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#ab09ab45738759ee7f2d7f72b2ab7e844",tooltip=" "];
+  Node18 [id="Node000018",label="Serializer::deserializeTextureComponent",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#ab09ab45738759ee7f2d7f72b2ab7e844",tooltip=" "];
   Node18 -> Node5 [id="edge28_Node000018_Node000005",color="steelblue1",style="solid",tooltip=" "];
   Node18 -> Node4 [id="edge29_Node000018_Node000004",color="steelblue1",style="solid",tooltip=" "];
   Node18 -> Node14 [id="edge30_Node000018_Node000014",color="steelblue1",style="solid",tooltip=" "];

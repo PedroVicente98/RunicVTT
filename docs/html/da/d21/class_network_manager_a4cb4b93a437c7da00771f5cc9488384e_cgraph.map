@@ -1,14 +1,11 @@
 <map id="NetworkManager::handleCommitBoard" name="NetworkManager::handleCommitBoard">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,218,85"/>
-<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="268,21,452,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="218,49,252,45,252,50,218,54"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#abdacab45fd438391b9fa75a6c6d3a421" title=" " alt="" coords="266,72,454,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="218,74,250,78,250,83,218,79"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="518,5,635,32"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="423,69,501,41,520,35,521,40,503,47,424,74"/>
-<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="534,80,619,107"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="454,91,518,91,518,96,454,96"/>
-<area shape="rect" id="Node000006" href="$d2/d0a/class_message_queue.html#ae18e8febb6e78fadd1fc56332a4b7ba2" title=" " alt="" coords="502,131,650,157"/>
-<area shape="poly" id="edge6_Node000003_Node000006" title=" " alt="" coords="454,113,502,124,501,129,453,118"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="540,81,533,71,538,62,552,55,576,53,602,56,616,62,613,67,600,61,576,59,553,61,541,65,538,71,544,78"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,252,57"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="320,5,504,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="252,30,304,26,304,31,252,36"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#abdacab45fd438391b9fa75a6c6d3a421" title=" " alt="" coords="300,56,524,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="252,52,284,55,284,61,252,58"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="588,31,705,57"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="524,54,571,49,572,55,525,60"/>
+<area shape="rect" id="Node000005" href="$d2/d0a/class_message_queue.html#ae18e8febb6e78fadd1fc56332a4b7ba2" title=" " alt="" coords="572,81,720,108"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="525,79,557,82,556,88,524,84"/>
 </map>

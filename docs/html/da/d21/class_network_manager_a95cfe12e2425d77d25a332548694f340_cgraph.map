@@ -1,11 +1,11 @@
 <map id="NetworkManager::handleGameTableSnapshot" name="NetworkManager::handleGameTableSnapshot">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,207,91"/>
-<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a47d1b2e09aaa99426b40f965ef2bf284" title=" " alt="" coords="257,5,436,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="207,45,265,33,266,38,208,51"/>
-<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="255,56,439,83"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="207,67,239,67,239,72,207,72"/>
-<area shape="rect" id="Node000005" href="$d2/d0a/class_message_queue.html#ae18e8febb6e78fadd1fc56332a4b7ba2" title=" " alt="" coords="273,107,421,133"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="208,88,266,100,265,106,207,93"/>
-<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="487,5,647,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="437,16,471,16,471,21,437,21"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,293,83"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a47d1b2e09aaa99426b40f965ef2bf284" title=" " alt="" coords="343,5,522,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,53,339,33,340,38,228,58"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#abc991f78f5490e60783620ab4c3444e6" title=" " alt="" coords="341,56,525,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="293,67,325,67,325,72,293,72"/>
+<area shape="rect" id="Node000005" href="$d2/d0a/class_message_queue.html#ae18e8febb6e78fadd1fc56332a4b7ba2" title=" " alt="" coords="359,107,507,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="228,81,344,101,343,107,227,86"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a45c8b78e8467c6f7dba85fd7a21c8781" title=" " alt="" coords="573,5,733,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="523,16,557,16,557,21,523,21"/>
 </map>

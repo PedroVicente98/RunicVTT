@@ -6,10 +6,7 @@ digraph "NetworkUtilities::safeCloseWebSocket"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="NetworkUtilities::safeClose\lWebSocket",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="NetworkUtilities::safeCloseWebSocket",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="Logger::instance",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f",tooltip=" "];
-  Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="Logger::log",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370",tooltip=" "];
-  Node3 -> Node3 [id="edge3_Node000003_Node000003",color="steelblue1",style="solid",tooltip=" "];
 }

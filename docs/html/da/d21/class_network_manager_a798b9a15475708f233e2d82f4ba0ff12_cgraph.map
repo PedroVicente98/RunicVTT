@@ -1,7 +1,7 @@
 <map id="NetworkManager::closeServer" name="NetworkManager::closeServer">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,203,40"/>
-<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#a1aff5744053044b32a0b910f02abc05a" title=" " alt="" coords="251,5,429,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,24,235,24,235,29,203,29"/>
-<area shape="rect" id="Node000003" href="$d5/d81/class_network_utilities.html#a9bb500d7c81ea448babc07ac94e6bd65" title=" " alt="" coords="477,13,679,40"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,24,461,24,461,29,430,29"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,203,32"/>
+<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#a1aff5744053044b32a0b910f02abc05a" title=" " alt="" coords="251,5,468,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="203,16,235,16,235,21,203,21"/>
+<area shape="rect" id="Node000003" href="$d5/d81/class_network_utilities.html#a9bb500d7c81ea448babc07ac94e6bd65" title=" " alt="" coords="516,5,718,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="469,16,501,16,501,21,469,21"/>
 </map>

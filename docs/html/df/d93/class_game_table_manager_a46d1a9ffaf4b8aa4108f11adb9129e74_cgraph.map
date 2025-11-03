@@ -1,5 +1,5 @@
 <map id="GameTableManager::handleMouseButtonInputs" name="GameTableManager::handleMouseButtonInputs">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,189,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2" title=" " alt="" coords="237,5,426,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,24,221,24,221,29,189,29"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,302,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2" title=" " alt="" coords="350,5,576,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="302,16,334,16,334,21,302,21"/>
 </map>

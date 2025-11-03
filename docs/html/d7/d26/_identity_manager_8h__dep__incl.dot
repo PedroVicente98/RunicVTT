@@ -27,10 +27,10 @@ digraph "include/IdentityManager.h"
   Node10 [id="Node000010",label="include/ChatManager.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$db/d8b/_chat_manager_8h.html",tooltip=" "];
   Node10 -> Node3 [id="edge11_Node000010_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node10 -> Node11 [id="edge12_Node000010_Node000011",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node11 [id="Node000011",label="include/note_editor\l/NoteEditorUI.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/ded/_note_editor_u_i_8h.html",tooltip=" "];
+  Node11 [id="Node000011",label="include/note_editor/NoteEditorUI.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/ded/_note_editor_u_i_8h.html",tooltip=" "];
   Node11 -> Node4 [id="edge13_Node000011_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node11 -> Node12 [id="edge14_Node000011_Node000012",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node12 [id="Node000012",label="src/note_editor/NoteEditor\lUI.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d67/_note_editor_u_i_8cpp.html",tooltip=" "];
+  Node12 [id="Node000012",label="src/note_editor/NoteEditorUI.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d67/_note_editor_u_i_8cpp.html",tooltip=" "];
   Node10 -> Node13 [id="edge15_Node000010_Node000013",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node13 [id="Node000013",label="src/ChatManager.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/d1e/_chat_manager_8cpp.html",tooltip=" "];
   Node1 -> Node3 [id="edge16_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];

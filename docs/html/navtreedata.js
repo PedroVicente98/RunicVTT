@@ -52,6 +52,7 @@ var NAVTREE =
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
         [ "Functions", "globals_func.html", null ],
+        [ "Variables", "globals_vars.html", null ],
         [ "Typedefs", "globals_type.html", null ],
         [ "Enumerations", "globals_enum.html", null ],
         [ "Macros", "globals_defs.html", null ]
@@ -63,12 +64,13 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"d3/d42/class_logger.html#a93b80c59fd796816ad1f33ca3eead846",
-"d4/d97/class_application_handler.html#adacc235494ef86a944ecdd8e4db9e2f9",
-"d7/dd8/_signaling_server_8h.html",
-"da/d21/class_network_manager.html#a80077121e02a5bf6a05c519a87a795f3",
-"db/db6/_message_8h.html#afd361074bb80961cd569df4ab665607d",
-"df/d93/class_game_table_manager.html#a299e84a2fe069db669b8096db8457297"
+"d2/dd0/struct_im_gui_toaster_1_1_config.html",
+"d4/d5d/structmsg_1_1_ready_message.html#ab719e8cbe914b1e1d4e9eebbaba65c9c",
+"d5/d7c/class_debug_console.html#a95c2342b396f49c75076f4055c22ff8b",
+"d9/d94/namespace_debug_actions.html#a0e48df310a0bde3d479a511ab03772b2",
+"db/d70/struct_visibility.html#ad248b282f33c38be62f40993d474f2ac",
+"de/d23/class_notes_manager.html#a91b824469d0c7b59abc82b536265049b",
+"dir_d44c64559bbebec7f509842c48db8b23.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

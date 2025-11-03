@@ -1,15 +1,15 @@
 <map id="IdentityManager::kMeFile" name="IdentityManager::kMeFile">
-<area shape="rect" id="Node000001" title=" " alt="" coords="751,47,920,73"/>
-<area shape="rect" id="Node000002" href="$d4/d55/class_identity_manager.html#a03e0bcd4a09304e6f8e4d9b7b3fa7736" title=" " alt="" coords="516,17,702,44"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="735,50,702,45,703,40,736,44"/>
-<area shape="rect" id="Node000004" href="$d4/d55/class_identity_manager.html#a39c326ae35bbfd58d73cae32d8793174" title=" " alt="" coords="514,72,703,99"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="736,74,704,77,703,72,735,68"/>
-<area shape="rect" id="Node000003" href="$d4/d55/class_identity_manager.html#af2952d782e6078643da4c28d90c87504" title=" " alt="" coords="257,5,464,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="500,32,464,31,464,26,500,26"/>
-<area shape="rect" id="Node000005" href="$d4/d55/class_identity_manager.html#a1869a9c4eeaabc2a70e422ae5c685a9b" title=" " alt="" coords="255,72,466,115"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="498,92,467,93,467,87,498,86"/>
-<area shape="rect" id="Node000006" href="$d4/d55/class_identity_manager.html#a06c9f1224957dbb9d2680a5c0d595ebd" title=" " alt="" coords="5,51,207,77"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="239,82,207,78,208,73,239,77"/>
-<area shape="rect" id="Node000007" href="$d4/d55/class_identity_manager.html#a2545919ba7d19962e6b4f147940cd3d9" title=" " alt="" coords="6,101,206,144"/>
-<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="239,110,207,114,207,108,239,105"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="857,31,1026,57"/>
+<area shape="rect" id="Node000002" href="$d4/d55/class_identity_manager.html#a03e0bcd4a09304e6f8e4d9b7b3fa7736" title=" " alt="" coords="622,5,808,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="841,36,808,32,809,26,842,30"/>
+<area shape="rect" id="Node000004" href="$d4/d55/class_identity_manager.html#a39c326ae35bbfd58d73cae32d8793174" title=" " alt="" coords="620,56,809,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="842,58,810,61,809,56,841,52"/>
+<area shape="rect" id="Node000003" href="$d4/d55/class_identity_manager.html#af2952d782e6078643da4c28d90c87504" title=" " alt="" coords="314,5,572,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="606,21,572,21,572,16,606,16"/>
+<area shape="rect" id="Node000005" href="$d4/d55/class_identity_manager.html#a1869a9c4eeaabc2a70e422ae5c685a9b" title=" " alt="" coords="320,56,566,83"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="604,72,566,72,566,67,604,67"/>
+<area shape="rect" id="Node000006" href="$d4/d55/class_identity_manager.html#a06c9f1224957dbb9d2680a5c0d595ebd" title=" " alt="" coords="35,31,236,57"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="304,61,236,55,237,50,305,55"/>
+<area shape="rect" id="Node000007" href="$d4/d55/class_identity_manager.html#a2545919ba7d19962e6b4f147940cd3d9" title=" " alt="" coords="5,81,266,108"/>
+<area shape="poly" id="edge6_Node000005_Node000007" title=" " alt="" coords="305,83,266,87,266,81,304,78"/>
 </map>

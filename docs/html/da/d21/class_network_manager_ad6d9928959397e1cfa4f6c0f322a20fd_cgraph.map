@@ -1,9 +1,9 @@
 <map id="NetworkManager::buildImageChunkFrame" name="NetworkManager::buildImageChunkFrame">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,197,91"/>
-<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="257,5,403,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="196,46,251,33,253,38,198,51"/>
-<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="245,56,415,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="197,67,229,67,229,72,197,72"/>
-<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="248,107,412,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="198,88,253,100,251,105,196,93"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,272,83"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="332,5,478,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="212,53,316,33,317,38,213,58"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a60889622ee4e36ea28a284e99bbdf4e5" title=" " alt="" coords="320,56,490,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="272,67,304,67,304,72,272,72"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#a3c3d58eaacc5f3c6f19cfde75424e9cc" title=" " alt="" coords="323,107,486,133"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="213,81,316,101,315,106,212,86"/>
 </map>

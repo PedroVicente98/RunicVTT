@@ -1,5 +1,5 @@
 <map id="BoardManager::computeMarkerDrawSize_ARFit" name="BoardManager::computeMarkerDrawSize_ARFit">
-<area shape="rect" id="Node000001" title=" " alt="" coords="243,5,446,48"/>
-<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#adee4c5e79862e8847198a98b6c1065d7" title=" " alt="" coords="5,13,195,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,29,195,29,195,24,227,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="243,5,544,32"/>
+<area shape="rect" id="Node000002" href="$d2/dbf/class_board_manager.html#adee4c5e79862e8847198a98b6c1065d7" title=" " alt="" coords="5,5,195,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="227,21,195,21,195,16,227,16"/>
 </map>

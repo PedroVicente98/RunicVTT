@@ -1,12 +1,11 @@
 <map id="ChatManager::applyReady" name="ChatManager::applyReady">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,81,182,108"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,182,83"/>
 <area shape="rect" id="Node000002" href="$d8/d37/class_chat_manager.html#aab66b4f8e1ca105e3670836cffdeb2fa" title=" " alt="" coords="230,5,435,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="127,78,229,41,255,34,257,39,230,47,129,83"/>
-<area shape="rect" id="Node000003" href="$d8/d37/class_chat_manager.html#a19ecba5f58757b7ce91ad2f3b57f87a3" title=" " alt="" coords="252,56,412,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="182,83,236,77,237,82,182,88"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="274,107,391,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="182,101,258,110,258,115,182,107"/>
-<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="290,181,375,208"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="129,106,286,173,283,177,127,111"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="292,183,285,173,290,163,306,157,332,155,361,157,376,164,374,169,360,162,332,160,307,162,293,167,290,172,296,179"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,53,251,33,252,38,161,58"/>
+<area shape="rect" id="Node000004" href="$d8/d37/class_chat_manager.html#a19ecba5f58757b7ce91ad2f3b57f87a3" title=" " alt="" coords="252,56,412,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="182,67,237,67,237,72,182,72"/>
+<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="274,107,391,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="161,81,259,102,258,107,159,86"/>
+<area shape="rect" id="Node000003" href="$d1/d1e/_chat_manager_8cpp.html#aad5eed848015271ba953705f1e4cc3b1" title=" " alt="" coords="483,5,601,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,16,467,16,467,21,435,21"/>
 </map>

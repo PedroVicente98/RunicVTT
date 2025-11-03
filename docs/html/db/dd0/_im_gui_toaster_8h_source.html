@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -187,9 +187,9 @@ $(function(){initNavTree('db/dd0/_im_gui_toaster_8h_source.html','../../'); init
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>        <span class="keyword">using </span>clock = std::chrono::steady_clock;</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>        <a class="code hl_struct" href="../../d7/d8b/struct_im_gui_toaster_1_1_toast.html">Toast</a> t;</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>        t.<a class="code hl_variable" href="../../d7/d8b/struct_im_gui_toaster_1_1_toast.html#a11a0275ded0e6780b412d61f6d856b75">id</a> = <a class="code hl_variable" href="../../d4/d6c/class_im_gui_toaster.html#a254efe528b0a82227b74c8ea1eb17f10">next_id_</a>.fetch_add(1, std::memory_order_relaxed);</div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        t.<a class="code hl_variable" href="../../d7/d8b/struct_im_gui_toaster_1_1_toast.html#a3a71f69120356265322e25163bf574ed">message</a> = <a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>;</div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        t.<a class="code hl_variable" href="../../d7/d8b/struct_im_gui_toaster_1_1_toast.html#aca23584d0898dbd5b3a5f282696a2586">level</a> = lvl;</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        t.<a class="code hl_variable" href="../../d7/d8b/struct_im_gui_toaster_1_1_toast.html#a743c1c1cb51f64dcfed883a4493602d8">expiresAt</a> = clock::now() + std::chrono::duration_cast&lt;clock::duration&gt;(std::chrono::duration&lt;float&gt;(durationSec));</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>        t.message = <a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>        t.level = lvl;</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>        t.expiresAt = clock::now() + std::chrono::duration_cast&lt;clock::duration&gt;(std::chrono::duration&lt;float&gt;(durationSec));</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>        {</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>            std::scoped_lock lk(<a class="code hl_variable" href="../../d4/d6c/class_im_gui_toaster.html#aeb075fef32b8d353b9c51f09dedfbeab">mtx_</a>);</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>            <a class="code hl_variable" href="../../d4/d6c/class_im_gui_toaster.html#a2c5f2f63bb5ad87bb04a36a065aab597">toasts_</a>.push_back(std::move(t));</div>

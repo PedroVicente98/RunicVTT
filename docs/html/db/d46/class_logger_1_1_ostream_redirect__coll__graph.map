@@ -1,9 +1,15 @@
 <map id="Logger::OstreamRedirect" name="Logger::OstreamRedirect">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,485,209,827"/>
-<area shape="rect" id="Node000002" href="$db/d80/class_logger_1_1_line_to_logger_buf.html" title=" " alt="" coords="6,155,209,421"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,421,110,468,105,468,105,421"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="13,5,108,75"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="72,89,85,154,80,155,67,90"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="133,5,175,75"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="150,75,138,138,133,137,145,74"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,437,275,709"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="6,229,77,299"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="55,297,94,420,89,422,50,299"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="102,229,179,299"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="143,298,143,420,138,420,138,298"/>
+<area shape="rect" id="Node000004" href="$db/d80/class_logger_1_1_line_to_logger_buf.html" title=" " alt="" coords="204,155,410,373"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="251,374,224,424,219,421,246,372"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="166,5,261,75"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="236,87,264,154,259,156,231,90"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="286,5,328,75"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="310,74,310,138,304,138,304,74"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="353,5,464,75"/>
+<area shape="poly" id="edge6_Node000004_Node000007" title=" " alt="" coords="396,76,371,132,367,140,362,138,366,130,391,73"/>
 </map>

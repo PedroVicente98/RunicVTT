@@ -10,9 +10,9 @@ digraph "NetworkManager::getMyPeerId"
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="NetworkManager::amIDragging",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a8f69585b1ab17b144a1301942789af4c",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="NetworkManager::debugIdentity\lSnapshot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a9b53362bce9f94b5d75f8b0ccae52cc7",tooltip=" "];
+  Node3 [id="Node000003",label="NetworkManager::debugIdentitySnapshot",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a9b53362bce9f94b5d75f8b0ccae52cc7",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node4 [id="Node000004",label="NetworkManager::setup",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a0f4f9de49973a81889e18034343a512e",tooltip=" "];
   Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="NetworkManager::markDragging\lLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a00095029e8bf9bf6520ae4f3383f29cf",tooltip=" "];
+  Node5 [id="Node000005",label="NetworkManager::markDraggingLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$da/d21/class_network_manager.html#a00095029e8bf9bf6520ae4f3383f29cf",tooltip=" "];
 }

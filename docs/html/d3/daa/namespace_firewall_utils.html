@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -146,27 +146,26 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html#l00073">73</a> of file <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html">FirewallUtils.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   76</span>    {</div>
+<div class="line"><span class="lineno">   77</span>        std::ostringstream ps;</div>
+<div class="line"><span class="lineno">   78</span>        ps &lt;&lt; <span class="stringliteral">&quot;New-NetFirewallRule &quot;</span></div>
+<div class="line"><span class="lineno">   79</span>           &lt;&lt; <span class="stringliteral">&quot;-DisplayName &#39;&quot;</span> &lt;&lt; <a class="code hl_function" href="#aeb36bfe1766b8cab726095eb9cdafcec">psEscape</a>(displayName) &lt;&lt; <span class="stringliteral">&quot;&#39; &quot;</span></div>
+<div class="line"><span class="lineno">   80</span>           &lt;&lt; <span class="stringliteral">&quot;-Direction Inbound -Action Allow -Protocol TCP -LocalPort Any &quot;</span></div>
+<div class="line"><span class="lineno">   81</span>           &lt;&lt; <span class="stringliteral">&quot;-Program &#39;&quot;</span> &lt;&lt; <a class="code hl_function" href="#aeb36bfe1766b8cab726095eb9cdafcec">psEscape</a>(programPath) &lt;&lt; <span class="stringliteral">&quot;&#39; &quot;</span></div>
+<div class="line"><span class="lineno">   82</span>           &lt;&lt; <span class="stringliteral">&quot;-Profile &quot;</span> &lt;&lt; (privateOnly ? <span class="stringliteral">&quot;Private&quot;</span> : <span class="stringliteral">&quot;Any&quot;</span>);</div>
+<div class="line"><span class="lineno">   83</span>        <a class="code hl_function" href="#a7fa6fae6f04113bbf5b67918fdc2ff4a">runPSElevatedWait</a>(ps.str());</div>
+<div class="line"><span class="lineno">   84</span>    }</div>
+<div class="ttc" id="anamespace_firewall_utils_html_a7fa6fae6f04113bbf5b67918fdc2ff4a"><div class="ttname"><a href="#a7fa6fae6f04113bbf5b67918fdc2ff4a">FirewallUtils::runPSElevatedWait</a></div><div class="ttdeci">bool runPSElevatedWait(const std::string &amp;psCommand)</div><div class="ttdef"><b>Definition</b> <a href="../../d9/de5/_firewall_utils_8h_source.html#l00020">FirewallUtils.h:20</a></div></div>
+<div class="ttc" id="anamespace_firewall_utils_html_aeb36bfe1766b8cab726095eb9cdafcec"><div class="ttname"><a href="#aeb36bfe1766b8cab726095eb9cdafcec">FirewallUtils::psEscape</a></div><div class="ttdeci">std::string psEscape(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="../../d9/de5/_firewall_utils_8h_source.html#l00012">FirewallUtils.h:12</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_cgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_cgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_cgraph" id="ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_cgraph">
-<area shape="rect" title=" " alt="" coords="5,23,174,65"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#aeb36bfe1766b8cab726095eb9cdafcec" title=" " alt="" coords="249,5,408,32"/>
-<area shape="poly" title=" " alt="" coords="174,32,234,26,234,31,175,38"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a7fa6fae6f04113bbf5b67918fdc2ff4a" title=" " alt="" coords="222,56,436,83"/>
-<area shape="poly" title=" " alt="" coords="175,50,206,54,206,59,174,56"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_cgraph.svg" width="442" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_icgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_icgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_icgraph" id="ad3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_icgraph">
-<area shape="rect" title=" " alt="" coords="103,5,271,48"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_a0c4cf4c2262c6defdc879f06ca39a1b6_icgraph.svg" width="276" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -204,17 +203,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html#l00087">87</a> of file <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html">FirewallUtils.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   90</span>    {</div>
+<div class="line"><span class="lineno">   91</span>        std::ostringstream ps;</div>
+<div class="line"><span class="lineno">   92</span>        ps &lt;&lt; <span class="stringliteral">&quot;New-NetFirewallRule &quot;</span></div>
+<div class="line"><span class="lineno">   93</span>           &lt;&lt; <span class="stringliteral">&quot;-DisplayName &#39;&quot;</span> &lt;&lt; <a class="code hl_function" href="#aeb36bfe1766b8cab726095eb9cdafcec">psEscape</a>(displayName) &lt;&lt; <span class="stringliteral">&quot;&#39; &quot;</span></div>
+<div class="line"><span class="lineno">   94</span>           &lt;&lt; <span class="stringliteral">&quot;-Direction Inbound -Action Allow -Protocol UDP &quot;</span></div>
+<div class="line"><span class="lineno">   95</span>           &lt;&lt; <span class="stringliteral">&quot;-Program &#39;&quot;</span> &lt;&lt; <a class="code hl_function" href="#aeb36bfe1766b8cab726095eb9cdafcec">psEscape</a>(programPath) &lt;&lt; <span class="stringliteral">&quot;&#39; &quot;</span></div>
+<div class="line"><span class="lineno">   96</span>           &lt;&lt; <span class="stringliteral">&quot;-Profile &quot;</span> &lt;&lt; (privateOnly ? <span class="stringliteral">&quot;Private&quot;</span> : <span class="stringliteral">&quot;Any&quot;</span>);</div>
+<div class="line"><span class="lineno">   97</span>        <a class="code hl_function" href="#a7fa6fae6f04113bbf5b67918fdc2ff4a">runPSElevatedWait</a>(ps.str());</div>
+<div class="line"><span class="lineno">   98</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_a8545a7caa1154ca1d2e4f33ab2b1c313_cgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_a8545a7caa1154ca1d2e4f33ab2b1c313_cgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_a8545a7caa1154ca1d2e4f33ab2b1c313_cgraph" id="ad3/daa/namespace_firewall_utils_a8545a7caa1154ca1d2e4f33ab2b1c313_cgraph">
-<area shape="rect" title=" " alt="" coords="5,23,174,65"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#aeb36bfe1766b8cab726095eb9cdafcec" title=" " alt="" coords="249,5,408,32"/>
-<area shape="poly" title=" " alt="" coords="174,32,234,26,234,31,175,38"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a7fa6fae6f04113bbf5b67918fdc2ff4a" title=" " alt="" coords="222,56,436,83"/>
-<area shape="poly" title=" " alt="" coords="175,50,206,54,206,59,174,56"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_a8545a7caa1154ca1d2e4f33ab2b1c313_cgraph.svg" width="442" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -243,22 +244,17 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html#l00012">12</a> of file <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html">FirewallUtils.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   13</span>    {</div>
+<div class="line"><span class="lineno">   14</span>        std::string out;</div>
+<div class="line"><span class="lineno">   15</span>        out.reserve(s.size() + 8);</div>
+<div class="line"><span class="lineno">   16</span>        <span class="keywordflow">for</span> (<span class="keywordtype">char</span> c : s)</div>
+<div class="line"><span class="lineno">   17</span>            out += (c == <span class="stringliteral">&#39;\&#39;&#39;</span>) ? <span class="stringliteral">&quot;&#39;&#39;&quot;</span> : std::string(1, c);</div>
+<div class="line"><span class="lineno">   18</span>        <span class="keywordflow">return</span> out;</div>
+<div class="line"><span class="lineno">   19</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_aeb36bfe1766b8cab726095eb9cdafcec_icgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_aeb36bfe1766b8cab726095eb9cdafcec_icgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_aeb36bfe1766b8cab726095eb9cdafcec_icgraph" id="ad3/daa/namespace_firewall_utils_aeb36bfe1766b8cab726095eb9cdafcec_icgraph">
-<area shape="rect" title=" " alt="" coords="322,80,481,107"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a0c4cf4c2262c6defdc879f06ca39a1b6" title=" " alt="" coords="104,5,272,48"/>
-<area shape="poly" title=" " alt="" coords="341,77,258,51,260,46,342,72"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a8545a7caa1154ca1d2e4f33ab2b1c313" title=" " alt="" coords="104,72,272,115"/>
-<area shape="poly" title=" " alt="" coords="307,96,273,96,273,91,307,91"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#aeb693e7086b7890dc330afc739537795" title=" " alt="" coords="103,139,274,181"/>
-<area shape="poly" title=" " alt="" coords="342,114,260,141,258,135,341,109"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,80,55,107"/>
-<area shape="poly" title=" " alt="" coords="117,57,104,62,56,84,54,79,102,58,115,52"/>
-<area shape="poly" title=" " alt="" coords="115,135,102,129,54,107,56,102,104,124,117,130"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_aeb36bfe1766b8cab726095eb9cdafcec_icgraph.svg" width="487" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -287,27 +283,22 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html#l00063">63</a> of file <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html">FirewallUtils.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   64</span>    {</div>
+<div class="line"><span class="lineno">   65</span>        std::ostringstream ps;</div>
+<div class="line"><span class="lineno">   66</span>        ps &lt;&lt; <span class="stringliteral">&quot;$n=&#39;&quot;</span> &lt;&lt; <a class="code hl_function" href="#aeb36bfe1766b8cab726095eb9cdafcec">psEscape</a>(displayName) &lt;&lt; <span class="stringliteral">&quot;&#39;; &quot;</span></div>
+<div class="line"><span class="lineno">   67</span>           &lt;&lt; <span class="stringliteral">&quot;Get-NetFirewallRule -DisplayName $n -ErrorAction SilentlyContinue | &quot;</span></div>
+<div class="line"><span class="lineno">   68</span>           &lt;&lt; <span class="stringliteral">&quot;Remove-NetFirewallRule -Confirm:$false&quot;</span>;</div>
+<div class="line"><span class="lineno">   69</span>        <a class="code hl_function" href="#a7fa6fae6f04113bbf5b67918fdc2ff4a">runPSElevatedWait</a>(ps.str());</div>
+<div class="line"><span class="lineno">   70</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_cgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_cgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_cgraph" id="ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_cgraph">
-<area shape="rect" title=" " alt="" coords="5,23,177,65"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#aeb36bfe1766b8cab726095eb9cdafcec" title=" " alt="" coords="252,5,412,32"/>
-<area shape="poly" title=" " alt="" coords="177,32,236,26,237,31,178,38"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a7fa6fae6f04113bbf5b67918fdc2ff4a" title=" " alt="" coords="225,56,439,83"/>
-<area shape="poly" title=" " alt="" coords="178,50,209,54,209,59,177,56"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_cgraph.svg" width="444" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_icgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_icgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_icgraph" id="ad3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_icgraph">
-<area shape="rect" title=" " alt="" coords="103,5,274,48"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_aeb693e7086b7890dc330afc739537795_icgraph.svg" width="280" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -336,22 +327,51 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html#l00020">20</a> of file <a class="el" href="../../d9/de5/_firewall_utils_8h_source.html">FirewallUtils.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   21</span>    {</div>
+<div class="line"><span class="lineno">   22</span>        <span class="comment">// Build the PowerShell arguments once, keep the std::string alive</span></div>
+<div class="line"><span class="lineno">   23</span>        std::ostringstream oss;</div>
+<div class="line"><span class="lineno">   24</span>        oss &lt;&lt; <span class="stringliteral">&quot;-NoProfile -ExecutionPolicy Bypass -Command \&quot;&quot;</span> &lt;&lt; psCommand &lt;&lt; <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   25</span>        <span class="keyword">const</span> std::string argStr = oss.str(); <span class="comment">// KEEP this alive for the whole function</span></div>
+<div class="line"><span class="lineno">   26</span> </div>
+<div class="line"><span class="lineno">   27</span>        <span class="comment">// Convert to UTF-16 safely</span></div>
+<div class="line"><span class="lineno">   28</span>        <span class="keyword">auto</span> toWide = [](<span class="keyword">const</span> std::string&amp; s) -&gt; std::wstring</div>
+<div class="line"><span class="lineno">   29</span>        {</div>
+<div class="line"><span class="lineno">   30</span>            <span class="keywordflow">if</span> (s.empty())</div>
+<div class="line"><span class="lineno">   31</span>                <span class="keywordflow">return</span> std::wstring();</div>
+<div class="line"><span class="lineno">   32</span>            <span class="keywordtype">int</span> needed = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), (<span class="keywordtype">int</span>)s.size(), <span class="keyword">nullptr</span>, 0);</div>
+<div class="line"><span class="lineno">   33</span>            std::wstring ws(needed, L<span class="charliteral">&#39;\0&#39;</span>);</div>
+<div class="line"><span class="lineno">   34</span>            MultiByteToWideChar(CP_UTF8, 0, s.c_str(), (<span class="keywordtype">int</span>)s.size(), ws.data(), needed);</div>
+<div class="line"><span class="lineno">   35</span>            <span class="keywordflow">return</span> ws;</div>
+<div class="line"><span class="lineno">   36</span>        };</div>
+<div class="line"><span class="lineno">   37</span> </div>
+<div class="line"><span class="lineno">   38</span>        <span class="keyword">const</span> std::wstring wExe = L<span class="stringliteral">&quot;powershell.exe&quot;</span>;</div>
+<div class="line"><span class="lineno">   39</span>        <span class="keyword">const</span> std::wstring wArgs = toWide(argStr);</div>
+<div class="line"><span class="lineno">   40</span> </div>
+<div class="line"><span class="lineno">   41</span>        SHELLEXECUTEINFOW sei{};</div>
+<div class="line"><span class="lineno">   42</span>        sei.cbSize = <span class="keyword">sizeof</span>(sei);</div>
+<div class="line"><span class="lineno">   43</span>        sei.fMask = SEE_MASK_NOCLOSEPROCESS;</div>
+<div class="line"><span class="lineno">   44</span>        sei.hwnd = <span class="keyword">nullptr</span>;</div>
+<div class="line"><span class="lineno">   45</span>        sei.lpVerb = L<span class="stringliteral">&quot;runas&quot;</span>; <span class="comment">// UAC prompt</span></div>
+<div class="line"><span class="lineno">   46</span>        sei.lpFile = wExe.c_str();</div>
+<div class="line"><span class="lineno">   47</span>        sei.lpParameters = wArgs.c_str();</div>
+<div class="line"><span class="lineno">   48</span>        sei.nShow = SW_HIDE;</div>
+<div class="line"><span class="lineno">   49</span> </div>
+<div class="line"><span class="lineno">   50</span>        <span class="keywordflow">if</span> (!ShellExecuteExW(&amp;sei))</div>
+<div class="line"><span class="lineno">   51</span>        {</div>
+<div class="line"><span class="lineno">   52</span>            <span class="comment">// Optional: GetLastError() logging here</span></div>
+<div class="line"><span class="lineno">   53</span>            <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   54</span>        }</div>
+<div class="line"><span class="lineno">   55</span>        <span class="keywordflow">if</span> (sei.hProcess)</div>
+<div class="line"><span class="lineno">   56</span>        {</div>
+<div class="line"><span class="lineno">   57</span>            WaitForSingleObject(sei.hProcess, INFINITE);</div>
+<div class="line"><span class="lineno">   58</span>            CloseHandle(sei.hProcess);</div>
+<div class="line"><span class="lineno">   59</span>        }</div>
+<div class="line"><span class="lineno">   60</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   61</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d3/daa/namespace_firewall_utils_a7fa6fae6f04113bbf5b67918fdc2ff4a_icgraph.png" border="0" usemap="#ad3/daa/namespace_firewall_utils_a7fa6fae6f04113bbf5b67918fdc2ff4a_icgraph" alt=""/></div>
-<map name="ad3/daa/namespace_firewall_utils_a7fa6fae6f04113bbf5b67918fdc2ff4a_icgraph" id="ad3/daa/namespace_firewall_utils_a7fa6fae6f04113bbf5b67918fdc2ff4a_icgraph">
-<area shape="rect" title=" " alt="" coords="322,80,536,107"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a0c4cf4c2262c6defdc879f06ca39a1b6" title=" " alt="" coords="104,5,272,48"/>
-<area shape="poly" title=" " alt="" coords="362,78,267,51,269,46,364,73"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#a8545a7caa1154ca1d2e4f33ab2b1c313" title=" " alt="" coords="104,72,272,115"/>
-<area shape="poly" title=" " alt="" coords="306,96,273,96,273,91,306,91"/>
-<area shape="rect" href="../../d3/daa/namespace_firewall_utils.html#aeb693e7086b7890dc330afc739537795" title=" " alt="" coords="103,139,274,181"/>
-<area shape="poly" title=" " alt="" coords="364,114,269,141,267,135,362,109"/>
-<area shape="rect" href="../../df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,80,55,107"/>
-<area shape="poly" title=" " alt="" coords="117,57,104,62,56,84,54,79,102,58,115,52"/>
-<area shape="poly" title=" " alt="" coords="115,135,102,129,54,107,56,102,104,124,117,130"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d3/daa/namespace_firewall_utils_a7fa6fae6f04113bbf5b67918fdc2ff4a_icgraph.svg" width="542" height="187"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>

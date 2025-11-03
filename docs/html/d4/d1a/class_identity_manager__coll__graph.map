@@ -1,5 +1,9 @@
 <map id="IdentityManager" name="IdentityManager">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,155,229,1152"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="96,5,139,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="120,75,120,138,115,138,115,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="30,171,287,907"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,13,48,83"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="38,82,58,154,52,155,33,83"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="72,5,246,91"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,91,161,153,156,153,156,91"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="269,5,443,91"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="342,92,296,205,291,203,337,90"/>
 </map>

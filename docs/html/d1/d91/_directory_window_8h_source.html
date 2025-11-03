@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -440,9 +440,9 @@ $(function(){initNavTree('d1/d91/_directory_window_8h_source.html','../../'); in
 <div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span> </div>
 <div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>                <span class="comment">// Use your existing loader (returns ImageData with texture + size)</span></div>
 <div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>                <a class="code hl_struct" href="../../d0/d92/struct_directory_window_1_1_image_data.html">ImageData</a> img = LoadTextureFromFile(fullpath.c_str());</div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                <span class="keywordflow">if</span> (img.<a class="code hl_variable" href="../../d0/d92/struct_directory_window_1_1_image_data.html#a60917cfdf3a5ade29117eee14db47e06">textureID</a> != 0)</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>                <span class="keywordflow">if</span> (img.textureID != 0)</div>
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>                {</div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                    img.<a class="code hl_variable" href="../../d0/d92/struct_directory_window_1_1_image_data.html#a4a6ef487ac0c257467bca420ca2cd750">filename</a> = fname; <span class="comment">// store filename (not full path) for matching</span></div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span>                    img.filename = fname; <span class="comment">// store filename (not full path) for matching</span></div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>                    toInsert.emplace_back(std::move(img));</div>
 <div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>                }</div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>            }</div>

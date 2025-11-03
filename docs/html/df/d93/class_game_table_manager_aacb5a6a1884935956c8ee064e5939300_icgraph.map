@@ -1,5 +1,5 @@
 <map id="GameTableManager::isGameTableActive" name="GameTableManager::isGameTableActive">
-<area shape="rect" id="Node000001" title=" " alt="" coords="235,5,425,48"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a84ac26472693cb40424deea06107f2d5" title=" " alt="" coords="5,13,187,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,29,187,29,187,24,219,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="235,5,493,32"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a84ac26472693cb40424deea06107f2d5" title=" " alt="" coords="5,5,187,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="219,21,187,21,187,16,219,16"/>
 </map>

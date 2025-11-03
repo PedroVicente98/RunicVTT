@@ -10,5 +10,5 @@ digraph "BoardManager::setActiveBoard"
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="BoardManager::createBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#affc264c3aa09dea984656e304658eb34",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="BoardManager::loadActive\lBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#ae3c8d16dfa3b0e954475b6cf8e5e52f2",tooltip=" "];
+  Node3 [id="Node000003",label="BoardManager::loadActiveBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#ae3c8d16dfa3b0e954475b6cf8e5e52f2",tooltip=" "];
 }

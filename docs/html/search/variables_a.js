@@ -1,9 +1,13 @@
 var searchData=
 [
-  ['kchunk_0',['kChunk',['../da/d21/class_network_manager.html#af3da69f6e107e6f031c10ed8b3f4d499',1,'NetworkManager']]],
-  ['killonclickanywhere_1',['killOnClickAnywhere',['../d2/dd0/struct_im_gui_toaster_1_1_config.html#a78836d455c62e5743af0af9c657034f7',1,'ImGuiToaster::Config']]],
-  ['kind_2',['kind',['../d8/d40/struct_chat_message_model.html#a7eeb84eec52024544528c011804894f3',1,'ChatMessageModel::kind'],['../d4/d5d/structmsg_1_1_ready_message.html#a271fd367ed16a31fdeb5318145b77997',1,'msg::ReadyMessage::kind'],['../d4/d47/struct_pending_image.html#ada856fdb56916a6d9fcc95bb8311c942',1,'PendingImage::kind'],['../db/dd2/struct_markdown_renderer_1_1_parsed.html#ad1c58f8c25be3115bcdd3cfe73e87692',1,'MarkdownRenderer::Parsed::kind']]],
-  ['kind_5f_3',['kind_',['../d4/db8/class_directory_window.html#a19e0231c0a112991db30af84d7fe29e3',1,'DirectoryWindow']]],
-  ['kpaceeveryn_4',['kPaceEveryN',['../da/d21/class_network_manager.html#a9e0d389e77f1076ea0a1441a9a67c8f0',1,'NetworkManager']]],
-  ['kpacemillis_5',['kPaceMillis',['../da/d21/class_network_manager.html#a855d7265ca1af0a8f0f670421ce5452e',1,'NetworkManager']]]
+  ['kbook_5fmagic_0',['kBOOK_MAGIC',['../d0/df0/_identity_manager_8cpp.html#a7dd4281647e1cfd4cb55d0dbc27f4978',1,'IdentityManager.cpp']]],
+  ['kbook_5fver_1',['kBOOK_VER',['../d0/df0/_identity_manager_8cpp.html#aec6f6db6d397d018b6e7d3334185d319',1,'IdentityManager.cpp']]],
+  ['kchunk_2',['kChunk',['../da/d21/class_network_manager.html#af3da69f6e107e6f031c10ed8b3f4d499',1,'NetworkManager']]],
+  ['killonclickanywhere_3',['killOnClickAnywhere',['../d2/dd0/struct_im_gui_toaster_1_1_config.html#a78836d455c62e5743af0af9c657034f7',1,'ImGuiToaster::Config']]],
+  ['kind_4',['kind',['../d8/d40/struct_chat_message_model.html#a7eeb84eec52024544528c011804894f3',1,'ChatMessageModel::kind'],['../d4/d5d/structmsg_1_1_ready_message.html#a271fd367ed16a31fdeb5318145b77997',1,'msg::ReadyMessage::kind'],['../d4/d47/struct_pending_image.html#ada856fdb56916a6d9fcc95bb8311c942',1,'PendingImage::kind'],['../db/dd2/struct_markdown_renderer_1_1_parsed.html#ad1c58f8c25be3115bcdd3cfe73e87692',1,'MarkdownRenderer::Parsed::kind']]],
+  ['kind_5f_5',['kind_',['../d4/db8/class_directory_window.html#a19e0231c0a112991db30af84d7fe29e3',1,'DirectoryWindow']]],
+  ['kme_5fmagic_6',['kME_MAGIC',['../d0/df0/_identity_manager_8cpp.html#ac587ecf1d94517a0bec7fae137dddb0d',1,'IdentityManager.cpp']]],
+  ['kme_5fver_7',['kME_VER',['../d0/df0/_identity_manager_8cpp.html#a7bfa841ca9bb20f51427772251055b62',1,'IdentityManager.cpp']]],
+  ['kpaceeveryn_8',['kPaceEveryN',['../da/d21/class_network_manager.html#a9e0d389e77f1076ea0a1441a9a67c8f0',1,'NetworkManager']]],
+  ['kpacemillis_9',['kPaceMillis',['../da/d21/class_network_manager.html#a855d7265ca1af0a8f0f670421ce5452e',1,'NetworkManager']]]
 ];

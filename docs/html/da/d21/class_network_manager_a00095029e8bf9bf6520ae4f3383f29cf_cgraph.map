@@ -1,7 +1,7 @@
 <map id="NetworkManager::markDraggingLocal" name="NetworkManager::markDraggingLocal">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,215,65"/>
-<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a18a48f401ea5dea0ceb2bcecf0be521a" title=" " alt="" coords="263,5,465,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="215,31,247,28,248,33,216,36"/>
-<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a1ca85e76187f45d46596a1d04d713f0f" title=" " alt="" coords="279,56,449,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="216,52,263,57,263,62,215,57"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,246,57"/>
+<area shape="rect" id="Node000002" href="$da/d21/class_network_manager.html#a18a48f401ea5dea0ceb2bcecf0be521a" title=" " alt="" coords="294,5,496,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="246,30,278,27,278,32,246,35"/>
+<area shape="rect" id="Node000003" href="$da/d21/class_network_manager.html#a1ca85e76187f45d46596a1d04d713f0f" title=" " alt="" coords="310,56,480,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="246,53,294,57,294,63,246,58"/>
 </map>

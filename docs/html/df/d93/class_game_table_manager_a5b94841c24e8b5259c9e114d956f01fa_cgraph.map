@@ -1,13 +1,13 @@
 <map id="GameTableManager::handleInputs" name="GameTableManager::handleInputs">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,72,189,115"/>
-<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a6088e68ec165e0415f315569325858da" title=" " alt="" coords="237,5,420,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,69,236,50,238,55,174,74"/>
-<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#a46d1a9ffaf4b8aa4108f11adb9129e74" title=" " alt="" coords="237,72,420,115"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="189,91,221,91,221,96,189,96"/>
-<area shape="rect" id="Node000005" href="$df/d93/class_game_table_manager.html#a92617131157ef2e90afed3afa7ec2e8d" title=" " alt="" coords="237,139,420,181"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="174,113,238,131,236,136,172,118"/>
-<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2" title=" " alt="" coords="468,72,657,115"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="406,46,471,65,470,70,405,51"/>
-<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="421,91,453,91,453,96,421,96"/>
-<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="405,136,470,117,471,122,406,141"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,225,83"/>
+<area shape="rect" id="Node000002" href="$df/d93/class_game_table_manager.html#a6088e68ec165e0415f315569325858da" title=" " alt="" coords="292,5,550,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,53,321,32,322,38,200,58"/>
+<area shape="rect" id="Node000004" href="$df/d93/class_game_table_manager.html#a46d1a9ffaf4b8aa4108f11adb9129e74" title=" " alt="" coords="273,56,569,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="225,67,257,67,257,72,225,72"/>
+<area shape="rect" id="Node000005" href="$df/d93/class_game_table_manager.html#a92617131157ef2e90afed3afa7ec2e8d" title=" " alt="" coords="295,107,547,133"/>
+<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="200,81,322,101,321,106,200,86"/>
+<area shape="rect" id="Node000003" href="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2" title=" " alt="" coords="617,56,843,83"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="507,30,630,50,629,56,506,35"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="570,67,601,67,601,72,570,72"/>
+<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="506,103,629,83,630,88,507,109"/>
 </map>

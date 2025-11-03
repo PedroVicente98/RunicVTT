@@ -10,13 +10,13 @@ digraph "ChatManager::classifyMessage"
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="ChatManager::applyReady",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#afbcd9a98952f12f4e7517491088e417f",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="ChatManager::pushMessage\lLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a12a185f305c7886960e02f78c61ccd18",tooltip=" "];
+  Node3 [id="Node000003",label="ChatManager::pushMessageLocal",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a12a185f305c7886960e02f78c61ccd18",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="ChatManager::renderRight\lPanel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd",tooltip=" "];
+  Node4 [id="Node000004",label="ChatManager::renderRightPanel",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a02d518f4157ae45e4bf43f7501994ecd",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="ChatManager::render",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#ae22b90f106a6b559be6533fda6c54fa5",tooltip=" "];
   Node3 -> Node6 [id="edge5_Node000003_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="ChatManager::tryHandleSlash\lCommand",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451",tooltip=" "];
+  Node6 [id="Node000006",label="ChatManager::tryHandleSlashCommand",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a5596a59f560f4f30aca7ac68a8b58451",tooltip=" "];
   Node6 -> Node7 [id="edge6_Node000006_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node7 [id="Node000007",label="ChatManager::renderDicePopup",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d8/d37/class_chat_manager.html#a5b19f0632a911a519401b1b40e70db7c",tooltip=" "];
   Node7 -> Node4 [id="edge7_Node000007_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];

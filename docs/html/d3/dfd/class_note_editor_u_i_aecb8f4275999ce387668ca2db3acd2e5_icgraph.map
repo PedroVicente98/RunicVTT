@@ -1,9 +1,9 @@
 <map id="NoteEditorUI::openTabByUuid" name="NoteEditorUI::openTabByUuid">
-<area shape="rect" id="Node000001" title=" " alt="" coords="653,13,851,40"/>
-<area shape="rect" id="Node000002" href="$d3/dfd/class_note_editor_u_i.html#a41e928a368befa223a486e3417e26382" title=" " alt="" coords="412,13,605,40"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="638,29,606,29,606,24,638,24"/>
-<area shape="rect" id="Node000003" href="$d3/dfd/class_note_editor_u_i.html#a3ea6ba49489a982beddb2ed1c4e46cf3" title=" " alt="" coords="195,5,364,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="397,29,365,29,365,24,397,24"/>
-<area shape="rect" id="Node000004" href="$d3/dfd/class_note_editor_u_i.html#a3a9be72ef4837839ff716f6afd456611" title=" " alt="" coords="5,13,147,40"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="179,29,147,29,147,24,179,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="687,5,885,32"/>
+<area shape="rect" id="Node000002" href="$d3/dfd/class_note_editor_u_i.html#a41e928a368befa223a486e3417e26382" title=" " alt="" coords="446,5,639,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="672,21,640,21,640,16,672,16"/>
+<area shape="rect" id="Node000003" href="$d3/dfd/class_note_editor_u_i.html#a3ea6ba49489a982beddb2ed1c4e46cf3" title=" " alt="" coords="195,5,398,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="430,21,398,21,398,16,430,16"/>
+<area shape="rect" id="Node000004" href="$d3/dfd/class_note_editor_u_i.html#a3a9be72ef4837839ff716f6afd456611" title=" " alt="" coords="5,5,147,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="179,21,147,21,147,16,179,16"/>
 </map>

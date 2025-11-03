@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,7 @@ $(function(){initNavTree('df/d03/class_u_pn_p_manager.html','../../'); initResiz
 <div class="dynheader">
 Collaboration diagram for UPnPManager:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d2/d46/class_u_pn_p_manager__coll__graph.png" border="0" usemap="#a_u_pn_p_manager_coll__map" alt="Collaboration graph"/></div>
-<map name="a_u_pn_p_manager_coll__map" id="a_u_pn_p_manager_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,209,389"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d2/d46/class_u_pn_p_manager__coll__graph.svg" width="215" height="395"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
@@ -181,31 +178,46 @@ Static Private Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00060">60</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   68</span>    {</div>
+<div class="line"><span class="lineno">   69</span>        std::wostringstream cmd;</div>
+<div class="line"><span class="lineno">   70</span>        <span class="comment">// Use your PathManager to get the path</span></div>
+<div class="line"><span class="lineno">   71</span>        cmd &lt;&lt; L<span class="stringliteral">&quot;\&quot;&quot;</span> &lt;&lt; <a class="code hl_function" href="../../de/d2f/class_path_manager.html#ac448bd3c10a386c7f89ca39560f6337b">PathManager::getUpnpcExePath</a>().wstring() &lt;&lt; L<span class="stringliteral">&quot;\&quot; -a &quot;</span> <span class="comment">// .wstring() for std::wostringstream</span></div>
+<div class="line"><span class="lineno">   72</span>            &lt;&lt; <a class="code hl_function" href="#abd58c0e1f52e2e50ed55df5430718ba3">stringToWString</a>(internalIp) &lt;&lt; L<span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><span class="lineno">   73</span>            &lt;&lt; internalPort &lt;&lt; L<span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><span class="lineno">   74</span>            &lt;&lt; externalPort &lt;&lt; L<span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><span class="lineno">   75</span>            &lt;&lt; <a class="code hl_function" href="#abd58c0e1f52e2e50ed55df5430718ba3">stringToWString</a>(<a class="code hl_function" href="#afc817fc590e223d3e762497676665b34">toUpper</a>(protocol)); <span class="comment">// Ensure protocol is uppercase</span></div>
+<div class="line"><span class="lineno">   76</span> </div>
+<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">if</span> (!description.empty())</div>
+<div class="line"><span class="lineno">   78</span>        {</div>
+<div class="line"><span class="lineno">   79</span>            cmd &lt;&lt; L<span class="stringliteral">&quot; \&quot;&quot;</span> &lt;&lt; <a class="code hl_function" href="#abd58c0e1f52e2e50ed55df5430718ba3">stringToWString</a>(description) &lt;&lt; L<span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   80</span>        }</div>
+<div class="line"><span class="lineno">   81</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   82</span>        {</div>
+<div class="line"><span class="lineno">   83</span>            cmd &lt;&lt; L<span class="stringliteral">&quot; \&quot;\&quot;&quot;</span>; <span class="comment">// Pass empty string if no description for consistency</span></div>
+<div class="line"><span class="lineno">   84</span>        }</div>
+<div class="line"><span class="lineno">   85</span>        cmd &lt;&lt; L<span class="stringliteral">&quot; &quot;</span> &lt;&lt; duration;</div>
+<div class="line"><span class="lineno">   86</span> </div>
+<div class="line"><span class="lineno">   87</span>        std::wcout &lt;&lt; L<span class="stringliteral">&quot;Executing UPNP command: &quot;</span> &lt;&lt; cmd.str() &lt;&lt; std::endl; <span class="comment">// For debugging</span></div>
+<div class="line"><span class="lineno">   88</span>        <span class="keywordtype">int</span> result = _wsystem(cmd.str().c_str());</div>
+<div class="line"><span class="lineno">   89</span> </div>
+<div class="line"><span class="lineno">   90</span>        <span class="keywordflow">if</span> (result != 0)</div>
+<div class="line"><span class="lineno">   91</span>        {</div>
+<div class="line"><span class="lineno">   92</span>            std::wcerr &lt;&lt; L<span class="stringliteral">&quot;UPNP addPortMapping command failed. _wsystem returned: &quot;</span> &lt;&lt; result &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   93</span>        }</div>
+<div class="line"><span class="lineno">   94</span>        <span class="keywordflow">return</span> result == 0;</div>
+<div class="line"><span class="lineno">   95</span>    }</div>
+<div class="ttc" id="aclass_path_manager_html_ac448bd3c10a386c7f89ca39560f6337b"><div class="ttname"><a href="../../de/d2f/class_path_manager.html#ac448bd3c10a386c7f89ca39560f6337b">PathManager::getUpnpcExePath</a></div><div class="ttdeci">static fs::path getUpnpcExePath()</div><div class="ttdef"><b>Definition</b> <a href="../../d0/d0d/_path_manager_8h_source.html#l00110">PathManager.h:110</a></div></div>
+<div class="ttc" id="aclass_u_pn_p_manager_html_abd58c0e1f52e2e50ed55df5430718ba3"><div class="ttname"><a href="#abd58c0e1f52e2e50ed55df5430718ba3">UPnPManager::stringToWString</a></div><div class="ttdeci">static std::wstring stringToWString(const std::string &amp;s)</div><div class="ttdef"><b>Definition</b> <a href="../../db/df2/_u_pn_p_manager_8h_source.html#l00121">UPnPManager.h:121</a></div></div>
+<div class="ttc" id="aclass_u_pn_p_manager_html_afc817fc590e223d3e762497676665b34"><div class="ttname"><a href="#afc817fc590e223d3e762497676665b34">UPnPManager::toUpper</a></div><div class="ttdeci">static std::string toUpper(std::string s)</div><div class="ttdef"><b>Definition</b> <a href="../../db/df2/_u_pn_p_manager_8h_source.html#l00135">UPnPManager.h:135</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_cgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_cgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_cgraph" id="adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_cgraph">
-<area shape="rect" title=" " alt="" coords="5,56,214,83"/>
-<area shape="rect" href="../../de/d2f/class_path_manager.html#ac448bd3c10a386c7f89ca39560f6337b" title=" " alt="" coords="262,5,474,32"/>
-<area shape="poly" title=" " alt="" coords="181,53,281,33,282,38,182,58"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#abd58c0e1f52e2e50ed55df5430718ba3" title=" " alt="" coords="264,56,472,83"/>
-<area shape="poly" title=" " alt="" coords="214,67,249,67,249,72,214,72"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#afc817fc590e223d3e762497676665b34" title=" " alt="" coords="288,107,448,133"/>
-<area shape="poly" title=" " alt="" coords="182,81,282,100,281,106,181,86"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_cgraph.svg" width="480" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_icgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_icgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_icgraph" id="adf/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_icgraph">
-<area shape="rect" title=" " alt="" coords="486,5,694,32"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="246,5,438,32"/>
-<area shape="poly" title=" " alt="" coords="470,21,438,21,438,16,470,16"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="5,5,198,32"/>
-<area shape="poly" title=" " alt="" coords="230,21,198,21,198,16,230,16"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_a0363b702f70a8e05a3a5a6c9fddcde76_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -234,7 +246,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00019">19</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   20</span>    {</div>
+<div class="line"><span class="lineno">   21</span>        <span class="keywordflow">return</span> std::string(<span class="stringliteral">&quot;NOT IMPLEMENTED YET!!&quot;</span>);</div>
+<div class="line"><span class="lineno">   22</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a8a0d993c67abd85fef24bab7b9172d5e" name="a8a0d993c67abd85fef24bab7b9172d5e"></a>
@@ -261,17 +276,44 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00024">24</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   25</span>    {</div>
+<div class="line"><span class="lineno">   26</span>        std::string ipAddress = <span class="stringliteral">&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   27</span>        std::filesystem::path scriptPath = <a class="code hl_function" href="../../de/d2f/class_path_manager.html#ab849cb5818b9f328bbd3214223761ccd">PathManager::getResPath</a>() / <span class="stringliteral">&quot;GetCorrectIPv4.ps1&quot;</span>;</div>
+<div class="line"><span class="lineno">   28</span>        std::string command = <span class="stringliteral">&quot;powershell.exe -NoProfile -ExecutionPolicy Bypass -File \&quot;&quot;</span> + scriptPath.string() + <span class="stringliteral">&quot;\&quot;&quot;</span>;</div>
+<div class="line"><span class="lineno">   29</span> </div>
+<div class="line"><span class="lineno">   30</span>        FILE* pipe = _popen(command.c_str(), <span class="stringliteral">&quot;r&quot;</span>);</div>
+<div class="line"><span class="lineno">   31</span>        <span class="keywordflow">if</span> (!pipe)</div>
+<div class="line"><span class="lineno">   32</span>        {</div>
+<div class="line"><span class="lineno">   33</span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Erro: Falha ao executar o script PowerShell. Comando: &quot;</span> &lt;&lt; command &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   34</span>            <span class="keywordflow">return</span> ipAddress; <span class="comment">// Retorna string vazia em caso de falha ao iniciar o processo</span></div>
+<div class="line"><span class="lineno">   35</span>        }</div>
+<div class="line"><span class="lineno">   36</span> </div>
+<div class="line"><span class="lineno">   37</span>        std::array&lt;char, 256&gt; buffer; <span class="comment">// Buffer para ler a linha</span></div>
+<div class="line"><span class="lineno">   38</span>        std::string line;</div>
+<div class="line"><span class="lineno">   39</span> </div>
+<div class="line"><span class="lineno">   40</span>        <span class="keywordflow">if</span> (fgets(buffer.data(), buffer.size(), pipe) != <span class="keyword">nullptr</span>)</div>
+<div class="line"><span class="lineno">   41</span>        {</div>
+<div class="line"><span class="lineno">   42</span>            line = buffer.data();</div>
+<div class="line"><span class="lineno">   43</span>            line.erase(0, line.find_first_not_of(<span class="stringliteral">&quot; \t\r\n&quot;</span>));</div>
+<div class="line"><span class="lineno">   44</span>            line.erase(line.find_last_not_of(<span class="stringliteral">&quot; \t\r\n&quot;</span>) + 1);</div>
+<div class="line"><span class="lineno">   45</span>            ipAddress = line;</div>
+<div class="line"><span class="lineno">   46</span>        }</div>
+<div class="line"><span class="lineno">   47</span> </div>
+<div class="line"><span class="lineno">   48</span>        _pclose(pipe);</div>
+<div class="line"><span class="lineno">   49</span>        std::regex ipv4_format_regex(<span class="stringliteral">&quot;^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}$&quot;</span>);</div>
+<div class="line"><span class="lineno">   50</span>        <span class="keywordflow">if</span> (!std::regex_match(ipAddress, ipv4_format_regex))</div>
+<div class="line"><span class="lineno">   51</span>        {</div>
+<div class="line"><span class="lineno">   52</span>            std::cerr &lt;&lt; <span class="stringliteral">&quot;Aviso: O script PowerShell retornou algo que não parece um IPv4 válido ou nada: &#39;&quot;</span> &lt;&lt; ipAddress &lt;&lt; <span class="stringliteral">&quot;&#39;&quot;</span> &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">   53</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;&quot;</span>; <span class="comment">// Retorna string vazia se o formato não for válido ou se nenhum IP foi encontrado</span></div>
+<div class="line"><span class="lineno">   54</span>        }</div>
+<div class="line"><span class="lineno">   55</span> </div>
+<div class="line"><span class="lineno">   56</span>        <span class="keywordflow">return</span> ipAddress;</div>
+<div class="line"><span class="lineno">   57</span>    }</div>
+<div class="ttc" id="aclass_path_manager_html_ab849cb5818b9f328bbd3214223761ccd"><div class="ttname"><a href="../../de/d2f/class_path_manager.html#ab849cb5818b9f328bbd3214223761ccd">PathManager::getResPath</a></div><div class="ttdeci">static fs::path getResPath()</div><div class="ttdef"><b>Definition</b> <a href="../../d0/d0d/_path_manager_8h_source.html#l00124">PathManager.h:124</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_a8a0d993c67abd85fef24bab7b9172d5e_cgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_a8a0d993c67abd85fef24bab7b9172d5e_cgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_a8a0d993c67abd85fef24bab7b9172d5e_cgraph" id="adf/d03/class_u_pn_p_manager_a8a0d993c67abd85fef24bab7b9172d5e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,196,48"/>
-<area shape="rect" href="../../de/d2f/class_path_manager.html#ab849cb5818b9f328bbd3214223761ccd" title=" " alt="" coords="244,13,419,40"/>
-<area shape="poly" title=" " alt="" coords="196,24,228,24,228,29,196,29"/>
-<area shape="rect" href="../../de/d2f/class_path_manager.html#a467b459b77c73cbc7544551b53911fcd" title=" " alt="" coords="467,13,684,40"/>
-<area shape="poly" title=" " alt="" coords="420,24,452,24,452,29,420,29"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_a8a0d993c67abd85fef24bab7b9172d5e_cgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -304,19 +346,26 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00098">98</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  102</span>    {</div>
+<div class="line"><span class="lineno">  103</span>        std::wostringstream cmd;</div>
+<div class="line"><span class="lineno">  104</span>        <span class="comment">// Use your PathManager to get the path</span></div>
+<div class="line"><span class="lineno">  105</span>        cmd &lt;&lt; L<span class="stringliteral">&quot;\&quot;&quot;</span> &lt;&lt; <a class="code hl_function" href="../../de/d2f/class_path_manager.html#ac448bd3c10a386c7f89ca39560f6337b">PathManager::getUpnpcExePath</a>().wstring() &lt;&lt; L<span class="stringliteral">&quot;\&quot; -d &quot;</span></div>
+<div class="line"><span class="lineno">  106</span>            &lt;&lt; externalPort &lt;&lt; L<span class="stringliteral">&quot; &quot;</span></div>
+<div class="line"><span class="lineno">  107</span>            &lt;&lt; <a class="code hl_function" href="#abd58c0e1f52e2e50ed55df5430718ba3">stringToWString</a>(<a class="code hl_function" href="#afc817fc590e223d3e762497676665b34">toUpper</a>(protocol)); <span class="comment">// Ensure protocol is uppercase</span></div>
+<div class="line"><span class="lineno">  108</span> </div>
+<div class="line"><span class="lineno">  109</span>        std::wcout &lt;&lt; L<span class="stringliteral">&quot;Executing UPNP command: &quot;</span> &lt;&lt; cmd.str() &lt;&lt; std::endl; <span class="comment">// For debugging</span></div>
+<div class="line"><span class="lineno">  110</span>        <span class="keywordtype">int</span> result = _wsystem(cmd.str().c_str());</div>
+<div class="line"><span class="lineno">  111</span> </div>
+<div class="line"><span class="lineno">  112</span>        <span class="keywordflow">if</span> (result != 0)</div>
+<div class="line"><span class="lineno">  113</span>        {</div>
+<div class="line"><span class="lineno">  114</span>            std::wcerr &lt;&lt; L<span class="stringliteral">&quot;UPNP removePortMapping command failed. _wsystem returned: &quot;</span> &lt;&lt; result &lt;&lt; std::endl;</div>
+<div class="line"><span class="lineno">  115</span>        }</div>
+<div class="line"><span class="lineno">  116</span>        <span class="keywordflow">return</span> result == 0;</div>
+<div class="line"><span class="lineno">  117</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_a26b24ac7ad78ccaaea101f9f3621c9ee_cgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_a26b24ac7ad78ccaaea101f9f3621c9ee_cgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_a26b24ac7ad78ccaaea101f9f3621c9ee_cgraph" id="adf/d03/class_u_pn_p_manager_a26b24ac7ad78ccaaea101f9f3621c9ee_cgraph">
-<area shape="rect" title=" " alt="" coords="5,56,236,83"/>
-<area shape="rect" href="../../de/d2f/class_path_manager.html#ac448bd3c10a386c7f89ca39560f6337b" title=" " alt="" coords="284,5,496,32"/>
-<area shape="poly" title=" " alt="" coords="195,53,300,33,301,38,196,58"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#abd58c0e1f52e2e50ed55df5430718ba3" title=" " alt="" coords="286,56,494,83"/>
-<area shape="poly" title=" " alt="" coords="236,67,271,67,271,72,236,72"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#afc817fc590e223d3e762497676665b34" title=" " alt="" coords="310,107,470,133"/>
-<area shape="poly" title=" " alt="" coords="196,81,301,101,300,106,195,86"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_a26b24ac7ad78ccaaea101f9f3621c9ee_cgraph.svg" width="502" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -345,21 +394,21 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00121">121</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  122</span>    {</div>
+<div class="line"><span class="lineno">  123</span>        <span class="keywordtype">int</span> len;</div>
+<div class="line"><span class="lineno">  124</span>        <span class="comment">// +1 for null terminator, assuming s.length() is byte length.</span></div>
+<div class="line"><span class="lineno">  125</span>        <span class="comment">// For UTF-8, this is safer, but if you&#39;re dealing with raw bytes, length might be different.</span></div>
+<div class="line"><span class="lineno">  126</span>        <span class="comment">// For general usage with ASCII/Latin-1 strings in arguments, this is fine.</span></div>
+<div class="line"><span class="lineno">  127</span>        <span class="keywordtype">int</span> slength = (int)s.length() + 1;</div>
+<div class="line"><span class="lineno">  128</span>        len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0);</div>
+<div class="line"><span class="lineno">  129</span>        std::vector&lt;wchar_t&gt; buf(len);</div>
+<div class="line"><span class="lineno">  130</span>        MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, &amp;buf[0], len);</div>
+<div class="line"><span class="lineno">  131</span>        <span class="keywordflow">return</span> std::wstring(&amp;buf[0]);</div>
+<div class="line"><span class="lineno">  132</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_abd58c0e1f52e2e50ed55df5430718ba3_icgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_abd58c0e1f52e2e50ed55df5430718ba3_icgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_abd58c0e1f52e2e50ed55df5430718ba3_icgraph" id="adf/d03/class_u_pn_p_manager_abd58c0e1f52e2e50ed55df5430718ba3_icgraph">
-<area shape="rect" title=" " alt="" coords="764,31,972,57"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#a0363b702f70a8e05a3a5a6c9fddcde76" title=" " alt="" coords="497,5,705,32"/>
-<area shape="poly" title=" " alt="" coords="748,35,706,31,706,26,749,30"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#a26b24ac7ad78ccaaea101f9f3621c9ee" title=" " alt="" coords="486,56,716,83"/>
-<area shape="poly" title=" " alt="" coords="749,58,717,61,717,56,748,53"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="246,5,438,32"/>
-<area shape="poly" title=" " alt="" coords="482,21,438,21,438,16,482,16"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="5,5,198,32"/>
-<area shape="poly" title=" " alt="" coords="230,21,198,21,198,16,230,16"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_abd58c0e1f52e2e50ed55df5430718ba3_icgraph.svg" width="100%" height="366"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -388,21 +437,16 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html#l00135">135</a> of file <a class="el" href="../../db/df2/_u_pn_p_manager_8h_source.html">UPnPManager.h</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  136</span>    {</div>
+<div class="line"><span class="lineno">  137</span>        std::transform(s.begin(), s.end(), s.begin(),</div>
+<div class="line"><span class="lineno">  138</span>                       [](<span class="keywordtype">unsigned</span> <span class="keywordtype">char</span> c)</div>
+<div class="line"><span class="lineno">  139</span>                       { return static_cast&lt;unsigned char&gt;(std::toupper(c)); });</div>
+<div class="line"><span class="lineno">  140</span>        <span class="keywordflow">return</span> s;</div>
+<div class="line"><span class="lineno">  141</span>    }</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d03/class_u_pn_p_manager_afc817fc590e223d3e762497676665b34_icgraph.png" border="0" usemap="#adf/d03/class_u_pn_p_manager_afc817fc590e223d3e762497676665b34_icgraph" alt=""/></div>
-<map name="adf/d03/class_u_pn_p_manager_afc817fc590e223d3e762497676665b34_icgraph" id="adf/d03/class_u_pn_p_manager_afc817fc590e223d3e762497676665b34_icgraph">
-<area shape="rect" title=" " alt="" coords="764,31,925,57"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#a0363b702f70a8e05a3a5a6c9fddcde76" title=" " alt="" coords="497,5,705,32"/>
-<area shape="poly" title=" " alt="" coords="748,37,706,32,706,27,749,31"/>
-<area shape="rect" href="../../df/d03/class_u_pn_p_manager.html#a26b24ac7ad78ccaaea101f9f3621c9ee" title=" " alt="" coords="486,56,716,83"/>
-<area shape="poly" title=" " alt="" coords="749,57,717,60,716,55,748,51"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#a183ff98131c32d577308340999b4de18" title=" " alt="" coords="246,5,438,32"/>
-<area shape="poly" title=" " alt="" coords="482,21,438,21,438,16,482,16"/>
-<area shape="rect" href="../../da/d21/class_network_manager.html#adef56253674bd7ebd40bf73c629feed2" title=" " alt="" coords="5,5,198,32"/>
-<area shape="poly" title=" " alt="" coords="230,21,198,21,198,16,230,16"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../df/d03/class_u_pn_p_manager_afc817fc590e223d3e762497676665b34_icgraph.svg" width="100%" height="366"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>

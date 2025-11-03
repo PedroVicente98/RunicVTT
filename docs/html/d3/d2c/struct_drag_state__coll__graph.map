@@ -1,5 +1,11 @@
 <map id="DragState" name="DragState">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,139,177,373"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="70,5,113,75"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="94,75,94,122,89,122,89,75"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="231,187,300,256"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,5,62,75"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="32,74,34,119,41,141,53,161,79,177,120,191,215,210,214,215,119,196,77,182,49,165,36,144,29,120,27,74"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="184,5,219,75"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="198,74,196,117,199,140,206,162,221,184,216,187,201,164,194,141,191,118,193,74"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="308,5,351,75"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="327,75,318,118,303,164,299,173,294,171,298,162,313,117,322,74"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="417,5,474,75"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="446,75,436,120,426,144,412,164,391,182,367,196,318,214,316,209,365,192,388,178,408,161,421,141,431,119,441,74"/>
 </map>

@@ -1,12 +1,9 @@
 <map id="SignalingClient::connectUrl" name="SignalingClient::connectUrl">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,43,185,69"/>
-<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#a7b9b352f171d45961ea91a8fe0772ac8" title=" " alt="" coords="235,5,414,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,42,219,37,220,43,186,47"/>
-<area shape="rect" id="Node000003" href="$d4/d9e/class_signaling_client.html#a957143d66873fe4b3b5c94ee9ae0b326" title=" " alt="" coords="233,72,416,99"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,65,217,69,217,74,185,70"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="464,35,581,61"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="398,69,448,59,449,64,399,74"/>
-<area shape="rect" id="Node000005" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="480,109,565,136"/>
-<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="399,97,466,109,465,115,398,102"/>
-<area shape="poly" id="edge5_Node000005_Node000005" title=" " alt="" coords="489,110,483,101,487,91,501,85,523,83,546,85,559,92,556,96,545,90,523,88,502,90,491,95,488,100,493,107"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,185,57"/>
+<area shape="rect" id="Node000002" href="$d5/d81/class_network_utilities.html#a7b9b352f171d45961ea91a8fe0772ac8" title=" " alt="" coords="233,5,448,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="185,32,217,29,217,34,186,37"/>
+<area shape="rect" id="Node000003" href="$d4/d9e/class_signaling_client.html#a957143d66873fe4b3b5c94ee9ae0b326" title=" " alt="" coords="249,56,432,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="186,51,234,56,233,61,185,56"/>
+<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="496,56,613,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="433,67,480,67,480,72,433,72"/>
 </map>

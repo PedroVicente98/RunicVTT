@@ -1,14 +1,10 @@
 <map id="Logger::LineToLoggerBuf::overflow" name="Logger::LineToLoggerBuf::overflow">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,171,81"/>
-<area shape="rect" id="Node000002" href="$db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="219,5,384,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="170,44,203,39,203,45,171,50"/>
-<area shape="rect" id="Node000005" href="$db/d80/class_logger_1_1_line_to_logger_buf.html#a9dd164184038b0f6a7d1b3926d228d30" title=" " alt="" coords="219,72,384,115"/>
-<area shape="poly" id="edge5_Node000001_Node000005" title=" " alt="" coords="171,70,203,75,203,81,170,76"/>
-<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="432,9,549,36"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="384,22,417,22,417,27,385,28"/>
-<area shape="rect" id="Node000004" href="$d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="448,84,533,111"/>
-<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="362,46,439,75,437,80,360,51"/>
-<area shape="poly" id="edge4_Node000004_Node000004" title=" " alt="" coords="458,85,453,75,457,66,470,59,491,57,513,60,525,66,523,71,512,65,491,63,471,65,460,69,458,75,463,82"/>
-<area shape="poly" id="edge6_Node000005_Node000003" title=" " alt="" coords="360,69,437,40,439,45,362,74"/>
-<area shape="poly" id="edge7_Node000005_Node000004" title=" " alt="" coords="385,92,432,93,432,99,384,98"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,228,57"/>
+<area shape="rect" id="Node000002" href="$db/d80/class_logger_1_1_line_to_logger_buf.html#a65604209f9adb1e9adf47388212c7cf8" title=" " alt="" coords="276,5,508,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="228,31,260,28,260,33,228,36"/>
+<area shape="rect" id="Node000004" href="$db/d80/class_logger_1_1_line_to_logger_buf.html#a9dd164184038b0f6a7d1b3926d228d30" title=" " alt="" coords="291,56,492,83"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="228,52,276,56,275,61,228,57"/>
+<area shape="rect" id="Node000003" href="$d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="556,31,673,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="509,29,541,33,541,38,508,35"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="493,55,540,50,541,55,493,61"/>
 </map>

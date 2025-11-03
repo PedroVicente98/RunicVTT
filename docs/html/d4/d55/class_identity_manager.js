@@ -3,6 +3,8 @@ var class_identity_manager =
     [ "all", "d4/d55/class_identity_manager.html#ae8f52588de8e9e345c248596f6129154", null ],
     [ "bindPeer", "d4/d55/class_identity_manager.html#a22e3ee5efe1fc4e1df1363b9490390fb", null ],
     [ "erasePeer", "d4/d55/class_identity_manager.html#a3865c83acdb1586d0a3e1a9dd2f7c9fb", null ],
+    [ "kBookFile", "d4/d55/class_identity_manager.html#ad6a5adbbaa98c88ed1447e8783b0a6b8", null ],
+    [ "kMeFile", "d4/d55/class_identity_manager.html#a611e5cdca43b5f0e960cd0a486e14d00", null ],
     [ "loadAddressBookFromFile", "d4/d55/class_identity_manager.html#a8ab84e3c1abaf38a289c276666ca52ad", null ],
     [ "loadMyIdentityFromFile", "d4/d55/class_identity_manager.html#af2952d782e6078643da4c28d90c87504", null ],
     [ "myUniqueId", "d4/d55/class_identity_manager.html#a0bef3f576e242a1da3e26a137b6066f0", null ],

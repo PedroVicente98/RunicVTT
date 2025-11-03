@@ -6,7 +6,7 @@ digraph "FirewallUtils::addInboundAnyUdpForExe"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="FirewallUtils::addInbound\lAnyUdpForExe",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="FirewallUtils::addInboundAnyUdpForExe",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="FirewallUtils::psEscape",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d3/daa/namespace_firewall_utils.html#aeb36bfe1766b8cab726095eb9cdafcec",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",color="steelblue1",style="solid",tooltip=" "];

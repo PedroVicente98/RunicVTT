@@ -1,7 +1,7 @@
 <map id="DirectoryWindow::renderDirectory" name="DirectoryWindow::renderDirectory">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,224,73"/>
-<area shape="rect" id="Node000002" href="$d4/db8/class_directory_window.html#a79841f306a66b8294dd5214704f3eac7" title=" " alt="" coords="272,5,472,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="222,43,256,39,256,44,223,49"/>
-<area shape="rect" id="Node000003" href="$d4/db8/class_directory_window.html#a2cf68068c1d14ad4435d84074a2239cc" title=" " alt="" coords="282,72,462,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="223,71,267,77,266,82,222,77"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,224,57"/>
+<area shape="rect" id="Node000002" href="$d4/db8/class_directory_window.html#a79841f306a66b8294dd5214704f3eac7" title=" " alt="" coords="272,5,523,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="224,32,256,29,256,34,224,37"/>
+<area shape="rect" id="Node000003" href="$d4/db8/class_directory_window.html#a2cf68068c1d14ad4435d84074a2239cc" title=" " alt="" coords="290,56,504,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="224,51,275,56,274,61,224,56"/>
 </map>

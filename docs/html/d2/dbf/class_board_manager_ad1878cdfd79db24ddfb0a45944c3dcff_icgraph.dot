@@ -8,5 +8,5 @@ digraph "BoardManager::getActiveBoard"
   rankdir="RL";
   Node1 [id="Node000001",label="BoardManager::getActiveBoard",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="BoardManager::renderEdit\lWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a619b2b693537168f2a9a0afe5191b1d9",tooltip=" "];
+  Node2 [id="Node000002",label="BoardManager::renderEditWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a619b2b693537168f2a9a0afe5191b1d9",tooltip=" "];
 }

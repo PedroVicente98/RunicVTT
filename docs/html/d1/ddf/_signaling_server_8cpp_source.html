@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -389,7 +389,7 @@ $(function(){initNavTree('d1/ddf/_signaling_server_8cpp_source.html','../../'); 
 <div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>            }</div>
 <div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span>            <span class="keywordflow">catch</span> (...)</div>
 <div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>            {</div>
-<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>                <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().<a class="code hl_function" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370">log</a>(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a>, <span class="stringliteral">&quot;WS close failed for &quot;</span> + <span class="keywordtype">id</span>);</div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>                <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a>, <span class="stringliteral">&quot;WS close failed for &quot;</span> + <span class="keywordtype">id</span>);</div>
 <div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>            }</div>
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>        }</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>        map.clear();</div>
@@ -438,7 +438,6 @@ $(function(){initNavTree('d1/ddf/_signaling_server_8cpp_source.html','../../'); 
 <div class="ttc" id="a_signaling_client_8cpp_html_a19bfb27380067c74ae297dd7dad5fb37"><div class="ttname"><a href="../../d3/d55/_signaling_client_8cpp.html#a19bfb27380067c74ae297dd7dad5fb37">Clock</a></div><div class="ttdeci">std::chrono::steady_clock Clock</div><div class="ttdef"><b>Definition</b> <a href="../../d3/d55/_signaling_client_8cpp_source.html#l00010">SignalingClient.cpp:10</a></div></div>
 <div class="ttc" id="a_signaling_client_8cpp_html_ab701e3ac61a85b337ec5c1abaad6742d"><div class="ttname"><a href="../../d3/d55/_signaling_client_8cpp.html#ab701e3ac61a85b337ec5c1abaad6742d">json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>Definition</b> <a href="../../d3/d55/_signaling_client_8cpp_source.html#l00009">SignalingClient.cpp:9</a></div></div>
 <div class="ttc" id="a_signaling_server_8h_html"><div class="ttname"><a href="../../d7/dd8/_signaling_server_8h.html">SignalingServer.h</a></div></div>
-<div class="ttc" id="aclass_logger_html_ab77a9a6a08954192b47c39f359b5d370"><div class="ttname"><a href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370">Logger::log</a></div><div class="ttdeci">void log(const std::string &amp;channel, const std::string &amp;line)</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00048">Logger.h:48</a></div></div>
 <div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17"><div class="ttname"><a href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a></div><div class="ttdeci">@ Warn</div></div>
 <div class="ttc" id="aclass_logger_html_aebb248e608f8e2724de20b482cb2a15f"><div class="ttname"><a href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a></div><div class="ttdeci">static Logger &amp; instance()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00039">Logger.h:39</a></div></div>
 <div class="ttc" id="aclass_network_utilities_html_ac24b451c3d4b386916a1062480656c00"><div class="ttname"><a href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00">NetworkUtilities::safeCloseWebSocket</a></div><div class="ttdeci">static void safeCloseWebSocket(std::shared_ptr&lt; rtc::WebSocket &gt; &amp;ws)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/da8/_network_utilities_8h_source.html#l00067">NetworkUtilities.h:67</a></div></div>

@@ -1,13 +1,11 @@
 <map id="Logger::channels" name="Logger::channels">
-<area shape="rect" id="Node000001" title=" " alt="" coords="972,13,1092,40"/>
-<area shape="rect" id="Node000002" href="$d5/d7c/class_debug_console.html#a54beaa848e4e2e121cad09e36ac26558" title=" " alt="" coords="734,5,924,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="956,29,925,29,925,24,956,24"/>
-<area shape="rect" id="Node000003" href="$d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="512,5,686,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="718,29,686,29,686,24,718,24"/>
-<area shape="rect" id="Node000004" href="$d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="307,13,464,40"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="497,29,465,29,465,24,497,24"/>
-<area shape="rect" id="Node000005" href="$d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="103,13,259,40"/>
-<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="292,29,260,29,260,24,292,24"/>
-<area shape="rect" id="Node000006" href="$df/d0a/main_8cpp.html#ae66f6b31b5ad750f1fe042a706a4e3d4" title=" " alt="" coords="5,13,55,40"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="87,29,55,29,55,24,87,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="950,5,1070,32"/>
+<area shape="rect" id="Node000002" href="$d5/d7c/class_debug_console.html#a54beaa848e4e2e121cad09e36ac26558" title=" " alt="" coords="676,5,902,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="934,21,902,21,902,16,934,16"/>
+<area shape="rect" id="Node000003" href="$d5/d7c/class_debug_console.html#a717dcde7a5054ddfa4c8b9aef2307d00" title=" " alt="" coords="415,5,628,32"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="661,21,629,21,629,16,661,16"/>
+<area shape="rect" id="Node000004" href="$d5/d7c/class_debug_console.html#adeb68f1f7a629e5f8550872c30fd0b8b" title=" " alt="" coords="210,5,367,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="399,21,367,21,367,16,399,16"/>
+<area shape="rect" id="Node000005" href="$d4/d97/class_application_handler.html#afaf00f4f20eca3fec59f8f02f76ef2ce" title=" " alt="" coords="5,5,162,32"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="194,21,162,21,162,16,194,16"/>
 </map>

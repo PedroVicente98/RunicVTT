@@ -38,12 +38,12 @@ digraph "include/ImGuiToaster.h"
   Node5 -> Node15 [id="edge17_Node000005_Node000015",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node15 [id="Node000015",label="src/network/SignalingServer.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/ddf/_signaling_server_8cpp.html",tooltip=" "];
   Node1 -> Node16 [id="edge18_Node000001_Node000016",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node16 [id="Node000016",label="include/note_editor\l/NoteEditorUI.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/ded/_note_editor_u_i_8h.html",tooltip=" "];
+  Node16 [id="Node000016",label="include/note_editor/NoteEditorUI.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d1/ded/_note_editor_u_i_8h.html",tooltip=" "];
   Node16 -> Node7 [id="edge19_Node000016_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node16 -> Node17 [id="edge20_Node000016_Node000017",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node17 [id="Node000017",label="src/note_editor/NoteEditor\lUI.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d67/_note_editor_u_i_8cpp.html",tooltip=" "];
+  Node17 [id="Node000017",label="src/note_editor/NoteEditorUI.cpp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d67/_note_editor_u_i_8cpp.html",tooltip=" "];
   Node1 -> Node18 [id="edge21_Node000001_Node000018",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node18 [id="Node000018",label="include/note_editor\l/NotesManager.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d7/d8b/_notes_manager_8h.html",tooltip=" "];
+  Node18 [id="Node000018",label="include/note_editor/NotesManager.h",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d7/d8b/_notes_manager_8h.html",tooltip=" "];
   Node18 -> Node7 [id="edge22_Node000018_Node000007",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node18 -> Node16 [id="edge23_Node000018_Node000016",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node18 -> Node19 [id="edge24_Node000018_Node000019",dir="back",color="steelblue1",style="solid",tooltip=" "];

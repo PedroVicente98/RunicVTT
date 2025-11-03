@@ -12,5 +12,5 @@ digraph "BoardManager::handleFogCreation"
   Node2 -> Node3 [id="edge2_Node000002_Node000003",color="steelblue1",style="solid",tooltip=" "];
   Node3 [id="Node000003",label="BoardManager::generateUniqueId",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a2f084d03176076e9260e06df52e474fe",tooltip=" "];
   Node1 -> Node4 [id="edge3_Node000001_Node000004",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="BoardManager::getMouseStart\lPosition",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a7d2d476b95461eead67e8d151f0d376a",tooltip=" "];
+  Node4 [id="Node000004",label="BoardManager::getMouseStartPosition",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a7d2d476b95461eead67e8d151f0d376a",tooltip=" "];
 }

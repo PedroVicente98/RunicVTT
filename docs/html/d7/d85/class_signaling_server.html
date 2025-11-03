@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,10 +105,7 @@ $(function(){initNavTree('d7/d85/class_signaling_server.html','../../'); initRes
 <div class="dynheader">
 Collaboration diagram for SignalingServer:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../dd/dc4/class_signaling_server__coll__graph.png" border="0" usemap="#a_signaling_server_coll__map" alt="Collaboration graph"/></div>
-<map name="a_signaling_server_coll__map" id="a_signaling_server_coll__map">
-<area shape="rect" title=" " alt="" coords="5,5,219,821"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../dd/dc4/class_signaling_server__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -185,7 +182,12 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00013">13</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   13</span>                                                                   :</div>
+<div class="line"><span class="lineno">   14</span>    <a class="code hl_variable" href="#ad5d3508991dc5043c01a7a9643efb997">network_manager</a>(parent)</div>
+<div class="line"><span class="lineno">   15</span>{</div>
+<div class="line"><span class="lineno">   16</span>}</div>
+<div class="ttc" id="aclass_signaling_server_html_ad5d3508991dc5043c01a7a9643efb997"><div class="ttname"><a href="#ad5d3508991dc5043c01a7a9643efb997">SignalingServer::network_manager</a></div><div class="ttdeci">std::weak_ptr&lt; NetworkManager &gt; network_manager</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00050">SignalingServer.h:50</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a257d9fcbdd01ef29c2c4b093a79b023a" name="a257d9fcbdd01ef29c2c4b093a79b023a"></a>
@@ -204,22 +206,14 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00018">18</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   19</span>{</div>
+<div class="line"><span class="lineno">   20</span>    this-&gt;<a class="code hl_function" href="#ad1eb7f34bf1ee45ab24d16020ffcb889">stop</a>();</div>
+<div class="line"><span class="lineno">   21</span>}</div>
+<div class="ttc" id="aclass_signaling_server_html_ad1eb7f34bf1ee45ab24d16020ffcb889"><div class="ttname"><a href="#ad1eb7f34bf1ee45ab24d16020ffcb889">SignalingServer::stop</a></div><div class="ttdeci">void stop()</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00065">SignalingServer.cpp:65</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a257d9fcbdd01ef29c2c4b093a79b023a_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a257d9fcbdd01ef29c2c4b093a79b023a_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a257d9fcbdd01ef29c2c4b093a79b023a_cgraph" id="ad7/d85/class_signaling_server_a257d9fcbdd01ef29c2c4b093a79b023a_cgraph">
-<area shape="rect" title=" " alt="" coords="5,35,187,77"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#ad1eb7f34bf1ee45ab24d16020ffcb889" title=" " alt="" coords="235,43,380,69"/>
-<area shape="poly" title=" " alt="" coords="187,53,220,53,220,59,187,59"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00" title=" " alt="" coords="428,35,609,77"/>
-<area shape="poly" title=" " alt="" coords="380,53,412,53,412,59,380,59"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="657,5,775,32"/>
-<area shape="poly" title=" " alt="" coords="609,36,641,30,642,35,610,41"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="673,80,759,107"/>
-<area shape="poly" title=" " alt="" coords="610,71,658,80,657,85,609,76"/>
-<area shape="poly" title=" " alt="" coords="682,81,676,71,681,62,694,55,716,53,740,56,752,62,750,67,738,61,716,59,695,61,684,65,682,71,687,78"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a257d9fcbdd01ef29c2c4b093a79b023a_cgraph.svg" width="100%" height="384"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -249,7 +243,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html#l00039">39</a> of file <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html">SignalingServer.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   40</span>    {</div>
+<div class="line"><span class="lineno">   41</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>;</div>
+<div class="line"><span class="lineno">   42</span>    }</div>
+<div class="ttc" id="aclass_signaling_server_html_ad689a80d65386807c2135adac7a095b3"><div class="ttname"><a href="#ad689a80d65386807c2135adac7a095b3">SignalingServer::authClients_</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::shared_ptr&lt; rtc::WebSocket &gt; &gt; authClients_</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00059">SignalingServer.h:59</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a2630087e21a05bf01d3cd4b799183bd5" name="a2630087e21a05bf01d3cd4b799183bd5"></a>
@@ -268,15 +266,17 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00231">231</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  232</span>{</div>
+<div class="line"><span class="lineno">  233</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, ws] : <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>)</div>
+<div class="line"><span class="lineno">  234</span>    {</div>
+<div class="line"><span class="lineno">  235</span>        <span class="keywordflow">if</span> (ws &amp;&amp; !ws-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  236</span>            ws-&gt;send(message);</div>
+<div class="line"><span class="lineno">  237</span>    }</div>
+<div class="line"><span class="lineno">  238</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a2630087e21a05bf01d3cd4b799183bd5_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a2630087e21a05bf01d3cd4b799183bd5_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a2630087e21a05bf01d3cd4b799183bd5_icgraph" id="ad7/d85/class_signaling_server_a2630087e21a05bf01d3cd4b799183bd5_icgraph">
-<area shape="rect" title=" " alt="" coords="231,13,408,40"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#ab53bb53bb4837a9fcffefb8200a6ee7b" title=" " alt="" coords="5,5,183,48"/>
-<area shape="poly" title=" " alt="" coords="215,29,183,29,183,24,215,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a2630087e21a05bf01d3cd4b799183bd5_icgraph.svg" width="414" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -297,17 +297,16 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00240">240</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  241</span>{</div>
+<div class="line"><span class="lineno">  242</span>    nlohmann::json j = <a class="code hl_function" href="../../d5/d64/namespacemsg.html#a3646ef374175fd6ca65233bf402f3704">msg::makeBroadcastShutdown</a>();</div>
+<div class="line"><span class="lineno">  243</span>    <a class="code hl_function" href="#a2630087e21a05bf01d3cd4b799183bd5">broadcast</a>(j.dump());</div>
+<div class="line"><span class="lineno">  244</span>}</div>
+<div class="ttc" id="aclass_signaling_server_html_a2630087e21a05bf01d3cd4b799183bd5"><div class="ttname"><a href="#a2630087e21a05bf01d3cd4b799183bd5">SignalingServer::broadcast</a></div><div class="ttdeci">void broadcast(const std::string &amp;message)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00231">SignalingServer.cpp:231</a></div></div>
+<div class="ttc" id="anamespacemsg_html_a3646ef374175fd6ca65233bf402f3704"><div class="ttname"><a href="../../d5/d64/namespacemsg.html#a3646ef374175fd6ca65233bf402f3704">msg::makeBroadcastShutdown</a></div><div class="ttdeci">Json makeBroadcastShutdown()</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00474">Message.h:474</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_ab53bb53bb4837a9fcffefb8200a6ee7b_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_ab53bb53bb4837a9fcffefb8200a6ee7b_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_ab53bb53bb4837a9fcffefb8200a6ee7b_cgraph" id="ad7/d85/class_signaling_server_ab53bb53bb4837a9fcffefb8200a6ee7b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,23,183,65"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a2630087e21a05bf01d3cd4b799183bd5" title=" " alt="" coords="244,5,421,32"/>
-<area shape="poly" title=" " alt="" coords="183,32,228,27,229,32,183,37"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a3646ef374175fd6ca65233bf402f3704" title=" " alt="" coords="231,56,434,83"/>
-<area shape="poly" title=" " alt="" coords="183,51,215,54,215,60,183,56"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_ab53bb53bb4837a9fcffefb8200a6ee7b_cgraph.svg" width="440" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -328,18 +327,45 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00246">246</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  247</span>{</div>
+<div class="line"><span class="lineno">  248</span>    <span class="comment">// Move out both maps to avoid erase while inside callbacks</span></div>
+<div class="line"><span class="lineno">  249</span>    <span class="keyword">auto</span> auth = std::move(<a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>);</div>
+<div class="line"><span class="lineno">  250</span>    <span class="keyword">auto</span> pend = std::move(<a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>);</div>
+<div class="line"><span class="lineno">  251</span>    <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.clear();</div>
+<div class="line"><span class="lineno">  252</span>    <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.clear();</div>
+<div class="line"><span class="lineno">  253</span> </div>
+<div class="line"><span class="lineno">  254</span>    <span class="keyword">auto</span> closer = [](<span class="keyword">auto</span>&amp; map)</div>
+<div class="line"><span class="lineno">  255</span>    {</div>
+<div class="line"><span class="lineno">  256</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, ws] : map)</div>
+<div class="line"><span class="lineno">  257</span>        {</div>
+<div class="line"><span class="lineno">  258</span>            <span class="keywordflow">if</span> (!ws)</div>
+<div class="line"><span class="lineno">  259</span>                <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  260</span>            <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  261</span>            {</div>
+<div class="line"><span class="lineno">  262</span>                ws-&gt;onOpen(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  263</span>                ws-&gt;onMessage(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  264</span>                ws-&gt;onClosed(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  265</span>                ws-&gt;onError(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  266</span>                ws-&gt;close();</div>
+<div class="line"><span class="lineno">  267</span>            }</div>
+<div class="line"><span class="lineno">  268</span>            <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  269</span>            {</div>
+<div class="line"><span class="lineno">  270</span>                <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a>, <span class="stringliteral">&quot;WS close failed for &quot;</span> + <span class="keywordtype">id</span>);</div>
+<div class="line"><span class="lineno">  271</span>            }</div>
+<div class="line"><span class="lineno">  272</span>        }</div>
+<div class="line"><span class="lineno">  273</span>        map.clear();</div>
+<div class="line"><span class="lineno">  274</span>    };</div>
+<div class="line"><span class="lineno">  275</span> </div>
+<div class="line"><span class="lineno">  276</span>    closer(auth);</div>
+<div class="line"><span class="lineno">  277</span>    closer(pend);</div>
+<div class="line"><span class="lineno">  278</span>}</div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17"><div class="ttname"><a href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca56525ae64d370c0b448ac0d60710ef17">Logger::Level::Warn</a></div><div class="ttdeci">@ Warn</div></div>
+<div class="ttc" id="aclass_logger_html_aebb248e608f8e2724de20b482cb2a15f"><div class="ttname"><a href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a></div><div class="ttdeci">static Logger &amp; instance()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00039">Logger.h:39</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_a587867b4ac354e5fe9a773f480532225"><div class="ttname"><a href="#a587867b4ac354e5fe9a773f480532225">SignalingServer::pendingClients_</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::shared_ptr&lt; rtc::WebSocket &gt; &gt; pendingClients_</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00053">SignalingServer.h:53</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a70aa13890f08f63bd8497e8bc366ccfa_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a70aa13890f08f63bd8497e8bc366ccfa_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a70aa13890f08f63bd8497e8bc366ccfa_cgraph" id="ad7/d85/class_signaling_server_a70aa13890f08f63bd8497e8bc366ccfa_cgraph">
-<area shape="rect" title=" " alt="" coords="5,35,189,77"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="237,5,354,32"/>
-<area shape="poly" title=" " alt="" coords="189,36,221,30,222,35,190,41"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="253,80,338,107"/>
-<area shape="poly" title=" " alt="" coords="190,71,238,80,237,85,189,76"/>
-<area shape="poly" title=" " alt="" coords="262,81,256,71,260,62,273,55,295,53,319,56,332,62,329,67,317,61,295,59,275,61,263,65,261,71,266,78"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a70aa13890f08f63bd8497e8bc366ccfa_cgraph.svg" width="360" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -360,7 +386,15 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00296">296</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  297</span>{</div>
+<div class="line"><span class="lineno">  298</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(clientId);</div>
+<div class="line"><span class="lineno">  299</span>    <span class="keywordflow">if</span> (it != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end() &amp;&amp; it-&gt;second)</div>
+<div class="line"><span class="lineno">  300</span>    {</div>
+<div class="line"><span class="lineno">  301</span>        <span class="keywordflow">if</span> (!it-&gt;second-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  302</span>            it-&gt;second-&gt;close();</div>
+<div class="line"><span class="lineno">  303</span>    }</div>
+<div class="line"><span class="lineno">  304</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a2c6fdfc468ee96cdb28722a11664845a" name="a2c6fdfc468ee96cdb28722a11664845a"></a>
@@ -379,17 +413,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00291">291</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  292</span>{</div>
+<div class="line"><span class="lineno">  293</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(clientId) != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end();</div>
+<div class="line"><span class="lineno">  294</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a2c6fdfc468ee96cdb28722a11664845a_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a2c6fdfc468ee96cdb28722a11664845a_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a2c6fdfc468ee96cdb28722a11664845a_icgraph" id="ad7/d85/class_signaling_server_a2c6fdfc468ee96cdb28722a11664845a_icgraph">
-<area shape="rect" title=" " alt="" coords="435,5,645,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a1bff9775c26724fe03a5bac447e0dd3b" title=" " alt="" coords="200,5,387,32"/>
-<area shape="poly" title=" " alt="" coords="419,21,387,21,387,16,419,16"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a2c6fdfc468ee96cdb28722a11664845a_icgraph.svg" width="651" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -418,7 +448,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html#l00043">43</a> of file <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html">SignalingServer.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   44</span>    {</div>
+<div class="line"><span class="lineno">   45</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#ab86a69361f5adc75790e3950d9d1fb05">is_running</a>;</div>
+<div class="line"><span class="lineno">   46</span>    }</div>
+<div class="ttc" id="aclass_signaling_server_html_ab86a69361f5adc75790e3950d9d1fb05"><div class="ttname"><a href="#ab86a69361f5adc75790e3950d9d1fb05">SignalingServer::is_running</a></div><div class="ttdeci">bool is_running</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00051">SignalingServer.h:51</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a8d9fc20c0e4d459bb2c4058c2de70a74" name="a8d9fc20c0e4d459bb2c4058c2de70a74"></a>
@@ -437,17 +471,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00280">280</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  281</span>{</div>
+<div class="line"><span class="lineno">  282</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.find(clientId);</div>
+<div class="line"><span class="lineno">  283</span>    <span class="keywordflow">if</span> (it == <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.end())</div>
+<div class="line"><span class="lineno">  284</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  285</span>    <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>[clientId] = it-&gt;second;</div>
+<div class="line"><span class="lineno">  286</span>    <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.erase(it);</div>
+<div class="line"><span class="lineno">  287</span>    <span class="comment">//pendingSince_.erase(clientId);</span></div>
+<div class="line"><span class="lineno">  288</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Authenticated: &quot;</span> &lt;&lt; clientId &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  289</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a8d9fc20c0e4d459bb2c4058c2de70a74_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a8d9fc20c0e4d459bb2c4058c2de70a74_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a8d9fc20c0e4d459bb2c4058c2de70a74_icgraph" id="ad7/d85/class_signaling_server_a8d9fc20c0e4d459bb2c4058c2de70a74_icgraph">
-<area shape="rect" title=" " alt="" coords="435,5,681,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a1bff9775c26724fe03a5bac447e0dd3b" title=" " alt="" coords="200,5,387,32"/>
-<area shape="poly" title=" " alt="" coords="419,21,387,21,387,16,419,16"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a8d9fc20c0e4d459bb2c4058c2de70a74_icgraph.svg" width="100%" height="300"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -472,15 +508,14 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00086">86</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   87</span>{</div>
+<div class="line"><span class="lineno">   88</span>    <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>[clientId] = std::move(ws);</div>
+<div class="line"><span class="lineno">   89</span>    <span class="comment">//pendingSince_[clientId] = Clock::now();</span></div>
+<div class="line"><span class="lineno">   90</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a64ed3edfe61396c7d723022cddf9db61_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a64ed3edfe61396c7d723022cddf9db61_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a64ed3edfe61396c7d723022cddf9db61_icgraph" id="ad7/d85/class_signaling_server_a64ed3edfe61396c7d723022cddf9db61_icgraph">
-<area shape="rect" title=" " alt="" coords="200,5,383,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a64ed3edfe61396c7d723022cddf9db61_icgraph.svg" width="388" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -505,31 +540,156 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00092">92</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   93</span>{</div>
+<div class="line"><span class="lineno">   94</span> </div>
+<div class="line"><span class="lineno">   95</span>    <a class="code hl_typedef" href="../../d3/d55/_signaling_client_8cpp.html#ab701e3ac61a85b337ec5c1abaad6742d">json</a> j;</div>
+<div class="line"><span class="lineno">   96</span>    <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">   97</span>    {</div>
+<div class="line"><span class="lineno">   98</span>        j = json::parse(text);</div>
+<div class="line"><span class="lineno">   99</span>    }</div>
+<div class="line"><span class="lineno">  100</span>    <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  101</span>    {</div>
+<div class="line"><span class="lineno">  102</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  103</span>    }</div>
+<div class="line"><span class="lineno">  104</span> </div>
+<div class="line"><span class="lineno">  105</span>    <span class="keyword">const</span> std::string type = j.value(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a21b57f64b4055cf5038d23c81d0273ae">msg::key::Type</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  106</span>    <span class="keywordflow">if</span> (type.empty())</div>
+<div class="line"><span class="lineno">  107</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  108</span> </div>
+<div class="line"><span class="lineno">  109</span>    <span class="keywordflow">if</span> (type == <a class="code hl_variable" href="../../dc/d03/namespacemsg_1_1signaling.html#abdfcb043c8b892117d8462e6b43b6c66">msg::signaling::Auth</a>)</div>
+<div class="line"><span class="lineno">  110</span>    {</div>
+<div class="line"><span class="lineno">  111</span>        <span class="keyword">auto</span> nm = <a class="code hl_variable" href="#ad5d3508991dc5043c01a7a9643efb997">network_manager</a>.lock();</div>
+<div class="line"><span class="lineno">  112</span>        <span class="keywordflow">if</span> (!nm)</div>
+<div class="line"><span class="lineno">  113</span>            <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;NetworkManager expired&quot;</span>);</div>
+<div class="line"><span class="lineno">  114</span> </div>
+<div class="line"><span class="lineno">  115</span>        <span class="keyword">const</span> std::string provided = j.value(std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a00337b9bc32d259aca874c4c827213ab">msg::key::AuthToken</a>), <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  116</span>        <span class="keyword">const</span> std::string expected = nm-&gt;getNetworkPassword();</div>
+<div class="line"><span class="lineno">  117</span> </div>
+<div class="line"><span class="lineno">  118</span>        <span class="keyword">const</span> <span class="keywordtype">bool</span> ok = (expected.empty() || provided == expected);</div>
+<div class="line"><span class="lineno">  119</span>        <span class="keyword">const</span> std::string username = j.value(std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#af3f97146b15b540f486b7c1df008de3e">msg::key::Username</a>), <span class="stringliteral">&quot;guest&quot;</span> + clientId);</div>
+<div class="line"><span class="lineno">  120</span>        <span class="keyword">const</span> std::string clientUniqueId = j.value(std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a6d2f548fdc2ff266863ad670c08536be">msg::key::UniqueId</a>), <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  121</span> </div>
+<div class="line"><span class="lineno">  122</span>        <span class="keywordflow">if</span> (ok)</div>
+<div class="line"><span class="lineno">  123</span>        {</div>
+<div class="line"><span class="lineno">  124</span>            <a class="code hl_function" href="#a8d9fc20c0e4d459bb2c4058c2de70a74">moveToAuthenticated</a>(clientId);</div>
+<div class="line"><span class="lineno">  125</span> </div>
+<div class="line"><span class="lineno">  126</span>            std::vector&lt;std::string&gt; others;</div>
+<div class="line"><span class="lineno">  127</span>            others.reserve(<a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.size());</div>
+<div class="line"><span class="lineno">  128</span>            <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, _] : <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>)</div>
+<div class="line"><span class="lineno">  129</span>                if (id != clientId)</div>
+<div class="line"><span class="lineno">  130</span>                    others.emplace_back(id);</div>
+<div class="line"><span class="lineno">  131</span> </div>
+<div class="line"><span class="lineno">  132</span>            <span class="comment">// IMPORTANT: GM id in response must be GM UNIQUE ID</span></div>
+<div class="line"><span class="lineno">  133</span>            <span class="keyword">const</span> std::string gmUniqueId = nm-&gt;getMyUniqueId();</div>
+<div class="line"><span class="lineno">  134</span> </div>
+<div class="line"><span class="lineno">  135</span>            <span class="comment">// you may optionally echo client uniqueId back (makeAuthResponse supports uniqueId param)</span></div>
+<div class="line"><span class="lineno">  136</span>            <span class="keyword">auto</span> resp = <a class="code hl_function" href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28">msg::makeAuthResponse</a>(<a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a>, <span class="stringliteral">&quot;welcome&quot;</span>,</div>
+<div class="line"><span class="lineno">  137</span>                                              clientId, username,</div>
+<div class="line"><span class="lineno">  138</span>                                              others,</div>
+<div class="line"><span class="lineno">  139</span>                                              <span class="comment">/*gmPeerId=*/</span>gmUniqueId,</div>
+<div class="line"><span class="lineno">  140</span>                                              <span class="comment">/*uniqueId=*/</span>clientUniqueId);</div>
+<div class="line"><span class="lineno">  141</span>            <a class="code hl_function" href="#adf87cd0f47619053b3b8d14d3793028a">sendTo</a>(clientId, resp.dump());</div>
+<div class="line"><span class="lineno">  142</span>        }</div>
+<div class="line"><span class="lineno">  143</span>        <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  144</span>        {</div>
+<div class="line"><span class="lineno">  145</span>            <span class="keyword">auto</span> resp = <a class="code hl_function" href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28">msg::makeAuthResponse</a>(<a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a190782599cb73a2e87f200f7582e5e9a">msg::value::False</a>, <span class="stringliteral">&quot;invalid password&quot;</span>,</div>
+<div class="line"><span class="lineno">  146</span>                                              clientId, username);</div>
+<div class="line"><span class="lineno">  147</span>            <a class="code hl_function" href="#adf87cd0f47619053b3b8d14d3793028a">sendTo</a>(clientId, resp.dump());</div>
+<div class="line"><span class="lineno">  148</span> </div>
+<div class="line"><span class="lineno">  149</span>            <span class="keywordflow">if</span> (<span class="keyword">auto</span> it = <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.find(clientId); it != <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.end() &amp;&amp; it-&gt;second)</div>
+<div class="line"><span class="lineno">  150</span>                it-&gt;second-&gt;close();</div>
+<div class="line"><span class="lineno">  151</span>            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (<span class="keyword">auto</span> it2 = <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(clientId); it2 != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end() &amp;&amp; it2-&gt;second)</div>
+<div class="line"><span class="lineno">  152</span>                it2-&gt;second-&gt;close();</div>
+<div class="line"><span class="lineno">  153</span>        }</div>
+<div class="line"><span class="lineno">  154</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  155</span>    }</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>    <span class="comment">// for all other types, require auth</span></div>
+<div class="line"><span class="lineno">  158</span>    <span class="keywordflow">if</span> (!<a class="code hl_function" href="#a2c6fdfc468ee96cdb28722a11664845a">isAuthenticated</a>(clientId))</div>
+<div class="line"><span class="lineno">  159</span>    {</div>
+<div class="line"><span class="lineno">  160</span>        <span class="keyword">auto</span> resp = <a class="code hl_function" href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28">msg::makeAuthResponse</a>(<a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a190782599cb73a2e87f200f7582e5e9a">msg::value::False</a>, <span class="stringliteral">&quot;unauthenticated&quot;</span>,</div>
+<div class="line"><span class="lineno">  161</span>                                          clientId, <span class="stringliteral">&quot;guest&quot;</span> + clientId);</div>
+<div class="line"><span class="lineno">  162</span>        <a class="code hl_function" href="#adf87cd0f47619053b3b8d14d3793028a">sendTo</a>(clientId, resp.dump());</div>
+<div class="line"><span class="lineno">  163</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  164</span>    }</div>
+<div class="line"><span class="lineno">  165</span> </div>
+<div class="line"><span class="lineno">  166</span>    <span class="comment">// Router: overwrite from with server-trusted clientId</span></div>
+<div class="line"><span class="lineno">  167</span>    j[<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#aa4558318c9d9eb4c5977f87f11f2dab2">msg::key::From</a>] = clientId;</div>
+<div class="line"><span class="lineno">  168</span> </div>
+<div class="line"><span class="lineno">  169</span>    <span class="comment">// In SignalingServer::onMessage (after auth checks)</span></div>
+<div class="line"><span class="lineno">  170</span>    <span class="keywordflow">if</span> (type == <a class="code hl_variable" href="../../dc/d03/namespacemsg_1_1signaling.html#a210b67a0f3acb976805bf1d4be7411a2">msg::signaling::PeerDisconnect</a>)</div>
+<div class="line"><span class="lineno">  171</span>    {</div>
+<div class="line"><span class="lineno">  172</span>        <span class="keyword">const</span> std::string target = j.value(std::string(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a411aa66989f8352a6ab744c351498666">msg::key::Target</a>), <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  173</span>        <span class="keywordflow">if</span> (target.empty())</div>
+<div class="line"><span class="lineno">  174</span>            <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  175</span> </div>
+<div class="line"><span class="lineno">  176</span>        <span class="comment">// Broadcast to all authed clients (including target)</span></div>
+<div class="line"><span class="lineno">  177</span>        <span class="keyword">const</span> std::string dump = j.dump();</div>
+<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, ws] : <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>)</div>
+<div class="line"><span class="lineno">  179</span>        {</div>
+<div class="line"><span class="lineno">  180</span>            <span class="keywordflow">if</span> (ws &amp;&amp; !ws-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  181</span>                ws-&gt;send(dump);</div>
+<div class="line"><span class="lineno">  182</span>        }</div>
+<div class="line"><span class="lineno">  183</span> </div>
+<div class="line"><span class="lineno">  184</span>        <span class="comment">// Optionally kick the target at signaling level</span></div>
+<div class="line"><span class="lineno">  185</span>        <span class="keywordflow">if</span> (<span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(target); it != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end())</div>
+<div class="line"><span class="lineno">  186</span>        {</div>
+<div class="line"><span class="lineno">  187</span>            <span class="keywordflow">if</span> (it-&gt;second)</div>
+<div class="line"><span class="lineno">  188</span>                it-&gt;second-&gt;close();</div>
+<div class="line"><span class="lineno">  189</span>        }</div>
+<div class="line"><span class="lineno">  190</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  191</span>    }</div>
+<div class="line"><span class="lineno">  192</span> </div>
+<div class="line"><span class="lineno">  193</span>    <span class="comment">// Broadcast to authenticated only</span></div>
+<div class="line"><span class="lineno">  194</span>    <span class="keywordflow">if</span> (j.value(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#af900ce19bf5b639f11a4b0e9df407d92">msg::key::Broadcast</a>, <a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a190782599cb73a2e87f200f7582e5e9a">msg::value::False</a>) == <a class="code hl_variable" href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a>)</div>
+<div class="line"><span class="lineno">  195</span>    {</div>
+<div class="line"><span class="lineno">  196</span>        <span class="keyword">const</span> std::string dump = j.dump();</div>
+<div class="line"><span class="lineno">  197</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [<span class="keywordtype">id</span>, ws] : <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>)</div>
+<div class="line"><span class="lineno">  198</span>        {</div>
+<div class="line"><span class="lineno">  199</span>            <span class="keywordflow">if</span> (<span class="keywordtype">id</span> == clientId)</div>
+<div class="line"><span class="lineno">  200</span>                <span class="keywordflow">continue</span>; <span class="comment">// don&#39;t echo to sender</span></div>
+<div class="line"><span class="lineno">  201</span>            <span class="keywordflow">if</span> (ws &amp;&amp; !ws-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  202</span>                ws-&gt;send(dump);</div>
+<div class="line"><span class="lineno">  203</span>        }</div>
+<div class="line"><span class="lineno">  204</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  205</span>    }</div>
+<div class="line"><span class="lineno">  206</span> </div>
+<div class="line"><span class="lineno">  207</span>    <span class="comment">// Direct</span></div>
+<div class="line"><span class="lineno">  208</span>    <span class="keyword">const</span> std::string to = j.value(<a class="code hl_variable" href="../../de/d1c/namespacemsg_1_1key.html#a4b94b46d526efbe098969f6d50c8cfef">msg::key::To</a>, <span class="stringliteral">&quot;&quot;</span>);</div>
+<div class="line"><span class="lineno">  209</span>    <span class="keywordflow">if</span> (to.empty())</div>
+<div class="line"><span class="lineno">  210</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  211</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(to);</div>
+<div class="line"><span class="lineno">  212</span>    <span class="keywordflow">if</span> (it != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end() &amp;&amp; it-&gt;second &amp;&amp; !it-&gt;second-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  213</span>    {</div>
+<div class="line"><span class="lineno">  214</span>        it-&gt;second-&gt;send(j.dump());</div>
+<div class="line"><span class="lineno">  215</span>    }</div>
+<div class="line"><span class="lineno">  216</span>}</div>
+<div class="ttc" id="a_signaling_client_8cpp_html_ab701e3ac61a85b337ec5c1abaad6742d"><div class="ttname"><a href="../../d3/d55/_signaling_client_8cpp.html#ab701e3ac61a85b337ec5c1abaad6742d">json</a></div><div class="ttdeci">nlohmann::json json</div><div class="ttdef"><b>Definition</b> <a href="../../d3/d55/_signaling_client_8cpp_source.html#l00009">SignalingClient.cpp:9</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_a2c6fdfc468ee96cdb28722a11664845a"><div class="ttname"><a href="#a2c6fdfc468ee96cdb28722a11664845a">SignalingServer::isAuthenticated</a></div><div class="ttdeci">bool isAuthenticated(const std::string &amp;clientId) const</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00291">SignalingServer.cpp:291</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_a8d9fc20c0e4d459bb2c4058c2de70a74"><div class="ttname"><a href="#a8d9fc20c0e4d459bb2c4058c2de70a74">SignalingServer::moveToAuthenticated</a></div><div class="ttdeci">void moveToAuthenticated(const std::string &amp;clientId)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00280">SignalingServer.cpp:280</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_adf87cd0f47619053b3b8d14d3793028a"><div class="ttname"><a href="#adf87cd0f47619053b3b8d14d3793028a">SignalingServer::sendTo</a></div><div class="ttdeci">void sendTo(const std::string &amp;clientId, const std::string &amp;message)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00218">SignalingServer.cpp:218</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a00337b9bc32d259aca874c4c827213ab"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a00337b9bc32d259aca874c4c827213ab">msg::key::AuthToken</a></div><div class="ttdeci">constexpr std::string_view AuthToken</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00251">Message.h:251</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a21b57f64b4055cf5038d23c81d0273ae"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a21b57f64b4055cf5038d23c81d0273ae">msg::key::Type</a></div><div class="ttdeci">constexpr std::string_view Type</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00229">Message.h:229</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a411aa66989f8352a6ab744c351498666"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a411aa66989f8352a6ab744c351498666">msg::key::Target</a></div><div class="ttdeci">constexpr std::string_view Target</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00239">Message.h:239</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a4b94b46d526efbe098969f6d50c8cfef"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a4b94b46d526efbe098969f6d50c8cfef">msg::key::To</a></div><div class="ttdeci">constexpr std::string_view To</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00231">Message.h:231</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_a6d2f548fdc2ff266863ad670c08536be"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#a6d2f548fdc2ff266863ad670c08536be">msg::key::UniqueId</a></div><div class="ttdeci">constexpr std::string_view UniqueId</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00248">Message.h:248</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_aa4558318c9d9eb4c5977f87f11f2dab2"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#aa4558318c9d9eb4c5977f87f11f2dab2">msg::key::From</a></div><div class="ttdeci">constexpr std::string_view From</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00230">Message.h:230</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_af3f97146b15b540f486b7c1df008de3e"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#af3f97146b15b540f486b7c1df008de3e">msg::key::Username</a></div><div class="ttdeci">constexpr std::string_view Username</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00237">Message.h:237</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1key_html_af900ce19bf5b639f11a4b0e9df407d92"><div class="ttname"><a href="../../de/d1c/namespacemsg_1_1key.html#af900ce19bf5b639f11a4b0e9df407d92">msg::key::Broadcast</a></div><div class="ttdeci">constexpr std::string_view Broadcast</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00232">Message.h:232</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1signaling_html_a210b67a0f3acb976805bf1d4be7411a2"><div class="ttname"><a href="../../dc/d03/namespacemsg_1_1signaling.html#a210b67a0f3acb976805bf1d4be7411a2">msg::signaling::PeerDisconnect</a></div><div class="ttdeci">constexpr std::string_view PeerDisconnect</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00282">Message.h:282</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1signaling_html_abdfcb043c8b892117d8462e6b43b6c66"><div class="ttname"><a href="../../dc/d03/namespacemsg_1_1signaling.html#abdfcb043c8b892117d8462e6b43b6c66">msg::signaling::Auth</a></div><div class="ttdeci">constexpr std::string_view Auth</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00278">Message.h:278</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1value_html_a190782599cb73a2e87f200f7582e5e9a"><div class="ttname"><a href="../../d1/d41/namespacemsg_1_1value.html#a190782599cb73a2e87f200f7582e5e9a">msg::value::False</a></div><div class="ttdeci">constexpr std::string False</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00287">Message.h:287</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1value_html_a5c9f830ef13e1b09033c5b1e6712d59c"><div class="ttname"><a href="../../d1/d41/namespacemsg_1_1value.html#a5c9f830ef13e1b09033c5b1e6712d59c">msg::value::True</a></div><div class="ttdeci">constexpr std::string True</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00288">Message.h:288</a></div></div>
+<div class="ttc" id="anamespacemsg_html_a86e3987841ce342ed4a4257a3ba2ff28"><div class="ttname"><a href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28">msg::makeAuthResponse</a></div><div class="ttdeci">nlohmann::json makeAuthResponse(const std::string ok, const std::string &amp;msg, const std::string &amp;clientId, const std::string &amp;username, const std::vector&lt; std::string &gt; &amp;clients={}, const std::string &amp;gmPeerId=&quot;&quot;, const std::string &amp;uniqueId=&quot;&quot;)</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00506">Message.h:506</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_cgraph" id="ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,81,193,108"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a2c6fdfc468ee96cdb28722a11664845a" title=" " alt="" coords="259,5,469,32"/>
-<area shape="poly" title=" " alt="" coords="134,78,240,41,272,33,273,38,241,47,135,83"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28" title=" " alt="" coords="278,56,450,83"/>
-<area shape="poly" title=" " alt="" coords="193,83,262,76,263,82,193,88"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a8d9fc20c0e4d459bb2c4058c2de70a74" title=" " alt="" coords="241,107,487,133"/>
-<area shape="poly" title=" " alt="" coords="193,101,226,104,225,109,193,106"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#adf87cd0f47619053b3b8d14d3793028a" title=" " alt="" coords="283,157,445,184"/>
-<area shape="poly" title=" " alt="" coords="135,106,241,143,273,151,272,156,240,148,134,111"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_cgraph.svg" width="492" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_icgraph" id="ad7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_icgraph">
-<area shape="rect" title=" " alt="" coords="200,5,387,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_a1bff9775c26724fe03a5bac447e0dd3b_icgraph.svg" width="392" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -554,17 +714,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00218">218</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  219</span>{</div>
+<div class="line"><span class="lineno">  220</span>    <span class="keywordflow">if</span> (<span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.find(clientId); it != <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.end() &amp;&amp; it-&gt;second &amp;&amp; !it-&gt;second-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  221</span>    {</div>
+<div class="line"><span class="lineno">  222</span>        it-&gt;second-&gt;send(message);</div>
+<div class="line"><span class="lineno">  223</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  224</span>    }</div>
+<div class="line"><span class="lineno">  225</span>    <span class="keywordflow">if</span> (<span class="keyword">auto</span> it = <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.find(clientId); it != <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.end() &amp;&amp; it-&gt;second &amp;&amp; !it-&gt;second-&gt;isClosed())</div>
+<div class="line"><span class="lineno">  226</span>    {</div>
+<div class="line"><span class="lineno">  227</span>        it-&gt;second-&gt;send(message);</div>
+<div class="line"><span class="lineno">  228</span>    }</div>
+<div class="line"><span class="lineno">  229</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_adf87cd0f47619053b3b8d14d3793028a_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_adf87cd0f47619053b3b8d14d3793028a_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_adf87cd0f47619053b3b8d14d3793028a_icgraph" id="ad7/d85/class_signaling_server_adf87cd0f47619053b3b8d14d3793028a_icgraph">
-<area shape="rect" title=" " alt="" coords="435,5,597,32"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a1bff9775c26724fe03a5bac447e0dd3b" title=" " alt="" coords="200,5,387,32"/>
-<area shape="poly" title=" " alt="" coords="420,21,387,21,387,16,420,16"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#abafab7138b02b0587351d777f3ece30e" title=" " alt="" coords="5,5,152,32"/>
-<area shape="poly" title=" " alt="" coords="184,21,152,21,152,16,184,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_adf87cd0f47619053b3b8d14d3793028a_icgraph.svg" width="603" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -593,7 +757,11 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html#l00028">28</a> of file <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html">SignalingServer.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   29</span>    {</div>
+<div class="line"><span class="lineno">   30</span>        <a class="code hl_variable" href="#a341c2adc26fc442e15c8a6ef7029a8c8">pendingTimeout_</a> = s;</div>
+<div class="line"><span class="lineno">   31</span>    }</div>
+<div class="ttc" id="aclass_signaling_server_html_a341c2adc26fc442e15c8a6ef7029a8c8"><div class="ttname"><a href="#a341c2adc26fc442e15c8a6ef7029a8c8">SignalingServer::pendingTimeout_</a></div><div class="ttdeci">std::chrono::seconds pendingTimeout_</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00060">SignalingServer.h:60</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="abafab7138b02b0587351d777f3ece30e" name="abafab7138b02b0587351d777f3ece30e"></a>
@@ -612,25 +780,54 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00023">23</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   24</span>{</div>
+<div class="line"><span class="lineno">   25</span>    rtc::WebSocketServerConfiguration cfg;</div>
+<div class="line"><span class="lineno">   26</span>    cfg.bindAddress = <span class="stringliteral">&quot;0.0.0.0&quot;</span>;</div>
+<div class="line"><span class="lineno">   27</span>    cfg.port = port;</div>
+<div class="line"><span class="lineno">   28</span>    cfg.connectionTimeout = std::chrono::milliseconds(0);</div>
+<div class="line"><span class="lineno">   29</span> </div>
+<div class="line"><span class="lineno">   30</span>    <a class="code hl_variable" href="#a1611acc9b2e5e74f3ec59f27ad96c851">server</a> = std::make_shared&lt;rtc::WebSocketServer&gt;(cfg);</div>
+<div class="line"><span class="lineno">   31</span> </div>
+<div class="line"><span class="lineno">   32</span>    <a class="code hl_variable" href="#a1611acc9b2e5e74f3ec59f27ad96c851">server</a>-&gt;onClient([<span class="keyword">this</span>](std::shared_ptr&lt;rtc::WebSocket&gt; ws)</div>
+<div class="line"><span class="lineno">   33</span>                     {</div>
+<div class="line"><span class="lineno">   34</span>        <span class="keyword">auto</span> addrOpt = ws-&gt;remoteAddress();</div>
+<div class="line"><span class="lineno">   35</span>        <span class="keywordflow">if</span> (!addrOpt) { std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Client connected (no addr)\n&quot;</span>; <span class="keywordflow">return</span>; }</div>
+<div class="line"><span class="lineno">   36</span>        std::string clientId = *addrOpt;</div>
+<div class="line"><span class="lineno">   37</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Client Connected: &quot;</span> &lt;&lt; clientId &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   38</span> </div>
+<div class="line"><span class="lineno">   39</span>        <a class="code hl_function" href="#a64ed3edfe61396c7d723022cddf9db61">onConnect</a>(clientId, ws);</div>
+<div class="line"><span class="lineno">   40</span> </div>
+<div class="line"><span class="lineno">   41</span>        ws-&gt;onMessage([<span class="keyword">this</span>, clientId](std::variant&lt;rtc::binary, rtc::string&gt; <a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>) {</div>
+<div class="line"><span class="lineno">   42</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] MESSAGE RECEIVED&quot;</span> &lt;&lt;<span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   43</span>            <span class="keywordflow">if</span> (!std::holds_alternative&lt;rtc::string&gt;(<a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>)) <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   44</span>            <span class="keyword">const</span> <span class="keyword">auto</span>&amp; s = std::get&lt;rtc::string&gt;(<a class="code hl_namespace" href="../../d5/d64/namespacemsg.html">msg</a>);</div>
+<div class="line"><span class="lineno">   45</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] MESSAGE: &quot;</span> &lt;&lt; s &lt;&lt;<span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   46</span>            <span class="comment">//prunePending();</span></div>
+<div class="line"><span class="lineno">   47</span>            <a class="code hl_function" href="#a1bff9775c26724fe03a5bac447e0dd3b">onMessage</a>(clientId, s);</div>
+<div class="line"><span class="lineno">   48</span>        });</div>
+<div class="line"><span class="lineno">   49</span> </div>
+<div class="line"><span class="lineno">   50</span>        ws-&gt;onError([clientId](std::string err) {</div>
+<div class="line"><span class="lineno">   51</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Client Error (&quot;</span> &lt;&lt; clientId &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; err &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   52</span>            });</div>
+<div class="line"><span class="lineno">   53</span> </div>
+<div class="line"><span class="lineno">   54</span>        ws-&gt;onClosed([<span class="keyword">this</span>, clientId]() {</div>
+<div class="line"><span class="lineno">   55</span>            std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Client disconnected: &quot;</span> &lt;&lt; clientId &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   56</span>            <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.erase(clientId);</div>
+<div class="line"><span class="lineno">   57</span>            <span class="comment">//pendingSince_.erase(clientId);</span></div>
+<div class="line"><span class="lineno">   58</span>            <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.erase(clientId);</div>
+<div class="line"><span class="lineno">   59</span>            }); });</div>
+<div class="line"><span class="lineno">   60</span> </div>
+<div class="line"><span class="lineno">   61</span>    <a class="code hl_variable" href="#ab86a69361f5adc75790e3950d9d1fb05">is_running</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   62</span>    std::cout &lt;&lt; <span class="stringliteral">&quot;[SignalingServer] Listening at ws://0.0.0.0:&quot;</span> &lt;&lt; port &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">   63</span>}</div>
+<div class="ttc" id="aclass_signaling_server_html_a1611acc9b2e5e74f3ec59f27ad96c851"><div class="ttname"><a href="#a1611acc9b2e5e74f3ec59f27ad96c851">SignalingServer::server</a></div><div class="ttdeci">std::shared_ptr&lt; rtc::WebSocketServer &gt; server</div><div class="ttdef"><b>Definition</b> <a href="../../d7/dd8/_signaling_server_8h_source.html#l00049">SignalingServer.h:49</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_a1bff9775c26724fe03a5bac447e0dd3b"><div class="ttname"><a href="#a1bff9775c26724fe03a5bac447e0dd3b">SignalingServer::onMessage</a></div><div class="ttdeci">void onMessage(const std::string &amp;clientId, const std::string &amp;text)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00092">SignalingServer.cpp:92</a></div></div>
+<div class="ttc" id="aclass_signaling_server_html_a64ed3edfe61396c7d723022cddf9db61"><div class="ttname"><a href="#a64ed3edfe61396c7d723022cddf9db61">SignalingServer::onConnect</a></div><div class="ttdeci">void onConnect(std::string clientId, std::shared_ptr&lt; rtc::WebSocket &gt; client)</div><div class="ttdef"><b>Definition</b> <a href="../../d1/ddf/_signaling_server_8cpp_source.html#l00086">SignalingServer.cpp:86</a></div></div>
+<div class="ttc" id="anamespacemsg_html"><div class="ttname"><a href="../../d5/d64/namespacemsg.html">msg</a></div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00027">Message.h:28</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_abafab7138b02b0587351d777f3ece30e_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_abafab7138b02b0587351d777f3ece30e_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_abafab7138b02b0587351d777f3ece30e_cgraph" id="ad7/d85/class_signaling_server_abafab7138b02b0587351d777f3ece30e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,56,152,83"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a64ed3edfe61396c7d723022cddf9db61" title=" " alt="" coords="202,31,385,57"/>
-<area shape="poly" title=" " alt="" coords="152,58,186,54,186,59,153,63"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a1bff9775c26724fe03a5bac447e0dd3b" title=" " alt="" coords="200,81,387,108"/>
-<area shape="poly" title=" " alt="" coords="153,75,184,79,184,84,152,81"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a2c6fdfc468ee96cdb28722a11664845a" title=" " alt="" coords="453,5,663,32"/>
-<area shape="poly" title=" " alt="" coords="352,78,386,67,410,54,434,42,459,34,461,39,436,46,412,59,388,72,354,83"/>
-<area shape="rect" href="../../d5/d64/namespacemsg.html#a86e3987841ce342ed4a4257a3ba2ff28" title=" " alt="" coords="472,56,644,83"/>
-<area shape="poly" title=" " alt="" coords="387,83,457,76,457,82,388,88"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a8d9fc20c0e4d459bb2c4058c2de70a74" title=" " alt="" coords="435,107,681,133"/>
-<area shape="poly" title=" " alt="" coords="388,101,420,104,420,109,387,106"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#adf87cd0f47619053b3b8d14d3793028a" title=" " alt="" coords="477,157,639,184"/>
-<area shape="poly" title=" " alt="" coords="330,106,436,143,468,151,466,156,434,148,328,111"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_abafab7138b02b0587351d777f3ece30e_cgraph.svg" width="100%" height="442"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 
 </div>
@@ -651,30 +848,35 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html#l00065">65</a> of file <a class="el" href="../../d1/ddf/_signaling_server_8cpp_source.html">SignalingServer.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   66</span>{</div>
+<div class="line"><span class="lineno">   67</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a1611acc9b2e5e74f3ec59f27ad96c851">server</a>)</div>
+<div class="line"><span class="lineno">   68</span>    {</div>
+<div class="line"><span class="lineno">   69</span>        <a class="code hl_variable" href="#a1611acc9b2e5e74f3ec59f27ad96c851">server</a>-&gt;stop();</div>
+<div class="line"><span class="lineno">   70</span>        <a class="code hl_variable" href="#a1611acc9b2e5e74f3ec59f27ad96c851">server</a>.reset();</div>
+<div class="line"><span class="lineno">   71</span>        <a class="code hl_variable" href="#ab86a69361f5adc75790e3950d9d1fb05">is_running</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   72</span>    }</div>
+<div class="line"><span class="lineno">   73</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> [<span class="keywordtype">id</span>, ws] : <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>)</div>
+<div class="line"><span class="lineno">   74</span>    {</div>
+<div class="line"><span class="lineno">   75</span>        <a class="code hl_function" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00">NetworkUtilities::safeCloseWebSocket</a>(ws);</div>
+<div class="line"><span class="lineno">   76</span>    }</div>
+<div class="line"><span class="lineno">   77</span> </div>
+<div class="line"><span class="lineno">   78</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span> [<span class="keywordtype">id</span>, ws] : <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>)</div>
+<div class="line"><span class="lineno">   79</span>    {</div>
+<div class="line"><span class="lineno">   80</span>        <a class="code hl_function" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00">NetworkUtilities::safeCloseWebSocket</a>(ws);</div>
+<div class="line"><span class="lineno">   81</span>    }</div>
+<div class="line"><span class="lineno">   82</span>    <a class="code hl_variable" href="#a587867b4ac354e5fe9a773f480532225">pendingClients_</a>.clear();</div>
+<div class="line"><span class="lineno">   83</span>    <a class="code hl_variable" href="#ad689a80d65386807c2135adac7a095b3">authClients_</a>.clear();</div>
+<div class="line"><span class="lineno">   84</span>}</div>
+<div class="ttc" id="aclass_network_utilities_html_ac24b451c3d4b386916a1062480656c00"><div class="ttname"><a href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00">NetworkUtilities::safeCloseWebSocket</a></div><div class="ttdeci">static void safeCloseWebSocket(std::shared_ptr&lt; rtc::WebSocket &gt; &amp;ws)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/da8/_network_utilities_8h_source.html#l00067">NetworkUtilities.h:67</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_cgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_cgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_cgraph" id="ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_cgraph">
-<area shape="rect" title=" " alt="" coords="5,43,151,69"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#ac24b451c3d4b386916a1062480656c00" title=" " alt="" coords="199,35,380,77"/>
-<area shape="poly" title=" " alt="" coords="151,53,183,53,183,59,151,59"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="428,5,545,32"/>
-<area shape="poly" title=" " alt="" coords="380,36,412,30,413,35,381,41"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="444,80,529,107"/>
-<area shape="poly" title=" " alt="" coords="381,71,429,80,428,85,380,76"/>
-<area shape="poly" title=" " alt="" coords="453,81,447,71,451,62,465,55,487,53,510,56,523,62,520,67,509,61,487,59,466,61,455,65,452,71,458,78"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_cgraph.svg" width="551" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_icgraph.png" border="0" usemap="#ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_icgraph" alt=""/></div>
-<map name="ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_icgraph" id="ad7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_icgraph">
-<area shape="rect" title=" " alt="" coords="235,13,380,40"/>
-<area shape="rect" href="../../d7/d85/class_signaling_server.html#a257d9fcbdd01ef29c2c4b093a79b023a" title=" " alt="" coords="5,5,187,48"/>
-<area shape="poly" title=" " alt="" coords="219,29,187,29,187,24,219,24"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d7/d85/class_signaling_server_ad1eb7f34bf1ee45ab24d16020ffcb889_icgraph.svg" width="386" height="54"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -821,7 +1023,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html#l00060">60</a> of file <a class="el" href="../../d7/dd8/_signaling_server_8h_source.html">SignalingServer.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   60</span>{60}; <span class="comment">// default: 60s to auth</span></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aeb43f7de6d12927b72d05839583af2fc" name="aeb43f7de6d12927b72d05839583af2fc"></a>

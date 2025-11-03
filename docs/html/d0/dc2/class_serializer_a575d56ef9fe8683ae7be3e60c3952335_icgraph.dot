@@ -6,15 +6,15 @@ digraph "Serializer::deserializeMarkerEntity"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="RL";
-  Node1 [id="Node000001",label="Serializer::deserializeMarker\lEntity",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="Serializer::deserializeMarkerEntity",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="Serializer::deserializeBoard\lEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aff25e5361ee486db1fb453b6ec1f8acf",tooltip=" "];
+  Node2 [id="Node000002",label="Serializer::deserializeBoardEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#aff25e5361ee486db1fb453b6ec1f8acf",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="Serializer::deserializeGame\lTableEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a0fa2fd5d94c71074a2a2d4d08fb2ddfd",tooltip=" "];
+  Node3 [id="Node000003",label="Serializer::deserializeGameTableEntity",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d0/dc2/class_serializer.html#a0fa2fd5d94c71074a2a2d4d08fb2ddfd",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="GameTableManager::loadGame\lTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#aedb2f2634710aeb401d6c7e1c2d6a96d",tooltip=" "];
+  Node4 [id="Node000004",label="GameTableManager::loadGameTable",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#aedb2f2634710aeb401d6c7e1c2d6a96d",tooltip=" "];
   Node4 -> Node5 [id="edge4_Node000004_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node5 [id="Node000005",label="GameTableManager::hostGame\lTablePopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a42414a5596a4e90a3f321f90e166f9a0",tooltip=" "];
+  Node5 [id="Node000005",label="GameTableManager::hostGameTablePopUp",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#a42414a5596a4e90a3f321f90e166f9a0",tooltip=" "];
   Node2 -> Node6 [id="edge5_Node000002_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="BoardManager::loadActive\lBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#ae3c8d16dfa3b0e954475b6cf8e5e52f2",tooltip=" "];
+  Node6 [id="Node000006",label="BoardManager::loadActiveBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#ae3c8d16dfa3b0e954475b6cf8e5e52f2",tooltip=" "];
 }

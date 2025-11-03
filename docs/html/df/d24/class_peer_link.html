@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -106,12 +106,7 @@ $(function(){initNavTree('df/d24/class_peer_link.html','../../'); initResizable(
 <div class="dynheader">
 Collaboration diagram for PeerLink:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d1/d1c/class_peer_link__coll__graph.png" border="0" usemap="#a_peer_link_coll__map" alt="Collaboration graph"/></div>
-<map name="a_peer_link_coll__map" id="a_peer_link_coll__map">
-<area shape="rect" title=" " alt="" coords="5,155,222,992"/>
-<area shape="rect" title=" " alt="" coords="92,5,135,75"/>
-<area shape="poly" title=" " alt="" coords="116,75,116,138,111,138,111,75"/>
-</map>
+<div class="center"><div class="zoom"><iframe scrolling="no" frameborder="0" src="../../d1/d1c/class_peer_link__coll__graph.svg" width="100%" height="600"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -243,17 +238,31 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00007">7</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">    7</span>                                                                          :</div>
+<div class="line"><span class="lineno">    8</span>    <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>(<span class="keywordtype">id</span>), <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>(parent)</div>
+<div class="line"><span class="lineno">    9</span>{</div>
+<div class="line"><span class="lineno">   10</span>    <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock())</div>
+<div class="line"><span class="lineno">   11</span>    {</div>
+<div class="line"><span class="lineno">   12</span>        <span class="keyword">auto</span> config = nm-&gt;getRTCConfig();</div>
+<div class="line"><span class="lineno">   13</span>        config.iceServers.push_back({<span class="stringliteral">&quot;stun:stun.l.google.com:19302&quot;</span>});    <span class="comment">// Google</span></div>
+<div class="line"><span class="lineno">   14</span>        config.iceServers.push_back({<span class="stringliteral">&quot;stun:stun1.l.google.com:19302&quot;</span>});   <span class="comment">// Google alt</span></div>
+<div class="line"><span class="lineno">   15</span>        config.iceServers.push_back({<span class="stringliteral">&quot;stun:stun.stunprotocol.org:3478&quot;</span>}); <span class="comment">// Community server</span></div>
+<div class="line"><span class="lineno">   16</span>        <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a> = std::make_shared&lt;rtc::PeerConnection&gt;(config);</div>
+<div class="line"><span class="lineno">   17</span>        <a class="code hl_function" href="#a67877f56504862a1c8a4f3ed41cbb91d">setupCallbacks</a>();</div>
+<div class="line"><span class="lineno">   18</span>    }</div>
+<div class="line"><span class="lineno">   19</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">   20</span>    {</div>
+<div class="line"><span class="lineno">   21</span>        <span class="keywordflow">throw</span> std::runtime_error(<span class="stringliteral">&quot;NetworkManager expired&quot;</span>);</div>
+<div class="line"><span class="lineno">   22</span>    }</div>
+<div class="line"><span class="lineno">   23</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a567cc11ec45661094156b4deeb1b1636"><div class="ttname"><a href="#a567cc11ec45661094156b4deeb1b1636">PeerLink::pc</a></div><div class="ttdeci">std::shared_ptr&lt; rtc::PeerConnection &gt; pc</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00083">PeerLink.h:83</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a67877f56504862a1c8a4f3ed41cbb91d"><div class="ttname"><a href="#a67877f56504862a1c8a4f3ed41cbb91d">PeerLink::setupCallbacks</a></div><div class="ttdeci">void setupCallbacks()</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d6b/_peer_link_8cpp_source.html#l00128">PeerLink.cpp:128</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a7beccd2af9e63c3d0d6bbbc39dcbbeab"><div class="ttname"><a href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">PeerLink::network_manager</a></div><div class="ttdeci">std::weak_ptr&lt; NetworkManager &gt; network_manager</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00087">PeerLink.h:87</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a8fd6b6fd92bf531e4106f5766429ff77"><div class="ttname"><a href="#a8fd6b6fd92bf531e4106f5766429ff77">PeerLink::peerId</a></div><div class="ttdeci">std::string peerId</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00081">PeerLink.h:81</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_ab667cc4b6267a871d6751185ff3d5d25_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_ab667cc4b6267a871d6751185ff3d5d25_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_ab667cc4b6267a871d6751185ff3d5d25_cgraph" id="adf/d24/class_peer_link_ab667cc4b6267a871d6751185ff3d5d25_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,137,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a67877f56504862a1c8a4f3ed41cbb91d" title=" " alt="" coords="185,5,355,32"/>
-<area shape="poly" title=" " alt="" coords="137,16,169,16,169,21,137,21"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#aec31714207e652371b259925990ee67a" title=" " alt="" coords="403,5,619,32"/>
-<area shape="poly" title=" " alt="" coords="356,16,387,16,387,21,356,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_ab667cc4b6267a871d6751185ff3d5d25_cgraph.svg" width="626" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -292,7 +301,21 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00115">115</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  116</span>{</div>
+<div class="line"><span class="lineno">  117</span>    std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#a67b612bc319f55591748213c9517105d">candMx_</a>);</div>
+<div class="line"><span class="lineno">  118</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a04bfb958ef7cf8e70983a6eb6f7b5b86">remoteDescSet_</a>.load(std::memory_order_acquire))</div>
+<div class="line"><span class="lineno">  119</span>    {</div>
+<div class="line"><span class="lineno">  120</span>        <a class="code hl_variable" href="#a6c78b766c779b02cc79762bdcab5f8fd">pendingRemoteCandidates_</a>.push_back(candidate);</div>
+<div class="line"><span class="lineno">  121</span>    }</div>
+<div class="line"><span class="lineno">  122</span>    <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  123</span>    {</div>
+<div class="line"><span class="lineno">  124</span>        <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;addRemoteCandidate(candidate);</div>
+<div class="line"><span class="lineno">  125</span>    }</div>
+<div class="line"><span class="lineno">  126</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a04bfb958ef7cf8e70983a6eb6f7b5b86"><div class="ttname"><a href="#a04bfb958ef7cf8e70983a6eb6f7b5b86">PeerLink::remoteDescSet_</a></div><div class="ttdeci">std::atomic&lt; bool &gt; remoteDescSet_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00092">PeerLink.h:92</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a67b612bc319f55591748213c9517105d"><div class="ttname"><a href="#a67b612bc319f55591748213c9517105d">PeerLink::candMx_</a></div><div class="ttdeci">std::mutex candMx_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00094">PeerLink.h:94</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a6c78b766c779b02cc79762bdcab5f8fd"><div class="ttname"><a href="#a6c78b766c779b02cc79762bdcab5f8fd">PeerLink::pendingRemoteCandidates_</a></div><div class="ttdeci">std::vector&lt; rtc::Candidate &gt; pendingRemoteCandidates_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00093">PeerLink.h:93</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a19a376c67f510ca9901e402722241483" name="a19a376c67f510ca9901e402722241483"></a>
@@ -311,7 +334,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00235">235</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  236</span>{</div>
+<div class="line"><span class="lineno">  237</span>    <span class="comment">// minimal: only require the channel used for snapshots</span></div>
+<div class="line"><span class="lineno">  238</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#a758c605795dc801a48b26e2d3d5d3ff2">dcOpen_</a>.find(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>);</div>
+<div class="line"><span class="lineno">  239</span>    <span class="keywordflow">return</span> it != <a class="code hl_variable" href="#a758c605795dc801a48b26e2d3d5d3ff2">dcOpen_</a>.end() &amp;&amp; it-&gt;second;</div>
+<div class="line"><span class="lineno">  240</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a758c605795dc801a48b26e2d3d5d3ff2"><div class="ttname"><a href="#a758c605795dc801a48b26e2d3d5d3ff2">PeerLink::dcOpen_</a></div><div class="ttdeci">std::unordered_map&lt; std::string, bool &gt; dcOpen_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00097">PeerLink.h:97</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1dc_1_1name_html_a0d585ade777534fda49e59da75a1b182"><div class="ttname"><a href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a></div><div class="ttdeci">constexpr std::string Game</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00297">Message.h:297</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aec31714207e652371b259925990ee67a" name="aec31714207e652371b259925990ee67a"></a>
@@ -334,19 +364,60 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00242">242</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  243</span>{</div>
+<div class="line"><span class="lineno">  244</span>    <span class="keywordflow">if</span> (!dc)</div>
+<div class="line"><span class="lineno">  245</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  246</span> </div>
+<div class="line"><span class="lineno">  247</span>    dc-&gt;onOpen([<span class="keyword">this</span>, <span class="keywordtype">id</span> = <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, label]()</div>
+<div class="line"><span class="lineno">  248</span>               {</div>
+<div class="line"><span class="lineno">  249</span>                   std::cout &lt;&lt; <span class="stringliteral">&quot;[PeerLink] DC open \&quot;&quot;</span> &lt;&lt; label &lt;&lt; <span class="stringliteral">&quot;\&quot; to &quot;</span> &lt;&lt; <span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  250</span>                   <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock())</div>
+<div class="line"><span class="lineno">  251</span>                   {</div>
+<div class="line"><span class="lineno">  252</span>                       msg::NetEvent ev{msg::NetEvent::Type::DcOpen, id, label};</div>
+<div class="line"><span class="lineno">  253</span>                       nm-&gt;events_.push(std::move(ev)); <span class="comment">// or nm-&gt;notifyDcOpen(id, label);</span></div>
+<div class="line"><span class="lineno">  254</span>                   }</div>
+<div class="line"><span class="lineno">  255</span>                   <a class="code hl_variable" href="#a758c605795dc801a48b26e2d3d5d3ff2">dcOpen_</a>[label] = <span class="keyword">true</span>; });</div>
+<div class="line"><span class="lineno">  256</span> </div>
+<div class="line"><span class="lineno">  257</span>    dc-&gt;onClosed([<span class="keyword">this</span>, <span class="keywordtype">id</span> = <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, label]()</div>
+<div class="line"><span class="lineno">  258</span>                 {</div>
+<div class="line"><span class="lineno">  259</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;[PeerLink] DC closed \&quot;&quot;</span> &lt;&lt; label &lt;&lt; <span class="stringliteral">&quot;\&quot; to &quot;</span> &lt;&lt; <span class="keywordtype">id</span> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  260</span>        <a class="code hl_variable" href="#a758c605795dc801a48b26e2d3d5d3ff2">dcOpen_</a>[label] = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  261</span>        <a class="code hl_variable" href="#a8ea98e8accd164b3f36e015119f2a51e">bootstrapSent_</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  262</span>        <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock()) {</div>
+<div class="line"><span class="lineno">  263</span>            <a class="code hl_struct" href="../../d8/d0b/structmsg_1_1_net_event.html">msg::NetEvent</a> ev{<a class="code hl_enumvalue" href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c">msg::NetEvent::Type::DcClosed</a>, id, label};</div>
+<div class="line"><span class="lineno">  264</span>            nm-&gt;events_.push(std::move(ev));</div>
+<div class="line"><span class="lineno">  265</span>        } });</div>
+<div class="line"><span class="lineno">  266</span> </div>
+<div class="line"><span class="lineno">  267</span>    dc-&gt;onMessage([<span class="keyword">this</span>, <span class="keywordtype">id</span> = <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, label](rtc::message_variant m)</div>
+<div class="line"><span class="lineno">  268</span>                  {</div>
+<div class="line"><span class="lineno">  269</span>                      <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;localtunnel&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Logger::Level::Info</a>, <span class="stringliteral">&quot;MESSAGE RECEIVED!! FROM: &quot;</span>+label);</div>
+<div class="line"><span class="lineno">  270</span>                      <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock())</div>
+<div class="line"><span class="lineno">  271</span>                      {</div>
+<div class="line"><span class="lineno">  272</span>                          <span class="keywordflow">if</span> (std::holds_alternative&lt;std::string&gt;(m))</div>
+<div class="line"><span class="lineno">  273</span>                          {</div>
+<div class="line"><span class="lineno">  274</span>                              <span class="keyword">const</span> <span class="keyword">auto</span>&amp; s = std::get&lt;std::string&gt;(m);</div>
+<div class="line"><span class="lineno">  275</span>                              std::vector&lt;uint8_t&gt; bytes(s.begin(), s.end());</div>
+<div class="line"><span class="lineno">  276</span>                              nm-&gt;inboundRaw_.push(<a class="code hl_struct" href="../../d3/d2b/structmsg_1_1_inbound_raw.html">msg::InboundRaw</a>{<a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, label, std::move(bytes)});</div>
+<div class="line"><span class="lineno">  277</span>                          }</div>
+<div class="line"><span class="lineno">  278</span>                          <span class="keywordflow">else</span></div>
+<div class="line"><span class="lineno">  279</span>                          {</div>
+<div class="line"><span class="lineno">  280</span>                              <span class="keyword">const</span> <span class="keyword">auto</span>&amp; bin = std::get&lt;rtc::binary&gt;(m);</div>
+<div class="line"><span class="lineno">  281</span>                              std::vector&lt;uint8_t&gt; bytes(bin.size());</div>
+<div class="line"><span class="lineno">  282</span>                              std::memcpy(bytes.data(), bin.data(), bin.size());</div>
+<div class="line"><span class="lineno">  283</span>                              nm-&gt;inboundRaw_.push(<a class="code hl_struct" href="../../d3/d2b/structmsg_1_1_inbound_raw.html">msg::InboundRaw</a>{<a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, label, std::move(bytes)});</div>
+<div class="line"><span class="lineno">  284</span>                          }</div>
+<div class="line"><span class="lineno">  285</span>                      } });</div>
+<div class="line"><span class="lineno">  286</span>}</div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875"><div class="ttname"><a href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4cca4059b0251f66a18cb56f544728796875">Logger::Level::Info</a></div><div class="ttdeci">@ Info</div></div>
+<div class="ttc" id="aclass_logger_html_aebb248e608f8e2724de20b482cb2a15f"><div class="ttname"><a href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a></div><div class="ttdeci">static Logger &amp; instance()</div><div class="ttdef"><b>Definition</b> <a href="../../d6/dec/_logger_8h_source.html#l00039">Logger.h:39</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_a8ea98e8accd164b3f36e015119f2a51e"><div class="ttname"><a href="#a8ea98e8accd164b3f36e015119f2a51e">PeerLink::bootstrapSent_</a></div><div class="ttdeci">bool bootstrapSent_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00096">PeerLink.h:96</a></div></div>
+<div class="ttc" id="astructmsg_1_1_inbound_raw_html"><div class="ttname"><a href="../../d3/d2b/structmsg_1_1_inbound_raw.html">msg::InboundRaw</a></div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00219">Message.h:220</a></div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html"><div class="ttname"><a href="../../d8/d0b/structmsg_1_1_net_event.html">msg::NetEvent</a></div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00203">Message.h:204</a></div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c"><div class="ttname"><a href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00a6312cfb13ceea115ef43ac1c58fd6c4c">msg::NetEvent::Type::DcClosed</a></div><div class="ttdeci">@ DcClosed</div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_aec31714207e652371b259925990ee67a_icgraph.png" border="0" usemap="#adf/d24/class_peer_link_aec31714207e652371b259925990ee67a_icgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_aec31714207e652371b259925990ee67a_icgraph" id="adf/d24/class_peer_link_aec31714207e652371b259925990ee67a_icgraph">
-<area shape="rect" title=" " alt="" coords="404,31,620,57"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#ae5d0cabfe7fa586a5907928b44075973" title=" " alt="" coords="185,5,356,32"/>
-<area shape="poly" title=" " alt="" coords="388,34,356,30,357,25,389,28"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a67877f56504862a1c8a4f3ed41cbb91d" title=" " alt="" coords="185,56,356,83"/>
-<area shape="poly" title=" " alt="" coords="389,60,356,63,356,58,388,54"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#ab667cc4b6267a871d6751185ff3d5d25" title=" " alt="" coords="5,56,137,83"/>
-<area shape="poly" title=" " alt="" coords="170,72,137,72,137,67,170,67"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_aec31714207e652371b259925990ee67a_icgraph.svg" width="626" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -396,7 +467,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00062">62</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   63</span>    {</div>
+<div class="line"><span class="lineno">   64</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#a8ea98e8accd164b3f36e015119f2a51e">bootstrapSent_</a>;</div>
+<div class="line"><span class="lineno">   65</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a2c76b411c7784b44b02f76f19773c252" name="a2c76b411c7784b44b02f76f19773c252"></a>
@@ -415,26 +489,66 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00342">342</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  343</span>{</div>
+<div class="line"><span class="lineno">  344</span>    <span class="keyword">static</span> std::atomic&lt;uint64_t&gt; guardSeq{0};</div>
+<div class="line"><span class="lineno">  345</span>    <span class="keyword">const</span> uint64_t seq = ++guardSeq;</div>
+<div class="line"><span class="lineno">  346</span> </div>
+<div class="line"><span class="lineno">  347</span>    <span class="keywordflow">if</span> (<a class="code hl_variable" href="#ad8f35143b0407afd6e4816da21a006fb">closing_</a>.exchange(<span class="keyword">true</span>))</div>
+<div class="line"><span class="lineno">  348</span>    {</div>
+<div class="line"><span class="lineno">  349</span>        <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Logger::Level::Debug</a>, <span class="stringliteral">&quot;PeerLink::close() re-entry ignored&quot;</span>);</div>
+<div class="line"><span class="lineno">  350</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">  351</span>    }</div>
+<div class="line"><span class="lineno">  352</span> </div>
+<div class="line"><span class="lineno">  353</span>    <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Logger::Level::Debug</a>, <span class="stringliteral">&quot;PeerLink::close() begin #&quot;</span> + std::to_string(seq));</div>
+<div class="line"><span class="lineno">  354</span> </div>
+<div class="line"><span class="lineno">  355</span>    <span class="keywordflow">try</span></div>
+<div class="line"><span class="lineno">  356</span>    {</div>
+<div class="line"><span class="lineno">  357</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [label, ch] : <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>)</div>
+<div class="line"><span class="lineno">  358</span>        {</div>
+<div class="line"><span class="lineno">  359</span>            <span class="keywordflow">if</span> (!ch)</div>
+<div class="line"><span class="lineno">  360</span>                <span class="keywordflow">continue</span>;</div>
+<div class="line"><span class="lineno">  361</span>            ch-&gt;onOpen(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  362</span>            ch-&gt;onMessage(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  363</span>            ch-&gt;onBufferedAmountLow(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  364</span>            ch-&gt;onClosed(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  365</span>            ch-&gt;onError(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  366</span>        }</div>
+<div class="line"><span class="lineno">  367</span>        <span class="keywordflow">if</span> (<a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>)</div>
+<div class="line"><span class="lineno">  368</span>        {</div>
+<div class="line"><span class="lineno">  369</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onStateChange(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  370</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onGatheringStateChange(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  371</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onLocalDescription(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  372</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onDataChannel(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  373</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onTrack(<span class="keyword">nullptr</span>);</div>
+<div class="line"><span class="lineno">  374</span>        }</div>
+<div class="line"><span class="lineno">  375</span>    }</div>
+<div class="line"><span class="lineno">  376</span>    <span class="keywordflow">catch</span> (...)</div>
+<div class="line"><span class="lineno">  377</span>    {</div>
+<div class="line"><span class="lineno">  378</span>        <span class="comment">// ignore</span></div>
+<div class="line"><span class="lineno">  379</span>    }</div>
+<div class="line"><span class="lineno">  380</span> </div>
+<div class="line"><span class="lineno">  381</span>    std::unordered_map&lt;std::string, std::shared_ptr&lt;rtc::DataChannel&gt;&gt; movedDcs;</div>
+<div class="line"><span class="lineno">  382</span>    movedDcs.swap(<a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>);</div>
+<div class="line"><span class="lineno">  383</span> </div>
+<div class="line"><span class="lineno">  384</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; kv : movedDcs)</div>
+<div class="line"><span class="lineno">  385</span>    {</div>
+<div class="line"><span class="lineno">  386</span>        <a class="code hl_function" href="../../d5/d81/class_network_utilities.html#a3b6ac761c2940db9d3214729e5e166a3">NetworkUtilities::safeCloseDataChannel</a>(kv.second);</div>
+<div class="line"><span class="lineno">  387</span>    }</div>
+<div class="line"><span class="lineno">  388</span>    movedDcs.clear();</div>
+<div class="line"><span class="lineno">  389</span> </div>
+<div class="line"><span class="lineno">  390</span>    <a class="code hl_function" href="../../d5/d81/class_network_utilities.html#a6644e970960fb75794434d8bb73e5b27">NetworkUtilities::safeClosePeerConnection</a>(<a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>);</div>
+<div class="line"><span class="lineno">  391</span> </div>
+<div class="line"><span class="lineno">  392</span>    <a class="code hl_function" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f">Logger::instance</a>().log(<span class="stringliteral">&quot;main&quot;</span>, <a class="code hl_enumvalue" href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Logger::Level::Debug</a>, <span class="stringliteral">&quot;PeerLink::close() end #&quot;</span> + std::to_string(seq));</div>
+<div class="line"><span class="lineno">  393</span>}</div>
+<div class="ttc" id="aclass_logger_html_ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba"><div class="ttname"><a href="../../d3/d42/class_logger.html#ac6a29c806d1917b5363ae43c5381c4ccaa603905470e2a5b8c13e96b579ef0dba">Logger::Level::Debug</a></div><div class="ttdeci">@ Debug</div></div>
+<div class="ttc" id="aclass_network_utilities_html_a3b6ac761c2940db9d3214729e5e166a3"><div class="ttname"><a href="../../d5/d81/class_network_utilities.html#a3b6ac761c2940db9d3214729e5e166a3">NetworkUtilities::safeCloseDataChannel</a></div><div class="ttdeci">static void safeCloseDataChannel(std::shared_ptr&lt; rtc::DataChannel &gt; &amp;dc)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/da8/_network_utilities_8h_source.html#l00031">NetworkUtilities.h:31</a></div></div>
+<div class="ttc" id="aclass_network_utilities_html_a6644e970960fb75794434d8bb73e5b27"><div class="ttname"><a href="../../d5/d81/class_network_utilities.html#a6644e970960fb75794434d8bb73e5b27">NetworkUtilities::safeClosePeerConnection</a></div><div class="ttdeci">static void safeClosePeerConnection(std::shared_ptr&lt; rtc::PeerConnection &gt; &amp;pc)</div><div class="ttdef"><b>Definition</b> <a href="../../d4/da8/_network_utilities_8h_source.html#l00049">NetworkUtilities.h:49</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_ad69a0783f1a4e6046dbe8a1e8131178f"><div class="ttname"><a href="#ad69a0783f1a4e6046dbe8a1e8131178f">PeerLink::dcs_</a></div><div class="ttdeci">std::unordered_map&lt; std::string, std::shared_ptr&lt; rtc::DataChannel &gt; &gt; dcs_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00085">PeerLink.h:85</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_ad8f35143b0407afd6e4816da21a006fb"><div class="ttname"><a href="#ad8f35143b0407afd6e4816da21a006fb">PeerLink::closing_</a></div><div class="ttdeci">std::atomic&lt; bool &gt; closing_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00086">PeerLink.h:86</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a2c76b411c7784b44b02f76f19773c252_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a2c76b411c7784b44b02f76f19773c252_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a2c76b411c7784b44b02f76f19773c252_cgraph" id="adf/d24/class_peer_link_a2c76b411c7784b44b02f76f19773c252_cgraph">
-<area shape="rect" title=" " alt="" coords="5,70,117,97"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#aebb248e608f8e2724de20b482cb2a15f" title=" " alt="" coords="394,33,511,60"/>
-<area shape="poly" title=" " alt="" coords="75,68,113,39,138,25,164,14,225,4,288,5,347,14,397,26,395,31,346,19,287,10,226,9,165,20,140,30,116,44,78,72"/>
-<area shape="rect" href="../../d3/d42/class_logger.html#ab77a9a6a08954192b47c39f359b5d370" title=" " alt="" coords="410,108,495,134"/>
-<area shape="poly" title=" " alt="" coords="78,95,116,124,140,137,165,148,226,158,287,157,346,148,395,136,397,142,347,154,288,162,225,163,164,153,138,142,113,128,75,99"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a3b6ac761c2940db9d3214729e5e166a3" title=" " alt="" coords="165,29,346,72"/>
-<area shape="poly" title=" " alt="" coords="117,71,149,66,150,71,118,77"/>
-<area shape="rect" href="../../d5/d81/class_network_utilities.html#a6644e970960fb75794434d8bb73e5b27" title=" " alt="" coords="165,96,346,138"/>
-<area shape="poly" title=" " alt="" coords="118,91,150,96,149,101,117,96"/>
-<area shape="poly" title=" " alt="" coords="419,109,413,99,417,89,431,83,453,81,476,84,489,90,486,95,475,89,453,86,432,88,421,93,418,98,424,106"/>
-<area shape="poly" title=" " alt="" coords="347,46,378,45,378,50,347,51"/>
-<area shape="poly" title=" " alt="" coords="318,70,400,99,398,104,316,75"/>
-<area shape="poly" title=" " alt="" coords="316,92,398,63,400,68,318,97"/>
-<area shape="poly" title=" " alt="" coords="347,116,394,117,394,122,347,121"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a2c76b411c7784b44b02f76f19773c252_cgraph.svg" width="518" height="167"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -455,7 +569,15 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00091">91</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   92</span>{</div>
+<div class="line"><span class="lineno">   93</span>    <span class="keyword">auto</span> answer = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createAnswer();</div>
+<div class="line"><span class="lineno">   94</span>    rtc::LocalDescriptionInit init;</div>
+<div class="line"><span class="lineno">   95</span>    init.icePwd = answer.icePwd();</div>
+<div class="line"><span class="lineno">   96</span>    init.iceUfrag = answer.iceUfrag();</div>
+<div class="line"><span class="lineno">   97</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;setLocalDescription(answer.type(), init);</div>
+<div class="line"><span class="lineno">   98</span>    <span class="keywordflow">return</span> answer; <span class="comment">// Send this via signaling</span></div>
+<div class="line"><span class="lineno">   99</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ae5d0cabfe7fa586a5907928b44075973" name="ae5d0cabfe7fa586a5907928b44075973"></a>
@@ -474,15 +596,43 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00050">50</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">   51</span>{</div>
+<div class="line"><span class="lineno">   52</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>)</div>
+<div class="line"><span class="lineno">   53</span>        <span class="keywordflow">return</span>;</div>
+<div class="line"><span class="lineno">   54</span> </div>
+<div class="line"><span class="lineno">   55</span>    rtc::DataChannelInit init;           <span class="comment">// default reliable/ordered</span></div>
+<div class="line"><span class="lineno">   56</span>    rtc::DataChannelInit markerMoveInit; <span class="comment">//</span></div>
+<div class="line"><span class="lineno">   57</span>    <span class="keyword">auto</span> reliability = rtc::Reliability{};</div>
+<div class="line"><span class="lineno">   58</span>    reliability.unordered = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   59</span>    reliability.maxPacketLifeTime = std::chrono::milliseconds(500);</div>
+<div class="line"><span class="lineno">   60</span>    <span class="comment">//reliability.maxRetransmits = 0;</span></div>
+<div class="line"><span class="lineno">   61</span>    markerMoveInit.reliability = reliability;</div>
+<div class="line"><span class="lineno">   62</span> </div>
+<div class="line"><span class="lineno">   63</span>    <span class="comment">// Offerer creates channels; answerer gets them in pc-&gt;onDataChannel</span></div>
+<div class="line"><span class="lineno">   64</span>    <span class="keyword">auto</span> dcGame = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createDataChannel(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>), init);</div>
+<div class="line"><span class="lineno">   65</span>    <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>[std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>)] = dcGame;</div>
+<div class="line"><span class="lineno">   66</span>    <a class="code hl_function" href="#aec31714207e652371b259925990ee67a">attachChannelHandlers</a>(dcGame, std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>));</div>
+<div class="line"><span class="lineno">   67</span> </div>
+<div class="line"><span class="lineno">   68</span>    <span class="keyword">auto</span> dcChat = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createDataChannel(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a>), init);</div>
+<div class="line"><span class="lineno">   69</span>    <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>[std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a>)] = dcChat;</div>
+<div class="line"><span class="lineno">   70</span>    <a class="code hl_function" href="#aec31714207e652371b259925990ee67a">attachChannelHandlers</a>(dcChat, std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a>));</div>
+<div class="line"><span class="lineno">   71</span> </div>
+<div class="line"><span class="lineno">   72</span>    <span class="keyword">auto</span> dcNotes = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createDataChannel(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#aaa910c83fe09f995487b1f0d52a372ef">msg::dc::name::Notes</a>), init);</div>
+<div class="line"><span class="lineno">   73</span>    <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>[std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#aaa910c83fe09f995487b1f0d52a372ef">msg::dc::name::Notes</a>)] = dcNotes;</div>
+<div class="line"><span class="lineno">   74</span>    <a class="code hl_function" href="#aec31714207e652371b259925990ee67a">attachChannelHandlers</a>(dcNotes, std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#aaa910c83fe09f995487b1f0d52a372ef">msg::dc::name::Notes</a>));</div>
+<div class="line"><span class="lineno">   75</span> </div>
+<div class="line"><span class="lineno">   76</span>    <span class="keyword">auto</span> dcMarkerMove = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createDataChannel(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#af7cab842064d77542ddf4b666a49473b">msg::dc::name::MarkerMove</a>), markerMoveInit);</div>
+<div class="line"><span class="lineno">   77</span>    <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>[std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#af7cab842064d77542ddf4b666a49473b">msg::dc::name::MarkerMove</a>)] = dcMarkerMove;</div>
+<div class="line"><span class="lineno">   78</span>    <a class="code hl_function" href="#aec31714207e652371b259925990ee67a">attachChannelHandlers</a>(dcMarkerMove, std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#af7cab842064d77542ddf4b666a49473b">msg::dc::name::MarkerMove</a>));</div>
+<div class="line"><span class="lineno">   79</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_aec31714207e652371b259925990ee67a"><div class="ttname"><a href="#aec31714207e652371b259925990ee67a">PeerLink::attachChannelHandlers</a></div><div class="ttdeci">void attachChannelHandlers(const std::shared_ptr&lt; rtc::DataChannel &gt; &amp;ch, const std::string &amp;label)</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d6b/_peer_link_8cpp_source.html#l00242">PeerLink.cpp:242</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1dc_1_1name_html_a0bd5d4f0613c63e6bddb56f092af1a80"><div class="ttname"><a href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a></div><div class="ttdeci">constexpr std::string Chat</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00298">Message.h:298</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1dc_1_1name_html_aaa910c83fe09f995487b1f0d52a372ef"><div class="ttname"><a href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#aaa910c83fe09f995487b1f0d52a372ef">msg::dc::name::Notes</a></div><div class="ttdeci">constexpr std::string Notes</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00299">Message.h:299</a></div></div>
+<div class="ttc" id="anamespacemsg_1_1dc_1_1name_html_af7cab842064d77542ddf4b666a49473b"><div class="ttname"><a href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#af7cab842064d77542ddf4b666a49473b">msg::dc::name::MarkerMove</a></div><div class="ttdeci">constexpr std::string MarkerMove</div><div class="ttdef"><b>Definition</b> <a href="../../db/db6/_message_8h_source.html#l00300">Message.h:300</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_ae5d0cabfe7fa586a5907928b44075973_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_ae5d0cabfe7fa586a5907928b44075973_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_ae5d0cabfe7fa586a5907928b44075973_cgraph" id="adf/d24/class_peer_link_ae5d0cabfe7fa586a5907928b44075973_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,177,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#aec31714207e652371b259925990ee67a" title=" " alt="" coords="225,5,441,32"/>
-<area shape="poly" title=" " alt="" coords="177,16,209,16,209,21,177,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_ae5d0cabfe7fa586a5907928b44075973_cgraph.svg" width="447" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -520,7 +670,15 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00081">81</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   82</span>{</div>
+<div class="line"><span class="lineno">   83</span>    <span class="keyword">auto</span> offer = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;createOffer();</div>
+<div class="line"><span class="lineno">   84</span>    rtc::LocalDescriptionInit init;</div>
+<div class="line"><span class="lineno">   85</span>    init.icePwd = offer.icePwd();     <span class="comment">// string</span></div>
+<div class="line"><span class="lineno">   86</span>    init.iceUfrag = offer.iceUfrag(); <span class="comment">// string</span></div>
+<div class="line"><span class="lineno">   87</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;setLocalDescription(offer.type(), init);</div>
+<div class="line"><span class="lineno">   88</span>    <span class="keywordflow">return</span> offer;</div>
+<div class="line"><span class="lineno">   89</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a3e9e74d9d9294257ae45ec2f7155ebf1" name="a3e9e74d9d9294257ae45ec2f7155ebf1"></a>
@@ -539,7 +697,11 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00031">31</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   32</span>{</div>
+<div class="line"><span class="lineno">   33</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#a77bb68add191266e5397346384114c5d">displayName_</a>;</div>
+<div class="line"><span class="lineno">   34</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a77bb68add191266e5397346384114c5d"><div class="ttname"><a href="#a77bb68add191266e5397346384114c5d">PeerLink::displayName_</a></div><div class="ttdeci">std::string displayName_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00082">PeerLink.h:82</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a77e70968600137859159967ee463f42a" name="a77e70968600137859159967ee463f42a"></a>
@@ -566,7 +728,10 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00075">75</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   76</span>    {</div>
+<div class="line"><span class="lineno">   77</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>;</div>
+<div class="line"><span class="lineno">   78</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a7fc074e0e97e42610e035d5036759525" name="a7fc074e0e97e42610e035d5036759525"></a>
@@ -585,7 +750,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00402">402</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  403</span>{</div>
+<div class="line"><span class="lineno">  404</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>)</div>
+<div class="line"><span class="lineno">  405</span>        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  406</span>    <span class="keyword">auto</span> s = <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;state();</div>
+<div class="line"><span class="lineno">  407</span>    <span class="keywordflow">return</span> s == rtc::PeerConnection::State::Closed ||</div>
+<div class="line"><span class="lineno">  408</span>           s == rtc::PeerConnection::State::Failed;</div>
+<div class="line"><span class="lineno">  409</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a4d0c2f75fcadd38944fc3e789c09e973" name="a4d0c2f75fcadd38944fc3e789c09e973"></a>
@@ -604,15 +776,16 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00288">288</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  289</span>{</div>
+<div class="line"><span class="lineno">  290</span>    <span class="comment">// â€œusableâ€ = PC connected AND at least Game channel open</span></div>
+<div class="line"><span class="lineno">  291</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.find(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>));</div>
+<div class="line"><span class="lineno">  292</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="#a3e70e07c2a61a1843e92e2792e0855bc">isPcConnectedOnly</a>() &amp;&amp; it != <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.end() &amp;&amp; it-&gt;second &amp;&amp; it-&gt;second-&gt;isOpen();</div>
+<div class="line"><span class="lineno">  293</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a3e70e07c2a61a1843e92e2792e0855bc"><div class="ttname"><a href="#a3e70e07c2a61a1843e92e2792e0855bc">PeerLink::isPcConnectedOnly</a></div><div class="ttdeci">bool isPcConnectedOnly() const</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d6b/_peer_link_8cpp_source.html#l00305">PeerLink.cpp:305</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a4d0c2f75fcadd38944fc3e789c09e973_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a4d0c2f75fcadd38944fc3e789c09e973_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a4d0c2f75fcadd38944fc3e789c09e973_cgraph" id="adf/d24/class_peer_link_a4d0c2f75fcadd38944fc3e789c09e973_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,159,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a3e70e07c2a61a1843e92e2792e0855bc" title=" " alt="" coords="207,5,403,32"/>
-<area shape="poly" title=" " alt="" coords="159,16,191,16,191,21,159,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a4d0c2f75fcadd38944fc3e789c09e973_cgraph.svg" width="408" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -633,7 +806,15 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00295">295</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  296</span>{</div>
+<div class="line"><span class="lineno">  297</span>    <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; [label, ch] : <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>)</div>
+<div class="line"><span class="lineno">  298</span>    {</div>
+<div class="line"><span class="lineno">  299</span>        <span class="keywordflow">if</span> (ch &amp;&amp; ch-&gt;isOpen())</div>
+<div class="line"><span class="lineno">  300</span>            <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  301</span>    }</div>
+<div class="line"><span class="lineno">  302</span>    <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  303</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a3e70e07c2a61a1843e92e2792e0855bc" name="a3e70e07c2a61a1843e92e2792e0855bc"></a>
@@ -652,15 +833,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00305">305</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  306</span>{</div>
+<div class="line"><span class="lineno">  307</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a> &amp;&amp; <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;state() == rtc::PeerConnection::State::Connected;</div>
+<div class="line"><span class="lineno">  308</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a3e70e07c2a61a1843e92e2792e0855bc_icgraph.png" border="0" usemap="#adf/d24/class_peer_link_a3e70e07c2a61a1843e92e2792e0855bc_icgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a3e70e07c2a61a1843e92e2792e0855bc_icgraph" id="adf/d24/class_peer_link_a3e70e07c2a61a1843e92e2792e0855bc_icgraph">
-<area shape="rect" title=" " alt="" coords="207,5,403,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a4d0c2f75fcadd38944fc3e789c09e973" title=" " alt="" coords="5,5,159,32"/>
-<area shape="poly" title=" " alt="" coords="191,21,159,21,159,16,191,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a3e70e07c2a61a1843e92e2792e0855bc_icgraph.svg" width="408" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -689,7 +868,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00070">70</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   71</span>    {</div>
+<div class="line"><span class="lineno">   72</span>        <a class="code hl_variable" href="#a8ea98e8accd164b3f36e015119f2a51e">bootstrapSent_</a> = <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">   73</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ad0f1236d9e443d2365820379749e4398" name="ad0f1236d9e443d2365820379749e4398"></a>
@@ -716,7 +898,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00066">66</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   67</span>    {</div>
+<div class="line"><span class="lineno">   68</span>        <a class="code hl_variable" href="#a8ea98e8accd164b3f36e015119f2a51e">bootstrapSent_</a> = <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">   69</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a582ce7d02f2969fdc76937ca5fffc781" name="a582ce7d02f2969fdc76937ca5fffc781"></a>
@@ -735,15 +920,15 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00395">395</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  396</span>{</div>
+<div class="line"><span class="lineno">  397</span>    <span class="keywordflow">if</span> (!<a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>)</div>
+<div class="line"><span class="lineno">  398</span>        <span class="keywordflow">return</span> rtc::PeerConnection::State::Closed;</div>
+<div class="line"><span class="lineno">  399</span>    <span class="keywordflow">return</span> <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;state();</div>
+<div class="line"><span class="lineno">  400</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a582ce7d02f2969fdc76937ca5fffc781_icgraph.png" border="0" usemap="#adf/d24/class_peer_link_a582ce7d02f2969fdc76937ca5fffc781_icgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a582ce7d02f2969fdc76937ca5fffc781_icgraph" id="adf/d24/class_peer_link_a582ce7d02f2969fdc76937ca5fffc781_icgraph">
-<area shape="rect" title=" " alt="" coords="213,5,338,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a22bb9f84ca45ba0abac14dca4d69fb1e" title=" " alt="" coords="5,5,165,32"/>
-<area shape="poly" title=" " alt="" coords="197,21,165,21,165,16,197,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a582ce7d02f2969fdc76937ca5fffc781_icgraph.svg" width="344" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -764,15 +949,31 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00411">411</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  412</span>{</div>
+<div class="line"><span class="lineno">  413</span>    <span class="keyword">auto</span> s = <a class="code hl_function" href="#a582ce7d02f2969fdc76937ca5fffc781">pcState</a>();</div>
+<div class="line"><span class="lineno">  414</span>    <span class="keyword">using </span>S = rtc::PeerConnection::State;</div>
+<div class="line"><span class="lineno">  415</span>    <span class="keywordflow">switch</span> (s)</div>
+<div class="line"><span class="lineno">  416</span>    {</div>
+<div class="line"><span class="lineno">  417</span>        <span class="keywordflow">case</span> S::New:</div>
+<div class="line"><span class="lineno">  418</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;New&quot;</span>;</div>
+<div class="line"><span class="lineno">  419</span>        <span class="keywordflow">case</span> S::Connecting:</div>
+<div class="line"><span class="lineno">  420</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Connecting&quot;</span>;</div>
+<div class="line"><span class="lineno">  421</span>        <span class="keywordflow">case</span> S::Connected:</div>
+<div class="line"><span class="lineno">  422</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Connected&quot;</span>;</div>
+<div class="line"><span class="lineno">  423</span>        <span class="keywordflow">case</span> S::Disconnected:</div>
+<div class="line"><span class="lineno">  424</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Disconnected&quot;</span>;</div>
+<div class="line"><span class="lineno">  425</span>        <span class="keywordflow">case</span> S::Failed:</div>
+<div class="line"><span class="lineno">  426</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Failed&quot;</span>;</div>
+<div class="line"><span class="lineno">  427</span>        <span class="keywordflow">case</span> S::Closed:</div>
+<div class="line"><span class="lineno">  428</span>            <span class="keywordflow">return</span> <span class="stringliteral">&quot;Closed&quot;</span>;</div>
+<div class="line"><span class="lineno">  429</span>    }</div>
+<div class="line"><span class="lineno">  430</span>    <span class="keywordflow">return</span> <span class="stringliteral">&quot;Unknown&quot;</span>;</div>
+<div class="line"><span class="lineno">  431</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a582ce7d02f2969fdc76937ca5fffc781"><div class="ttname"><a href="#a582ce7d02f2969fdc76937ca5fffc781">PeerLink::pcState</a></div><div class="ttdeci">rtc::PeerConnection::State pcState() const</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d6b/_peer_link_8cpp_source.html#l00395">PeerLink.cpp:395</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a22bb9f84ca45ba0abac14dca4d69fb1e_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a22bb9f84ca45ba0abac14dca4d69fb1e_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a22bb9f84ca45ba0abac14dca4d69fb1e_cgraph" id="adf/d24/class_peer_link_a22bb9f84ca45ba0abac14dca4d69fb1e_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,165,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a582ce7d02f2969fdc76937ca5fffc781" title=" " alt="" coords="213,5,338,32"/>
-<area shape="poly" title=" " alt="" coords="165,16,197,16,197,21,165,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a22bb9f84ca45ba0abac14dca4d69fb1e_cgraph.svg" width="344" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -827,15 +1028,14 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00216">216</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  217</span>{</div>
+<div class="line"><span class="lineno">  218</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="#a848db4c9d1cc97ca74cd966156c18a25">sendOn</a>(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a>), bytes);</div>
+<div class="line"><span class="lineno">  219</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a848db4c9d1cc97ca74cd966156c18a25"><div class="ttname"><a href="#a848db4c9d1cc97ca74cd966156c18a25">PeerLink::sendOn</a></div><div class="ttdeci">bool sendOn(const std::string &amp;label, const std::vector&lt; uint8_t &gt; &amp;bytes)</div><div class="ttdef"><b>Definition</b> <a href="../../d8/d6b/_peer_link_8cpp_source.html#l00187">PeerLink.cpp:187</a></div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_ae695d62c9d0c40de4095b788d16ffa14_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_ae695d62c9d0c40de4095b788d16ffa14_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_ae695d62c9d0c40de4095b788d16ffa14_cgraph" id="adf/d24/class_peer_link_ae695d62c9d0c40de4095b788d16ffa14_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,142,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a848db4c9d1cc97ca74cd966156c18a25" title=" " alt="" coords="190,5,315,32"/>
-<area shape="poly" title=" " alt="" coords="142,16,174,16,174,21,142,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_ae695d62c9d0c40de4095b788d16ffa14_cgraph.svg" width="320" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -856,15 +1056,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00230">230</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  231</span>{</div>
+<div class="line"><span class="lineno">  232</span>    <a class="code hl_function" href="#a848db4c9d1cc97ca74cd966156c18a25">sendOn</a>(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0bd5d4f0613c63e6bddb56f092af1a80">msg::dc::name::Chat</a>, jsonText);</div>
+<div class="line"><span class="lineno">  233</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a42cec64b3bb231e08dbf2e1a1255cb0b_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a42cec64b3bb231e08dbf2e1a1255cb0b_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a42cec64b3bb231e08dbf2e1a1255cb0b_cgraph" id="adf/d24/class_peer_link_a42cec64b3bb231e08dbf2e1a1255cb0b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,170,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a848db4c9d1cc97ca74cd966156c18a25" title=" " alt="" coords="218,5,343,32"/>
-<area shape="poly" title=" " alt="" coords="170,16,202,16,202,21,170,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a42cec64b3bb231e08dbf2e1a1255cb0b_cgraph.svg" width="348" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -885,15 +1083,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00211">211</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  212</span>{</div>
+<div class="line"><span class="lineno">  213</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="#a848db4c9d1cc97ca74cd966156c18a25">sendOn</a>(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#a0d585ade777534fda49e59da75a1b182">msg::dc::name::Game</a>), bytes);</div>
+<div class="line"><span class="lineno">  214</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a99198972a845babd476bbbf2b76d62fd_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a99198972a845babd476bbbf2b76d62fd_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a99198972a845babd476bbbf2b76d62fd_cgraph" id="adf/d24/class_peer_link_a99198972a845babd476bbbf2b76d62fd_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,149,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a848db4c9d1cc97ca74cd966156c18a25" title=" " alt="" coords="197,5,322,32"/>
-<area shape="poly" title=" " alt="" coords="149,16,181,16,181,21,149,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a99198972a845babd476bbbf2b76d62fd_cgraph.svg" width="328" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -914,15 +1110,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00226">226</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  227</span>{</div>
+<div class="line"><span class="lineno">  228</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="#a848db4c9d1cc97ca74cd966156c18a25">sendOn</a>(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#af7cab842064d77542ddf4b666a49473b">msg::dc::name::MarkerMove</a>), bytes);</div>
+<div class="line"><span class="lineno">  229</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_aac284ff5355b02f9ab5859f6aca8861c_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_aac284ff5355b02f9ab5859f6aca8861c_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_aac284ff5355b02f9ab5859f6aca8861c_cgraph" id="adf/d24/class_peer_link_aac284ff5355b02f9ab5859f6aca8861c_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,186,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a848db4c9d1cc97ca74cd966156c18a25" title=" " alt="" coords="234,5,359,32"/>
-<area shape="poly" title=" " alt="" coords="186,16,218,16,218,21,186,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_aac284ff5355b02f9ab5859f6aca8861c_cgraph.svg" width="364" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -943,15 +1137,13 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00221">221</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  222</span>{</div>
+<div class="line"><span class="lineno">  223</span>    <span class="keywordflow">return</span> <a class="code hl_function" href="#a848db4c9d1cc97ca74cd966156c18a25">sendOn</a>(std::string(<a class="code hl_variable" href="../../db/dc6/namespacemsg_1_1dc_1_1name.html#aaa910c83fe09f995487b1f0d52a372ef">msg::dc::name::Notes</a>), bytes);</div>
+<div class="line"><span class="lineno">  224</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a9c7ab8d37311f1f46b7b617e6396b82b_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a9c7ab8d37311f1f46b7b617e6396b82b_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a9c7ab8d37311f1f46b7b617e6396b82b_cgraph" id="adf/d24/class_peer_link_a9c7ab8d37311f1f46b7b617e6396b82b_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,142,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a848db4c9d1cc97ca74cd966156c18a25" title=" " alt="" coords="190,5,315,32"/>
-<area shape="poly" title=" " alt="" coords="142,16,174,16,174,21,142,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a9c7ab8d37311f1f46b7b617e6396b82b_cgraph.svg" width="320" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -976,23 +1168,32 @@ Here is the call graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00187">187</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  188</span>{</div>
+<div class="line"><span class="lineno">  189</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.find(label);</div>
+<div class="line"><span class="lineno">  190</span>    <span class="keywordflow">if</span> (it == <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.end() || !it-&gt;second)</div>
+<div class="line"><span class="lineno">  191</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  192</span>    <span class="keyword">auto</span>&amp; ch = it-&gt;second;</div>
+<div class="line"><span class="lineno">  193</span>    <span class="keywordflow">if</span> (!ch-&gt;isOpen())</div>
+<div class="line"><span class="lineno">  194</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  195</span> </div>
+<div class="line"><span class="lineno">  197</span>    <span class="comment">//if (ch-&gt;bufferedAmount() &gt; kMaxBufferedBytes)</span></div>
+<div class="line"><span class="lineno">  198</span>    <span class="comment">//{</span></div>
+<div class="line"><span class="lineno">  199</span>    <span class="comment">//    // You can queue locally instead of dropping, if you want</span></div>
+<div class="line"><span class="lineno">  200</span>    <span class="comment">//    return false;</span></div>
+<div class="line"><span class="lineno">  201</span>    <span class="comment">//}</span></div>
+<div class="line"><span class="lineno">  202</span>    rtc::binary b;</div>
+<div class="line"><span class="lineno">  203</span>    b.resize(bytes.size());</div>
+<div class="line"><span class="lineno">  204</span>    <span class="keywordflow">if</span> (!bytes.empty())</div>
+<div class="line"><span class="lineno">  205</span>    {</div>
+<div class="line"><span class="lineno">  206</span>        std::memcpy(b.data(), bytes.data(), bytes.size()); <span class="comment">// std::byte is trivially copyable</span></div>
+<div class="line"><span class="lineno">  207</span>    }</div>
+<div class="line"><span class="lineno">  208</span>    ch-&gt;send(b); <span class="comment">// libdatachannel handles SCTP fragmentation</span></div>
+<div class="line"><span class="lineno">  209</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  210</span>}</div>
+</div><!-- fragment --><div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a848db4c9d1cc97ca74cd966156c18a25_icgraph.png" border="0" usemap="#adf/d24/class_peer_link_a848db4c9d1cc97ca74cd966156c18a25_icgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a848db4c9d1cc97ca74cd966156c18a25_icgraph" id="adf/d24/class_peer_link_a848db4c9d1cc97ca74cd966156c18a25_icgraph">
-<area shape="rect" title=" " alt="" coords="234,107,359,133"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#ae695d62c9d0c40de4095b788d16ffa14" title=" " alt="" coords="27,5,164,32"/>
-<area shape="poly" title=" " alt="" coords="265,99,228,71,185,46,155,35,157,30,187,42,231,67,268,94"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a42cec64b3bb231e08dbf2e1a1255cb0b" title=" " alt="" coords="13,56,178,83"/>
-<area shape="poly" title=" " alt="" coords="225,105,151,86,152,81,226,100"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a99198972a845babd476bbbf2b76d62fd" title=" " alt="" coords="24,107,167,133"/>
-<area shape="poly" title=" " alt="" coords="218,123,168,123,168,117,218,117"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#aac284ff5355b02f9ab5859f6aca8861c" title=" " alt="" coords="5,157,186,184"/>
-<area shape="poly" title=" " alt="" coords="226,140,152,159,151,154,225,135"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#a9c7ab8d37311f1f46b7b617e6396b82b" title=" " alt="" coords="27,208,164,235"/>
-<area shape="poly" title=" " alt="" coords="268,146,231,173,187,198,157,210,155,205,185,194,228,169,265,141"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a848db4c9d1cc97ca74cd966156c18a25_icgraph.svg" width="364" height="240"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1017,7 +1218,21 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00171">171</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  172</span>{</div>
+<div class="line"><span class="lineno">  173</span>    <span class="keyword">auto</span> it = <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.find(label);</div>
+<div class="line"><span class="lineno">  174</span>    <span class="keywordflow">if</span> (it == <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>.end() || !it-&gt;second)</div>
+<div class="line"><span class="lineno">  175</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  176</span>    <span class="keyword">auto</span>&amp; ch = it-&gt;second;</div>
+<div class="line"><span class="lineno">  177</span>    <span class="keywordflow">if</span> (!ch-&gt;isOpen())</div>
+<div class="line"><span class="lineno">  178</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><span class="lineno">  179</span> </div>
+<div class="line"><span class="lineno">  180</span>    <span class="comment">// optional backpressure guard</span></div>
+<div class="line"><span class="lineno">  181</span>    <span class="comment">// if (ch-&gt;bufferedAmount() &gt; kMaxBufferedBytes) return false;</span></div>
+<div class="line"><span class="lineno">  182</span> </div>
+<div class="line"><span class="lineno">  183</span>    ch-&gt;send(std::string(text)); <span class="comment">// TEXT frame over DC</span></div>
+<div class="line"><span class="lineno">  184</span>    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><span class="lineno">  185</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a8cfdd4d48e381e05f4a65753704d082d" name="a8cfdd4d48e381e05f4a65753704d082d"></a>
@@ -1036,7 +1251,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00026">26</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   27</span>{</div>
+<div class="line"><span class="lineno">   28</span>    <a class="code hl_variable" href="#a77bb68add191266e5397346384114c5d">displayName_</a> = std::move(n);</div>
+<div class="line"><span class="lineno">   29</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a27fe2a7fade36d6b8d5d3a49855f749a" name="a27fe2a7fade36d6b8d5d3a49855f749a"></a>
@@ -1067,7 +1285,10 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00056">56</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   57</span>    {</div>
+<div class="line"><span class="lineno">   58</span>        <a class="code hl_variable" href="#a758c605795dc801a48b26e2d3d5d3ff2">dcOpen_</a>[label] = open;</div>
+<div class="line"><span class="lineno">   59</span>    }</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="aca68f3432e9abccc1f42576d667e7721" name="aca68f3432e9abccc1f42576d667e7721"></a>
@@ -1086,7 +1307,19 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00101">101</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">  102</span>{</div>
+<div class="line"><span class="lineno">  103</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;setRemoteDescription(desc);</div>
+<div class="line"><span class="lineno">  104</span>    {</div>
+<div class="line"><span class="lineno">  105</span>        std::lock_guard&lt;std::mutex&gt; lk(<a class="code hl_variable" href="#a67b612bc319f55591748213c9517105d">candMx_</a>);</div>
+<div class="line"><span class="lineno">  106</span>        <a class="code hl_variable" href="#a04bfb958ef7cf8e70983a6eb6f7b5b86">remoteDescSet_</a>.store(<span class="keyword">true</span>, std::memory_order_release);</div>
+<div class="line"><span class="lineno">  107</span>        <span class="keywordflow">for</span> (<span class="keyword">auto</span>&amp; c : <a class="code hl_variable" href="#a6c78b766c779b02cc79762bdcab5f8fd">pendingRemoteCandidates_</a>)</div>
+<div class="line"><span class="lineno">  108</span>        {</div>
+<div class="line"><span class="lineno">  109</span>            <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;addRemoteCandidate(c);</div>
+<div class="line"><span class="lineno">  110</span>        }</div>
+<div class="line"><span class="lineno">  111</span>        <a class="code hl_variable" href="#a6c78b766c779b02cc79762bdcab5f8fd">pendingRemoteCandidates_</a>.clear();</div>
+<div class="line"><span class="lineno">  112</span>    }</div>
+<div class="line"><span class="lineno">  113</span>}</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a67877f56504862a1c8a4f3ed41cbb91d" name="a67877f56504862a1c8a4f3ed41cbb91d"></a>
@@ -1113,25 +1346,54 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html#l00128">128</a> of file <a class="el" href="../../d8/d6b/_peer_link_8cpp_source.html">PeerLink.cpp</a>.</p>
-<div class="dynheader">
+<div class="fragment"><div class="line"><span class="lineno">  129</span>{</div>
+<div class="line"><span class="lineno">  130</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onStateChange([<span class="keyword">this</span>](rtc::PeerConnection::State s)</div>
+<div class="line"><span class="lineno">  131</span>                      {</div>
+<div class="line"><span class="lineno">  132</span>        <a class="code hl_variable" href="#a191ffb5424da0c61582acb1d397ca038">lastState_</a> = s;</div>
+<div class="line"><span class="lineno">  133</span>        <a class="code hl_variable" href="#ace2310fe2f13b88c2d50295b23693ca5">lastStateAt_</a> = std::chrono::seconds().count();</div>
+<div class="line"><span class="lineno">  134</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;[PeerLink] State(&quot;</span> &lt;&lt; <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a> &lt;&lt; <span class="stringliteral">&quot;): &quot;</span> &lt;&lt; (int)s &lt;&lt; <span class="stringliteral">&quot;at &quot;</span> &lt;&lt; <a class="code hl_variable" href="#ace2310fe2f13b88c2d50295b23693ca5">lastStateAt_</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>;</div>
+<div class="line"><span class="lineno">  135</span> </div>
+<div class="line"><span class="lineno">  136</span>        <span class="keywordflow">if</span> (s == rtc::PeerConnection::State::Closed || s == rtc::PeerConnection::State::Failed) {</div>
+<div class="line"><span class="lineno">  137</span>            <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock()) {</div>
+<div class="line"><span class="lineno">  138</span>                <a class="code hl_struct" href="../../d8/d0b/structmsg_1_1_net_event.html">msg::NetEvent</a> ev{<a class="code hl_enumvalue" href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515">msg::NetEvent::Type::PcClosed</a>, <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, <span class="stringliteral">&quot;PC&quot;</span>};</div>
+<div class="line"><span class="lineno">  139</span>                nm-&gt;events_.push(std::move(ev));</div>
+<div class="line"><span class="lineno">  140</span>            } </div>
+<div class="line"><span class="lineno">  141</span>        }</div>
+<div class="line"><span class="lineno">  142</span>        <span class="keywordflow">if</span> (s == rtc::PeerConnection::State::Connected) {</div>
+<div class="line"><span class="lineno">  143</span>            <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>.lock()) {</div>
+<div class="line"><span class="lineno">  144</span>                <a class="code hl_struct" href="../../d8/d0b/structmsg_1_1_net_event.html">msg::NetEvent</a> ev{<a class="code hl_enumvalue" href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495">msg::NetEvent::Type::PcOpen</a>, <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>, <span class="stringliteral">&quot;PC&quot;</span>};</div>
+<div class="line"><span class="lineno">  145</span>                nm-&gt;events_.push(std::move(ev));</div>
+<div class="line"><span class="lineno">  146</span>            } </div>
+<div class="line"><span class="lineno">  147</span>        } });</div>
+<div class="line"><span class="lineno">  148</span> </div>
+<div class="line"><span class="lineno">  149</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onLocalDescription([wk = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>, <span class="keywordtype">id</span> = <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>](rtc::Description desc)</div>
+<div class="line"><span class="lineno">  150</span>                           {</div>
+<div class="line"><span class="lineno">  151</span>        <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = wk.lock()) nm-&gt;onPeerLocalDescription(<span class="keywordtype">id</span>, desc); });</div>
+<div class="line"><span class="lineno">  152</span> </div>
+<div class="line"><span class="lineno">  153</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onLocalCandidate([wk = <a class="code hl_variable" href="#a7beccd2af9e63c3d0d6bbbc39dcbbeab">network_manager</a>, <span class="keywordtype">id</span> = <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a>](rtc::Candidate cand)</div>
+<div class="line"><span class="lineno">  154</span>                         {</div>
+<div class="line"><span class="lineno">  155</span>        <span class="keywordflow">if</span> (<span class="keyword">auto</span> nm = wk.lock()) nm-&gt;onPeerLocalCandidate(<span class="keywordtype">id</span>, cand); });</div>
+<div class="line"><span class="lineno">  156</span> </div>
+<div class="line"><span class="lineno">  157</span>    <a class="code hl_variable" href="#a567cc11ec45661094156b4deeb1b1636">pc</a>-&gt;onDataChannel([<span class="keyword">this</span>](std::shared_ptr&lt;rtc::DataChannel&gt; ch)</div>
+<div class="line"><span class="lineno">  158</span>                      {</div>
+<div class="line"><span class="lineno">  159</span>        <span class="keyword">const</span> std::string label = ch-&gt;label();</div>
+<div class="line"><span class="lineno">  160</span>        <a class="code hl_variable" href="#ad69a0783f1a4e6046dbe8a1e8131178f">dcs_</a>[label] = ch;</div>
+<div class="line"><span class="lineno">  161</span>        <a class="code hl_function" href="#aec31714207e652371b259925990ee67a">attachChannelHandlers</a>(ch, label);</div>
+<div class="line"><span class="lineno">  162</span>        std::cout &lt;&lt; <span class="stringliteral">&quot;[PeerLink] Received DC \&quot;&quot;</span> &lt;&lt; label &lt;&lt; <span class="stringliteral">&quot;\&quot; from &quot;</span> &lt;&lt; <a class="code hl_variable" href="#a8fd6b6fd92bf531e4106f5766429ff77">peerId</a> &lt;&lt; <span class="stringliteral">&quot;\n&quot;</span>; });</div>
+<div class="line"><span class="lineno">  163</span>}</div>
+<div class="ttc" id="aclass_peer_link_html_a191ffb5424da0c61582acb1d397ca038"><div class="ttname"><a href="#a191ffb5424da0c61582acb1d397ca038">PeerLink::lastState_</a></div><div class="ttdeci">std::atomic&lt; rtc::PeerConnection::State &gt; lastState_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00089">PeerLink.h:89</a></div></div>
+<div class="ttc" id="aclass_peer_link_html_ace2310fe2f13b88c2d50295b23693ca5"><div class="ttname"><a href="#ace2310fe2f13b88c2d50295b23693ca5">PeerLink::lastStateAt_</a></div><div class="ttdeci">std::atomic&lt; double &gt; lastStateAt_</div><div class="ttdef"><b>Definition</b> <a href="../../d1/def/_peer_link_8h_source.html#l00090">PeerLink.h:90</a></div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495"><div class="ttname"><a href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00a2cd0c0e5c55bab86615225e2ff5a9495">msg::NetEvent::Type::PcOpen</a></div><div class="ttdeci">@ PcOpen</div></div>
+<div class="ttc" id="astructmsg_1_1_net_event_html_ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515"><div class="ttname"><a href="../../d8/d0b/structmsg_1_1_net_event.html#ad7bacc0d79f1287207577d95d635bc00aed21951925d4b353f0ec7082282bc515">msg::NetEvent::Type::PcClosed</a></div><div class="ttdeci">@ PcClosed</div></div>
+</div><!-- fragment --><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_cgraph.png" border="0" usemap="#adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_cgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_cgraph" id="adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_cgraph">
-<area shape="rect" title=" " alt="" coords="5,5,176,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#aec31714207e652371b259925990ee67a" title=" " alt="" coords="224,5,440,32"/>
-<area shape="poly" title=" " alt="" coords="176,16,208,16,208,21,176,21"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_cgraph.svg" width="446" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../df/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_icgraph.png" border="0" usemap="#adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_icgraph" alt=""/></div>
-<map name="adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_icgraph" id="adf/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_icgraph">
-<area shape="rect" title=" " alt="" coords="185,5,355,32"/>
-<area shape="rect" href="../../df/d24/class_peer_link.html#ab667cc4b6267a871d6751185ff3d5d25" title=" " alt="" coords="5,5,137,32"/>
-<area shape="poly" title=" " alt="" coords="169,21,137,21,137,16,169,16"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../df/d24/class_peer_link_a67877f56504862a1c8a4f3ed41cbb91d_icgraph.svg" width="360" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 
 </div>
@@ -1206,7 +1468,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00086">86</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   86</span>{<span class="keyword">false</span>};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a758c605795dc801a48b26e2d3d5d3ff2" name="a758c605795dc801a48b26e2d3d5d3ff2"></a>
@@ -1302,7 +1565,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00089">89</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   89</span>{rtc::PeerConnection::State::New};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="ace2310fe2f13b88c2d50295b23693ca5" name="ace2310fe2f13b88c2d50295b23693ca5"></a>
@@ -1326,7 +1590,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00090">90</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   90</span>{0.0};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a7beccd2af9e63c3d0d6bbbc39dcbbeab" name="a7beccd2af9e63c3d0d6bbbc39dcbbeab"></a>
@@ -1446,7 +1711,8 @@ Here is the caller graph for this function:</div>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../d1/def/_peer_link_8h_source.html#l00092">92</a> of file <a class="el" href="../../d1/def/_peer_link_8h_source.html">PeerLink.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   92</span>{<span class="keyword">false</span>};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>

@@ -1,5 +1,5 @@
 <map id="DebugActions::RegisterToasterToggles" name="DebugActions::RegisterToasterToggles">
-<area shape="rect" id="Node000001" title=" " alt="" coords="192,5,395,48"/>
-<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="5,5,144,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,29,144,29,144,24,176,24"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="301,5,549,32"/>
+<area shape="rect" id="Node000002" href="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703" title=" " alt="" coords="5,5,253,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="285,21,253,21,253,16,285,16"/>
 </map>

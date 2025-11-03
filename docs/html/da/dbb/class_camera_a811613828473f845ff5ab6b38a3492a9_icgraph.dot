@@ -10,7 +10,7 @@ digraph "Camera::getZoom"
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="BoardManager::panBoard",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#af5874577abd59ea5a9d44735d3944424",tooltip=" "];
   Node1 -> Node3 [id="edge2_Node000001_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="BoardManager::renderCamera\lWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#aa78dbda1a719e20ebd433c876451bf59",tooltip=" "];
+  Node3 [id="Node000003",label="BoardManager::renderCameraWindow",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#aa78dbda1a719e20ebd433c876451bf59",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node4 [id="Node000004",label="BoardManager::renderToolbar",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d2/dbf/class_board_manager.html#a2aad7a42521772a965571ce188decae8",tooltip=" "];
 }

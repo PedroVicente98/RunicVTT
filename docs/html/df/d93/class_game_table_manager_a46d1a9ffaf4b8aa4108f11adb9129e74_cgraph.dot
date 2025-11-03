@@ -6,7 +6,7 @@ digraph "GameTableManager::handleMouseButtonInputs"
   edge [fontname=Helvetica,fontsize=10,labelfontname=Helvetica,labelfontsize=10];
   node [fontname=Helvetica,fontsize=10,shape=box,height=0.2,width=0.4];
   rankdir="LR";
-  Node1 [id="Node000001",label="GameTableManager::handle\lMouseButtonInputs",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
+  Node1 [id="Node000001",label="GameTableManager::handleMouseButtonInputs",height=0.2,width=0.4,color="gray40", fillcolor="grey60", style="filled", fontcolor="black",tooltip=" "];
   Node1 -> Node2 [id="edge1_Node000001_Node000002",color="steelblue1",style="solid",tooltip=" "];
-  Node2 [id="Node000002",label="GameTableManager::isBoard\lActive",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2",tooltip=" "];
+  Node2 [id="Node000002",label="GameTableManager::isBoardActive",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$df/d93/class_game_table_manager.html#afc78b5f6708c67259bca12556fe7b0b2",tooltip=" "];
 }

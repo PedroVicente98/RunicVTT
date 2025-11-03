@@ -1,9 +1,9 @@
 <map id="Serializer::serializeMarkerComponent" name="Serializer::serializeMarkerComponent">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,23,177,65"/>
-<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a2a407c3a379b680296ee190ed625f05f" title=" " alt="" coords="229,5,386,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="176,31,213,27,213,32,177,37"/>
-<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c" title=" " alt="" coords="225,56,390,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="177,51,209,55,209,60,176,57"/>
-<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="438,56,584,83"/>
-<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="390,67,422,67,422,72,390,72"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,244,57"/>
+<area shape="rect" id="Node000002" href="$d0/dc2/class_serializer.html#a2a407c3a379b680296ee190ed625f05f" title=" " alt="" coords="296,5,453,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="244,29,280,26,280,31,244,35"/>
+<area shape="rect" id="Node000003" href="$d0/dc2/class_serializer.html#a8a72c08ebb91348dc2a7ef6557c44f6c" title=" " alt="" coords="292,56,457,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="244,53,276,57,276,62,244,59"/>
+<area shape="rect" id="Node000004" href="$d0/dc2/class_serializer.html#ac812cf485e5804fd6f22d34ae076f79f" title=" " alt="" coords="505,56,651,83"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="457,67,489,67,489,72,457,72"/>
 </map>

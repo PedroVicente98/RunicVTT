@@ -29,7 +29,7 @@
  <tr id="projectrow">
   <td id="projectlogo"><img alt="Logo" src="../../RunicVTTIcon_64.png"/></td>
   <td id="projectalign">
-   <div id="projectname">RunicVTT
+   <div id="projectname">RunicVTT<span id="projectnumber">&#160;Open Source Virtual Tabletop for TTRPG using P2P</span>
    </div>
   </td>
  </tr>
@@ -105,12 +105,7 @@ $(function(){initNavTree('d8/de3/struct_board_image_data.html','../../'); initRe
 <div class="dynheader">
 Collaboration diagram for BoardImageData:</div>
 <div class="dyncontent">
-<div class="center"><img src="../../d2/d8a/struct_board_image_data__coll__graph.png" border="0" usemap="#a_board_image_data_coll__map" alt="Collaboration graph"/></div>
-<map name="a_board_image_data_coll__map" id="a_board_image_data_coll__map">
-<area shape="rect" title=" " alt="" coords="5,139,182,283"/>
-<area shape="rect" title=" " alt="" coords="72,5,115,75"/>
-<area shape="poly" title=" " alt="" coords="96,75,96,121,91,121,91,75"/>
-</map>
+<div class="center"><iframe scrolling="no" frameborder="0" src="../../d2/d8a/struct_board_image_data__coll__graph.svg" width="188" height="288"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
@@ -191,7 +186,12 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/d3c/_board_manager_8h_source.html#l00028">28</a> of file <a class="el" href="../../df/d3c/_board_manager_8h_source.html">BoardManager.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   28</span>                                                      :</div>
+<div class="line"><span class="lineno">   29</span>        <a class="code hl_variable" href="#a086059621072103486a35b691b2d8d6f">textureID</a>(<span class="keywordtype">id</span>), <a class="code hl_variable" href="#a2962fd614ee3f8e3487aa9639d30fcec">size</a>(s), <a class="code hl_variable" href="#afa620806699a257dbd621955dfdb0773">path</a>(std::move(p)) {}</div>
+<div class="ttc" id="astruct_board_image_data_html_a086059621072103486a35b691b2d8d6f"><div class="ttname"><a href="#a086059621072103486a35b691b2d8d6f">BoardImageData::textureID</a></div><div class="ttdeci">GLuint textureID</div><div class="ttdef"><b>Definition</b> <a href="../../df/d3c/_board_manager_8h_source.html#l00024">BoardManager.h:24</a></div></div>
+<div class="ttc" id="astruct_board_image_data_html_a2962fd614ee3f8e3487aa9639d30fcec"><div class="ttname"><a href="#a2962fd614ee3f8e3487aa9639d30fcec">BoardImageData::size</a></div><div class="ttdeci">glm::vec2 size</div><div class="ttdef"><b>Definition</b> <a href="../../df/d3c/_board_manager_8h_source.html#l00025">BoardManager.h:25</a></div></div>
+<div class="ttc" id="astruct_board_image_data_html_afa620806699a257dbd621955dfdb0773"><div class="ttname"><a href="#afa620806699a257dbd621955dfdb0773">BoardImageData::path</a></div><div class="ttdeci">std::string path</div><div class="ttdef"><b>Definition</b> <a href="../../df/d3c/_board_manager_8h_source.html#l00026">BoardManager.h:26</a></div></div>
+</div><!-- fragment -->
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
@@ -224,7 +224,8 @@ Public Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="../../df/d3c/_board_manager_8h_source.html#l00025">25</a> of file <a class="el" href="../../df/d3c/_board_manager_8h_source.html">BoardManager.h</a>.</p>
-
+<div class="fragment"><div class="line"><span class="lineno">   25</span>{};</div>
+</div><!-- fragment -->
 </div>
 </div>
 <a id="a086059621072103486a35b691b2d8d6f" name="a086059621072103486a35b691b2d8d6f"></a>

@@ -10,12 +10,12 @@ digraph "DebugActions::timeElapsedMs"
   Node1 -> Node2 [id="edge1_Node000001_Node000002",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node2 [id="Node000002",label="DebugActions::PingLogTick",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a5bb9f9327ede8452c1fcd437608e23a8",tooltip=" "];
   Node2 -> Node3 [id="edge2_Node000002_Node000003",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node3 [id="Node000003",label="DebugActions::RegisterAll\lDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
+  Node3 [id="Node000003",label="DebugActions::RegisterAllDefaultToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#aa2db1f085f875091d9a75432f6e45dba",tooltip=" "];
   Node3 -> Node4 [id="edge3_Node000003_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node4 [id="Node000004",label="ApplicationHandler\l::ApplicationHandler",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703",tooltip=" "];
+  Node4 [id="Node000004",label="ApplicationHandler::ApplicationHandler",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d4/d97/class_application_handler.html#a5488b63e5eb5617c18e2a85c0e2d8703",tooltip=" "];
   Node1 -> Node5 [id="edge4_Node000001_Node000005",dir="back",color="steelblue1",style="solid",tooltip=" "];
   Node5 [id="Node000005",label="DebugActions::ToasterTick",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#a9f0ef1ee48947cd640d772814c7e5140",tooltip=" "];
   Node5 -> Node6 [id="edge5_Node000005_Node000006",dir="back",color="steelblue1",style="solid",tooltip=" "];
-  Node6 [id="Node000006",label="DebugActions::RegisterToaster\lToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd",tooltip=" "];
+  Node6 [id="Node000006",label="DebugActions::RegisterToasterToggles",height=0.2,width=0.4,color="grey40", fillcolor="white", style="filled",URL="$d9/d94/namespace_debug_actions.html#ab01b32376c3f2c27c176777985893ccd",tooltip=" "];
   Node6 -> Node4 [id="edge6_Node000006_Node000004",dir="back",color="steelblue1",style="solid",tooltip=" "];
 }
