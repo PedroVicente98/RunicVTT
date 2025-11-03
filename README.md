@@ -4,7 +4,10 @@
 It enables direct peer-to-peer sessions without the need for centralized servers.
 
 ---
+## Documentation
+The complete Doxygen Documentation can be found [here](https://pedrovicente98.github.io/runicvtt.github.io/)
 
+---
 ## Features
 - Peer-to-peer networking with WebRTC (`libdatachannel`)
 - Entity-Component System (ECS) with `flecs`
