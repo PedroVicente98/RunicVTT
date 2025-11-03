@@ -20,13 +20,10 @@ jobs:
       - name: Build docs
         run: doxygen Doxyfile
 
-      # opcional: mandar o ícone junto dentro de docs/res/
       - name: Copy assets
         run: |
-          mkdir -p docs/res
-          # se não existir, não quebra o job
-          cp res/RunicVTTIcon_64.png docs/html/res/RunicVTTIcon_64.png 2>/dev/null || true
-          cp ./res/RunicVTTIcon_64.png ./docs/html/logo.png
+          mkdir -p ./docs/html/res
+          cp ./res/RunicVTTIcon_64.png ./docs/html/res/RunicVTTIcon_64.png 2>/dev/null || true
 
       - name: Push to pages repo
         uses: peaceiris/actions-gh-pages@v4
