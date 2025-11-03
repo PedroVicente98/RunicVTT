@@ -10,8 +10,8 @@ PROJECT_NAME           = "RunicVTT"            # ### RunicVTT: nome do projeto
 PROJECT_NUMBER         = 
 PROJECT_BRIEF          =
 
-PROJECT_LOGO           = .\res\RunicVTTIcon_64.png
-PROJECT_ICON           = .\res\RunicVTTIcon_64.png
+PROJECT_LOGO           = ./res/RunicVTTIcon_64.png
+PROJECT_ICON           = ./res/RunicVTTIcon_64.png
 
 OUTPUT_DIRECTORY       = docs                  # ### RunicVTT: gera em ./docs
 CREATE_SUBDIRS         = YES
