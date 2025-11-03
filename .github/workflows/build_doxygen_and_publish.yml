@@ -25,7 +25,8 @@ jobs:
         run: |
           mkdir -p docs/res
           # se não existir, não quebra o job
-          cp res/RunicVTTIcon_64.png docs/res/RunicVTTIcon_64.png 2>/dev/null || true
+          cp res/RunicVTTIcon_64.png docs/html/res/RunicVTTIcon_64.png 2>/dev/null || true
+          cp ./res/RunicVTTIcon_64.png ./docs/html/logo.png
 
       - name: Push to pages repo
         uses: peaceiris/actions-gh-pages@v4
