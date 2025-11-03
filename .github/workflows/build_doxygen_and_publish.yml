@@ -3,11 +3,13 @@ name: Build Doxygen and publish to pages repo
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:        # <-- manual run
+  workflow_dispatch:
 
 jobs:
   docs:
     runs-on: ubuntu-latest
+    environment: RunicVTT Distribuition
+
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -18,12 +20,19 @@ jobs:
       - name: Build docs
         run: doxygen Doxyfile
 
+      - name: Copy assets
+        run: |
+          mkdir -p ./docs/html/res
+          cp ./res/RunicVTTIcon_64.png ./docs/html/res/RunicVTTIcon_64.png 2>/dev/null || true
+
       - name: Push to pages repo
         uses: peaceiris/actions-gh-pages@v4
         with:
           external_repository: PedroVicente98/runicvtt.github.io
           publish_branch: main
-          publish_dir: ./docs/html 
+          publish_dir: ./docs          # <- manda só o que o doxygen gerou
+          destination_dir: docs         # <- cai em repo B /docs/...
+          keep_files: true              # <- NÃO apaga o que já está na raiz
           personal_token: ${{ secrets.PAGES_TOKEN }}
           user_name: github-actions[bot]
           user_email: github-actions[bot]@users.noreply.github.com
