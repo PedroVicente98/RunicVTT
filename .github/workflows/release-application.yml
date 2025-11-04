@@ -3,6 +3,7 @@ name: Build & Package (Windows)
 on:
   push:
     tags: ['v*']   # e.g. v1.2.3
+    branches: main 
 
 permissions:
   contents: write
