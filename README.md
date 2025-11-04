@@ -1,5 +1,5 @@
-![Build Status](https://github.com/PedroVicente98/RunicVTT/actions/workflows/release-application.yml/badge.svg)
-![Doxygen Status](https://github.com/PedroVicente98/RunicVTT/actions/workflows/build_doxygen_and_publish.yml/badge.svg)
+[![Build & Package (Windows)](https://github.com/PedroVicente98/RunicVTT/actions/workflows/release-application.yml/badge.svg?branch=main&event=workflow_run)](https://github.com/PedroVicente98/RunicVTT/actions/workflows/release-application.yml)
+[![Doxygen Status](https://github.com/PedroVicente98/RunicVTT/actions/workflows/build_doxygen_and_publish.yml/badge.svg)](https://github.com/PedroVicente98/RunicVTT/actions/workflows/build_doxygen_and_publish.yml)
 
 # Runic VTT
 
