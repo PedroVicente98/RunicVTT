@@ -90,10 +90,15 @@ Contributions are welcome!
 ---
 
 ## Roadmap / To do 
-- Markdown Notes Editor.  
+- Expand Markdown Notes Editor Functionality.  
 - No Grid Distance Measures.  
 - Hexagonal Grid.  
-- Entity Manager Window.  
+- Entity Manager Window.
+- UI Overhaul
+- Portuguese Localization
+- Add Emojis
+- More..
+
 ---
 
 ## License
