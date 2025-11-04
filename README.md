@@ -1,3 +1,6 @@
+![Build Status](https://github.com/PedroVicente98/RunicVTT/actions/workflows/release-application.yml/badge.svg)
+![Doxygen Status](https://github.com/PedroVicente98/RunicVTT/actions/workflows/build_doxygen_and_publish.yml/badge.svg)
+
 # Runic VTT
 
 **Runic VTT** is a peer-to-peer **Virtual Tabletop (VTT)** for tabletop RPGs, built in C++ with [libdatachannel](https://github.com/paullouisageneau/libdatachannel).  
@@ -6,6 +9,9 @@ It enables direct peer-to-peer sessions without the need for centralized servers
 ---
 ## Documentation
 The complete Doxygen Documentation can be found [here](https://pedrovicente98.github.io/runicvtt.github.io/)
+
+> [!note]
+> The documentation is updated when pushing to the *main* branch.
 
 ---
 ## Features
